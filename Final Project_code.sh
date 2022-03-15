@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=histone_chaperone_plot	                      # Job name
+#SBATCH --job-name=histone_chaperone_plot	              # Job name
 #SBATCH --partition=batch		                            # Partition (queue) name
 #SBATCH --ntasks=1			                                # Single task job
 #SBATCH --cpus-per-task=6		                            # Number of cores per task - match this to the num_threads used by BLAST
