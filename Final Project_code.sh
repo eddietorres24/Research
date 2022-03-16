@@ -17,7 +17,7 @@ if [ ! -d $OUTDIR ]
 then
     mkdir -p $OUTDIR
 fi
-##
+###
 
 #loading modules
 module load SRA-Toolkit/2.9.6-1-centos_linux64 BWA/0.7.17-GCC-8.3.0 SAMtools/1.10-GCC-8.3.0 Subread/2.0.0-GCC-8.3.0
