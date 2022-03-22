@@ -27,7 +27,7 @@ library(RColorBrewer)
 #start anaysis here
 ##################################
 #set working directory to folder containing featureCounts output
-setwd("C:\\Users\\eddie\\Desktop\\Fall 2021\\GENE 8940")
+setwd("C:\\Users\\eddie\\Desktop\\Research\\GitHub")
 
 #Bring in table with unnormalized transcription counts; check.names is important if you have dashes in the gene names 
 #row.names=1 command sets geneIDs as the row name
@@ -89,18 +89,17 @@ write.table(samplesname, file="samplenames.txt", sep="\t")
 
 sampleNames <- colnames(allDataTPM)
 write.table(sampleNames, file="stuff.txt")
-Ordered_KO_data <- cbind(allDataTPM[,25:28],allDataTPM[,29:31],allDataTPM[,32:35],allDataTPM[,1:3],allDataTPM[,4:6],allDataTPM[ ,7:9],allDataTPM[ ,10:12],allDataTPM[ ,13:15],allDataTPM[ ,19:21],allDataTPM[ ,22:24])
+Ordered_KO_data <- cbind(allDataTPM[,25:28],allDataTPM[,29:31],allDataTPM[,1:3],allDataTPM[,4:6],allDataTPM[,7:9],allDataTPM[,10:12],allDataTPM[,13:15],allDataTPM[,19:21],allDataTPM[,22:24])
 Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,25:28], na.rm = TRUE),
                                  rowMeans(allDataTPM[,29:31], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,32:35], na.rm = TRUE),
                                  rowMeans(allDataTPM[,1:3], na.rm = TRUE),
                                  rowMeans(allDataTPM[,4:6], na.rm = TRUE),
-                                 rowMeans(allDataTPM[ ,7:10], na.rm = TRUE),
-                                 rowMeans(allDataTPM[ ,10:12], na.rm = TRUE),
-                                 rowMeans(allDataTPM[ ,13:15], na.rm = TRUE),
-                                 rowMeans(allDataTPM[ ,19:21], na.rm = TRUE),
-                                 rowMeans(allDataTPM[ ,22:24], na.rm = TRUE))
-averageRowIDs=c("WT","set-7","isw","cac-1","cac-2","cac-3","naf-1","asf-1","naf-2","ATRX")
+                                 rowMeans(allDataTPM[,7:9], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,10:12], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,13:15], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,19:21], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,22:24], na.rm = TRUE))
+averageRowIDs=c("WT","set-7","cac-1","cac-2","cac-3","naf-1","asf-1","naf-2","ATRX")
 colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 
 ###calculate summary stats for all gene data
@@ -162,13 +161,13 @@ library(reshape2)
 meltedAveragePRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
-altorder = rev(c( "WT","set-7","isw","cac-1","cac-2","cac-3","naf-1","naf-2","asf-1","ATRX"))
+altorder = rev(c( "WT","set-7","cac-1","cac-2","cac-3","naf-1","naf-2","asf-1","ATRX"))
 meltedAveragePRC2targetData$Sample <- factor(meltedAveragePRC2targetData$Sample, altorder)
 
 # this works for all genes but formatting is terrible
 library(ggplot2)
 xlabels = averageRowIDs
-colors = rev(c( "#4575b4","#fee090","#d73027","#fee090", "#fee090", "#fee090", "#4575b4", "#4575b4", "#4575b4", "#4575b4"))
+colors = rev(c( "#4575b4","#fee090","#fee090", "#fee090", "#fee090", "#4575b4", "#4575b4", "#4575b4", "#4575b4"))
 
 box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
   labs(y="Expression Level (Transcripts per Million)", x="Strain") +
@@ -188,7 +187,7 @@ box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
 #device.on()
 box
 
-ggsave(filename = "GENE_8940_boxplot.pdf", plot = box, dpi=600, height= 3, width=4)
+ggsave(filename = "histone_chaperone_boxplot.pdf", plot = box, dpi=600, height= 3, width=4)
 
 
 ########################3
@@ -216,7 +215,7 @@ heatmap<- pheatmap(GenesWithChanges[,rev(altorder)], color = colorRampPalette(re
 #to plot with ggplot, you need to extract [[4]] from the heatmap object
 heatmap_plot<-heatmap[[4]]
 
-ggsave(filename = "./GENE_8940_Heatmap.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
+ggsave(filename = "./histone_chaperone_heatmap.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
 dev.off()
 #clustering_method="centroid", clustering_distance_cols="euclidean", 
 

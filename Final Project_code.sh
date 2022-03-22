@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=histone_chaperone_plot	              # Job name
+#SBATCH --job-name=histone_chaperone_plot_no_rtt109	    # Job name
 #SBATCH --partition=batch		                            # Partition (queue) name
 #SBATCH --ntasks=1			                                # Single task job
 #SBATCH --cpus-per-task=6		                            # Number of cores per task - match this to the num_threads used by BLAST
@@ -10,7 +10,7 @@
 #SBATCH --mail-type=END,FAIL                            # Mail events (BEGIN, END, FAIL, ALL)
 
 #set input and output directory variables
-OUTDIR="/scratch/evt82290/histone_chaperone_plot"
+OUTDIR="/scratch/evt82290/histone_chaperone_plot_no_rtt109"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
@@ -27,7 +27,12 @@ curl -s ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/fungi/Neurospora_crassa/lates
 curl -s ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/182/925/GCA_000182925.2_NC12/GCA_000182925.2_NC12_genomic.gtf.gz | gunzip -c > ${OUTDIR}/NC12_annotation.gtf
 
 # #downloading fastq files using accession numbers
-prefetch -O ${OUTDIR} SRR8444037 SRR8444038 SRR8444043 SRR7970629 SRR7970630 SRR7970631 SRR7970598 SRR7970599 SRR7970600 SRR8269830 SRR8269647 SRR8269650 SRR10916318 SRR10916319 SRR10916320 SRR10916326 SRR10916324 SRR10916325 SRR7970603 SRR7970606 SRR7970610 SRR9027727 SRR9027728 SRR9027730 SRR8269825 SRR8269775	SRR8269782	SRR8269810 SRR10916163	SRR10916164	SRR10916165
+prefetch -O ${OUTDIR} SRR8444037 SRR8444038 SRR8444043 SRR7970629 SRR7970630 SRR7970631 SRR7970598 SRR7970599 SRR7970600 SRR8269830 SRR8269647 SRR8269650 SRR10916318 SRR10916319 SRR10916320 SRR7970603 SRR7970606 SRR7970610 SRR9027727 SRR9027728 SRR9027730 SRR8269825 SRR8269775	SRR8269782	SRR8269810 SRR10916163	SRR10916164	SRR10916165
+
+#rtt109
+#SRR10916326 SRR10916324 SRR10916325
+
+#isw
 #SRR8269628	SRR8269763	SRR8269811	SRR8269812
 
 fastq-dump --split-files --gzip ${OUTDIR}/SRR8444037.sra -O ${OUTDIR}
@@ -50,9 +55,9 @@ fastq-dump --split-files --gzip ${OUTDIR}/SRR10916318.sra -O ${OUTDIR}
 fastq-dump --split-files --gzip ${OUTDIR}/SRR10916319.sra -O ${OUTDIR}
 fastq-dump --split-files --gzip ${OUTDIR}/SRR10916320.sra -O ${OUTDIR}
 
-fastq-dump --split-files --gzip ${OUTDIR}/SRR10916324.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR10916325.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR10916326.sra -O ${OUTDIR}
+#fastq-dump --split-files --gzip ${OUTDIR}/SRR10916324.sra -O ${OUTDIR}
+#fastq-dump --split-files --gzip ${OUTDIR}/SRR10916325.sra -O ${OUTDIR}
+#fastq-dump --split-files --gzip ${OUTDIR}/SRR10916326.sra -O ${OUTDIR}
 
 fastq-dump --split-files --gzip ${OUTDIR}/SRR7970603.sra -O ${OUTDIR}
 fastq-dump --split-files --gzip ${OUTDIR}/SRR7970606.sra -O ${OUTDIR}
@@ -145,17 +150,17 @@ samtools view ${OUTDIR}/SRR10916320.sam -O BAM -o ${OUTDIR}/SRR10916320.bam
 samtools sort --threads 6 ${OUTDIR}/SRR10916320.bam -o ${OUTDIR}/SRR10916320.sorted.bam
 
 
-bwa mem -t 6 ${OUTDIR}/NC12_genome.fna ${OUTDIR}/SRR10916324_1.fastq.gz ${OUTDIR}/SRR10916324_2.fastq.gz > ${OUTDIR}/SRR10916324.sam
-samtools view ${OUTDIR}/SRR10916324.sam -O BAM -o ${OUTDIR}/SRR10916324.bam
-samtools sort --threads 6 ${OUTDIR}/SRR10916324.bam -o ${OUTDIR}/SRR10916324.sorted.bam
+#bwa mem -t 6 ${OUTDIR}/NC12_genome.fna ${OUTDIR}/SRR10916324_1.fastq.gz ${OUTDIR}/SRR10916324_2.fastq.gz > ${OUTDIR}/SRR10916324.sam
+#samtools view ${OUTDIR}/SRR10916324.sam -O BAM -o ${OUTDIR}/SRR10916324.bam
+#samtools sort --threads 6 ${OUTDIR}/SRR10916324.bam -o ${OUTDIR}/SRR10916324.sorted.bam
 
-bwa mem -t 6 ${OUTDIR}/NC12_genome.fna ${OUTDIR}/SRR10916325_1.fastq.gz ${OUTDIR}/SRR10916325_2.fastq.gz > ${OUTDIR}/SRR10916325.sam
-samtools view ${OUTDIR}/SRR10916325.sam -O BAM -o ${OUTDIR}/SRR10916325.bam
-samtools sort --threads 6 ${OUTDIR}/SRR10916325.bam -o ${OUTDIR}/SRR10916325.sorted.bam
+#bwa mem -t 6 ${OUTDIR}/NC12_genome.fna ${OUTDIR}/SRR10916325_1.fastq.gz ${OUTDIR}/SRR10916325_2.fastq.gz > ${OUTDIR}/SRR10916325.sam
+#samtools view ${OUTDIR}/SRR10916325.sam -O BAM -o ${OUTDIR}/SRR10916325.bam
+#samtools sort --threads 6 ${OUTDIR}/SRR10916325.bam -o ${OUTDIR}/SRR10916325.sorted.bam
 
-bwa mem -t 6 ${OUTDIR}/NC12_genome.fna ${OUTDIR}/SRR10916326_1.fastq.gz ${OUTDIR}/SRR10916326_2.fastq.gz > ${OUTDIR}/SRR10916326.sam
-samtools view ${OUTDIR}/SRR10916326.sam -O BAM -o ${OUTDIR}/SRR10916326.bam
-samtools sort --threads 6 ${OUTDIR}/SRR10916326.bam -o ${OUTDIR}/SRR10916326.sorted.bam
+#bwa mem -t 6 ${OUTDIR}/NC12_genome.fna ${OUTDIR}/SRR10916326_1.fastq.gz ${OUTDIR}/SRR10916326_2.fastq.gz > ${OUTDIR}/SRR10916326.sam
+#samtools view ${OUTDIR}/SRR10916326.sam -O BAM -o ${OUTDIR}/SRR10916326.bam
+#samtools sort --threads 6 ${OUTDIR}/SRR10916326.bam -o ${OUTDIR}/SRR10916326.sorted.bam
 
 
 bwa mem -t 6 ${OUTDIR}/NC12_genome.fna ${OUTDIR}/SRR7970603_1.fastq.gz ${OUTDIR}/SRR7970603_2.fastq.gz > ${OUTDIR}/SRR7970603.sam
@@ -231,6 +236,10 @@ samtools sort --threads 6 ${OUTDIR}/SRR10916165.bam -o ${OUTDIR}/SRR10916165.sor
 # samtools sort --threads 6 ${OUTDIR}/SRR8269812.bam -o ${OUTDIR}/SRR8269812.sorted.bam
 
 ##making matrix using featurecounts
-featureCounts -T 6 -a ${OUTDIR}/NC12_annotation.gtf -o ${OUTDIR}/readcounts_3.txt ${OUTDIR}/SRR8444037.sorted.bam ${OUTDIR}/SRR8444038.sorted.bam ${OUTDIR}/SRR8444043.sorted.bam ${OUTDIR}/SRR7970629.sorted.bam ${OUTDIR}/SRR7970630.sorted.bam ${OUTDIR}/SRR7970631.sorted.bam ${OUTDIR}/SRR7970598.sorted.bam ${OUTDIR}/SRR7970599.sorted.bam ${OUTDIR}/SRR7970600.sorted.bam ${OUTDIR}/SRR8269830.sorted.bam ${OUTDIR}/SRR8269647.sorted.bam ${OUTDIR}/SRR8269650.sorted.bam ${OUTDIR}/SRR10916318.sorted.bam ${OUTDIR}/SRR10916319.sorted.bam ${OUTDIR}/SRR10916320.sorted.bam ${OUTDIR}/SRR10916326.sorted.bam ${OUTDIR}/SRR10916324.sorted.bam ${OUTDIR}/SRR10916325.sorted.bam ${OUTDIR}/SRR7970603.sorted.bam ${OUTDIR}/SRR7970606.sorted.bam ${OUTDIR}/SRR7970610.sorted.bam ${OUTDIR}/SRR9027727.sorted.bam ${OUTDIR}/SRR9027728.sorted.bam ${OUTDIR}/SRR9027730.sorted.bam ${OUTDIR}/SRR8269825.sorted.bam ${OUTDIR}/SRR8269775.sorted.bam ${OUTDIR}/SRR8269782.sorted.bam ${OUTDIR}/SRR8269810.sorted.bam ${OUTDIR}/SRR10916163.sorted.bam ${OUTDIR}/SRR10916164.sorted.bam ${OUTDIR}/SRR10916165.sorted.bam
+featureCounts -T 6 -a ${OUTDIR}/NC12_annotation.gtf -o ${OUTDIR}/readcounts_3.txt ${OUTDIR}/SRR8444037.sorted.bam ${OUTDIR}/SRR8444038.sorted.bam ${OUTDIR}/SRR8444043.sorted.bam ${OUTDIR}/SRR7970629.sorted.bam ${OUTDIR}/SRR7970630.sorted.bam ${OUTDIR}/SRR7970631.sorted.bam ${OUTDIR}/SRR7970598.sorted.bam ${OUTDIR}/SRR7970599.sorted.bam ${OUTDIR}/SRR7970600.sorted.bam ${OUTDIR}/SRR8269830.sorted.bam ${OUTDIR}/SRR8269647.sorted.bam ${OUTDIR}/SRR8269650.sorted.bam ${OUTDIR}/SRR10916318.sorted.bam ${OUTDIR}/SRR10916319.sorted.bam ${OUTDIR}/SRR10916320.sorted.bam ${OUTDIR}/SRR7970603.sorted.bam ${OUTDIR}/SRR7970606.sorted.bam ${OUTDIR}/SRR7970610.sorted.bam ${OUTDIR}/SRR9027727.sorted.bam ${OUTDIR}/SRR9027728.sorted.bam ${OUTDIR}/SRR9027730.sorted.bam ${OUTDIR}/SRR8269825.sorted.bam ${OUTDIR}/SRR8269775.sorted.bam ${OUTDIR}/SRR8269782.sorted.bam ${OUTDIR}/SRR8269810.sorted.bam ${OUTDIR}/SRR10916163.sorted.bam ${OUTDIR}/SRR10916164.sorted.bam ${OUTDIR}/SRR10916165.sorted.bam
 
+#isw
 #${OUTDIR}/SRR8269628.sorted.bam ${OUTDIR}/SRR8269763.sorted.bam ${OUTDIR}/SRR8269811.sorted.bam ${OUTDIR}/SRR8269812.sorted.bam
+
+#rtt109
+#${OUTDIR}/SRR10916326.sorted.bam ${OUTDIR}/SRR10916324.sorted.bam ${OUTDIR}/SRR10916325.sorted.bam
