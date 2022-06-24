@@ -20,7 +20,7 @@ fi
 ###
 
 #loading modules
-module load SRA-Toolkit/2.10.8-centos_linux64 BWA/0.7.17-GCC-8.3.0 SAMtools/1.10-GCC-8.3.0 Subread/2.0.0-GCC-8.3.0
+module load SRA-Toolkit/2.9.6-centos_linux64 BWA/0.7.17-GCC-8.3.0 SAMtools/1.10-GCC-8.3.0 Subread/2.0.0-GCC-8.3.0
 
 #downloading reference genome
 curl -s ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/fungi/Neurospora_crassa/latest_assembly_versions/GCA_000182925.2_NC12/GCA_000182925.2_NC12_genomic.fna.gz  | gunzip -c > ${OUTDIR}/NC12_genome.fna
