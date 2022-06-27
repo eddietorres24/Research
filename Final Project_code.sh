@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=histone_chaperone_rtt109	            # Job name
+#SBATCH --job-name=histone_chaperone_plot_rtt109	            # Job name
 #SBATCH --partition=batch		                            # Partition (queue) name
 #SBATCH --ntasks=1			                                # Single task job
 #SBATCH --cpus-per-task=6		                            # Number of cores per task - match this to the num_threads used by BLAST
@@ -10,7 +10,7 @@
 #SBATCH --mail-type=END,FAIL                            # Mail events (BEGIN, END, FAIL, ALL)
 
 #set input and output directory variables
-OUTDIR="scratch/evt82290/histone_chaperone_rtt109"
+OUTDIR="scratch/evt82290/histone_chaperone_plot_rtt109"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
