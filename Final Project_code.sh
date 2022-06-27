@@ -10,7 +10,7 @@
 #SBATCH --mail-type=END,FAIL                            # Mail events (BEGIN, END, FAIL, ALL)
 
 #set input and output directory variables
-OUTDIR="scratch/evt82290/histone_chaperone_plot_rtt109"
+OUTDIR="/scratch/evt82290/histone_chaperone_plot_rtt109"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
