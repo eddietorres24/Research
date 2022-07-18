@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=zl_mapChIPseq
+#SBATCH --job-name=ET_mapChIPseq
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=zlewis@uga.edu
+#SBATCH --mail-user=evt82290@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
-#SBATCH --time=08:00:00
+#SBATCH --time=72:00:00
 #SBATCH --output=../MapCutAndRun.%j.out
 #SBATCH --error=../MapCutAndRun.%j.err
 
@@ -15,6 +15,17 @@ cd $SLURM_SUBMIT_DIR
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
+
+#Make output directory
+OUTDIR="/scratch/evt82290/Run126"
+
+#if output directory doesn't exist, create it
+if [ ! -d $OUTDIR ]
+then
+    mkdir -p $OUTDIR
+fi
+###
+
 
 # #process reads using trimGalore
 #
@@ -37,7 +48,7 @@ do
 # 		#See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
 		#${string//substring/replacement}
 # 		#dir=${f%/*}
-		
+
 	file=${f##*/}
 	#remove ending from file name to create shorter names for bam files and other downstream output
 	name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
