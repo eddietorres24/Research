@@ -17,7 +17,7 @@ cd $SLURM_SUBMIT_DIR
 source config.txt
 
 #Make output directory
-OUTDIR="/scratch/evt82290/Run126"
+OUTDIR="/scratch/evt82290/Run127"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
