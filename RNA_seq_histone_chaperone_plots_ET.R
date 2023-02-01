@@ -187,7 +187,7 @@ box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
 #device.on()
 box
 
-ggsave(filename = "histone_chaperone_boxplot.pdf", plot = box, dpi=600, height= 3, width=4)
+ggsave(filename = "histone_chaperone_boxplot_rerun.pdf", plot = box, dpi=600, height= 3, width=4)
 
 
 ########################3
@@ -216,7 +216,7 @@ heatmap<- pheatmap(GenesWithChanges[,rev(altorder)], color = colorRampPalette(re
 #to plot with ggplot, you need to extract [[4]] from the heatmap object
 heatmap_plot<-heatmap[[4]]
 
-ggsave(filename = "./histone_chaperone_heatmap.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
+ggsave(filename = "./histone_chaperone_heatmap_rerun.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
 dev.off()
 #clustering_method="centroid", clustering_distance_cols="euclidean", 
 
