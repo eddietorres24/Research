@@ -11,7 +11,7 @@
 #SBATCH --error=../callpeaks.%j.err
 
 #load modules
-module load Homer/4.11-foss-2019b
+module load Homer/4.11-foss-2019b SAMtools/1.16.1-GCC-11.3.0
 
 #Make directory where you want your called peaks file to go at the end, I recommend the "Peaks" directory created after running MapCutAndRun script
 OUTDIR="/scratch/evt82290/Run129/Peaks"
