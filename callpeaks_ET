@@ -17,7 +17,7 @@ module load Homer/4.11-foss-2019b
 OUTDIR="/scratch/evt82290/Run129/Peaks"
 
 #Make directory for tag files, will need to change Run# for your set of files
-TAGDIR="${TAGDIR}"
+TAGDIR="/scratch/evt82290/Run129/homer/tag"
 
 if [ ! -d $TAGDIR ]
 then
