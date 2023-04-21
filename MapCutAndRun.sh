@@ -14,7 +14,7 @@ cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
-source config1.txt
+source config.txt
 
 #Make output directory
 OUTDIR="/scratch/evt82290/Run131"
