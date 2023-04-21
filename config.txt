@@ -33,7 +33,7 @@ GENOME ="/home/evt82290/Research/Foxy_Ncrassa_merged.fasta
 
 
 
-
+#
 
 #SET Deeptools paramenters
 #binsize for windows
