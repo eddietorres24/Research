@@ -39,7 +39,7 @@ FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
  mkdir "${OUTDIR}/Peaks"
 #mkdir "$OUTDIR/HomerTagDirectories"
 #mkdir "$OUTDIR/TdfFiles"
-bwa index -p $GENOME
+bwa index -p "/home/evt82290/Research/Foxy_Ncrassa_merged.fasta"
 
 #Iterate over the files
 for f in $FILES
