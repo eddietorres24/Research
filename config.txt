@@ -12,7 +12,7 @@ OUTDIR="/scratch/evt82290/Run131"
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
 
-GENOME ="/home/evt82290/Research/Foxy_Ncrassa_merged.fasta"
+GENOME ="/home/evt82290/Research/Foxy_Ncrassa_Genome/Foxy_Ncrassa_merged.fasta"
 
 #GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"
 
