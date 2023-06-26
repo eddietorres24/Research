@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
-#SBATCH --time=8:00:00
+#SBATCH --time=24:00:00
 #SBATCH --output=../MapCutAndRun.%j.out
 #SBATCH --error=../MapCutAndRun.%j.err
 
@@ -17,7 +17,7 @@ cd $SLURM_SUBMIT_DIR
 source config.txt
 
 #Make output directory
-OUTDIR="/scratch/evt82290/Run131"
+OUTDIR="/scratch/evt82290/Run133"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
