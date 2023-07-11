@@ -18,4 +18,4 @@ module load deepTools/3.5.1-intel-2020b-Python-3.8.6
 
 computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S $OUTDIR/BigWigs/133-32_ChIP_cac-1_H3K27me3_4hr_Rep1_S30_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw $OUTDIR/BigWigs/133-36_ChIP_cac-1_H3K27me3_8hr_Rep1_S34_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw $OUTDIR/BigWigs/133-40_ChIP_cac-1_H3K27me3_17hr_Rep1_S37_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw -R heatmapPRC2genes.bed --skipZeros -o matrix_PRC2.gz
 
-plotHeatmap -m matrix_PRC2.gz -out cac1heatmap_timecourse_H3K27me2me3_Run133_hclust.png --samplesLabel cac-14hr cac-18hr cac-117hr --hclust --colorMap bwr
+plotHeatmap -m matrix_PRC2.gz -out cac1heatmap_timecourse_H3K27me2me3_Run133_hclust.png --samplesLabel cac-14hr cac-18hr cac-117hr --hclust 4 --colorMap bwr
