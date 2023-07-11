@@ -18,4 +18,15 @@ module load deepTools/3.5.1-intel-2020b-Python-3.8.6
 
 computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S $OUTDIR/133-19_ChIP_WT_H4K20me3_Rep1.bin_25.smooth_75.bw $OUTDIR/133-20_ChIP_cac-1_H4K20me3_Rep1.bin_25.smooth_75.bw $OUTDIR/133-21_ChIP_cac-2_H4K20me3_Rep1.bin_25.smooth_75.bw -R heatmapPRC2genes.bed --skipZeros -o matrix_PRC2.gz
 
-plotHeatmap -m matrix_PRC2.gz -out cacheatmap_H4K20me3_Run133_hclust.png --samplesLabel WT4hr WT8hr WT24hr cac-14hr cac-18hr cac-117hr --hclust 1 --colorMap Blues
+plotHeatmap -m matrix_PRC2.gz -out cacheatmap_H4K20me3_Run133_hclust.png --samplesLabel WT cac-1 cac-2 --hclust 1 --colorMap Blues
+
+
+#133-23_ChIP_WT_H3K9me3_Rep2.bin_25.smooth_75.bw
+#133-24_ChIP_cac-1_H3K9me3_Rep2.bin_25.smooth_75.bw
+#133-25_ChIP_cac-2_H3K9me3_Rep2.bin_25.smooth_75.bw
+
+#129-90_ChIP_WT_H3K36me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
+#129-91_ChIP_cac-1_H3K36me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
+#129-92_ChIP_cac-2_H3K36me3_Rep1_S73_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
+#129-93_ChIP_cac-3_H3K36me3_Rep1_S74_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
+#129-94_ChIP_set-7_H3K36me3_Rep1_S75_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
