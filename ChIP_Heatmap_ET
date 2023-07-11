@@ -10,10 +10,10 @@
 #SBATCH --output=../HeatMap.%j.out
 #SBATCH --error=../HeatMap.%j.err
 
-OUTDIR="/scratch/evt82290/Run131"
+OUTDIR="/scratch/evt82290/Run133"
 
 conda install -c bioconda deeptools
 
-computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S 131-67_ChIP_WT_H3K27me2me3_Rep2_S55_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 131-68_ChIP_cac-1_H3K27me2me3_Rep2_S56_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 131-69_ChIP_cac-2_H3K27me2me3_Rep2_S57_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 131-70_ChIP_cac-3_H3K27me2me3_Rep2_S58_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 131-71_ChIP_set-7_H3K27me2me3_Rep2_S59_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R heatmapPRC2genes.bed --skipZeros -o matrix_PRC2.gz
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S 133-32_ChIP_cac-1_H3K27me3_4hr_Rep1_S30_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw 133-36_ChIP_cac-1_H3K27me3_8hr_Rep1_S34_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw 133-40_ChIP_cac-1_H3K27me3_17hr_Rep1_S37_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw -R heatmapPRC2genes.bed --skipZeros -o matrix_PRC2.gz
 
-plotHeatmap -m matrix_PRC2.gz -out cacheatmapPRC2_H3K27me2me3_Run131_hclust_1.png --samplesLabel WT cac-1 cac-2 cac-3 set-7 --hclust 1 --colorMap bwr
+plotHeatmap -m matrix_PRC2.gz -out cacheatmapPRC2_H3K27me2me3_Run131_hclust.png --samplesLabel cac-14hr cac-18hr cac-117hr cac-124hr --hclust --colorMap bwr
