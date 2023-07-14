@@ -10,7 +10,7 @@
 #SBATCH --output=../HeatMap.%j.out
 #SBATCH --error=../HeatMap.%j.err
 
-OUTDIR="/scratch/evt82290/Run129"
+OUTDIR="/scratch/evt82290/Run129/BigWigs"
 
 module load deepTools/3.5.1-intel-2020b-Python-3.8.6
 
