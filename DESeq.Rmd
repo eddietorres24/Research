@@ -25,6 +25,7 @@ library("DESeq2")
 library("ggplot2")
 library("scales")
 library(readr)
+library(tidyr)
 library(tidyverse)
 library(dplyr)
 ```
@@ -185,7 +186,7 @@ l2fc_data[is.na(l2fc_data)] <- 0
 
 
 library(tibble)
-l2fc_data <- tibble::rownames_to_column(l2fc_data, "VALUE")
+cac3_up_data <- tibble::rownames_to_column(cac3_up_data, "VALUE")
 ```
 
 Find genes upregulated at any stage of perithecial development

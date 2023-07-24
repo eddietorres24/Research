@@ -19,7 +19,7 @@ library("dplyr")
 library("pheatmap")
 library("grid")
 library("corrplot")
-library("ggpubr")
+#library("ggpubr")
 library(RColorBrewer)
 
 
@@ -136,7 +136,7 @@ TPMmedian <- colMedians(AVERAGE_Prc2targetTPM)
 TPMstdev <- apply(AVERAGE_Prc2targetTPM,2,sd)
 w<- cbind(TPMmean,TPMmedian,TPMstdev)
 
-write.table(w, file="~/Dropbox/DropBOX Documents/Zack Papers/2018_RemodellerPaper/IswiPaperFilesFromMasayuki/SummaryTablesFromGenomics/KO_AverageTPM_stats.txt", sep="\t")
+#write.table(w, file="~/Dropbox/DropBOX Documents/Zack Papers/2018_RemodellerPaper/IswiPaperFilesFromMasayuki/SummaryTablesFromGenomics/KO_AverageTPM_stats.txt", sep="\t")
 
 #these commands can be used pn the command line to check stats of data
 #FCstats <- boxplot.stats(AVERAGE_Prc2targetTPM[,12])
@@ -217,11 +217,12 @@ heatmap<- pheatmap(GenesWithChanges[,rev(altorder)], color = colorRampPalette(re
 heatmap_plot<-heatmap[[4]]
 
 ggsave(filename = "./histone_chaperone_heatmap_rerun.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
-dev.off()
+#dev.off()
 #clustering_method="centroid", clustering_distance_cols="euclidean", 
 
 #######################################################################
 #######################################################################
 
+allgene_chromatin_reg = subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data) %in% chromatin_regulators$Gene.ID)
 
-
+data_subset <- data[rownames(data) %in% data_keep_rows, ]

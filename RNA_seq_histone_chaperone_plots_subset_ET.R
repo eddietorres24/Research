@@ -19,6 +19,7 @@ library("dplyr")
 library("pheatmap")
 library("grid")
 library("corrplot")
+#library("ggpubr")
 library(RColorBrewer)
 
 
@@ -147,14 +148,6 @@ library(reshape2)
 meltedPRC2targetData <- melt(Prc2targetTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
-#melting and organizing for all gene data
-meltedAllData <- melt(allDataTPM, value.name = 'Count',
-                             varnames=c('GeneID', 'Sample'))
-library(reshape2)
-meltedAverageAllData <- melt(Averaged_Orderd_KO_data, value.name = 'Count',
-                                    varnames=c('GeneID', 'Sample'))
-
-meltedAverageAllData$Sample <- factor(meltedAverageAllData$Sample, altorder)
 #################################################################################
 
 ##PLOT AVERAGE DATA FOR FIGURE 1A
@@ -176,11 +169,11 @@ library(ggplot2)
 xlabels = averageRowIDs
 colors = rev(c( "#4575b4","#fee090","#fee090", "#fee090", "#fee090", "#4575b4", "#4575b4", "#4575b4", "#4575b4"))
 
-box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
+box<-ggplot(meltedAverage_chromatin_reg, aes(x=Sample, y=Count)) +
   labs(y="Expression Level (Transcripts per Million)", x="Strain") +
   stat_boxplot(geom = "errorbar", width = 0.2) + 
   geom_boxplot(notch = TRUE, outlier.shape = NA, fill=colors, size=0.1, coef=1.5, lwd=5) +
-  coord_flip(ylim=c(-1,15))+
+  coord_flip(ylim=c(-1,25))+
   theme_get() + 
   theme(axis.line.x = element_line(size = 0.5, colour = "black"),
         axis.line.y = element_line(size = 0.5, colour = "black"),
@@ -194,7 +187,7 @@ box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
 #device.on()
 box
 
-ggsave(filename = "histone_chaperone_boxplot_test.pdf", plot = box, dpi=600, height= 3, width=4)
+ggsave(filename = "histone_chaperone_boxplot_rerun.pdf", plot = box, dpi=600, height= 3, width=4)
 
 
 ########################3
@@ -211,35 +204,50 @@ breaks1=seq(-4, 5, by=.09) #This is to set a custom heatmaps scale. Not used her
 ##strategy 1 - Plot the average TMP of all genes that change expression; row normalization; clustredRows
 
 ##Keep Only Genes that are expressed in at least one sample
-#AVERAGE_Prc2targetTPM <- AVERAGE_Prc2targetTPM[, 1:9] + 0.1
-GenesWithChanges <- subset(log(AVERAGE_Prc2targetTPM), (rowSums(Prc2targetTPM) > 0))
-#GenesWithChanges <- GenesWithChanges[!is.infinite(rowSums(GenesWithChanges)),]
-
-#GenesWithChanges_95 <- remove_percentile_outlier(GenesWithChanges, cols = "auto", percentile = 3, verbose = TRUE)
-#GenesWithChanges_95 <- data.matrix(GenesWithChanges_95)
-
-
-## Genes with change for all gene dataset
-GenesWithChangesALL <- subset(Averaged_Orderd_KO_data, (rowSums(allDataTPM) > 0))
-
-#GenesWithChangesALL_95 <- remove_percentile_outlier(GenesWithChangesALL, cols = "auto", percentile = 5, verbose = TRUE)
-#GenesWithChangesALL_95 <- data.matrix(GenesWithChangesALL_95)
+GenesWithChanges <- subset(allgene_fac, (rowSums(fac_TPM) > 0))
+GenesWithChanges_95 <- subset(allgene_chromatin_reg, (rowSums(Prc2targetTPM) > 0))
 
 #plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above
 
 heatmap<- pheatmap(GenesWithChanges[,rev(altorder)], color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdYlBu")))(100),
-                   cellwidth = NA, scale= "row", cellheight = NA,  cluster_rows =T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
+                   cellwidth = NA, cellheight = NA,  cluster_rows =T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
                    legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5)
 
 #to plot with ggplot, you need to extract [[4]] from the heatmap object
 heatmap_plot<-heatmap[[4]]
 
-ggsave(filename = "./histone_chaperone_heatmap_test.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
-dev.off()
+ggsave(filename = "./fac_het_tpm.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
+#dev.off()
 #clustering_method="centroid", clustering_distance_cols="euclidean", 
 
 #######################################################################
 #######################################################################
 
+allgene_chromatin_reg = subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data) %in% chromatin_regulators$Gene.ID)
+
+meltedAverage_chromatin_reg <- melt(allgene_chromatin_reg, value.name = 'Count',
+                                    varnames=c('GeneID', 'Sample'))
+
+meltedAverage_chromatin_reg$Sample <- factor(meltedAverage_chromatin_reg$Sample, altorder)
+
+chromatin_reg_TPM <- subset(allDataTPM, rownames(allDataTPM)%in%chromatin_regulators$Gene.ID)
+
+GenesWithChanges = GenesWithChanges + 1
+log_GenesWithChanges = log2(GenesWithChanges)
+
+#####
+allgene_fac = subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data) %in% fac_het$Gene.ID)
+
+meltedAverage_fac <- melt(allgene_fac, value.name = 'Count',
+                                    varnames=c('GeneID', 'Sample'))
+
+meltedAverage_fac$Sample <- factor(meltedAverage_fac$Sample, altorder)
+
+fac_TPM <- subset(allDataTPM, rownames(allDataTPM)%in%fac_het$Gene.ID)
+
+GenesWithChanges = GenesWithChanges + 1
+log_GenesWithChanges = log2(GenesWithChanges)
 
 
+draw.triple.venn(area1 = 3918, area2 = 3246, area3 = 3738, n12 = 2786, n23 = 2162, n13 = 2491, n123 = 1983,
+                 category = c("cac-1", "cac-2", "cac-3"), fill = c("Blue", "Red", "Green"))
