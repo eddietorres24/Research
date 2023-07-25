@@ -21,11 +21,11 @@ then
 fi
 
 ##Run callpeak on all your samples
-macs2 callpeak -t 129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bam -c 129-43_ChIP_WT_input_S42_L001_R1_001_val_1.fq.gz.bam -f BAM -n WT_H3K27me3 --outdir macs2
-macs2 callpeak -t 129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bam -c 129-44_ChIP_cac-1_input_S43_L001_R1_001_val_1.fq.gz.bam -f BAM -n cac-1_H3K27me3 --outdir macs2
-macs2 callpeak -t 129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bam -c 129-45_ChIP_cac-2_input_S44_L001_R1_001_val_1.fq.gz.bam -f BAM -n cac-2_H3K27me3 --outdir macs2
-macs2 callpeak -t 129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bam -c 129-46_ChIP_cac-3_input_S45_L001_R1_001_val_1.fq.gz.bam -f BAM -n cac-3_H3K27me3 --outdir macs2
-macs2 callpeak -t 129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam -c 129-47_ChIP_set-7_input_S46_L001_R1_001_val_1.fq.gz.bam -f BAM -n set-7_H3K27me3 --outdir macs2
+macs2 callpeak -t $OUTDIR/SortedBamFiles/129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bam -c $OUTDIR/SortedBamFiles/129-43_ChIP_WT_input_S42_L001_R1_001_val_1.fq.gz.bam -f BAM -n WT_H3K27me3 --outdir $OUTDIR/macs2
+macs2 callpeak -t $OUTDIR/SortedBamFiles/129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bam -c $OUTDIR/SortedBamFiles/129-44_ChIP_cac-1_input_S43_L001_R1_001_val_1.fq.gz.bam -f BAM -n cac-1_H3K27me3 --outdir $OUTDIR/macs2
+macs2 callpeak -t $OUTDIR/SortedBamFiles/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bam -c $OUTDIR/SortedBamFiles/129-45_ChIP_cac-2_input_S44_L001_R1_001_val_1.fq.gz.bam -f BAM -n cac-2_H3K27me3 --outdir $OUTDIR/macs2
+macs2 callpeak -t $OUTDIR/SortedBamFiles/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bam -c $OUTDIR/SortedBamFiles/129-46_ChIP_cac-3_input_S45_L001_R1_001_val_1.fq.gz.bam -f BAM -n cac-3_H3K27me3 --outdir $OUTDIR/macs2
+macs2 callpeak -t $OUTDIR/SortedBamFiles/129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam -c $OUTDIR/SortedBamFiles/129-47_ChIP_set-7_input_S46_L001_R1_001_val_1.fq.gz.bam -f BAM -n set-7_H3K27me3 --outdir $OUTDIR/macs2
 
 
 
