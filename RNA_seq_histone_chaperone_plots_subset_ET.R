@@ -249,5 +249,5 @@ GenesWithChanges = GenesWithChanges + 1
 log_GenesWithChanges = log2(GenesWithChanges)
 
 
-draw.triple.venn(area1 = 3918, area2 = 3246, area3 = 3738, n12 = 2786, n23 = 2162, n13 = 2491, n123 = 1983,
+draw.triple.venn(area1 = 1711, area2 = 1625, area3 = 1953, n12 = 1261, n23 = 947, n13 = 1016, n123 = 823,
                  category = c("cac-1", "cac-2", "cac-3"), fill = c("Blue", "Red", "Green"))
