@@ -169,7 +169,7 @@ library(ggplot2)
 xlabels = averageRowIDs
 colors = rev(c( "#4575b4","#fee090","#fee090", "#fee090", "#fee090", "#4575b4", "#4575b4", "#4575b4", "#4575b4"))
 
-box<-ggplot(meltedAverage_chromatin_reg, aes(x=Sample, y=Count)) +
+box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
   labs(y="Expression Level (Transcripts per Million)", x="Strain") +
   stat_boxplot(geom = "errorbar", width = 0.2) + 
   geom_boxplot(notch = TRUE, outlier.shape = NA, fill=colors, size=0.1, coef=1.5, lwd=5) +
