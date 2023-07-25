@@ -14,7 +14,7 @@
 module load Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4 BWA/0.7.17-GCC-8.3.0 SAMtools/1.16.1-GCC-11.3.0 MACS2/2.2.7.1-foss-2019b-Python-3.7.4
 
 #Make directory where you can access your bam files AND make a subfolder for macs2 output
-OUTDIR="/scratch/evt82290/Run133"
+OUTDIR="/scratch/evt82290/Run129"
 
 if [ ! -d $OUTDIR ]
 then
