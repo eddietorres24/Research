@@ -64,12 +64,8 @@ All samples must have the same number of replicates. I'm averaging across sample
 cac1 <- rowMeans(cts_numeric[, 1:3], na.rm = TRUE)
 cac2 <- rowMeans(cts_numeric[, 4:6], na.rm = TRUE)
 cac3 <- rowMeans(cts_numeric[, 7:9], na.rm = TRUE)
-naf1 <- rowMeans(cts_numeric[, 10:12], na.rm = TRUE)
-asf1 <- rowMeans(cts_numeric[, 13:15], na.rm = TRUE)
-naf2 <- rowMeans(cts_numeric[, 16:18], na.rm = TRUE)
-ATRX <- rowMeans(cts_numeric[, 19:21], na.rm = TRUE)
-WT <- rowMeans(cts_numeric[, 22:25], na.rm = TRUE)
-set7 <- rowMeans(cts_numeric[, 26:28], na.rm = TRUE)
+WT <- rowMeans(cts_numeric[, 10:13], na.rm = TRUE)
+set7 <- rowMeans(cts_numeric[, 14:16], na.rm = TRUE)
 ```
 
 ## Importing DEseq metadata
@@ -88,16 +84,16 @@ After that, convert each column to a factor.
 
 ```{r coldata}
 coldata <- read.csv("./coldata.csv", header= TRUE, row.names = 1)
-coldata$condition <- factor(coldata$condition)
-coldata$type <- factor(coldata$type)
-
+coldata2$condition <- factor(coldata2$condition)
+coldata2$type <- factor(coldata2$type)
 ```
 
 Confirm that the number and order of samples are the same in each dataset before proceeding.
 ```{r coldata}
-all(rownames(coldata) %in% colnames(cts_numeric))
-all(rownames(coldata) == colnames(cts_numeric))
+all(rownames(coldata2) %in% colnames(cts_numeric_2))
+all(rownames(coldata2) == colnames(cts_numeric_2))
 
+cts_numeric_3 = cts_numeric_2 + 1
 ```
 ##### CREATE DESEQ DATASET AND RUN DESEQ2 #####
 
@@ -105,8 +101,8 @@ Before running DESeq2, create a matrix from the objects you created and specify 
 )
 ```{r coldata}
 ##create DEseq dataset
-dds2<- DESeqDataSetFromMatrix(countData = round(cts_numeric),
-                              colData = coldata,
+dds2<- DESeqDataSetFromMatrix(countData = round(cts_numeric_3),
+                              colData = coldata2,
                               design = ~ condition)
 dds2
 
@@ -132,10 +128,10 @@ alpha = 0.05
 cac1 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1", "WTmycelia"))
 cac2 <- results(dds2, alpha=alpha, contrast=c("condition", "cac2", "WTmycelia"))
 cac3 <- results(dds2, alpha=alpha, contrast=c("condition", "cac3", "WTmycelia"))
-naf1 <- results(dds2, alpha=alpha, contrast=c("condition", "naf1", "WTmycelia"))
-naf2 <- results(dds2, alpha=alpha, contrast=c("condition", "naf2", "WTmycelia"))
-asf1 <- results(dds2, alpha=alpha, contrast=c("condition", "asf1", "WTmycelia"))
-ATRX <- results(dds2, alpha=alpha, contrast=c("condition", "ATRX", "WTmycelia"))
+#naf1 <- results(dds2, alpha=alpha, contrast=c("condition", "naf1", "WTmycelia"))
+#naf2 <- results(dds2, alpha=alpha, contrast=c("condition", "naf2", "WTmycelia"))
+#asf1 <- results(dds2, alpha=alpha, contrast=c("condition", "asf1", "WTmycelia"))
+#ATRX <- results(dds2, alpha=alpha, contrast=c("condition", "ATRX", "WTmycelia"))
 set7 <- results(dds2, alpha=alpha, contrast=c("condition", "set7", "WTmycelia"))
 
 ```
@@ -146,21 +142,20 @@ Subset to only export significant differentially expressed genes
 cac1 <- subset(cac1, padj < 0.05)
 cac2 <- subset(cac2, padj < 0.05)
 cac3 <- subset(cac3, padj < 0.05)
-naf1 <- subset(naf1, padj < 0.05)
-naf2 <- subset(naf2, padj < 0.05)
-asf1 <- subset(asf1, padj < 0.05)
-ATRX <- subset(ATRX, padj < 0.05)
+#naf1 <- subset(naf1, padj < 0.05)
+#naf2 <- subset(naf2, padj < 0.05)
+#asf1 <- subset(asf1, padj < 0.05)
+#ATRX <- subset(ATRX, padj < 0.05)
 set7 <- subset(set7, padj < 0.05)
 
 write.csv(as.data.frame(cac1), file = "cac1.csv")
 write.csv(as.data.frame(cac2), file = "cac2.csv")
 write.csv(as.data.frame(cac3), file = "cac3.csv")
-write.csv(as.data.frame(naf1), file = "naf1.csv")
-write.csv(as.data.frame(naf2), file = "naf2.csv")
-write.csv(as.data.frame(asf1), file = "asf1.csv")
-write.csv(as.data.frame(ATRX), file = "ATRX.csv")
+#write.csv(as.data.frame(naf1), file = "naf1.csv")
+#write.csv(as.data.frame(naf2), file = "naf2.csv")
+#write.csv(as.data.frame(asf1), file = "asf1.csv")
+#write.csv(as.data.frame(ATRX), file = "ATRX.csv")
 write.csv(as.data.frame(set7), file = "set7.csv")
-
 ```
 
 ### Analyzing DE Genes
@@ -186,7 +181,7 @@ l2fc_data[is.na(l2fc_data)] <- 0
 
 
 library(tibble)
-cac3_up_data <- tibble::rownames_to_column(cac3_up_data, "VALUE")
+l2fc <- tibble::rownames_to_column(l2fc_data, "VALUE")
 ```
 
 Find genes upregulated at any stage of perithecial development
