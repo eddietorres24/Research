@@ -93,7 +93,7 @@ fastq-dump --split-files --gzip ${OUTDIR}/SRR7690268.sra -O ${OUTDIR}
 #making bwa index for neurospora genome
 bwa index ${OUTDIR}/NC12_genome.fna
 
-mapping to neurospora genome, generating sorted .bam files
+#mapping to neurospora genome, generating sorted .bam files
 bwa mem -t 6 ${OUTDIR}/NC12_genome.fna ${OUTDIR}/SRR8444037_1.fastq.gz ${OUTDIR}/SRR8444037_2.fastq.gz > ${OUTDIR}/SRR8444037.sam
 samtools view ${OUTDIR}/SRR8444037.sam -O BAM -o ${OUTDIR}/SRR8444037.bam
 samtools sort --threads 6 ${OUTDIR}/SRR8444037.bam -o ${OUTDIR}/SRR8444037.sorted.bam
