@@ -41,49 +41,49 @@ curl -s ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/182/925/GCA_000182925.2_N
 #isw
 #SRR8269628	SRR8269763	SRR8269811	SRR8269812
 
-fastq-dump --split-files --gzip ${OUTDIR}/SRR8444037.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR8444038.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR8444043.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR8444037/SRR8444037.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR8444038/SRR8444038.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR8444043/SRR8444043.sra -O ${OUTDIR}
 
-fastq-dump --split-files --gzip ${OUTDIR}/SRR7970629.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR7970630.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR7970631.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR7970629/SRR7970629.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR7970630/SRR7970630.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR7970631/SRR7970631.sra -O ${OUTDIR}
 
-fastq-dump --split-files --gzip ${OUTDIR}/SRR7970598.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR7970599.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR7970600.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR7970598/SRR7970598.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR7970599/SRR7970599.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR7970600/SRR7970600.sra -O ${OUTDIR}
 
-fastq-dump --split-files --gzip ${OUTDIR}/SRR8269830.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR8269647.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR8269650.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR8269830/SRR8269830.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR8269647/SRR8269647.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR8269650/SRR8269650.sra -O ${OUTDIR}
 
-fastq-dump --split-files --gzip ${OUTDIR}/SRR10916318.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR10916319.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR10916320.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR10916318/SRR10916318.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR10916319/SRR10916319.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR10916320/SRR10916320.sra -O ${OUTDIR}
 
 # fastq-dump --split-files --gzip ${OUTDIR}/SRR10916324.sra -O ${OUTDIR}
 # fastq-dump --split-files --gzip ${OUTDIR}/SRR10916325.sra -O ${OUTDIR}
 # fastq-dump --split-files --gzip ${OUTDIR}/SRR10916326.sra -O ${OUTDIR}
 
-fastq-dump --split-files --gzip ${OUTDIR}/SRR7970603.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR7970606.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR7970610.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR7970603/SRR7970603.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR7970606/SRR7970606.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR7970610/SRR7970610.sra -O ${OUTDIR}
 
-fastq-dump --split-files --gzip ${OUTDIR}/SRR9027727.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR9027728.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR9027730.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR9027727/SRR9027727.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR9027728/SRR9027728.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR9027730/SRR9027730.sra -O ${OUTDIR}
 
-fastq-dump --split-files --gzip ${OUTDIR}/SRR8269825.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR8269775.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR8269782.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR8269810.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR8269825/SRR8269825.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR8269775/SRR8269775.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR8269782/SRR8269782.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR8269810/SRR8269810.sra -O ${OUTDIR}
 
-fastq-dump --split-files --gzip ${OUTDIR}/SRR10916163.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR10916164.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR10916165.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR10916163/SRR10916163.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR10916164/SRR10916164.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR10916165/SRR10916165.sra -O ${OUTDIR}
 
-fastq-dump --split-files --gzip ${OUTDIR}/SRR7690267.sra -O ${OUTDIR}
-fastq-dump --split-files --gzip ${OUTDIR}/SRR7690268.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR7690267/SRR7690267.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR7690268/SRR7690268.sra -O ${OUTDIR}
 
 # fastq-dump --split-files --gzip ${OUTDIR}/SRR8269628.sra -O ${OUTDIR}
 # fastq-dump --split-files --gzip ${OUTDIR}/SRR8269763.sra -O ${OUTDIR}
