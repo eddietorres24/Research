@@ -41,7 +41,7 @@ curl -s ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/182/925/GCA_000182925.2_N
 #isw
 #SRR8269628	SRR8269763	SRR8269811	SRR8269812
 
-#fastq-dump --split-files --gzip ${OUTDIR}/SRR8444037/SRR8444037.sra -O ${OUTDIR}
+fastq-dump --split-files --gzip ${OUTDIR}/SRR8444037/SRR8444037.sra -O ${OUTDIR}
 fastq-dump --split-files --gzip ${OUTDIR}/SRR8444038/SRR8444038.sra -O ${OUTDIR}
 fastq-dump --split-files --gzip ${OUTDIR}/SRR8444043/SRR8444043.sra -O ${OUTDIR}
 
