@@ -229,11 +229,11 @@ samtools view ${OUTDIR}/SRR10916165.sam -O BAM -o ${OUTDIR}/SRR10916165.bam
 samtools sort --threads 6 ${OUTDIR}/SRR10916165.bam -o ${OUTDIR}/SRR10916165.sorted.bam
 
 
-bwa mem -t 6 ${OUTDIR}/NC12_genome.fna ${FASTDIR}/SRR7690267/SRR7690267_1.fastq.gz ${FASTDIR}/SRR7690267/SRR7690267_2.fastq.gz > ${OUTDIR}/SRR7690267.sam
+bwa mem -t 6 ${OUTDIR}/NC12_genome.fna ${FASTDIR}/SRR7690267/SRR7690267.fastq.gz  > ${OUTDIR}/SRR7690267.sam
 samtools view ${OUTDIR}/SRR7690267.sam -O BAM -o ${OUTDIR}/SRR7690267.bam
 samtools sort --threads 6 ${OUTDIR}/SRR7690267.bam -o ${OUTDIR}/SRR7690267.sorted.bam
 
-bwa mem -t 6 ${OUTDIR}/NC12_genome.fna ${FASTDIR}/SRR7690268/SRR7690268_1.fastq.gz ${FASTDIR}/SRR7690268/SRR7690268_2.fastq.gz > ${OUTDIR}/SRR7690268.sam
+bwa mem -t 6 ${OUTDIR}/NC12_genome.fna ${FASTDIR}/SRR7690268/SRR7690268.fastq.gz  > ${OUTDIR}/SRR7690268.sam
 samtools view ${OUTDIR}/SRR7690268.sam -O BAM -o ${OUTDIR}/SRR7690268.bam
 samtools sort --threads 6 ${OUTDIR}/SRR7690268.bam -o ${OUTDIR}/SRR7690268.sorted.bam
 
