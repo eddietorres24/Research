@@ -16,9 +16,15 @@ cd $SLURM_SUBMIT_DIR
 
 source config.txt
 
-OUTDIR=../${OutputFolderName}
-mkdir ${OUTDIR}
+#Make Output Directory
+OUTDIR="/scratch/evt82290/Run133"
 
+#if output directory doesn't exist, create it
+if [ ! -d $OUTDIR ]
+then
+    mkdir -p $OUTDIR
+fi
+###
 
 # #process reads using trimGalore
 #
@@ -41,7 +47,7 @@ do
 # 		#See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
 		#${string//substring/replacement}
 # 		#dir=${f%/*}
-		
+
 	file=${f##*/}
 	#remove ending from file name to create shorter names for bam files and other downstream output
 	name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
@@ -57,7 +63,7 @@ do
 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 #
 
-ml SAMtools/1.16.1-GCC-11.3.0 
+ml SAMtools/1.16.1-GCC-11.3.0
 ml BWA/0.7.17-GCCcore-11.3.0
 #
 bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
@@ -73,8 +79,8 @@ ml deepTools/3.5.2-foss-2022a
 #Plot all reads
 bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 
-#plot mononucleosomes
-bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
+#plot mononucleosomes (don't need to do for ChIP)
+#bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
 
 #call Peaks
 module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
