@@ -27,3 +27,5 @@ x
 26	set7_Rep1
 27	set7_Rep2
 28	set7_Rep3
+29	set3_Rep1
+30	set3_Rep2

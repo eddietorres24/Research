@@ -19,9 +19,7 @@ library("dplyr")
 library("pheatmap")
 library("grid")
 library("corrplot")
-#library("ggpubr")
 library(RColorBrewer)
-
 
 ##################################
 #start anaysis here
@@ -31,12 +29,10 @@ setwd("C:\\Users\\eddie\\Desktop\\Research\\GitHub")
 
 #Bring in table with unnormalized transcription counts; check.names is important if you have dashes in the gene names 
 #row.names=1 command sets geneIDs as the row name
-
 countdataInteractors <- read.table("./readcounts_FINAL.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
 countdataInteractors_ash3 <- read.table("./readcounts_ash3.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
-
-countdataInteractors <- data.matrix(countdataInteractors_2)
-
+countdataInteractors_final = cbind(countdataInteractors, countdataInteractors_ash3[,6:7])
+countdataInteractors <- data.matrix(countdataInteractors_final)
 
 #################################################
 #Section 1: calculate tpm using the scater package
@@ -46,17 +42,15 @@ countdataInteractors <- data.matrix(countdataInteractors_2)
 #but this DID NOT WORK. once I used v <- data.matrix(countfile) then it all worked fine#
 
 #create matrix containing count data only; i.e. eliminate contig, start, stop, length fields
-Interactors_countsOnly<- data.matrix(countdataInteractors_F[ ,6:ncol(countdataInteractors_F)])
+Interactors_countsOnly <- data.matrix(countdataInteractors_final[ ,6:ncol(countdataInteractors_final)])
 
 ##Run calculateRPM function - must load "scater" library
-
 library("scater")
-Interactors_tpm <- calculateTPM(Interactors_countsOnly, lengths = countdataInteractors_F[,5])
+Interactors_tpm <- calculateTPM(Interactors_countsOnly, lengths = countdataInteractors_final[,5])
 
 ##convert to matrix again
 allDataTPM  <- data.matrix(Interactors_tpm)
 
-####################
 #rename columns with human readable sample names
 
 ###THIS NEXT SECTION REQUIRED MANUAL INPUT INTO A SPREADSHEET OR TEXT EDITOR
@@ -68,22 +62,6 @@ samplesname <- colnames(allDataTPM)
 write.table(samplesname, file="samplenames.txt", sep="\t")
 
 #################
-#Section 2: Skip this section for now_this is for percentile normalizing for heat mapping, 
-
-#normalizaton methods; do this after it is working
-
-#calculate the 95th percentile value
-####max = quantile(tpm,0.95)
-
-#replace outliers with 95th percentile value
-####tpm[tpm>max] = max
-
-#remove rows with zeros for every gene; these cause white lines to be produced in the heatmap
-###data_mat <- data_mat[apply(data_mat[,-1], 1, function(x) !all(x==0)),]
-###data_mat<-as.matrix(data_mat)
-
-#add row names
-####rownames(data_mat) <- dataRnames  
 
 #create a list of column names that you want to plot; !!!!You must include the column name for gene ID
 
@@ -105,20 +83,6 @@ Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,22:25], na.rm = TRUE),
 averageRowIDs=c("WT","set-7","set-3","cac-1","cac-2","cac-3","naf-1","asf-1","naf-2","ATRX")
 colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 
-###calculate summary stats for all gene data
-TPMmean <- colMeans(Averaged_Orderd_KO_data)
-TPMmedian <- colMedians(Averaged_Orderd_KO_data)
-TPMstdev <- apply(Averaged_Orderd_KO_data,2,sd)
-w<- cbind(TPMmean,TPMmedian,TPMstdev)
-
-#write.table(w, file="~/Dropbox/DropBOX Documents/Zack Papers/2018_RemodellerPaper/IswiPaperFilesFromMasayuki/SummaryTablesFromGenomics/KO_AverageTPM_stats.txt", sep="\t")
-
-#These stats can be used on the command prompt to check data
-#FCstats <- boxplot.stats(Averaged_Orderd_KO_data[,1])
-#FCstats$conf
-
-####################################################################
-####################################################################
 ####################################################################
 
 #SECTION 3
@@ -128,24 +92,19 @@ w<- cbind(TPMmean,TPMmedian,TPMstdev)
 Prc2targets <- read.table("./JGI_ListofK27SilentGenesNCUs.txt", header=FALSE,stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
 
 ###SUBSET DATA FOR ALL KO SAMPLES
-Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,1])
+Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets_new[,1])
 
 ###SUBSET DATA FOR AVERAGED KO SAMPLES
-AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,1])
+AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets_new[,1])
 
-###calculateSummaryStats for PCR2 target gene data
-TPMmean <- colMeans(AVERAGE_Prc2targetTPM)
-TPMmedian <- colMedians(AVERAGE_Prc2targetTPM)
-TPMstdev <- apply(AVERAGE_Prc2targetTPM,2,sd)
-w<- cbind(TPMmean,TPMmedian,TPMstdev)
+###Subset data to filter out non-PRC2 target regions that got through (cutting out any genes over 2 tpm in WT)
+AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 2))
 
-#write.table(w, file="~/Dropbox/DropBOX Documents/Zack Papers/2018_RemodellerPaper/IswiPaperFilesFromMasayuki/SummaryTablesFromGenomics/KO_AverageTPM_stats.txt", sep="\t")
+###Add sudocount and log transform (if necessary)
+AVERAGE_Prc2targetTPM <- AVERAGE_Prc2targetTPM + 0.1
+AVERAGE_Prc2targetTPM <- log2(AVERAGE_Prc2targetTPM)
 
-#these commands can be used pn the command line to check stats of data
-#FCstats <- boxplot.stats(AVERAGE_Prc2targetTPM[,12])
-#FCstats$conf
-
-#melt data to get it into a format ggplots can use
+#melt data to get it into a format ggplots can use (load library "reshape2")
 library(reshape2)
 
 meltedPRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
@@ -160,14 +119,13 @@ meltedPRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
 #meltedData <- melt(tpm, value.name = "Count",
 #varnames=c('GeneID', 'Sample'))
 
-library(reshape2)
 meltedAveragePRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
 altorder = rev(c( "WT","set-7","set-3","cac-1","cac-2","cac-3","naf-1","naf-2","asf-1","ATRX"))
 meltedAveragePRC2targetData$Sample <- factor(meltedAveragePRC2targetData$Sample, altorder)
 
-# this works for all genes but formatting is terrible
+# Plot box & whisker chart
 library(ggplot2)
 xlabels = averageRowIDs
 colors = rev(c( "#4575b4","#fee090","#fee090","#fee090", "#fee090", "#fee090", "#4575b4", "#4575b4", "#4575b4", "#4575b4"))
@@ -176,7 +134,7 @@ box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
   labs(y="Expression Level (Transcripts per Million)", x="Strain") +
   stat_boxplot(geom = "errorbar", width = 0.2) + 
   geom_boxplot(notch = TRUE, outlier.shape = NA, fill=colors, size=0.1, coef=1.5, lwd=0.25) +
-  coord_flip(ylim=c(-0.25,10))+
+  coord_flip(ylim=c(0,10))+
   theme_get() + 
   theme(axis.line.x = element_line(size = 0.5, colour = "black"),
         axis.line.y = element_line(size = 0.5, colour = "black"),
@@ -190,7 +148,7 @@ box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
 #device.on()
 box
 
-ggsave(filename = "histone_chaperone_boxplot_ash3.pdf", plot = box, dpi=600, height= 3, width=4)
+ggsave(filename = "histone_chaperone_boxplot_PAPER.pdf", plot = box, dpi=600, height= 3, width=4)
 
 
 ########################3
@@ -213,19 +171,11 @@ GenesWithChanges_95 <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0
 #plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above
 
 heatmap<- pheatmap(GenesWithChanges[,rev(altorder)], color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
-                   cellwidth = NA, cellheight = NA, scale="row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
+                   cellwidth = NA, cellheight = NA, cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
                    legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5)
 
 #to plot with ggplot, you need to extract [[4]] from the heatmap object
 heatmap_plot<-heatmap[[4]]
 
-ggsave(filename = "./histone_chaperone_heatmap_ash-1_log2_under5_row_scale.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
-dev.off()
-#clustering_method="centroid", clustering_distance_cols="euclidean", 
-
-#######################################################################
-#######################################################################
-
-#allgene_chromatin_reg = subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data) %in% chromatin_regulators$Gene.ID)
-
-#data_subset <- data[rownames(data) %in% data_keep_rows, ]
+ggsave(filename = "./histone_chaperone_heatmap_log2_allgene_no_scale.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
+#dev.off()
