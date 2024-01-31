@@ -2,7 +2,7 @@
 #SBATCH --job-name=zl_mapChIPseq
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=zlewis@uga.edu
+#SBATCH --mail-user=evt82290@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
@@ -17,7 +17,7 @@ cd $SLURM_SUBMIT_DIR
 source config.txt
 
 #Make Output Directory
-OUTDIR="/scratch/evt82290/Run136"
+OUTDIR="/scratch/evt82290/Run136_Geno"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
