@@ -73,14 +73,14 @@ if [ ! -f $read1 ]; then
 #trim reads
   echo "${line} running as unpaired file only"
 
-  module load Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
+  module load Trim_Galore/0.6.7-GCCcore-11.2.0
 
   trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $unpaired
 
   wait
 
 #map with STAR
-  module load STAR/2.7.10a-GCC-8.3.0
+  module load STAR/2.7.10b-GCC-11.3.0
 
   STAR --runMode alignReads \
   --runThreadN $THREADS \
@@ -96,11 +96,11 @@ if [ ! -f $read1 ]; then
   --limitBAMsortRAM 19990000000
 
   #create index
-  ml SAMtools/1.9-GCC-8.3.0
+  module load SAMtools/1.16.1-GCC-11.3.0
   samtools index "${bam}Aligned.sortedByCoord.out.bam"
 
   ##quantify with featureCounts
-  module load Subread/2.0.1-GCC-8.3.0
+  module load Subread/2.0.6-GCC-11.3.0
 
   featureCounts -T $THREADS \
   -t CDS \
@@ -112,7 +112,7 @@ if [ ! -f $read1 ]; then
 
 
   ##Plot reads to visualize tracks if needed
-       ml deepTools/3.3.1-intel-2019b-Python-3.7.4
+       module load deepTools/3.5.2-foss-2022a
        #Plot all reads
        bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}Aligned.sortedByCoord.out.bam" -o "${bw}"
 
@@ -126,14 +126,14 @@ elif [ -f $read2 ]; then
   ##################
   #Trimming
   #################
-  	  module load Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
+  	  module load Trim_Galore/0.6.7-GCCcore-11.2.0
 
   	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
   	  wait
 
 
   ##map with STAR
-  	  module load STAR/2.7.10a-GCC-8.3.0
+  	  module load STAR/2.7.10b-GCC-11.3.0
   	    STAR --runMode alignReads \
   	    --runThreadN $THREADS \
   	    --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
@@ -147,11 +147,11 @@ elif [ -f $read2 ]; then
         --outSAMattributes Standard \
         --limitBAMsortRAM 19990000000
         #create index
-        ml SAMtools/1.9-GCC-8.3.0
+        module load SAMtools/1.16.1-GCC-11.3.0
         samtools index "${bam}Aligned.sortedByCoord.out.bam"
 
         ##quantify with featureCounts
-        module load Subread/2.0.1-GCC-8.3.0
+        module load Subread/2.0.6-GCC-11.3.0
 
         featureCounts -T $THREADS \
         -t CDS \
@@ -163,7 +163,8 @@ elif [ -f $read2 ]; then
 
 
         ##Plot reads to visualize tracks if needed
-             ml deepTools/3.3.1-intel-2019b-Python-3.7.4
+             module load deepTools/3.5.2-foss-2022a
+
              #Plot all reads
              bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}Aligned.sortedByCoord.out.bam" -o "${bw}"
 
@@ -193,11 +194,11 @@ else
 
 
          #create index
-         ml SAMtools/1.9-GCC-8.3.0
+         module load SAMtools/1.16.1-GCC-11.3.0
          samtools index "${bam}Aligned.sortedByCoord.out.bam"
 
          ##quantify with featureCounts
-         module load Subread/2.0.1-GCC-8.3.0
+         module load Subread/2.0.6-GCC-11.3.0
 
          featureCounts -T $THREADS \
          -t CDS \
@@ -209,7 +210,7 @@ else
 
 
          ##Plot reads to visualize tracks if needed
-         	    ml deepTools/3.3.1-intel-2019b-Python-3.7.4
+         	    module load deepTools/3.5.2-foss-2022a
          	    #Plot all reads
          	    bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}Aligned.sortedByCoord.out.bam" -o "${bw}"
 
