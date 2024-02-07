@@ -1,4 +1,14 @@
 #!/bin/bash
+#SBATCH --job-name=zl_mapChIPseq
+#SBATCH --partition=batch
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=evt82290@uga.edu
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=20gb
+#SBATCH --time=8:00:00
+#SBATCH --output=../MappingOutput/logs/MapRNAseq.%j.out
+#SBATCH --error=../MappingOutput/logs/MapRNAseq.%j.err
 
 #check for required command line argument
 
