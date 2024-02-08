@@ -10,7 +10,7 @@
 #SBATCH --output=../HeatMap.%j.out
 #SBATCH --error=../HeatMap.%j.err
 
-OUTDIR="/scratch/evt82290/Run136/BigWigs"
+OUTDIR="/scratch/evt82290/Run129/BigWigs"
 
 module load deepTools/3.5.2-foss-2022a
 
