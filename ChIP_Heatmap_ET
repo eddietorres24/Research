@@ -12,24 +12,24 @@
 
 OUTDIR="/scratch/evt82290/Run129/BigWigs"
 
-module load deepTools/3.5.1-intel-2020b-Python-3.8.6
+module load deepTools/3.5.2-foss-2022a
 
 #conda install -c bioconda deeptools
 
-computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S $OUTDIR/129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw $OUTDIR/129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw $OUTDIR/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw $OUTDIR/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw -R cac3_not_list.bed --skipZeros -o matrix_PRC2.gz
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S $OUTDIR/129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R cac3_not_list.bed --skipZeros -o matrix_PRC2.gz
 
 plotHeatmap -m matrix_PRC2.gz -out H3K27me3_cac3_not_up_kmeans_1_.png --samplesLabel WT cac-1 cac-2 cac-3 --sortUsingSamples 4 --clusterUsingSamples 4 --outFileSortedRegions heatmap.bed --kmeans 1 --colorMap bwr
 
 
-#133-23_ChIP_WT_H3K9me3_Rep2.bin_25.smooth_75.bw
-#133-24_ChIP_cac-1_H3K9me3_Rep2.bin_25.smooth_75.bw
-#133-25_ChIP_cac-2_H3K9me3_Rep2.bin_25.smooth_75.bw
+#133-23_ChIP_WT_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw
+#133-24_ChIP_cac-1_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw
+#133-25_ChIP_cac-2_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw
 
-#129-90_ChIP_WT_H3K36me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
-#129-91_ChIP_cac-1_H3K36me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
-#129-92_ChIP_cac-2_H3K36me3_Rep1_S73_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
-#129-93_ChIP_cac-3_H3K36me3_Rep1_S74_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
-#129-94_ChIP_set-7_H3K36me3_Rep1_S75_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
+#129-90_ChIP_WT_H3K36me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+#129-91_ChIP_cac-1_H3K36me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+#129-92_ChIP_cac-2_H3K36me3_Rep1_S73_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+#129-93_ChIP_cac-3_H3K36me3_Rep1_S74_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+#129-94_ChIP_set-7_H3K36me3_Rep1_S75_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
 
 #124_1_ChIP_WT_K4me2_Rep1_4901.bin_25.smooth_50_BPM.bw
 #124_2_ChIP_cac_1_K4me2_Rep1_4901.bin_25.smooth_50_BPM.bw
@@ -37,27 +37,27 @@ plotHeatmap -m matrix_PRC2.gz -out H3K27me3_cac3_not_up_kmeans_1_.png --samplesL
 #124_4_ChIP_cac_3_K4me2_Rep1_4901.bin_25.smooth_50_BPM.bw
 #124_5_ChIP_set_7_K4me2_Rep1_4901.bin_25.smooth_50_BPM.bw
 
-#133-19_ChIP_WT_H4K20me3_Rep1.bin_25.smooth_75.bw
-#133-20_ChIP_cac-1_H4K20me3_Rep1.bin_25.smooth_75.bw
-#133-21_ChIP_cac-2_H4K20me3_Rep1.bin_25.smooth_75.bw
-#133-22_ChIP_set-7_H4K20me3_Rep1.bin_25.smooth_75.bw
+#133-19_ChIP_WT_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
+#133-20_ChIP_cac-1_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
+#133-21_ChIP_cac-2_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
+#133-22_ChIP_set-7_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
 
-#131-22_ChIP_WT_H3K27me2me3_Rep1.bin_25.smooth_75.bw
-#131-23_ChIP_cac-1_H3K27me2me3_Rep1.bin_25.smooth_75.bw
-#131-24_ChIP_cac-2_H3K27me2me3_Rep1.bin_25.smooth_75.bw
-#131-25_ChIP_cac-3_H3K27me2me3_Rep1.bin_25.smooth_75.bw
-#131-26_ChIP_set-7_H3K27me2me3_Rep1.bin_25.smooth_75.bw
+#131-22_ChIP_WT_H3K27me2me3_Rep1.bin_25.smooth_75Bulk.bw
+#131-23_ChIP_cac-1_H3K27me2me3_Rep1.bin_25.smooth_75Bulk.bw
+#131-24_ChIP_cac-2_H3K27me2me3_Rep1.bin_25.smooth_75Bulk.bw
+#131-25_ChIP_cac-3_H3K27me2me3_Rep1.bin_25.smooth_75Bulk.bw
+#131-26_ChIP_set-7_H3K27me2me3_Rep1.bin_25.smooth_75Bulk.bw
 
-#131-82_ChIP_WT_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
-#131-83_ChIP_cac-1_H3K27me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
-#131-84_ChIP_cac-2_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
-#131-85_ChIP_cac-3_H3K27me3_Rep1_S73_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
-#131-86_ChIP_set-7_H3K27me3_Rep1_S74_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
+#131-82_ChIP_WT_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+#131-83_ChIP_cac-1_H3K27me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+#131-84_ChIP_cac-2_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+#131-85_ChIP_cac-3_H3K27me3_Rep1_S73_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+#131-86_ChIP_set-7_H3K27me3_Rep1_S74_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
 
-#129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
-#129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
-#129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
-#129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
-#129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
+#129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+#129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+#129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+#129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+#129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
 
-#$OUTDIR/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw $OUTDIR/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw $OUTDIR/129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bin_25.smooth_75.bw
+#$OUTDIR/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
