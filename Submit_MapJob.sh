@@ -26,7 +26,7 @@ fi
 
 #iterates through list of accessions and passes to mapping script
 
-fastqPath="/scratch/evt82290/histone_chaperone_plot_FINAL" #fastq directory generate by https://github.com/UGALewisLab/downloadSRA.git
+fastqPath="/scratch/evt82290/downSRA/FastqFiles" #fastq directory generate by https://github.com/UGALewisLab/downloadSRA.git
 outdir="/scratch/evt82290/RNAseqIGV"
 
 mkdir ${outdir}
