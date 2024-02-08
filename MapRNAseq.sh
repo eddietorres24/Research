@@ -103,6 +103,7 @@ if [ ! -f $read1 ]; then
   module load Subread/2.0.6-GCC-11.3.0
 
   featureCounts -T $THREADS \
+  -p \
   -t CDS \
   -g gene_name \
   -s 0 --primary \
@@ -154,6 +155,7 @@ elif [ -f $read2 ]; then
         module load Subread/2.0.6-GCC-11.3.0
 
         featureCounts -T $THREADS \
+        -p \
         -t CDS \
         -g gene_name \
         -s 0 --primary \
@@ -204,6 +206,7 @@ else
          -t CDS \
          -g gene_name \
          -s 0 --primary \
+         -p \
          -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
          -o $counts \
          ${bam}Aligned.sortedByCoord.out.bam
