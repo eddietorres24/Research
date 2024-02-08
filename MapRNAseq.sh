@@ -103,7 +103,6 @@ if [ ! -f $read1 ]; then
   module load Subread/2.0.6-GCC-11.3.0
 
   featureCounts -T $THREADS \
-  -p \
   -t CDS \
   -g gene_name \
   -s 0 --primary \
