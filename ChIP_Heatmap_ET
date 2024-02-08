@@ -12,7 +12,7 @@
 
 OUTDIR="/scratch/evt82290/Run136/BigWigs"
 
-module load deepTools/3.5.1-intel-2020b-Python-3.8.6
+module load deepTools/3.5.2-foss-2022a
 
 #conda install -c bioconda deeptools
 
