@@ -23,7 +23,14 @@ computeMatrix reference-point --referencePoint TSS -b 15000 -a 15000 \
     $OUTDIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
 
-plotHeatmap -m matrix_PRC2.gz -out 2024_CS_H3K27me3_kmeans_15kb.png --samplesLabel WT cac-1 cac-2 cac-3 --sortUsingSamples 1 --clusterUsingSamples 1 --outFileSortedRegions heatmap.bed --kmeans 1 --colorMap bwr
+    computeMatrix reference-point --referencePoint TSS -b 15000 -a 15000 \
+     -S $OUTDIR/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
+        $OUTDIR/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
+        $OUTDIR/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+        $OUTDIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+        -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
+
+plotHeatmap -m matrix_PRC2.gz -out 2024_abcam_H3K27me3_kmeans_15kb.png --samplesLabel WT cac-1 cac-2 cac-3 --sortUsingSamples 1 --clusterUsingSamples 1 --outFileSortedRegions heatmap.bed --kmeans 1 --colorMap bwr
 
 
 #133-23_ChIP_WT_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw
