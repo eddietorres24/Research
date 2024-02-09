@@ -16,12 +16,12 @@ module load deepTools/3.5.2-foss-2022a
 
 #conda install -c bioconda deeptools
 
-computeMatrix reference-point --referencePoint TSS -b 15000 -a 15000 \
- -S $OUTDIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-    $OUTDIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-    $OUTDIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-    $OUTDIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-    -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
+# computeMatrix reference-point --referencePoint TSS -b 15000 -a 15000 \
+#  -S $OUTDIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+#     $OUTDIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+#     $OUTDIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+#     $OUTDIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+#     -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
 
     computeMatrix reference-point --referencePoint TSS -b 15000 -a 15000 \
      -S $OUTDIR/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
