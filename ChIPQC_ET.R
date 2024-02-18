@@ -45,30 +45,30 @@ dba.plotPCA(dbObj, contrast=1, method=DBA_DESEQ2, attributes=DBA_FACTOR, label=D
 dba.plotVenn(dbObj,contrast=1,method=DBA_ALL_METHODS)
 
 # MA Plots
-dba.plotMA(dbObj, method=DBA_DESEQ2)
-dba.plotMA(dbObj, bXY=TRUE)
-pvals <- dba.plotBox(dbObj)
+dba.plotMA(dbObj, contrast=1, method=DBA_DESEQ2)
+dba.plotMA(dbObj, contrast=1, bXY=TRUE)
+pvals <- dba.plotBox(dbObj, contrast=1)
 
 ## Extract Results
-res_deseq <- dba.report(dbObj, method=DBA_DESEQ2, contrast = 1, th=1)
+res_deseq <- dba.report(dbObj, method=DBA_DESEQ2, contrast = 3, th=1)
 
 # Write to File
 out <- as.data.frame(res_deseq)
-write.table(out, file="results/cac1_H3K27me3_DiffBind.txt", sep="\t", quote=F, row.names=F)
+write.table(out, file="cac3_H3K27me3_DiffBind.txt", sep="\t", quote=F, row.names=F)
 
 # Create bed files for each keeping only significant peaks (p < 0.05)
 
-WT_enrich <- out %>% 
+WT_cac3_enrich <- out %>% 
   filter(FDR < 0.05 & Fold > 0) %>% 
   select(seqnames, start, end)
 
 # Write to file
-write.table(WT_enrich, file="WT_enriched.bed", sep="\t", quote=F, row.names=F, col.names=F)
+write.table(WT_cac3_enrich, file="WT_cac3_enriched.bed", sep="\t", quote=F, row.names=F, col.names=F)
 
-cac1_enrich <- out %>% 
+cac3_enrich <- out %>% 
   filter(FDR < 0.05 & Fold < 0) %>% 
   select(seqnames, start, end)
 
 # Write to file
-write.table(cac1_enrich, file="cac1_enriched.bed", sep="\t", quote=F, row.names=F, col.names=F)
+write.table(cac3_enrich, file="cac3_enriched.bed", sep="\t", quote=F, row.names=F, col.names=F)
 
