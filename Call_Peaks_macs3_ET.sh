@@ -86,7 +86,7 @@ ml deepTools/3.5.2-foss-2022a
 module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 
 #using --nolambda paramenter to call peaks without control
-macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "136-1_ChIP_WT_H3K27me3_abcam_Rep2_TEST_6" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 700 --max-gap 350
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "136-1_ChIP_WT_H3K27me3_abcam_Rep2_TEST_7" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 750 --max-gap 350
 
 
 
