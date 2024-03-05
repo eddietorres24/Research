@@ -86,9 +86,17 @@ ml deepTools/3.5.2-foss-2022a
 module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 
 #using --nolambda paramenter to call peaks without control
-macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-7_ChIP_cac-1_H3K27me3_CS_Rep1_S7_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-12_ChIP_cac-1_input.bam" -f BAMPE -n "136-7_ChIP_cac-1_H3K27me3_CS_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-13_ChIP_cac-2_input.bam" -f BAMPE -n "136-3_ChIP_cac-2_H3K27me3_abcam_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-8_ChIP_cac-2_H3K27me3_CS_Rep1_S8_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-13_ChIP_cac-2_input.bam" -f BAMPE -n "136-8_ChIP_cac-2_H3K27me3_CS_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
 
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-14_ChIP_cac-3_input.bam" -f BAMPE -n "136-4_ChIP_cac-3_H3K27me3_abcam_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-9_ChIP_cac-3_H3K27me3_CS_Rep1_S9_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-14_ChIP_cac-3_input.bam" -f BAMPE -n "136-9_ChIP_cac-3_H3K27me3_CS_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
 
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-84_ChIP_WT_input_S83_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "136-78_ChIP_WT_H3K27me3_CS_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-85_ChIP_cac-1_input_S83_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "136-79_ChIP_cac-1_H3K27me3_CS_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-89_ChIP_cac-2_input_S83_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "136-80_ChIP_cac-2_H3K27me3_CS_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-14_ChIP_cac-3_input.bam" -f BAMPE -n "136-81_ChIP_cac-3_H3K27me3_CS_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-92_ChIP_set-7_input_S83_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "136-82_ChIP_set-7_H3K27me3_CS_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
 
 # #Run136
 # 6147_136-10_ChIP_cac-1-2_H3K27me3_CS_Rep1.bam                                                6147_136-45_ChIP_set-7_H3K27me3_abcam_6hr_Rep1_S45_L001_R1_001_val_1.fq.gz.bam.bai
