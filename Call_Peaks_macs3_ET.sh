@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=zl_mapChIPseq
+#SBATCH --job-name=Call_Peaks_macs3_ET
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=evt82290@uga.edu
@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
 #SBATCH --time=48:00:00
-#SBATCH --output=../MapCutAndRun.%j.out
-#SBATCH --error=../MapCutAndRun.%j.err
+#SBATCH --output=../CallPeak.%j.out
+#SBATCH --error=../CallPeak.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
@@ -86,7 +86,7 @@ ml deepTools/3.5.2-foss-2022a
 module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 
 #using --nolambda paramenter to call peaks without control
-macs3 callpeak -t "6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bam" -c "6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "136-1_ChIP_WT_H3K27me3_abcam_Rep2_TEST" --broad -g 41037538 --broad-cutoff 0.1 --outdir "${OUTDIR}/Peaks" --min-length 500 --max-gap 200
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "136-1_ChIP_WT_H3K27me3_abcam_Rep2_TEST" --broad -g 41037538 --broad-cutoff 0.1 --outdir "${OUTDIR}/Peaks" --min-length 500 --max-gap 200
 done
 
 
