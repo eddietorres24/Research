@@ -16,6 +16,8 @@ chipObj <- ChIPQC(samples)
 ## Make QC Report
 ChIPQCreport(chipObj, reportName="ChIP_QC_report_cac_H3K27me3", reportFolder="ChIPQCreport")
 
+
+
 ### DiffBind Script
 
 ## Load Libraries
