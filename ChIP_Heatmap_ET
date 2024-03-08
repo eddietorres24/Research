@@ -10,7 +10,7 @@
 #SBATCH --output=../HeatMap.%j.out
 #SBATCH --error=../HeatMap.%j.err
 
-OUTDIR="/scratch/evt82290/Run129/BigWigs"
+OUTDIR="/scratch/evt82290/Run133/BigWigs"
 
 module load deepTools/3.5.2-foss-2022a
 
@@ -24,12 +24,12 @@ module load deepTools/3.5.2-foss-2022a
 #     -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
 
     computeMatrix reference-point --referencePoint TSS -b 5000 -a 5000 \
-     -S $OUTDIR/129-90_ChIP_WT_H3K36me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-        $OUTDIR/129-91_ChIP_cac-1_H3K36me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-        $OUTDIR/129-92_ChIP_cac-2_H3K36me3_Rep1_S73_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+     -S $OUTDIR/133-19_ChIP_WT_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw \
+        $OUTDIR/133-20_ChIP_cac-1_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw \
+        $OUTDIR/133-21_ChIP_cac-2_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw \
         -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
 
-plotHeatmap -m matrix_PRC2.gz -out 2024_H3K36me3_test.png --samplesLabel WT cac-1 cac-2 cac-3 set-7 --sortUsingSamples 1 --clusterUsingSamples 1 --outFileSortedRegions heatmap.bed --kmeans 1 --colorMap Purples
+plotHeatmap -m matrix_PRC2.gz -out 2024_H4K20me3_test.png --samplesLabel WT cac-1 cac-2 --sortUsingSamples 1 --clusterUsingSamples 1 --outFileSortedRegions heatmap.bed --kmeans 1 --colorMap Greens
 
 
 #133-23_ChIP_WT_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw
