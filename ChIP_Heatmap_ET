@@ -30,7 +30,7 @@ computeMatrix reference-point --referencePoint TSS -b 5000 -a 5000 \
     #     $OUTDIR/129-92_ChIP_cac-2_H3K36me3_Rep1_S73_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     #     -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
 
-plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_poster_test_2.png --samplesLabel WT cac-1 cac-2 cac-3 set-7 --sortUsingSamples 1 --clusterUsingSamples 1 --outFileSortedRegions heatmap.bed --kmeans 1 --colorMap Blues -max 30
+plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_poster_test_2.png --samplesLabel WT cac-1 cac-2 cac-3 set-7 --sortUsingSamples 2 --clusterUsingSamples 1 --outFileSortedRegions heatmap.bed --kmeans 1 --colorMap Blues -max 35
 
 
 #133-23_ChIP_WT_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw
