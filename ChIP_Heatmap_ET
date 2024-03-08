@@ -27,8 +27,6 @@ module load deepTools/3.5.2-foss-2022a
      -S $OUTDIR/129-90_ChIP_WT_H3K36me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
         $OUTDIR/129-91_ChIP_cac-1_H3K36me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
         $OUTDIR/129-92_ChIP_cac-2_H3K36me3_Rep1_S73_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-        $OUTDIR/129-93_ChIP_cac-3_H3K36me3_Rep1_S74_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-        $OUTDIR/129-94_ChIP_set-7_H3K36me3_Rep1_S75_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
         -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
 
 plotHeatmap -m matrix_PRC2.gz -out 2024_H3K36me3_test.png --samplesLabel WT cac-1 cac-2 cac-3 set-7 --sortUsingSamples 1 --clusterUsingSamples 1 --outFileSortedRegions heatmap.bed --kmeans 1 --colorMap Purples

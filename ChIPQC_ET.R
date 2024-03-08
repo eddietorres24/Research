@@ -11,6 +11,7 @@ setwd("C:\\Users\\eddie\\Desktop\\Research\\GitHub")
 samples <- read.csv('meta/samplesheet_chr12.csv')
 
 ## Make ChIPQC Object
+register(SerialParam())
 chipObj <- ChIPQC(samples) 
 
 ## Make QC Report
