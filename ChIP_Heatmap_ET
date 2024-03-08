@@ -28,7 +28,7 @@ module load deepTools/3.5.2-foss-2022a
      -S $OUTDIR/133-23_ChIP_WT_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw \
         $OUTDIR/133-24_ChIP_cac-1_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw \
         $OUTDIR/133-25_ChIP_cac-2_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw \
-        -R $OUTDIR/133-23_ChIP_WT_H3K9me3_Rep2_peaks.bed --skipZeros -o matrix_PRC2.gz
+        -R $OUTDIR/133-23_ChIP_WT_H3K9me3_Rep2_peaks_2.bed --skipZeros -o matrix_PRC2.gz
 
 plotHeatmap -m matrix_PRC2.gz -out 2024_H3K9me3_poster_test_2.png --samplesLabel WT cac-1 cac-2 --sortUsingSamples 1 --clusterUsingSamples 1 --outFileSortedRegions heatmap.bed --kmeans 1 --colorMap Oranges -max 35
 
