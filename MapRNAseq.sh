@@ -46,17 +46,13 @@ fi
   unpaired=${fastqPath}/${accession}/${accession}.fastq.gz
 
 #make output file folders
-trimmed="${outdir}/TrimmedFastQs/${accession}"
-mkdir $trimmed
+trimmed= mkdir "${outdir}/TrimmedFastQs/${accession}"
 
-bamdir="${outdir}/bamFiles/${accession}"
-mkdir "${bamdir}"
+bamdir= mkdir "${outdir}/bamFiles/${accession}"
 
-countsdir="${outdir}/counts/${accession}"
-mkdir "${countsdir}"
+countsdir= mkdir "${outdir}/counts/${accession}"
 
-bwDir="${outdir}/bigWig/${accession}"
-mkdir "${bwDir}"
+bwDir= mkdir "${outdir}/bigWig/${accession}"
 
 #make variables for output file names
 bam="${bamdir}/${accession}_"
