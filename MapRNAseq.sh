@@ -21,9 +21,9 @@ fastqPath="/scratch/evt82290/downSRA/FastqFiles"
 outdir="/scratch/evt82290/Run136/BigWigs_RNA"
 
 #if output directory doesn't exist, create it
-if [ ! -d $OUTDIR ]
+if [ ! -d $outdir ]
 then
-    mkdir -p $OUTDIR
+    mkdir -p $outdir
 fi
 ###
 
