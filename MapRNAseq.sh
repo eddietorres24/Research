@@ -54,14 +54,14 @@ bwDir= mkdir -p "${outdir}/bigWig/${accession}"
   read2=${fastqPath}/${accession}/${accession}_2.fastq.gz
   unpaired=${fastqPath}/${accession}/${accession}.fastq.gz
 
-#make output file folders
-trimmed= mkdir "${outdir}/TrimmedFastQs/${accession}"
-
-bamdir= mkdir "${outdir}/bamFiles/${accession}"
-
-countsdir= mkdir "${outdir}/counts/${accession}"
-
-bwDir= mkdir "${outdir}/bigWig/${accession}"
+# #make output file folders
+# trimmed= mkdir "${outdir}/TrimmedFastQs/${accession}"
+#
+# bamdir= mkdir "${outdir}/bamFiles/${accession}"
+#
+# countsdir= mkdir "${outdir}/counts/${accession}"
+#
+# bwDir= mkdir "${outdir}/bigWig/${accession}"
 
 #make variables for output file names
 bam="${bamdir}/${accession}_"
