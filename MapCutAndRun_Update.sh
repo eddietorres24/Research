@@ -17,7 +17,7 @@ cd $SLURM_SUBMIT_DIR
 source config.txt
 
 #Make Output Directory
-OUTDIR="/scratch/evt82290/histone_chaperone_plot_FINAL"
+OUTDIR="/scratch/evt82290/Run139"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
