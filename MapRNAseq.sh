@@ -20,21 +20,36 @@ THREADS=2
 #fastqPath="/scratch/evt82290/downSRA/FastqFiles"
 #outdir="/scratch/evt82290/RNAseqIGV"
 
-#if output directory doesn't exist, create it
-if [ ! -d $outdir ]
-then
-    mkdir -p $outdir
-fi
-###
+# #if output directory doesn't exist, create it
+# if [ ! -d $outdir ]
+# then
+#     mkdir -p $outdir
+# fi
+# ###
+
+###################
+#start
+####################################################
+
+#input file variables
+  read1=${fastqPath}/${accession}/${accession}_1.fastq.gz
+  read2=${fastqPath}/${accession}/${accession}_2.fastq.gz
+  unpaired=${fastqPath}/${accession}/${accession}.fastq.gz
+
+###################################
 
 #make output file folders
-trimmed= "${outdir}/TrimmedFastQs/${accession}"
+trimmed="${outdir}/TrimmedFastQs/${accession}"
+mkdir $trimmed
 
-bamdir= "${outdir}/bamFiles/${accession}"
+bamdir="${outdir}/bamFiles/${accession}"
+mkdir "${bamdir}"
 
-countsdir= "${outdir}/counts/${accession}"
+countsdir="${outdir}/counts/${accession}"
+mkdir "${countsdir}"
 
-bwDir= "${outdir}/bigWig/${accession}"
+bwDir="${outdir}/bigWig/${accession}"
+mkdir "${bwDir}"
 
 #pipeaccession summary: trim reads, map with STAR, get Counts
 
@@ -43,16 +58,6 @@ bwDir= "${outdir}/bigWig/${accession}"
 #STAR --runMode genomeGenerate --runThreadN 1 --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR --genomeFastaFiles /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO.fna --sjdbGTFfile /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_WithExtras_GFFtoGTFconversion.gtf
 #need to rerun with normal genome assembly. The his-3 duplicated region will create multi-mappers
 
-
-###################
-#start
-####################################################
-
-###################################
-#input file variables
-  read1=${fastqPath}/${accession}/${accession}_1.fastq.gz
-  read2=${fastqPath}/${accession}/${accession}_2.fastq.gz
-  #unpaired=${fastqPath}/${accession}/${accession}.fastq.gz
 
 # #make output file folders
 # trimmed= mkdir "${outdir}/TrimmedFastQs/${accession}"
