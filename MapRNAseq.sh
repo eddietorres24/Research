@@ -28,13 +28,13 @@ fi
 ###
 
 #make output file folders
-trimmed= mkdir -p "${outdir}/TrimmedFastQs/${accession}"
+trimmed= "${outdir}/TrimmedFastQs/${accession}"
 
-bamdir= mkdir -p "${outdir}/bamFiles/${accession}"
+bamdir= "${outdir}/bamFiles/${accession}"
 
-countsdir= mkdir -p "${outdir}/counts/${accession}"
+countsdir= "${outdir}/counts/${accession}"
 
-bwDir= mkdir -p "${outdir}/bigWig/${accession}"
+bwDir= "${outdir}/bigWig/${accession}"
 
 #pipeaccession summary: trim reads, map with STAR, get Counts
 
