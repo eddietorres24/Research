@@ -18,7 +18,7 @@ THREADS=2
 #variables imported from submission script
 accession=SRR10916163
 fastqPath="/scratch/evt82290/downSRA/FastqFiles"
-outdir="/scratch/evt82290/Run136/BigWigs_RNA"
+outdir="/scratch/evt82290/RNAseqIGV"
 
 #if output directory doesn't exist, create it
 if [ ! -d $outdir ]
