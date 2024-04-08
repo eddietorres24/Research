@@ -44,7 +44,7 @@ module load deepTools/3.5.2-foss-2022a
     #     $OUTDIR/133-25_ChIP_cac-2_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw \
     #     -R $OUTDIR/133-23_ChIP_WT_H3K9me3_Rep2_peaks_2.bed --skipZeros -o matrix_PRC2.gz
 
-plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_RNAseq_test_2.png --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 --clusterUsingSamples 1 --sortUsingSamples 1 --outFileSortedRegions heatmap.bed --colorList 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, orangered' 'white, orangered' 'white, orangered' 'white, orangered' 'white, orangered' --colorNumber 500 --zMin 0 0 --zMax 50 50
+plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_RNAseq_test_2.png --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 --clusterUsingSamples 1 --sortUsingSamples 1 --outFileSortedRegions heatmap.bed --colorList 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, orangered' 'white, orangered' 'white, orangered' 'white, orangered' 'white, orangered' --colorNumber 500 --zMin 0 0 --zMax 50 5
 
 
 #133-23_ChIP_WT_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw
