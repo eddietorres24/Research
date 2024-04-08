@@ -52,7 +52,7 @@ plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_RNAseq_test_2.png \
             --colorList 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, orangered' 'white, orangered' 'white, orangered' 'white, orangered' 'white, orangered' \
             --colorNumber 1000 \
             --zMin 0 \
-            --zMax 45 45 45 45 45 10 10 10 10 10
+            --zMax 45 45 45 45 45 3 3 3 3 3
 
 
 #133-23_ChIP_WT_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw
