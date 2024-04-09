@@ -33,6 +33,9 @@ fi
 #
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 #
+
+#/137-66_ChIP_WT_H3K27me3_Rep1_S63_R1_001_val_1.fq.gz.bam
+
  mkdir "${OUTDIR}/SortedBamFiles"
  mkdir "${OUTDIR}/BigWigs"
  mkdir "${OUTDIR}/Peaks"
@@ -50,7 +53,7 @@ do
 
 	file=${f##*/}
 	#remove ending from file name to create shorter names for bam files and other downstream output
-	name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
+	name=${file/%_S[1-12]*_R1_001_val_1.fq.gz/}
 
 #
 # 	# File Vars
