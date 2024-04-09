@@ -48,8 +48,8 @@ module load deepTools/3.5.2-foss-2022a
 
 plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_RNAseq_test_2.png \
             --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
-            --clusterUsingSamples 6 \
-            --sortUsingSamples 1 \
+            --clusterUsingSamples 1 \
+            --sortUsingSamples 6 \
             --outFileSortedRegions heatmap.bed \
             --kmeans 3 \
             --colorList 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, orangered' 'white, orangered' 'white, orangered' 'white, orangered' 'white, orangered' \
