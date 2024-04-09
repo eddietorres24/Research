@@ -51,7 +51,7 @@ module load deepTools/3.5.2-foss-2022a
         -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
 
         plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_qasuz12_timecourse.png \
-                    --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
+                    --samplesLabel WT WT 0hr 4hr 8hr 12hr 24hr \
                     --clusterUsingSamples 1 \
                     --sortUsingSamples 1 \
                     --outFileSortedRegions heatmap.bed \
