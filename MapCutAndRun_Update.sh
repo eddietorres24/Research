@@ -53,7 +53,11 @@ do
 
 	file=${f##*/}
 	#remove ending from file name to create shorter names for bam files and other downstream output
-	name=${file/%_S[1-12]*_R1_001_val_1.fq.gz/}
+	name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
+
+# 137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_R1_001_val_1.fq.gz
+# 137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_R2_001_val_2.fq.gz
+# /scratch/evt82290/Run137/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_R1_001_val_1.fq.gz.bam
 
 #L001
 #
