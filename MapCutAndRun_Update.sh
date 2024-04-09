@@ -17,7 +17,7 @@ cd $SLURM_SUBMIT_DIR
 source config.txt
 
 #Make Output Directory
-OUTDIR="/scratch/evt82290/Run136"
+OUTDIR="/scratch/evt82290/Run137"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
@@ -55,6 +55,7 @@ do
 	#remove ending from file name to create shorter names for bam files and other downstream output
 	name=${file/%_S[1-12]*_R1_001_val_1.fq.gz/}
 
+#L001
 #
 # 	# File Vars
 # 	#use sed to get the name of the second read matching the input file
