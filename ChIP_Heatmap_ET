@@ -18,8 +18,8 @@ module load deepTools/3.5.2-foss-2022a
 #conda install -c bioconda deeptools
 
 computeMatrix scale-regions \
- --unscaled5prime 1000 \
- --unscaled3prime 1000 \
+ --unscaled5prime 600 \
+ --unscaled3prime 600 \
  -S $OUTDIR/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
     $OUTDIR/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
     $OUTDIR/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
@@ -49,7 +49,7 @@ computeMatrix scale-regions \
 plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_RNAseq_test_4.png \
             --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
             --clusterUsingSamples 1 \
-            --sortUsingSamples 1 \
+            --sortUsingSamples 6 \
             --outFileSortedRegions heatmap.bed \
             --colorList 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, orangered' 'white, orangered' 'white, orangered' 'white, orangered' 'white, orangered' \
             --zMin 0 \
