@@ -36,9 +36,9 @@ fi
 
 #/137-66_ChIP_WT_H3K27me3_Rep1_S63_R1_001_val_1.fq.gz.bam
 
- mkdir "${OUTDIR}/SortedBamFiles"
- mkdir "${OUTDIR}/BigWigs"
- mkdir "${OUTDIR}/Peaks"
+ # mkdir "${OUTDIR}/SortedBamFiles"
+ # mkdir "${OUTDIR}/BigWigs"
+ # mkdir "${OUTDIR}/Peaks"
 #mkdir "$OUTDIR/HomerTagDirectories"
 #mkdir "$OUTDIR/TdfFiles"
 #
@@ -71,7 +71,7 @@ do
 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 
 ml SAMtools/1.16.1-GCC-11.3.0
-ml BWA/0.7.17-GCCcore-11.3.0 
+ml BWA/0.7.17-GCCcore-11.3.0
 #
 bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
