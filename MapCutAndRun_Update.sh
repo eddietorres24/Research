@@ -94,4 +94,4 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 
 #using --nolambda paramenter to call peaks without control
 # macs3 callpeak -t "${bam}" -f BAMPE -n "${name}" --broad -g 41037538 --broad-cutoff 0.1 --outdir "${OUTDIR}/Peaks" --min-length 800 --max-gap 500 --nolambda
-# done
+ done
