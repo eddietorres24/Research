@@ -28,17 +28,17 @@ fi
 
 # #process reads using trimGalore
 #
-  ml Trim_Galore SAMtools BWA
-#  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+ml Trim_Galore SAMtools BWA
+ # trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
-FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
+FILES="${OUTDIR}/TrimmedReads/*L001_R1_001_val_1\.fq\.gz" #Don't forget the *
 # #
 
 #/137-66_ChIP_WT_H3K27me3_Rep1_S63_R1_001_val_1.fq.gz.bam
 
- # mkdir "${OUTDIR}/SortedBamFiles"
- # mkdir "${OUTDIR}/BigWigs"
- # mkdir "${OUTDIR}/Peaks"
+ mkdir "${OUTDIR}/SortedBamFiles"
+ mkdir "${OUTDIR}/BigWigs"
+ mkdir "${OUTDIR}/Peaks"
 #mkdir "$OUTDIR/HomerTagDirectories"
 #mkdir "$OUTDIR/TdfFiles"
 #
@@ -49,7 +49,7 @@ do
 # 	#Examples to Get Different parts of the file name
 # 		#See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
 		#${string//substring/replacement}
-# 		#dir=${f%/*}
+		# dir=${f%/*}
 
 	file=${f##*/}
 	#remove ending from file name to create shorter names for bam files and other downstream output
