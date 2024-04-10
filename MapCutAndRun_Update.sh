@@ -28,7 +28,7 @@ fi
 
 # #process reads using trimGalore
 #
-  ml Trim_Galore/0.6.7-GCCcore-11.2.0
+  ml Trim_Galore
 #  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
@@ -70,8 +70,8 @@ do
 	bigwig="${OUTDIR}/BigWigs/${name}"
 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 
-ml SAMtools/1.16.1-GCC-11.3.0
-ml BWA/0.7.17-GCCcore-11.3.0
+ml SAMtools
+ml BWA
 #
 bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
@@ -82,7 +82,7 @@ samtools index "$bam"
 ############################
 # # #deeptools
 
-ml deepTools/3.5.2-foss-2022a
+ml deepTools
 #Plot all reads
 bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 
@@ -90,7 +90,7 @@ bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of
 #bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
 
 #call Peaks
-module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
+module load MACS3
 
 #using --nolambda paramenter to call peaks without control
 # macs3 callpeak -t "${bam}" -f BAMPE -n "${name}" --broad -g 41037538 --broad-cutoff 0.1 --outdir "${OUTDIR}/Peaks" --min-length 800 --max-gap 500 --nolambda
