@@ -28,11 +28,11 @@ fi
 
 # #process reads using trimGalore
 #
- ml Trim_Galore/0.6.7-GCCcore-11.2.0
- trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
-#
-FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
-#
+#  ml Trim_Galore/0.6.7-GCCcore-11.2.0
+#  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+# #
+# FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
+# #
 
 #/137-66_ChIP_WT_H3K27me3_Rep1_S63_R1_001_val_1.fq.gz.bam
 
@@ -55,11 +55,11 @@ do
 	#remove ending from file name to create shorter names for bam files and other downstream output
 	name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
 
+
 # 137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_R1_001_val_1.fq.gz
 # 137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_R2_001_val_2.fq.gz
 # /scratch/evt82290/Run137/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_R1_001_val_1.fq.gz.bam
 
-#L001
 #
 # 	# File Vars
 # 	#use sed to get the name of the second read matching the input file
@@ -69,7 +69,6 @@ do
 	#variable name for bigwig output
 	bigwig="${OUTDIR}/BigWigs/${name}"
 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
-#
 
 ml SAMtools/1.16.1-GCC-11.3.0
 ml BWA/0.7.17-GCCcore-11.3.0
@@ -94,5 +93,5 @@ bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of
 module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 
 #using --nolambda paramenter to call peaks without control
-macs3 callpeak -t "${bam}" -f BAMPE -n "${name}" --broad -g 41037538 --broad-cutoff 0.1 --outdir "${OUTDIR}/Peaks" --min-length 800 --max-gap 500 --nolambda
-done
+# macs3 callpeak -t "${bam}" -f BAMPE -n "${name}" --broad -g 41037538 --broad-cutoff 0.1 --outdir "${OUTDIR}/Peaks" --min-length 800 --max-gap 500 --nolambda
+# done
