@@ -42,12 +42,12 @@ module load deepTools/3.5.2-foss-2022a
 
     computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 \
      -S $OUTDIR2/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
-        $OUTDIR/137-68_ChIP_WT_H3K27me3_Rep1_S65_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw \
-        $OUTDIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw \
-        $OUTDIR/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw \
-        $OUTDIR/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw \
-        $OUTDIR/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw \
-        $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw \
+        $OUTDIR/137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw   \
+        $OUTDIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+        $OUTDIR/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+        $OUTDIR/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+        $OUTDIR/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+        $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
         -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
 
         plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_qasuz12_timecourse.png \
@@ -69,14 +69,14 @@ module load deepTools/3.5.2-foss-2022a
 
 
 #Run137
-#137-60_ChIP_WT_HA_Rep1_S57_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw              137-68_ChIP_WT_H3K27me3_Rep1_S65_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw
-#137-61_ChIP_ETX51-cac-1-HA_HA_Rep1_S58_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw  137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw
-#137-62_ChIP_ETX52-cac-1-HA_HA_Rep1_S59_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw  137-70_ChIP_WT_H3K27me3_Rep1_S67_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw
-#137-63_ChIP_WT_input__S60_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw               137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw
-#137-64_ChIP_ETX51-cac-1-HA_input__S61_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw   137-72_ChIP_WT_H3K27me3_Rep1_S69_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw
-#137-65_ChIP_ETX52-cac-1-HA_input__S62_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw   137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw
-#137-66_ChIP_WT_H3K27me3_Rep1_S63_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw        137-74_ChIP_WT_H3K27me3_Rep1_S71_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw
-#137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw  137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw
+# 137-60_ChIP_WT_HA_Rep1_S57_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw              137-68_ChIP_WT_H3K27me3_Rep1_S65_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+# 137-61_ChIP_ETX51-cac-1-HA_HA_Rep1_S58_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw  137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+# 137-62_ChIP_ETX52-cac-1-HA_HA_Rep1_S59_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw  137-70_ChIP_WT_H3K27me3_Rep1_S67_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+# 137-63_ChIP_WT_input__S60_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw               137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+# 137-64_ChIP_ETX51-cac-1-HA_input__S61_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw   137-72_ChIP_WT_H3K27me3_Rep1_S69_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+# 137-65_ChIP_ETX52-cac-1-HA_input__S62_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw   137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+# 137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw        137-74_ChIP_WT_H3K27me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+# 137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw  137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
 
 
 #133-23_ChIP_WT_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw
