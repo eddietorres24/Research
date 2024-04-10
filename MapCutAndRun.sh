@@ -34,9 +34,9 @@ fi
 #
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 #
- mkdir "${OUTDIR}/SortedBamFiles"
- mkdir "${OUTDIR}/BigWigs"
- mkdir "${OUTDIR}/Peaks"
+ # mkdir "${OUTDIR}/SortedBamFiles"
+ # mkdir "${OUTDIR}/BigWigs"
+ # mkdir "${OUTDIR}/Peaks"
 #mkdir "$OUTDIR/HomerTagDirectories"
 #mkdir "$OUTDIR/TdfFiles"
 
