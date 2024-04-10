@@ -17,7 +17,7 @@ cd $SLURM_SUBMIT_DIR
 source config.txt
 
 #Make output directory
-OUTDIR="/scratch/evt82290/Run133"
+OUTDIR="/scratch/evt82290/Run137"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
@@ -29,7 +29,7 @@ fi
 
 # #process reads using trimGalore
 #
- ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4 BWA/0.7.17-GCC-8.3.0
+ ml Trim_Galore BWA
  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 #
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
