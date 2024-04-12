@@ -18,12 +18,13 @@ source config.txt
 
 #Make Output Directory
 OUTDIR="/scratch/evt82290/Run137"
+OUTDIR2="/scratch/evt82290/Run136"
 
 #if output directory doesn't exist, create it
-if [ ! -d $OUTDIR ]
-then
-    mkdir -p $OUTDIR
-fi
+# if [ ! -d $OUTDIR ]
+# then
+#     mkdir -p $OUTDIR
+# fi
 ###
 
 #process reads using trimGalore
@@ -63,8 +64,8 @@ fi
 # 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 # #
 
-ml SAMtools/1.16.1-GCC-11.3.0
-ml BWA/0.7.17-GCCcore-11.3.0
+ml SAMtools
+ml BWA
 # #
 # bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
 # samtools index "$bam"
@@ -75,7 +76,7 @@ ml BWA/0.7.17-GCCcore-11.3.0
 # ############################
 # # # #deeptools
 #
-ml deepTools/3.5.2-foss-2022a
+ml deepTools
 # #Plot all reads
 # bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 
@@ -83,10 +84,10 @@ ml deepTools/3.5.2-foss-2022a
 #bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
 
 #call Peaks
-module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
+module load MACS3
 
 #using --nolambda paramenter to call peaks without control
-macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-12_ChIP_cac-1_input.bam" -f BAMPE -n "136-2_ChIP_cac-1_H3K27me3_abcam_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-12_ChIP_cac-1_input.bam" -f BAMPE -n "136-2_ChIP_cac-1_H3K27me3_abcam_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-8_ChIP_cac-2_H3K27me3_CS_Rep1_S8_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-13_ChIP_cac-2_input.bam" -f BAMPE -n "136-8_ChIP_cac-2_H3K27me3_CS_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
 #
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-14_ChIP_cac-3_input.bam" -f BAMPE -n "136-4_ChIP_cac-3_H3K27me3_abcam_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
@@ -100,19 +101,25 @@ macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-2_ChIP_cac-1_H3K27me3_abcam
 
 #Run137 callpeaks
 
-macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-43_ChIP_WT_input_S42_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-38_ChIP_WT_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-44_ChIP_cac-1_input_S43_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-39_ChIP_cac-1_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-45_ChIP_cac-2_input_S44_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-40_ChIP_cac-2_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-46_ChIP_cac-3_input_S45_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-41_ChIP_cac-3_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-47_ChIP_set-7_input_S46_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-42_ChIP_set-7_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-66_ChIP_WT_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-67_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-69_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-71_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-73_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-75_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
 #Run129
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-43_ChIP_WT_input_S42_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-38_ChIP_WT_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-44_ChIP_cac-1_input_S43_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-39_ChIP_cac-1_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-45_ChIP_cac-2_input_S44_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-40_ChIP_cac-2_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-46_ChIP_cac-3_input_S45_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-41_ChIP_cac-3_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-47_ChIP_set-7_input_S46_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-42_ChIP_set-7_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-#
+
+# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-43_ChIP_WT_input_S42_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-38_ChIP_WT_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-44_ChIP_cac-1_input_S43_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-39_ChIP_cac-1_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-45_ChIP_cac-2_input_S44_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-40_ChIP_cac-2_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-46_ChIP_cac-3_input_S45_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-41_ChIP_cac-3_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-47_ChIP_set-7_input_S46_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-42_ChIP_set-7_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+
 # #Run129
 # 124228-2.bam                                                            129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam
 # 124228-2.bam.bai                                                        129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam.bai
@@ -140,6 +147,25 @@ macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-42_ChIP_set-7_K27me3_AbC_Rep_1_S
 # 129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bam.bai  129-94_ChIP_set-7_H3K36me3_Rep1_S75_L001_R1_001_val_1.fq.gz.bam.bai
 # 129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bam      MV.bam
 # 129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bam.bai  MV.bam.bai
+
+#Run137
+
+# 137-60_ChIP_WT_HA_Rep1_S57_L001_R1_001_val_1.fq.gz.bam                  137-68_ChIP_WT_H3K27me3_Rep1_S65_L001_R1_001_val_1.fq.gz.bam
+# 137-60_ChIP_WT_HA_Rep1_S57_L001_R1_001_val_1.fq.gz.bam.bai              137-68_ChIP_WT_H3K27me3_Rep1_S65_L001_R1_001_val_1.fq.gz.bam.bai
+# 137-61_ChIP_ETX51-cac-1-HA_HA_Rep1_S58_L001_R1_001_val_1.fq.gz.bam      137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bam
+# 137-61_ChIP_ETX51-cac-1-HA_HA_Rep1_S58_L001_R1_001_val_1.fq.gz.bam.bai  137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bam.bai
+# 137-62_ChIP_ETX52-cac-1-HA_HA_Rep1_S59_L001_R1_001_val_1.fq.gz.bam      137-70_ChIP_WT_H3K27me3_Rep1_S67_L001_R1_001_val_1.fq.gz.bam
+# 137-62_ChIP_ETX52-cac-1-HA_HA_Rep1_S59_L001_R1_001_val_1.fq.gz.bam.bai  137-70_ChIP_WT_H3K27me3_Rep1_S67_L001_R1_001_val_1.fq.gz.bam.bai
+# 137-63_ChIP_WT_input__S60_L001_R1_001_val_1.fq.gz.bam                   137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam
+# 137-63_ChIP_WT_input__S60_L001_R1_001_val_1.fq.gz.bam.bai               137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam.bai
+# 137-64_ChIP_ETX51-cac-1-HA_input__S61_L001_R1_001_val_1.fq.gz.bam       137-72_ChIP_WT_H3K27me3_Rep1_S69_L001_R1_001_val_1.fq.gz.bam
+# 137-64_ChIP_ETX51-cac-1-HA_input__S61_L001_R1_001_val_1.fq.gz.bam.bai   137-72_ChIP_WT_H3K27me3_Rep1_S69_L001_R1_001_val_1.fq.gz.bam.bai
+# 137-65_ChIP_ETX52-cac-1-HA_input__S62_L001_R1_001_val_1.fq.gz.bam       137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam
+# 137-65_ChIP_ETX52-cac-1-HA_input__S62_L001_R1_001_val_1.fq.gz.bam.bai   137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam.bai
+# 137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bam            137-74_ChIP_WT_H3K27me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bam
+# 137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bam.bai        137-74_ChIP_WT_H3K27me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bam.bai
+# 137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam      137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam
+# 137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam.bai  137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam.bai
 
 
 # #Run136
