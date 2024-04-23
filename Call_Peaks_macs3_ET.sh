@@ -134,8 +134,8 @@ module load BEDTools
 #                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 
 
-bedtools sort -chrThenSizeA -i ${OUTDIR3}/merged.bed > ${OUTDIR3}/merged_sorted.bed
-bedtools merge -i ${OUTDIR3}/merged_sorted.bed > ${OUTDIR3}/merged_file.txt
+bedtools sort -i ${OUTDIR3}/merged_sorted.bed > ${OUTDIR3}/merged_sorted_2.bed
+bedtools merge -i ${OUTDIR3}/merged_sorted_2.bed > ${OUTDIR3}/merged_file.txt
 
 #determining which peaks overlap across peak files
 bedtools intersect -wa -wb \
