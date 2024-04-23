@@ -127,16 +127,16 @@ module load MACS3
 module load BEDTools
 
 #Combining all overlapping peaks
-bedtools multiinter -header -i 2024_04_23_WT_peaks.bed \
-                               2024_04_23_136_abcam_cac-1_peaks.bed \
-                               2024_04_23_136_abcam_cac-2_peaks.bed \
-                               2024_04_23_136_abcam_cac-3_peaks.bed \
-                               2024_04_23_24hr_peaks.bed
+bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \
+                               ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed \
+                               ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed \
+                               ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
+                               ${OUTDIR3}/2024_04_23_24hr_peaks.bed
 
 #determining which peaks overlap across peak files
 bedtools intersect -wa -wb \
-    -a ${OUTDIR}/2024_04_23_WT_peaks.bed \
-    -b 2024_04_23_136_abcam_cac-1_peaks.bed 2024_04_23_136_abcam_cac-2_peaks.bed 2024_04_23_136_abcam_cac-3_peaks.bed 2024_04_23_24hr_peaks.bed \
+    -a ${OUTDIR3}/2024_04_23_WT_peaks.bed \
+    -b ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed ${OUTDIR3}/2024_04_23_24hr_peaks.bed \
     -names cac-1 cac-2 cac-3 24hr \
     -sorted
 
