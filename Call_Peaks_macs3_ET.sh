@@ -135,7 +135,7 @@ module load BEDTools
 
 
 bedtools sort -chrThenSizeA -i ${OUTDIR3}/merged.bed > ${OUTDIR3}/merged_sorted.bed
-# bedtools merge -i ${OUTDIR3}/merged.bed > ${OUTDIR3}/merged_file.txt
+bedtools merge -i ${OUTDIR3}/merged_sorted.bed > ${OUTDIR3}/merged_file.txt
 
 #determining which peaks overlap across peak files
 bedtools intersect -wa -wb \
