@@ -55,9 +55,9 @@ module load deepTools/3.5.2-foss-2022a
         plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_CAF_qa-suz12.png \
                     --samplesLabel WT cac-1 cac-2 cac-3 0hr 4hr 8hr 12hr 24hr \
                     --clusterUsingSamples 1 \
-                    --sortUsingSamples 5 \
+                    --sortUsingSamples 1 5 \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'lightcoral, white, royalblue' \
+                    --colorList 'white, royalblue' \
 
 # plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_RNAseq_test_cac1.png \
 #             --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
