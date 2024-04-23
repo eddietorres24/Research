@@ -59,14 +59,14 @@ module load deepTools/3.5.2-foss-2022a
     #     $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     #     -R merged_file.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_CAF_qa-suz12.png \
+        plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_CAF_qa-suz12_2.png \
                     --samplesLabel WT cac-1 cac-2 0hr 4hr 8hr 12hr 24hr \
                     --clusterUsingSamples 1 \
                     --sortUsingSamples 1 \
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'lightcoral, white, royalblue' \
                     --zMin 0 \
-                    --zMax 12 \
+                    --zMax 20 \
 
 
 # plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_RNAseq_test_cac1.png \
