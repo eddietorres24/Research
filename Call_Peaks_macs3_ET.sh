@@ -19,6 +19,7 @@ source config.txt
 #Make Output Directory
 OUTDIR="/scratch/evt82290/Run137"
 OUTDIR2="/scratch/evt82290/Run136"
+OUTDIR3="/scratch/evt82290/Peaks"
 
 #if output directory doesn't exist, create it
 # if [ ! -d $OUTDIR ]
@@ -101,12 +102,13 @@ module load MACS3
 
 #Run137 callpeaks
 
-macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-66_ChIP_WT_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-67_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-69_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-71_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-73_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-75_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-66_ChIP_WT_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-67_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-69_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-71_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-73_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-75_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+
 #Run129
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-43_ChIP_WT_input_S42_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-38_ChIP_WT_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-44_ChIP_cac-1_input_S43_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-39_ChIP_cac-1_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
@@ -119,6 +121,25 @@ macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-45_ChIP_cac-2_input_S44_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-40_ChIP_cac-2_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-46_ChIP_cac-3_input_S45_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-41_ChIP_cac-3_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-47_ChIP_set-7_input_S46_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-42_ChIP_set-7_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+
+#bedtools
+
+module load BEDTools
+
+#Combining all overlapping peaks
+bedtools multiinter -header -i 2024_04_23_WT_peaks.bed \
+                               2024_04_23_136_abcam_cac-1_peaks.bed \
+                               2024_04_23_136_abcam_cac-2_peaks.bed \
+                               2024_04_23_136_abcam_cac-3_peaks.bed \
+                               2024_04_23_24hr_peaks.bed
+
+#determining which peaks overlap across peak files
+bedtools intersect -wa -wb \
+    -a ${OUTDIR}/2024_04_23_WT_peaks.bed \
+    -b 2024_04_23_136_abcam_cac-1_peaks.bed 2024_04_23_136_abcam_cac-2_peaks.bed 2024_04_23_136_abcam_cac-3_peaks.bed 2024_04_23_24hr_peaks.bed \
+    -names cac-1 cac-2 cac-3 24hr \
+    -sorted
+
 
 # #Run129
 # 124228-2.bam                                                            129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam
