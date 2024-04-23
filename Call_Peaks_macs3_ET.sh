@@ -133,7 +133,7 @@ module load BEDTools
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 
-mergeBed -i merged.bed > ${OUTDIR3}/merged_file.txt
+${OUTDIR3}/mergeBed -i merged.bed > ${OUTDIR3}/merged_file.txt
 
 #determining which peaks overlap across peak files
 bedtools intersect -wa -wb \
