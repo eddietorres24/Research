@@ -66,7 +66,7 @@ module load deepTools/3.5.2-foss-2022a
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'lightcoral, white, royalblue' \
                     --zMin 0 \
-                    --zMax 15
+                    --zMax 12
 
 
 # plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_RNAseq_test_cac1.png \
