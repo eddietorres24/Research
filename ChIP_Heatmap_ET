@@ -48,19 +48,20 @@ module load deepTools/3.5.2-foss-2022a
 #     $OUTDIR2/SRR10916163.bw \
 #     -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
 
-    # computeMatrix reference-point --referencePoint center -b 3000 -a 3000 \
-    #  -S $OUTDIR/137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw   \
-    #     $OUTDIR2/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
-    #     $OUTDIR2/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-    #     $OUTDIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-    #     $OUTDIR/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-    #     $OUTDIR/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-    #     $OUTDIR/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-    #     $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-    #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
+    computeMatrix reference-point --referencePoint center -b 3000 -a 3000 \
+     -S $OUTDIR/137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw   \
+        $OUTDIR2/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
+        $OUTDIR2/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+        $OUTDIR2/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+        $OUTDIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+        $OUTDIR/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+        $OUTDIR/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+        $OUTDIR/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+        $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+        -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_CAF_qa-suz12_no_telo_5.png \
-                    --samplesLabel WT cac-1 cac-2 0hr 4hr 8hr 12hr 24hr \
+        plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_CAF_qa-suz12_no_telo_6.png \
+                    --samplesLabel WT cac-1 cac-2 set-7 0hr 4hr 8hr 12hr 24hr \
                     --clusterUsingSamples 1 \
                     --sortUsingSamples 1 4 \
                     --outFileSortedRegions heatmap.bed \
