@@ -32,7 +32,7 @@ computeMatrix reference-point --referencePoint TSS -p 12 -b 3000 -a 3000 \
 
 
 #https://deeptools.readthedocs.io/en/develop/content/tools/plotHeatmap.html
-plotHeatmap -m /Research/edge_matrix.matrix \
+plotHeatmap -m /Research/edge_matrix.matrix -out 2024_H3K27me3_CAF_edges.png \
   --sortRegions keep \
   --refPointLabel "5' edge" \
   --samplesLabel "WT K27me3" "cac-1 K27me3" "cac-2 K27me3" "cac-3 K27me3"  "set-7 K27me3" \
