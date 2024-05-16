@@ -14,7 +14,7 @@ OUTDIR2="/scratch/evt82290/Run136/BigWigs"
 
 module load deepTools/3.5.2-foss-2022a
 
-computeMatrix reference-point --referencePoint TSS -p 12 -b 1500 -a 3500 \
+computeMatrix reference-point --referencePoint TSS -p 12 -b 3500 -a 2000 \
  -S  $OUTDIR2/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
      $OUTDIR2/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
      $OUTDIR2/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
