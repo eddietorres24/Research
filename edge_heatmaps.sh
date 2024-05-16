@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=ET_ChIP_Heatmap
+#SBATCH --job-name=ET_ChIP_Heatmap_edge
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=evt82290@uga.edu
@@ -7,10 +7,12 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
 #SBATCH --time=6:00:00
-#SBATCH --output=../HeatMap.%j.out
-#SBATCH --error=../HeatMap.%j.err
+#SBATCH --output=../HeatMapEdge.%j.out
+#SBATCH --error=../HeatMapEdge.%j.err
 
 OUTDIR2="/scratch/evt82290/Run136/BigWigs"
+
+module load deepTools/3.5.2-foss-2022a
 
 computeMatrix reference-point -p 12 -R Figure2_K27regions_Scaledcenter_FileToCheckOrderFINAL_ZL.txt \
  -S  $OUTDIR2/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
