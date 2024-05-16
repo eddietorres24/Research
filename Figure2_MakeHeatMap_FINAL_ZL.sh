@@ -12,20 +12,18 @@
 
 OUTDIR2="/scratch/evt82290/Run136/BigWigs"
 
-ml deepTools/3.5.2-foss-2022a
+module load deepTools/3.5.2-foss-2022a
 
 #Peakfile for H3K9me3 is based on CutNRun Sample 114-19
 
 ####Plotting scaled enrichment across all het domains
-computeMatrix scale-regions -p 12 \
+computeMatrix scale-regions -p 12 -b 1000 -a 1000 \
 -S  $OUTDIR2/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
     $OUTDIR2/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
     $OUTDIR2/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     $OUTDIR2/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     $OUTDIR2/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-  -R Figure2_K27regions_Scaledcenter_FileToCheckOrderFINAL_ZL.txt \
-	-b 1000 -a 1000 \
-	-o edge_map.matrix \
+  -R Figure2_K27regions_Scaledcenter_FileToCheckOrderFINAL_ZL.txt -o edge_map.matrix \
 	--outFileNameMatrix edge_map.txt \
 	--sortRegions keep \
    --missingDataAsZero -bs 10
