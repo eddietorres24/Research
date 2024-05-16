@@ -28,7 +28,7 @@ computeMatrix reference-point --referencePoint TSS -p 12 -b 1500 -a 3500 \
 
 
 #https://deeptools.readthedocs.io/en/develop/content/tools/plotHeatmap.html
-plotHeatmap -m edge_matrix.matrix -out 2024_H3K27me3_CAF_edges_2.png \
+plotHeatmap -m edge_matrix.matrix -out 2024_H3K27me3_CAF_edges_3.png \
   --sortRegions keep \
   --refPointLabel "5' edge" \
   --samplesLabel "WT" "cac-1" "cac-2" "cac-3"  "set-7" \
