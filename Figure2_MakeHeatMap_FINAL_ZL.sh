@@ -10,8 +10,6 @@
 #SBATCH --output=../heatmap_edge.%j.out
 #SBATCH --error=../heatmap_edge.%j.err
 
-cd $SLURM_SUBMIT_DIR
-
 OUTDIR2="/scratch/evt82290/Run136/BigWigs"
 
 ml deepTools/3.5.2-foss-2022a
