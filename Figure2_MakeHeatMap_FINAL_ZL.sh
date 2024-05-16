@@ -2,13 +2,13 @@
 #SBATCH --job-name=zl_heatmap
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=zlewis@uga.edu
+#SBATCH --mail-user=evt82290@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=20gb
 #SBATCH --time=1:00:00
-#SBATCH --output=./heatmap.%j.out
-#SBATCH --error=./heatmap.%j.err
+#SBATCH --output=./heatmap_edge.%j.out
+#SBATCH --error=./heatmap_edge.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
