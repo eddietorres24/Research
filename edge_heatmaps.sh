@@ -14,7 +14,7 @@ OUTDIR2="/scratch/evt82290/Run136/BigWigs"
 
 module load deepTools/3.5.2-foss-2022a
 
-computeMatrix reference-point --referencePoint TSS -p 12 -b 3000 -a 3000 \
+computeMatrix reference-point --referencePoint TSS -p 12 -b 1500 -a 1500 \
  -S  $OUTDIR2/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
      $OUTDIR2/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
      $OUTDIR2/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
@@ -28,9 +28,8 @@ computeMatrix reference-point --referencePoint TSS -p 12 -b 3000 -a 3000 \
 
 
 #https://deeptools.readthedocs.io/en/develop/content/tools/plotHeatmap.html
-plotHeatmap -m edge_matrix.matrix -out 2024_H3K27me3_CAF_edges.png \
+plotHeatmap -m edge_matrix.matrix -out 2024_H3K27me3_CAF_edges_2.png \
   --sortRegions keep \
   --refPointLabel "5' edge" \
-  --samplesLabel "WT K27me3" "cac-1 K27me3" "cac-2 K27me3" "cac-3 K27me3"  "set-7 K27me3" \
-  --zMax 20 20 20 20 20 \
-  --colorMap 'Blues'
+  --samplesLabel "WT" "cac-1" "cac-2" "cac-3"  "set-7" \
+  --colorList 'white, royalblue'
