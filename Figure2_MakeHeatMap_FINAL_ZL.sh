@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=20gb
 #SBATCH --time=1:00:00
-#SBATCH --output=./heatmap_edge.%j.out
-#SBATCH --error=./heatmap_edge.%j.err
+#SBATCH --output=../heatmap_edge.%j.out
+#SBATCH --error=../heatmap_edge.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
