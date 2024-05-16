@@ -75,7 +75,7 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 1000 \
                     --clusterUsingSamples 1 \
                     --sortUsingSamples 1  \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'royalblue' \
+                    --colorList 'white, royalblue' \
                     --zMin 0 \
                     --zMax 20
 
