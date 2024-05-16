@@ -30,22 +30,7 @@ computeMatrix reference-point -p 12 -R Figure2_K27regions_Scaledcenter_FileToChe
       #--sortRegions descend --sortUsing sum \
        #  --sortUsingSamples 3
 
- computeMatrix reference-point -p 12 -R /scratch/zlewis/HDA1_MS/Figure2/Figure2_Output/Peaks/K9_Peaks.txt -S \
-       /scratch/zlewis/HDA1_MS/Figure2/Figure2_Output/BigWigs/119-49_CUT_RUN_WT_H3K9__S37_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-       /scratch/zlewis/HDA1_MS/Figure2/Figure2_Output/BigWigs/133-75_CUTnRUN_WT_H3K27m2m3__S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-       /scratch/zlewis/HDA1_MS/Figure2/Figure2_Output/BigWigs/119-41_CUT_RUN_WT_K27me3_.bin_25.smooth_75Bulk.bw \
-       /scratch/zlewis/HDA1_MS/Figure2/Figure2_Output/BigWigs/119-50_CUT_RUN_hda-1_H3K9__S38_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-       /scratch/zlewis/HDA1_MS/Figure2/Figure2_Output/BigWigs/6147_136-18_CUTnRUN_HDA-1_H3K27me2m3.bin_25.smooth_75Bulk.bw \
-       /scratch/zlewis/HDA1_MS/Figure2/Figure2_Output/BigWigs/119-42_CUT_RUN_hda-1_K27me3__S30_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-       --referencePoint TSS \
-       -b 3000 -a 3000 \
-       -o /scratch/zlewis/HDA1_MS/Figure2/Figure2_Output/MatrixFiles/Figure2_K9regions_FivePrime.matrix \
-       --outFileNameMatrix Figure2_K9regions_FivePrime.matrix.txt \
-       --sortRegions keep \
-    --missingDataAsZero -bs 10
-  # --sortUsing sum --sortUsingSamples 5 2 
-       #--sortRegions descend --sortUsing sum \
-        #  --sortUsingSamples 3
+
 
 
 
