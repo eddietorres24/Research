@@ -73,7 +73,9 @@ computeMatrix scale-regions -b 1000 -a 1000 \
                     --startLabel "5'" \
               			--endLabel "3'" \
                     --clusterUsingSamples 1 \
-                    --sortUsingSamples 1  \
+                    --sortUsingSamples 2  \
+                    --sortUsingSum \
+                    --sortRegions descend \
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'white, royalblue' \
                     --zMin 0 \
