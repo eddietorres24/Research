@@ -22,7 +22,6 @@ computeMatrix reference-point --referencePoint TSS -p 12 -b 3000 -a 3000 \
      $OUTDIR2/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
      -R Figure2_K27regions_Scaledcenter_FileToCheckOrderFINAL_ZL.txt \
       -o edge_matrix.matrix \
-      --sortRegions keep \
       --missingDataAsZero \
       -bs 10
  # --sortUsing sum --sortUsingSamples 5 2
