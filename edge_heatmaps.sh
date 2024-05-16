@@ -21,19 +21,18 @@ computeMatrix reference-point --referencePoint TSS -p 12 -b 3000 -a 3000 \
      $OUTDIR2/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
      $OUTDIR2/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
      -R Figure2_K27regions_Scaledcenter_FileToCheckOrderFINAL_ZL.txt \
-      -o edge_matrix.matrix \
-      --missingDataAsZero \
-      -bs 10
- # --sortUsing sum --sortUsingSamples 5 2
-      #--sortRegions descend --sortUsing sum \
-       #  --sortUsingSamples 3
+     -o /Research/edge_matrix.matrix \
+     --sortRegions keep \
+     --missingDataAsZero \
+     -bs 10
+
 
 
 
 
 
 #https://deeptools.readthedocs.io/en/develop/content/tools/plotHeatmap.html
-plotHeatmap -m edge_matrix.matrix \
+plotHeatmap -m /Research/edge_matrix.matrix \
   --sortRegions keep \
   --refPointLabel "5' edge" \
   --samplesLabel "WT K27me3" "cac-1 K27me3" "cac-2 K27me3" "cac-3 K27me3"  "set-7 K27me3" \
