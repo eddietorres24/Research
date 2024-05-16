@@ -32,4 +32,7 @@ plotHeatmap -m edge_matrix.matrix -out 2024_H3K27me3_CAF_edges_2.png \
   --sortRegions keep \
   --refPointLabel "5' edge" \
   --samplesLabel "WT" "cac-1" "cac-2" "cac-3"  "set-7" \
+  --sortUsingSamples 2  \
+  --sortUsing sum \
+  --sortRegions descend \
   --colorList 'white, royalblue'
