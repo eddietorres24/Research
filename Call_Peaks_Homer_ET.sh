@@ -65,7 +65,7 @@ module load Homer/4.11-foss-2022a
 # findPeaks ${TAGDIR}/qa-suz12_24hr -style histone -region -size 150 -minDist 530 -o ${TAGDIR}/qa-suz12_24hr
 
 #Find Motifs
-findMotifsGenome.pl merged_file.bed Foxy_Ncrassa_merged.fasta $OUTDIR/motifs -size given
+findMotifsGenome.pl merged_file.bed /scratch/evt82290/Foxy_Ncrassa_merged.fasta $OUTDIR/motifs -size given
 
 #using --nolambda paramenter to call peaks without control
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-12_ChIP_cac-1_input.bam" -f BAMPE -n "136-2_ChIP_cac-1_H3K27me3_abcam_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
