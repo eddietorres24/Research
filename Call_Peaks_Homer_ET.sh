@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
 #SBATCH --time=48:00:00
-#SBATCH --output=../CallPeak.%j.out
+#SBATCH --output=../CallPeak_homer.%j.out
 #SBATCH --error=../CallPeak.%j.err
 
 cd $SLURM_SUBMIT_DIR
