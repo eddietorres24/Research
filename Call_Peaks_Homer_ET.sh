@@ -53,15 +53,17 @@ ml deepTools
 #call Peaks
 module load Homer/4.11-foss-2022a
 
-makeTagDirectory $TAGDIR/qa-suz12_0hr $OUTDIR/SortedBamFiles/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam
-makeTagDirectory $TAGDIR/qa-suz12_4hr $OUTDIR/SortedBamFiles/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bam
-makeTagDirectory $TAGDIR/qa-suz12_8hr $OUTDIR/SortedBamFiles/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam
-makeTagDirectory $TAGDIR/qa-suz12_12hr $OUTDIR/SortedBamFiles/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam
-makeTagDirectory $TAGDIR/qa-suz12_24hr $OUTDIR/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam
+# makeTagDirectory $TAGDIR/qa-suz12_0hr $OUTDIR/SortedBamFiles/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam
+# makeTagDirectory $TAGDIR/qa-suz12_4hr $OUTDIR/SortedBamFiles/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bam
+# makeTagDirectory $TAGDIR/qa-suz12_8hr $OUTDIR/SortedBamFiles/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam
+# makeTagDirectory $TAGDIR/qa-suz12_12hr $OUTDIR/SortedBamFiles/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam
+# makeTagDirectory $TAGDIR/qa-suz12_24hr $OUTDIR/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam
 
-#findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt"
-
-#findPeaks <tag directory> -style histone -o auto -i <control tag directory>
+findPeaks "${TAGDIR}/qa-suz12_0hr" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/qa-suz12_0hr"
+findPeaks "${TAGDIR}/qa-suz12_4hr" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/qa-suz12_4hr"
+findPeaks "${TAGDIR}/qa-suz12_8hr" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/qa-suz12_8hr"
+findPeaks "${TAGDIR}/qa-suz12_12hr" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/qa-suz12_12hr"
+findPeaks "${TAGDIR}/qa-suz12_24hr" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/qa-suz12_24hr"
 
 #using --nolambda paramenter to call peaks without control
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-12_ChIP_cac-1_input.bam" -f BAMPE -n "136-2_ChIP_cac-1_H3K27me3_abcam_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
