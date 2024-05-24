@@ -21,8 +21,7 @@ source config.txt
 #Make Output Directory
 OUTDIR="/scratch/evt82290/Run137"
 TAGDIR="/scratch/evt82290/Run137/homertags"
-OUTDIR2="/scratch/evt82290/Run136"
-OUTDIR3="/scratch/evt82290/Peaks"
+PEAKDIR="/scratch/evt82290/Run137/Peaks"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
@@ -59,11 +58,14 @@ module load Homer/4.11-foss-2022a
 # makeTagDirectory $TAGDIR/qa-suz12_12hr $OUTDIR/SortedBamFiles/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam
 # makeTagDirectory $TAGDIR/qa-suz12_24hr $OUTDIR/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam
 
-findPeaks ${TAGDIR} -style histone -region -size 150 -minDist 530 -o ${TAGDIR}/qa-suz12_0hr
+# findPeaks ${TAGDIR}/qa-suz12_0hr -style histone -region -size 150 -minDist 530 -o ${TAGDIR}/qa-suz12_0hr
 # findPeaks ${TAGDIR}/qa-suz12_4hr -style histone -region -size 150 -minDist 530 -o ${TAGDIR}/qa-suz12_4hr
 # findPeaks ${TAGDIR}/qa-suz12_8hr -style histone -region -size 150 -minDist 530 -o ${TAGDIR}/qa-suz12_8hr
 # findPeaks ${TAGDIR}/qa-suz12_12hr -style histone -region -size 150 -minDist 530 -o ${TAGDIR}/qa-suz12_12hr
 # findPeaks ${TAGDIR}/qa-suz12_24hr -style histone -region -size 150 -minDist 530 -o ${TAGDIR}/qa-suz12_24hr
+
+#Find Motifs
+findMotifsGenome.pl merged_file.bed Foxy_Ncrassa_merged.fasta $OUTDIR/motifs -size given
 
 #using --nolambda paramenter to call peaks without control
 # macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-12_ChIP_cac-1_input.bam" -f BAMPE -n "136-2_ChIP_cac-1_H3K27me3_abcam_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
