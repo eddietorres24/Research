@@ -58,7 +58,7 @@ module load Homer/4.11-foss-2022a
 # makeTagDirectory $TAGDIR/qa-suz12_12hr $OUTDIR/SortedBamFiles/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam
 # makeTagDirectory $TAGDIR/qa-suz12_24hr $OUTDIR/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam
 
-findPeaks $TAGDIR/qa-suz12_0hr -style histone -region -size 150 -minDist 530 -o $TAGDIR/qa-suz12_0hr
+findPeaks $OUTDIR/qa-suz12_0hr -style histone -region -size 150 -minDist 530 -o $TAGDIR/qa-suz12_0hr
 # findPeaks $TAGDIR/qa-suz12_4hr -style histone -region -size 150 -minDist 530 -o $TAGDIR/qa-suz12_4hr
 # findPeaks $TAGDIR/qa-suz12_8hr -style histone -region -size 150 -minDist 530 -o $TAGDIR/qa-suz12_8hr
 # findPeaks $TAGDIR/qa-suz12_12hr -style histone -region -size 150 -minDist 530 -o $TAGDIR/qa-suz12_12hr
