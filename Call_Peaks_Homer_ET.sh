@@ -49,16 +49,18 @@ ml deepTools
 #plot mononucleosomes (don't need to do for ChIP)
 #bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
 
-#call Peaks
+#HOMER
 module load Homer/4.11-foss-2022a
 
-# makeTagDirectory $TAGDIR/qa-suz12_0hr $OUTDIR/SortedBamFiles/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam
+#Make Tag Directories
+makeTagDirectory $TAGDIR/qa-suz12_0hr $OUTDIR/SortedBamFiles/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam
 # makeTagDirectory $TAGDIR/qa-suz12_4hr $OUTDIR/SortedBamFiles/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bam
 # makeTagDirectory $TAGDIR/qa-suz12_8hr $OUTDIR/SortedBamFiles/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam
 # makeTagDirectory $TAGDIR/qa-suz12_12hr $OUTDIR/SortedBamFiles/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam
 # makeTagDirectory $TAGDIR/qa-suz12_24hr $OUTDIR/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam
 
-findPeaks $OUTDIR/qa-suz12_0hr -style histone -region -size 150 -minDist 530 -o $TAGDIR/qa-suz12_0hr
+#call Peaks
+# findPeaks $TAGDIR/qa-suz12_0hr -style histone -region -size 150 -minDist 530 -o $TAGDIR/qa-suz12_0hr
 # findPeaks $TAGDIR/qa-suz12_4hr -style histone -region -size 150 -minDist 530 -o $TAGDIR/qa-suz12_4hr
 # findPeaks $TAGDIR/qa-suz12_8hr -style histone -region -size 150 -minDist 530 -o $TAGDIR/qa-suz12_8hr
 # findPeaks $TAGDIR/qa-suz12_12hr -style histone -region -size 150 -minDist 530 -o $TAGDIR/qa-suz12_12hr
