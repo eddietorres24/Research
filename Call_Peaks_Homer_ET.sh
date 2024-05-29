@@ -20,6 +20,7 @@ source config.txt
 
 #Make Output Directory
 OUTDIR="/scratch/evt82290/Run137"
+CONDIR="/scratch/evt82290/Run136"
 TAGDIR="/scratch/evt82290/Run137/homertags"
 PEAKDIR="/scratch/evt82290/Run137/Peaks"
 
@@ -58,13 +59,14 @@ module load Homer/4.11-foss-2022a
 # makeTagDirectory $TAGDIR/qasuz12_8hr $OUTDIR/SortedBamFiles/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam
 # makeTagDirectory $TAGDIR/qasuz12_12hr $OUTDIR/SortedBamFiles/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam
 # makeTagDirectory $TAGDIR/qasuz12_24hr $OUTDIR/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam
+makeTagDirectory $TAGDIR/WT_ctrl $CONDIR/SortedBamFiles/6147_136-11_ChIP_WT_input.bam
 
 #call Peaks
-findPeaks $TAGDIR/qasuz12_0hr -style histone -size 500 -minDist 530 -o auto
-findPeaks $TAGDIR/qasuz12_4hr -style histone -size 500 -minDist 530 -o auto
-findPeaks $TAGDIR/qasuz12_8hr -style histone -size 500 -minDist 530 -o auto
-findPeaks $TAGDIR/qasuz12_12hr -style histone -size 500 -minDist 530 -o auto
-findPeaks $TAGDIR/qasuz12_24hr -style histone -size 500 -minDist 530 -o auto
+findPeaks $TAGDIR/qasuz12_0hr -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_ctrl
+findPeaks $TAGDIR/qasuz12_4hr -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_ctrl
+findPeaks $TAGDIR/qasuz12_8hr -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_ctrl
+findPeaks $TAGDIR/qasuz12_12hr -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_ctrl
+findPeaks $TAGDIR/qasuz12_24hr -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_ctrl
 
 #Find Motifs
 # findMotifsGenome.pl merged_file.bed /scratch/evt82290/Foxy_Ncrassa_merged.fasta $OUTDIR/motifs -size given
