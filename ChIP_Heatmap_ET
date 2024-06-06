@@ -38,7 +38,7 @@ BEDDIR="/scratch/evt82290/RNAseqIGV/bedgraph"
 # bedGraphToBigWig ${BEDDIR}/SRR10916163_log2_sorted.bedGraph /home/evt82290/Research/chrom_sizes.txt ${OUTDIR2}/SRR10916163_log.bw
 
 ###
-conda install -c bioconda deeptools
+# conda install -c bioconda deeptools
 
 module load deepTools
 
