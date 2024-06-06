@@ -40,7 +40,7 @@ BEDDIR="/scratch/evt82290/RNAseqIGV/bedgraph"
 ###
 #conda install -c bioconda deeptools
 
-module load deepTools/3.5.2-foss-2022a 3.10.4-GCCcore-11.3.0
+module load deepTools/3.5.2-foss-2022a
 
 computeMatrix scale-regions \
  --unscaled5prime 250 \
