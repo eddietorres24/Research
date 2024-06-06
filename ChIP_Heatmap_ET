@@ -15,7 +15,7 @@ OUTDIR2="/scratch/evt82290/RNAseqIGV/bigWig"
 BEDDIR="/scratch/evt82290/RNAseqIGV/bedgraph"
 
 #Log transforming bigwig files
-module load ucsc/434
+# module load ucsc/434
 
 # bigWigToBedGraph ${OUTDIR2}/SRR8444037.bw ${BEDDIR}/SRR8444037.bedGraph
 # awk '{ $4=(log($4+1)/log(2)); } 1' < ${BEDDIR}/SRR8444037.bedGraph > ${BEDDIR}/SRR8444037_log2.bedGraph
