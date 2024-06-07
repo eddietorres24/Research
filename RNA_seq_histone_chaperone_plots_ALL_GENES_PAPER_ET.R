@@ -92,10 +92,15 @@ colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 Prc2targets <- read.table("heatmapPRC2genesEdit.txt", header=FALSE,stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
 
 ###SUBSET DATA FOR ALL KO SAMPLES
-Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,1])
+Prc2targetTPM <- subset(allDataTPM, !(rownames(allDataTPM)%in%Prc2targets[,1]))
+Prc2targetTPM <- subset(Prc2targetTPM, rownames(Prc2targetTPM)%in%rownames(cac1DE) | rownames(Prc2targetTPM)%in%rownames(cac2DE) | rownames(Prc2targetTPM)%in%rownames(cac3DE))
 
 ###SUBSET DATA FOR AVERAGED KO SAMPLES
 AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,1])
+
+###SUBSET TO GET RID OF PRC2 GENES, BUT KEEP OTHER DE GENES (cac-1/2/3)
+AVERAGE_NonPRC2targetTPM <- subset(Averaged_Orderd_KO_data, !(rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,1]))
+AVERAGE_NonPRC2targetTPM <- subset(AVERAGE_NonPRC2targetTPM, rownames(AVERAGE_NonPRC2targetTPM)%in%rownames(cac1DE) | rownames(AVERAGE_NonPRC2targetTPM)%in%rownames(cac2DE) | rownames(AVERAGE_NonPRC2targetTPM)%in%rownames(cac3DE))
 
 ###Subset data to filter out non-PRC2 target regions that got through (cutting out any genes over 2 tpm in WT)
 AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 2))
@@ -103,6 +108,10 @@ AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1
 ###Add sudocount and log transform (if necessary)
 AVERAGE_Prc2targetTPM <- AVERAGE_Prc2targetTPM + 0.1
 AVERAGE_Prc2targetTPM <- log2(AVERAGE_Prc2targetTPM)
+
+#Non-PRC2
+AVERAGE_NonPRC2targetTPM <- AVERAGE_NonPRC2targetTPM + 0.1
+AVERAGE_NonPRC2targetTPM <- log2(AVERAGE_NonPRC2targetTPM)
 
 #melt data to get it into a format ggplots can use (load library "reshape2")
 library(reshape2)
@@ -130,11 +139,11 @@ library(ggplot2)
 xlabels = averageRowIDs
 colors = rev(c( "#4575b4","#fee090","#fee090","#fee090", "#fee090", "#fee090", "#4575b4", "#4575b4", "#4575b4", "#4575b4"))
 
-box<-ggplot(meltedAverageallData, aes(x=Sample, y=Count)) +
+box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
   labs(y="Expression Level (Transcripts per Million)", x="Strain") +
   stat_boxplot(geom = "errorbar", width = 0.2) + 
   geom_boxplot(notch = TRUE, outlier.shape = NA, fill=colors, size=0.1, coef=1.5, lwd=0.25) +
-  coord_flip(ylim=c(-4,15))+
+  coord_flip(ylim=c(0,15))+
   theme_get() + 
   theme(axis.line.x = element_line(size = 0.5, colour = "black"),
         axis.line.y = element_line(size = 0.5, colour = "black"),
@@ -165,7 +174,7 @@ breaks1=seq(-4, 5, by=.09) #This is to set a custom heatmaps scale. Not used her
 ##strategy 1 - Plot the average TMP of all genes that change expression; row normalization; clustredRows
 
 ##Keep Only Genes that are expressed in at least one sample
-GenesWithChanges <- subset(Averaged_Orderd_KO_data, (rowSums(allDataTPM) > 0))
+GenesWithChanges <- subset(AVERAGE_NonPRC2targetTPM, (rowSums(allDataTPM) > 0))
 GenesWithChanges_95 <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0))
 
 #plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above
