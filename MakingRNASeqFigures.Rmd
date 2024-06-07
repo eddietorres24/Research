@@ -91,7 +91,7 @@ top_genes <- rownames(Rtt109DeSeq)[order(Rtt109DeSeq$pvalue)][1:15]
 ```
 Define the volcano plot
 ```{r}
-volcano_plot <- ggplot(Rtt109DeSeq, aes(x = log2FoldChange, y = -log10(pvalue), color = ifelse(log2FoldChange < 0 & pvalue < 0.05, "Downregulated", ifelse(log2FoldChange > 0 & pvalue < 0.05, "Upregulated", "Not significant")))) +
+volcano_plot <- ggplot(cac1DE, aes(x = log2FoldChange, y = -log10(pvalue), color = ifelse(log2FoldChange < 0 & pvalue < 0.05, "Downregulated", ifelse(log2FoldChange > 0 & pvalue < 0.05, "Upregulated", "Not significant")))) +
   geom_point(size = 2.5, alpha = 0.7) +
   scale_color_manual(values = c("Downregulated" = "blue", "Upregulated" = "red", "Not significant" = "black"),
                      labels = c("Downregulated", "Upregulated", "Not significant")) +
