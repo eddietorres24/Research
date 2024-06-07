@@ -15,7 +15,7 @@ OUTDIR2="/scratch/evt82290/RNAseqIGV/bigWig"
 BEDDIR="/scratch/evt82290/RNAseqIGV/bedgraph"
 
 #Log transforming bigwig files
-# module load ucsc/434
+module load ucsc/434
 
 ## Abby's code
 # bigWigToBedGraph ${bw} ${bg}
