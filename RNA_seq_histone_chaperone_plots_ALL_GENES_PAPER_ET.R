@@ -130,11 +130,11 @@ library(ggplot2)
 xlabels = averageRowIDs
 colors = rev(c( "#4575b4","#fee090","#fee090","#fee090", "#fee090", "#fee090", "#4575b4", "#4575b4", "#4575b4", "#4575b4"))
 
-box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
+box<-ggplot(meltedAverageallData, aes(x=Sample, y=Count)) +
   labs(y="Expression Level (Transcripts per Million)", x="Strain") +
   stat_boxplot(geom = "errorbar", width = 0.2) + 
   geom_boxplot(notch = TRUE, outlier.shape = NA, fill=colors, size=0.1, coef=1.5, lwd=0.25) +
-  coord_flip(ylim=c(-4,10))+
+  coord_flip(ylim=c(-4,15))+
   theme_get() + 
   theme(axis.line.x = element_line(size = 0.5, colour = "black"),
         axis.line.y = element_line(size = 0.5, colour = "black"),
@@ -165,13 +165,13 @@ breaks1=seq(-4, 5, by=.09) #This is to set a custom heatmaps scale. Not used her
 ##strategy 1 - Plot the average TMP of all genes that change expression; row normalization; clustredRows
 
 ##Keep Only Genes that are expressed in at least one sample
-GenesWithChanges <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0))
+GenesWithChanges <- subset(Averaged_Orderd_KO_data, (rowSums(allDataTPM) > 0))
 GenesWithChanges_95 <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0))
 
 #plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above
 
-heatmap<- pheatmap(GenesWithChanges[,rev(altorder)], color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
-                   cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
+heatmap<- pheatmap(GenesWithChanges_no_PRC2[,rev(altorder)], color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
+                   cellwidth = NA, cellheight = NA, cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
                    legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5)
 
 #to plot with ggplot, you need to extract [[4]] from the heatmap object

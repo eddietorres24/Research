@@ -34,8 +34,8 @@ library(dplyr)
 Read in the featurecounts output, convert to a matrix, and remove unneccesary columns to include ONLY the count numbers, then convert columns to numeric.
 ```{r cts}
 setwd("C:\\Users\\eddie\\Desktop\\Research\\GitHub")
-cts <- as.matrix(read.table("./readcounts_ash3.txt", sep="\t", row.names =1, header = TRUE))
-cts <- as.matrix(cts[,-c(1:5)])
+cts2 <- as.matrix(read.table("./readcounts_no_isw_rtt109.txt", sep="\t", row.names =1, header = TRUE))
+cts2 <- as.matrix(cts2[,-c(1:5)])
 ## change ncol to match number of columns
 cts_numeric <- matrix(as.numeric(cts), ncol = 30)
 dimnames(cts_numeric) <- list(rownames(cts), colnames(cts))

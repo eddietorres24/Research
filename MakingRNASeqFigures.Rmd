@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-# Calculate quantiles based on the 'TPM' column
+ Calculate quantiles based on the 'TPM' column
 
 ```{r cars}
 tpm_vsd1 <- read.table("vsd1TPMsacrossStrains.txt", sep = "\t")
@@ -19,14 +19,14 @@ tpm_vsd1 <- read.table("vsd1TPMsacrossStrains.txt", sep = "\t")
 
 prc2_genes <- c("S238", "NCU05460", "NCU05300", "cac3")
 quantiles_vsd1 <- quantile(tpm_vsd1$TPM, c(0.05, 0.95))
-top_rows <- filter(tpm_vsd1, tpm_vsd1$TPM >= quantiles_vsd1[2])
-bottom_rows <- filter(tpm_vsd1, tpm_vsd1$TPM <= quantiles_vsd1[1])
+top_rows <- filter(tpm_vsd1, TPM >= quantiles_vsd1[2])
+bottom_rows <- filter(tpm_vsd1, TPM <= quantiles_vsd1[1])
 
 wildtype_row <- filter(tpm_vsd1, Sample == "Wildtype")
 head(tpm_vsd1)
 ```
 
-#Function to assign colors based on TPM values
+Function to assign colors based on TPM values
 
 ```{r pressure, echo=FALSE}
 assign_color <- function(tpm) {
@@ -38,7 +38,7 @@ assign_color <- function(tpm) {
 }
 ```
 
-#Add a new column 'Color' based on the assigned colors
+Add a new column 'Color' based on the assigned colors
 ```{r}
 tpm_vsd1$Color <- sapply(tpm_vsd1$TPM, assign_color)
 
@@ -54,15 +54,15 @@ tpm_vsd1$Color <- ifelse(tpm_vsd1$Sample %in% prc2_genes | tpm_vsd1$Sample == "P
 )
 print(tpm_vsd1)
 ```
-#Load packages
+Load packages
 ```{r}
 library(ggrepel)
 library(ggplot2)
 ```
 # Plot scatter plot with color labels and customizations
 ```{r}
-ggplot(tpm_vsd1, aes(x = Sample, y = TPM, colour = tpm_vsd1$Color)) +
-  geom_point(size = 3) +  scale_color_manual(values = c(Red = "red", Blue = "blue", Black = "black", SkyBlue = "skyblue", Green = "green")) +
+gg <- ggplot(tpm_vsd1, aes(x = Sample, y = TPM, color = Color)) +
+  geom_point(size = 3) +  scale_color_manual(values = c(Red = "red", Blue = "blue", Black = "black", SkyBlue = "skyblue")) +
   geom_text_repel(data = rbind(top_rows, bottom_rows, wildtype_row),
                   aes(label = Sample), direction = "both", size = 4,
                   max.overlaps = Inf, box.padding = 0.5) +  # Adjust parameters for label repelling
@@ -73,32 +73,29 @@ ggplot(tpm_vsd1, aes(x = Sample, y = TPM, colour = tpm_vsd1$Color)) +
         panel.background = element_rect(fill = "white"),  # Set background color to white
         plot.title = element_text(hjust = 0.5)) +  # Center the plot title
   guides(color = FALSE)  # Remove legend
-
+print(gg)
 ```
 
-#Make a Volcano Plot for Rtt109 
+Make a Volcano Plot for Rtt109 
 
 ```{r}
-cac1DE <- read.csv("cac1.csv", sep = ",", header = TRUE, row.names = 1)
-cac2DE <- read.csv("cac2.csv", sep = ",", header = TRUE, row.names = 1)
-cac3DE <- read.csv("cac3.csv", sep = ",", header = TRUE, row.names = 1)
+Rtt109DeSeq <- read.csv("~/Desktop/RochelleLabDesktopData/RNAseq/Rtt109/DeSeq2Results_032024/S534.csv", sep = ",", header = TRUE, row.names = 1)
+head(Rtt109DeSeq)
 ```
+
 
 # Get the top 15 differentially expressed genes (they should be the row names)
-##Edit_ET: getting PRC2 targets using my strategy
 
 ```{r}
-top_genes <- rownames(cac2DE)[order(cac2DE$pvalue)][1:15]
-prc2target <- subset(cac3DE, rownames(cac3DE)%in%Prc2targets$V1)
-prc2target <- rownames(prc2target)
+top_genes <- rownames(Rtt109DeSeq)[order(Rtt109DeSeq$pvalue)][1:15]
 ```
 Define the volcano plot
 ```{r}
-volcano_plot <- ggplot(cac3DE, aes(x = log2FoldChange, y = -log10(pvalue), color = ifelse(log2FoldChange > 0 & pvalue < 0.05 & !(rownames(cac3DE)%in%Prc2targets$V1), "Upregulated", ifelse(log2FoldChange < 0 & pvalue < 0.05 & !(rownames(cac3DE)%in%Prc2targets$V1), "Downregulated", "PRC2")))) +
-  geom_point(size = 1.5, alpha = 0.7) +
-  scale_color_manual(values = c("Upregulated" = "red", "Downregulated" = "blue", "PRC2" = "chocolate2"),
-                     labels = c("Downregulated", "PRC2", "Upregulated")) +
-  labs(x = expression(paste("log"[2], "FoldChange")), y = expression(paste("-log"[10], "(Adjusted p-value)")), title = "cac-3 vs WT") +
+volcano_plot <- ggplot(Rtt109DeSeq, aes(x = log2FoldChange, y = -log10(pvalue), color = ifelse(log2FoldChange < 0 & pvalue < 0.05, "Downregulated", ifelse(log2FoldChange > 0 & pvalue < 0.05, "Upregulated", "Not significant")))) +
+  geom_point(size = 2.5, alpha = 0.7) +
+  scale_color_manual(values = c("Downregulated" = "blue", "Upregulated" = "red", "Not significant" = "black"),
+                     labels = c("Downregulated", "Upregulated", "Not significant")) +
+  labs(x = expression(paste("log"[2], "FoldChange")), y = expression(paste("-log"[10], "(Adjusted p-value)")), title = "Rtt109 vs Wildtype") +
   geom_vline(xintercept = c(-0.6, 0.6), col = "gray", linetype = 'dashed') +
   geom_hline(yintercept = -log10(0.05), col = "gray", linetype = 'dashed') +
   theme_classic(base_size = 20) +
@@ -117,20 +114,20 @@ print(volcano_plot)
 # Print the volcano plot with labels
 ```{r}
 volcano_plot_with_labels <- volcano_plot +
-  geom_text_repel(data = subset(cac1DE, rownames(cac1DE) %in% top_genes), aes(label = top_genes), size = 3, nudge_y = 0.2, force = 3, max.overlaps = 30)
+  geom_text_repel(data = subset(Rtt109DeSeq, rownames(Rtt109DeSeq) %in% top_genes), aes(label = top_genes), size = 3, nudge_y = 0.2, force = 3)
 print(volcano_plot_with_labels)
 ```
 Create a new column to indicate whether each gene should be labeled and add PRC2 subunit meta names. These can be changed prior in excel by hand or later in the script 
 
 ```{r}
-top_genes_wPRC2 <- c(rownames(cac1DE)[order(cac1DE$padj)][1:15], "NCU05460", "NCU05300", "set-7", "cac-3")
+top_genes_wPRC2 <- c(rownames(Rtt109DeSeq)[order(Rtt109DeSeq$padj)][1:15], "NCU05460", "NCU05300", "set-7", "cac-3")
 
-cac1DE$label <- ifelse(rownames(cac1DE) %in% top_genes_wPRC2, rownames(cac1DE), "")
+Rtt109DeSeq$label <- ifelse(rownames(Rtt109DeSeq) %in% top_genes_wPRC2, rownames(Rtt109DeSeq), "")
 
 ```
 Define the volcano plot
 ```{r}
-volcano_plot <- ggplot(cac1DE, aes(x = log2FoldChange, y = -log10(pvalue), color = ifelse(log2FoldChange < 0 & pvalue < 0.05, "Downregulated", ifelse(log2FoldChange > 0 & pvalue < 0.05, "Upregulated", "Not significant")))) +
+volcano_plot <- ggplot(Rtt109DeSeq, aes(x = log2FoldChange, y = -log10(pvalue), color = ifelse(log2FoldChange < 0 & pvalue < 0.05, "Downregulated", ifelse(log2FoldChange > 0 & pvalue < 0.05, "Upregulated", "Not significant")))) +
   geom_point(size = 2.5, alpha = 0.7) +
   scale_color_manual(values = c("Downregulated" = "blue", "Upregulated" = "red", "Not significant" = "black"),
                      labels = c("Downregulated", "Upregulated", "Not significant")) +
@@ -148,13 +145,13 @@ volcano_plot <- ggplot(cac1DE, aes(x = log2FoldChange, y = -log10(pvalue), color
   )
 
 volcano_plot_with_labels <- volcano_plot +
-  geom_point(data = subset(cac1DE, rownames(cac1DE) %in% K27SilentAcounts[,1]), aes(shape = "PRC2 Target Genes"), color = "#E7B800", size = 3) +
- geom_text_repel(data = subset(cac1DE, !is.na(label)), aes(label = label), size = 3, nudge_y = 0.2, force = 3, color = "black", max.overlaps = Inf) 
+  geom_point(data = subset(Rtt109DeSeq, rownames(Rtt109DeSeq) %in% K27SilentAcounts[,1]), aes(shape = "PRC2 Target Genes"), color = "#E7B800", size = 3) +
+ geom_text_repel(data = subset(Rtt109DeSeq, !is.na(label)), aes(label = label), size = 3, nudge_y = 0.2, force = 3, color = "black", max.overlaps = Inf) 
   print(volcano_plot_with_labels)
 ```
  # Assign labels based on top_genes_wPRC2
 ```{r}
-  cac1DE$label <- ifelse(rownames(cac1DE) %in% top_genes_wPRC2, rownames(cac1DE), "")
+  Rtt109DeSeq$label <- ifelse(rownames(Rtt109DeSeq) %in% top_genes_wPRC2, rownames(Rtt109DeSeq), "")
 
 ```
 
@@ -166,22 +163,22 @@ head(RevisedK27Genes)
 ```
    # Set color based on significance and K27 list
 ```{r}
- cac1DE$color <- ifelse(cac1DE$pvalue >= 0.05, "black", 
-                              ifelse(cac1DE$log2FoldChange < 0, "Downregulated", "Upregulated"))
-  cac1DE$color[rownames(cac1DE) %in% K27SilentAcounts[,1] & cac1DE$pvalue < 0.05] <- "#E7B800"
+ Rtt109DeSeq$color <- ifelse(Rtt109DeSeq$pvalue >= 0.05, "black", 
+                              ifelse(Rtt109DeSeq$log2FoldChange < 0, "Downregulated", "Upregulated"))
+  Rtt109DeSeq$color[rownames(Rtt109DeSeq) %in% K27SilentAcounts[,1] & Rtt109DeSeq$pvalue < 0.05] <- "#E7B800"
 ```
 Plot the volcano plot  
 
 
 ```{r}
-  volcano_plot_with_labels3 <- ggplot(cac1DE, aes(x = log2FoldChange, y = -log10(pvalue), color = color)) +
+  volcano_plot_with_labels3 <- ggplot(Rtt109DeSeq, aes(x = log2FoldChange, y = -log10(pvalue), color = color)) +
     geom_point(size = 2.5, alpha = 0.7) +
     scale_color_manual(values = c("Downregulated" = "blue", "Upregulated" = "red", "black" = "black", "#E7B800" = "#E7B800"),
                        labels = c("PRC2 Target Gene", "Not Significant", "Downregulated", "Upregulated")) +
     labs(x = expression(paste("log"[2], "FoldChange")), y = expression(paste("-log"[10], "(p-value)")), title = "Rtt109 vs Wildtype") +
     geom_vline(xintercept = c(-0.6, 0.6), col = "gray", linetype = 'dashed') +
     geom_hline(yintercept = -log10(0.05), col = "gray", linetype = 'dashed') +
-    geom_text_repel(data = subset(cac1DE, !is.na(label)), aes(label = label), size = 3, nudge_y = 0.2, force = 3, color = "black", max.overlaps = Inf) +
+    geom_text_repel(data = subset(Rtt109DeSeq, !is.na(label)), aes(label = label), size = 3, nudge_y = 0.2, force = 3, color = "black", max.overlaps = Inf) +
     theme_classic(base_size = 20) +
     theme(
       axis.title.y = element_text(face = "bold", margin = margin(0,20,0,0), size = rel(1.1), color = 'black'),
@@ -197,7 +194,7 @@ Plot the volcano plot
 
 
 ```{r}
-PRC2TargetGenes_cac1DE <- subset(cac1DE, rownames(cac1DE)%in%RevisedK27Genes[,1])
+PRC2TargetGenes_Rtt109DeSeq <- subset(Rtt109DeSeq, rownames(Rtt109DeSeq)%in%RevisedK27Genes[,1])
 ```
 Define the volcano plot for PRC2 target genes
 ```{r}
