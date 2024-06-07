@@ -117,7 +117,7 @@ plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_RNAseq_LOG_cac1.png \
             --kmeans 3 \
             --colorList 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, orangered' 'white, orangered' 'white, orangered' 'white, orangered' 'white, orangered' \
             --zMin 0 \
-            --zMax 30 30 30 30 30 12 12 12 12 12
+            --zMax 30 30 30 30 30 8 8 8 8 8
 
 
 #Run137
