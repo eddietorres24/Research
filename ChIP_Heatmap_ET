@@ -109,7 +109,7 @@ module load deepTools/3.5.2-foss-2022a
         #             --zMax 20
 
 
-plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_RNAseq_LOG_cac1.png \
+plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_RNAseq_LOG_cac1_2.png \
             --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
             --clusterUsingSamples 2 \
             --sortUsingSamples 6 \
@@ -117,7 +117,7 @@ plotHeatmap -m matrix_PRC2.gz -out 2024_H3K27me3_RNAseq_LOG_cac1.png \
             --kmeans 3 \
             --colorList 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, royalblue' 'white, orangered' 'white, orangered' 'white, orangered' 'white, orangered' 'white, orangered' \
             --zMin 0 \
-            --zMax 30 30 30 30 30 5 5 5 5 5
+            --zMax 30 30 30 30 30 3 3 3 3 3
 
 
 #Run137
