@@ -68,7 +68,7 @@ module load deepTools/3.5.2-foss-2022a
         $OUTDIR2/SRR8269825_log.bw \
         $OUTDIR2/SRR8444037_log.bw \
         $OUTDIR2/SRR10916163_log.bw \
-        -R cac1_DE.bed --skipZeros -o matrix_PRC2.gz
+        -R cac1_up.bed --skipZeros -o matrix_PRC2.gz
 
 # computeMatrix reference-point --referencePoint center -b 3000 -a 3000 \
 #  -S $OUTDIR2/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
