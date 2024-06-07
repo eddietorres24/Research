@@ -17,15 +17,17 @@ BEDDIR="/scratch/evt82290/RNAseqIGV/bedgraph"
 #Log transforming bigwig files
 # module load ucsc/434
 
-# bigWigToBedGraph ${OUTDIR2}/SRR8444037.bw ${BEDDIR}/SRR8444037.bedGraph
-# awk '{ $4=(log($4+1)/log(2)); } 1' < ${BEDDIR}/SRR8444037.bedGraph > ${BEDDIR}/SRR8444037_log2.bedGraph
-# sort -k1,1 -k2,2n ${BEDDIR}/SRR8444037_log2.bedGraph > ${BEDDIR}/SRR8444037_log2_sorted.bedGraph
-# bedGraphToBigWig ${BEDDIR}/SRR8444037_log2_sorted.bedGraph /home/evt82290/Research/chrom_sizes.txt ${OUTDIR2}/SRR8444037_log.bw
+## Abby's code
+# bigWigToBedGraph ${bw} ${bg}
+# awk '{ $4=(log($4+1)/log(2)); } 1' < ${bg} > ${bg2}
+# sort -k1,1 -k2,2n ${bg2} > ${bg2_sort}
+# bedGraphToBigWig ${bg2_sort} /home/ad45368/chrom_sizes.txt ${bw2}
+
 #
-# bigWigToBedGraph ${OUTDIR2}/SRR7970629.bw ${BEDDIR}/SRR7970629.bedGraph
-# awk '{ $4=(log($4+1)/log(2)); } 1' < ${BEDDIR}/SRR7970629.bedGraph > ${BEDDIR}/SRR7970629_log2.bedGraph
-# sort -k1,1 -k2,2n ${BEDDIR}/SRR79706291_log2.bedGraph > ${BEDDIR}/SRR7970629_log2_sorted.bedGraph
-# bedGraphToBigWig ${BEDDIR}/SRR7970629_log2_sorted.bedGraph /home/evt82290/Research/chrom_sizes.txt ${OUTDIR2}/SRR7970629_log.bw
+bigWigToBedGraph ${OUTDIR2}/SRR7970629.bw ${BEDDIR}/SRR7970629.bedGraph
+awk '{ $4=(log($4+1)/log(2)); } 1' < ${BEDDIR}/SRR7970629.bedGraph > ${BEDDIR}/SRR7970629_log2.bedGraph
+sort -k1,1 -k2,2n ${BEDDIR}/SRR7970629_log2.bedGraph > ${BEDDIR}/SRR7970629_log2_sorted.bedGraph
+bedGraphToBigWig ${BEDDIR}/SRR7970629_log2_sorted.bedGraph /home/evt82290/Research/chrom_sizes.txt ${OUTDIR2}/SRR7970629_log.bw
 #
 # bigWigToBedGraph ${OUTDIR2}/SRR7970598.bw ${BEDDIR}/SRR7970598.bedGraph
 # awk '{ $4=(log($4+1)/log(2)); } 1' < ${BEDDIR}/SRR7970598.bedGraph > ${BEDDIR}/SRR7970598_log2.bedGraph

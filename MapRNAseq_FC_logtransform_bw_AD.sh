@@ -135,6 +135,7 @@ awk '{ $4=(log($4+1)/log(2)); } 1' < ${bg} > ${bg2}
 sort -k1,1 -k2,2n ${bg2} > ${bg2_sort}
 bedGraphToBigWig ${bg2_sort} /home/ad45368/chrom_sizes.txt ${bw2}
 
+
 #elseif read2 exists, do paired-end Trimming and PE mapping
 elif [ -f $read2 ]; then
   echo "${line} running as PE file only"
