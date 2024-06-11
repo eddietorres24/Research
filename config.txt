@@ -3,12 +3,12 @@ THREADS=12
 
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 
-FASTQ="/scratch/evt82290/2024_Run137_ET"
+FASTQ="/scratch/evt82290/2024_Run139_ET"
 
 #Edit Code to add Q score option
 
 #OUTDIR should be the path a folder for writing output
-OUTDIR="/scratch/evt82290/Run137"
+OUTDIR="/scratch/evt82290/Run139"
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
 
