@@ -28,7 +28,7 @@ fi
 
 # #process reads using trimGalore
 #
-ml Trim_Galore SAMtools BWA
+module load Trim_Galore SAMtools/1.17-GCC-12.2.0 BWA/0.7.17-GCCcore-12.2.0
 
 bwa index $GENOME
  #\ trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
