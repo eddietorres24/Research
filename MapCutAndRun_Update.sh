@@ -31,7 +31,7 @@ fi
 ml Trim_Galore SAMtools BWA
 
 bwa index $GENOME
- #\ trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+# trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
 FILES="${FASTQ}/*fastq\.gz" #Don't forget the *
 # #
