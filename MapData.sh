@@ -48,7 +48,7 @@ bam="${bamdir}/${accession}.bam"
 bigwig="${bwDir}/${accession}"
 peak="$PeakDir/${accession}"
 
-name=${bam/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
+name=${bam/%_S[1-12]*_L002_R1_001_val_1.fq.gz/}
 
 
 ############# Read Trimming ##############
@@ -69,7 +69,7 @@ name=${bam/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
 
 
 
-ml SAMtools/1.16.1-GCC-11.3.0 
+ml SAMtools/1.16.1-GCC-11.3.0
 ml BWA/0.7.17-GCCcore-11.3.0
 #
 
@@ -94,5 +94,3 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 
 #using --nolambda paramenter to call peaks without control
 macs3 callpeak -t "${bam}" -f BAMPE -n "${accession}" --broad -g 41037538 --broad-cutoff 0.1 --outdir "${PeakDir}" --min-length 800 --max-gap 500 --nolambda
-
-
