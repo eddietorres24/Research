@@ -48,7 +48,7 @@ bam="${bamdir}/.bam"
 bigwig="${bwDir}"
 peak="$PeakDir"
 
-name=${bam/%_S[1-12]*_L002_R1_001_val_1.fq.gz/}
+name=${bam/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}
 
 
 ############# Read Trimming ##############
