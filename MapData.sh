@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=evt82290@uga.edu
+#SBATCH --mail-user=zlewis@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=100gb
@@ -27,11 +27,11 @@ source config.txt
 
 ###################################
 #input file variables
-  read1="${fastqPath}/*_R1_001.fastq.gz"
-  read2="${fastqPath}/*_R2_001.fastq.gz"
+  read1="${fastqPath}/${accession}*_R1_001.fastq.gz"
+  read2="${fastqPath}/${accession}*_R2_001.fastq.gz"
 
 #make output file folders
-trimmed="${outdir}/TrimmedFastQs"
+trimmed="${outdir}/TrimmedFastQs/${accession}"
 mkdir $trimmed
 
 tmp="${outdir}/tempFile"
@@ -41,14 +41,14 @@ mkdir "${bamdir}"
 bwDir="${outdir}/bigWig"
 mkdir "${bwDir}"
 
-PeakDir="${outdir}/Peaks"
+PeakDir="${outdir}/Peaks/${accession}"
 
 #make variables for output file names
-bam="${bamdir}/.bam"
-bigwig="${bwDir}"
-peak="$PeakDir"
+bam="${bamdir}/${accession}.bam"
+bigwig="${bwDir}/${accession}"
+peak="$PeakDir/${accession}"
 
-name=${bam/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}
+name=${bam/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
 
 
 ############# Read Trimming ##############
@@ -64,23 +64,23 @@ name=${bam/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}
 #################
 	  ml Trim_Galore/0.6.7-GCCcore-11.2.0
 
-	  trim_galore --illumina --fastqc --paired --length 25 --gzip -o $trimmed $read1 $read2
+	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
 	  wait
 
 
 
-ml SAMtools/1.16.1-GCC-11.3.0
+ml SAMtools/1.16.1-GCC-11.3.0 
 ml BWA/0.7.17-GCCcore-11.3.0
 #
 
 #make directory to store temporary files written by samtools sort
-mkdir -p ${tmp}
+mkdir -p ${tmp}/${accession}
 
-bwa mem -M -v 3 -t $THREADS $GENOME ${trimmed}/*val_1.fq.gz ${trimmed}/*val_2.fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T ${tmp} -o "$bam" -
+bwa mem -M -v 3 -t $THREADS $GENOME ${trimmed}/*val_1.fq.gz ${trimmed}/*val_2.fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T ${tmp}/${accession} -o "$bam" -
 samtools index "$bam"
 
 #delete directory written by samtools sort
-rm -r ${tmp}/
+rm -r ${tmp}/${accession}
 
 ml deepTools/3.5.2-foss-2022a
 #Plot all reads
@@ -93,4 +93,6 @@ bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --minMappingQuality 2
 module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 
 #using --nolambda paramenter to call peaks without control
-macs3 callpeak -t "${bam}" -f BAMPE -n "${name}" --broad -g 41037538 --broad-cutoff 0.1 --outdir "${PeakDir}" --min-length 800 --max-gap 500 --nolambda
+macs3 callpeak -t "${bam}" -f BAMPE -n "${accession}" --broad -g 41037538 --broad-cutoff 0.1 --outdir "${PeakDir}" --min-length 800 --max-gap 500 --nolambda
+
+
