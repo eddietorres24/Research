@@ -41,7 +41,7 @@ mkdir "${bamdir}"
 bwDir="${outdir}/bigWig"
 mkdir "${bwDir}"
 
-PeakDir="${outdir}/Peaks/${accession}"
+PeakDir="${outdir}/Peak/${accession}"
 
 #make variables for output file names
 bam="${bamdir}/${accession}.bam"
