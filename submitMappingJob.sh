@@ -32,6 +32,6 @@ mkdir "${outdir}/Peaks"
 while read -r line
 
 	do
-	sleep 10
+	sleep 5
 	echo "$line mapping job submitted"
 	sbatch --job-name="${line}" --export=ALL,accession="${line}",fastqPath="${fastqPath}",outdir="${outdir}" MapData.sh & done <"$1"
