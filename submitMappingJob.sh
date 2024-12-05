@@ -26,7 +26,7 @@ mkdir ${outdir}/logs
 mkdir "${outdir}/TrimmedFastQs"
 mkdir "${outdir}/bamFiles"
 mkdir "${outdir}/bigWig"
-mkdir "${outdir}/Peaks"
+mkdir "${outdir}/Peak"
 
 
 while read -r line
