@@ -32,8 +32,7 @@ outdir="/scratch/evt82290/Run139"
 
 #make output file folders
 trimmed="${outdir}/TrimmedFastQs/${accession}"
-#"/scratch/evt82290/Run137/TrimmedFastQs/137-61_ChIP_ETX51-cac-1-HA_HA_Rep1_S58"
-#"/scratch/evt82290/Run137/TrimmedFastQs/137-61_ChIP_ETX51-cac-1-HA_HA_Rep1_S58"
+
 mkdir $trimmed
 
 tmp="${outdir}/tempFile"
