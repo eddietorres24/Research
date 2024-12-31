@@ -49,7 +49,7 @@ bam="${bamdir}/${accession}.bam"
 bigwig="${bwDir}/${accession}"
 peak="$PeakDir/${accession}"
 
-name=${bam/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}
+name=${bam/%_S[1-12]*_L002_R1_001_val_1.fq.gz/}
 
 
 ############# Read Trimming ##############
@@ -68,10 +68,8 @@ name=${bam/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}
 	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
 	  wait
 
-
-
-ml SAMtools/1.18-GCC-12.3.0
-ml BWA/0.7.17-GCCcore-12.3.0
+ml SAMtools
+ml BWA
 
 #
 
@@ -83,12 +81,12 @@ samtools index "$bam"
 #delete directory written by samtools sort
 rm -r ${tmp}/${accession}
 
-ml deepTools/3.5.2-foss-2022a
+ml deepTools
 #Plot all reads
 bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 20 --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 
 #plot mononucleosomes
-bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --minMappingQuality 20 --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
+#bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --minMappingQuality 20 --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
 
 #call Peaks
 module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
