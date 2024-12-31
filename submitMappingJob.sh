@@ -19,14 +19,14 @@ fi
 fastqPath="/scratch/evt82290/2024_Run145_ET/2024_Run145_FastQ"
 outdir="/scratch/evt82290/Run145"
 
-mkdir ${outdir}
-mkdir ${outdir}/logs
+#mkdir ${outdir}
+#mkdir ${outdir}/logs
 
 #make output file folders
-mkdir "${outdir}/TrimmedFastQs"
-mkdir "${outdir}/bamFiles"
-mkdir "${outdir}/bigWig"
-mkdir "${outdir}/Peak"
+#mkdir "${outdir}/TrimmedFastQs"
+#mkdir "${outdir}/bamFiles"
+#mkdir "${outdir}/bigWig"
+#mkdir "${outdir}/Peak"
 
 
 while read -r line

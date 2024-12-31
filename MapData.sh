@@ -33,14 +33,14 @@ outdir="/scratch/evt82290/Run145"
 #make output file folders
 trimmed="${outdir}/TrimmedFastQs/${accession}"
 
-mkdir $trimmed
+#mkdir $trimmed
 
 tmp="${outdir}/tempFile"
 bamdir="${outdir}/bamFiles"
-mkdir "${bamdir}"
+#mkdir "${bamdir}"
 
 bwDir="${outdir}/bigWig"
-mkdir "${bwDir}"
+#mkdir "${bwDir}"
 
 PeakDir="${outdir}/Peak/${accession}"
 
