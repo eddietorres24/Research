@@ -14,7 +14,7 @@
 #Output directory
 
 OUTDIR="/scratch/evt82290/alphafold"
-FASTADIR="./Research/FASTA_Protein_Sequences"
+FASTADIR="/home/evt82290/Research/FASTA_Protein_Sequences"
 
 #Run Alphafold
 cd $SLURM_SUBMIT_DIR
