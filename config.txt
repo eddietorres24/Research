@@ -12,10 +12,10 @@ THREADS=12
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
 
-#GENOME="/home/evt82290/Research/Foxy_Ncrassa_Genome/Foxy_Ncrassa_merged.fasta"
+GENOME="/home/evt82290/Research/Foxy_Ncrassa_Genome/Foxy_Ncrassa_merged.fasta"
 
 #Normal genome
-GENOME="/home/evt82290/Research/GCA_000182925.2_NC12_genomic.fna"
+#GENOME="/home/evt82290/Research/GCA_000182925.2_NC12_genomic.fna"
 
 #New tetO genome
 #GENOME="/home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta"
