@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=alphafoldjobname
+#SBATCH --job-name=cac3
 #SBATCH --partition=gpu_p
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=evt82290@uga.edu
@@ -19,9 +19,9 @@ FASTADIR="/home/evt82290/Research/FASTA_Protein_Sequences"
 #Run Alphafold
 cd $SLURM_SUBMIT_DIR
 
-ml AlphaFold/2.3.4-foss-2022a-CUDA-11.7.0-ColabFold
+ml AlphaFold/2.3.1-foss-2022a-CUDA-11.7.0
 
-alphafold --output_dir ${OUTDIR}/PRC2 --model_preset multimer --fasta_paths ${FASTADIR}/PRC2.fasta --max_template_date 3000-01-01
+alphafold --data_dir /apps/db/AlphaFold/2.3.1 --output_dir ${OUTDIR}/cac3 --fasta_paths ${FASTADIR}/cac3.fasta --max_template_date 3000-01-01
 
 #exmaple
 #alphafold --data_dir /apps/db/AlphaFold/2.3.1 --output_dir ./output --model_names model_1 --fasta_paths ./query.fasta --max_template_date 2021-11-17
