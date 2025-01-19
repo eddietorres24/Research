@@ -21,7 +21,7 @@ cd $SLURM_SUBMIT_DIR
 
 ml AlphaFold/2.3.1-foss-2022a-CUDA-11.7.0
 
-alphafold --data_dir /apps/db/AlphaFold/2.3.1 --output_dir ${OUTDIR}/PRC2 --model_preset multimer --fasta_paths ${FASTADIR}/PRC2.fasta --max_template_date 3000-01-01
+alphafold --output_dir ${OUTDIR}/PRC2 --model_preset multimer --fasta_paths ${FASTADIR}/PRC2.fasta --max_template_date 3000-01-01
 
 #exmaple
 #alphafold --data_dir /apps/db/AlphaFold/2.3.1 --output_dir ./output --model_names model_1 --fasta_paths ./query.fasta --max_template_date 2021-11-17
