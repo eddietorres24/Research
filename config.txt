@@ -15,10 +15,10 @@ THREADS=12
 #GENOME="/home/evt82290/Research/Foxy_Ncrassa_Genome/Foxy_Ncrassa_merged.fasta"
 
 #Normal genome
-#GENOME="/home/evt82290/Research/GCA_000182925.2_NC12_genomic.fna"
+GENOME="/home/evt82290/Research/GCA_000182925.2_NC12_genomic.fna"
 
 #New tetO genome
-GENOME="/home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta"
+#GENOME="/home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta"
 
 #tetO Genome with hph fragment
 #GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"
