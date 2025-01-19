@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=10
 #SBATCH --gres=gpu:P100:1
-#SBATCH --mem=50gb
+#SBATCH --mem=60gb
 #SBATCH --time=120:00:00
 #SBATCH --output=../Alphafold/logs/%x.out
 #SBATCH --error=../Alphafold/logs/%x.err
