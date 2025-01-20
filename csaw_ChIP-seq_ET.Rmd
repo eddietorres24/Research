@@ -1,0 +1,26 @@
+---
+  title: "csaw ChIP-seq Analysis"
+author: "Eddie Torres"
+date: "2025-01-19"
+output: pdf_document
+---
+  
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+# Set working environment
+
+workingdir="~/Dropbox/DropBOX Documents/2. Zack Papers/2024_HDA1_paper/DataForFigures/Figure7/"
+
+#set working directory to the correct location for working machine
+knitr::opts_knit$set(root.dir = workingdir)
+
+```
+
+```{r ReadBams and countWindows}
+#Loading in BAM files
+library(csaw)
+param <- readParam(minq=20)
+data <- windowCounts(bam.files, ext=110, width=10, param=param)
+```
