@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Set working environment
 
-workingdir="C:/Users/eddie/Research/GitHub/Research"
+workingdir="C:/Users/eddie/Research/GitHub"
 
 #set working directory to the correct location for working machine
 knitr::opts_knit$set(root.dir = workingdir)
@@ -60,11 +60,11 @@ getwd()
 #read in sample sheet
 samples <- read.csv("./csaw_samples_files/cac_csaw.csv")
 
-samples$bamReads <- paste("./bam_files/Run_136/cacs",samples$bamReads, sep="")
+#samples$bamReads <- paste("./bam_files/Run_136/cacs",samples$bamReads, sep="")
 
 ###Example commands to import data from individual experiments
 # input <- samples[samples$Antibody == "input"]
-K27samples <- samples[samples$Antibody == "H3K27me3", ]
+# K27samples <- samples[samples$Antibody == "H3K27me3", ]
 # K9samples <- samples[samples$Antibody == "H3K9me3", ]
 # K36samples <- samples[samples$Antibody == "H3K36me3",]
 # Kacsamples <- samples[samples$Antibody == "Kac",]
@@ -81,8 +81,7 @@ param <- readParam(discard = matLocus, pe="both", max.frag=1500, minq=20 )
 data_csaw <- windowCounts(samples$bamReads, spacing=300, width=300, shift=0,
 filter=0, bin=TRUE, param=param)
 
-data_K27 <- windowCounts(K27samples$bamReads, spacing=1000, width=1000, shift=0,
-filter=0, bin=TRUE, param=param)
+#data_K27 <- windowCounts(K27samples$bamReads, spacing=1000, width=1000, shift=0, filter=0, bin=TRUE, param=param)
 
 ####QC check: look at fragment sizes of PE data to get max.frag paramenter used above. 
 # out <- getPESizes(samples$bamReads)
@@ -113,16 +112,18 @@ filter=0, bin=TRUE, param=param)
 ### don't like this one. try selecting only K27/K9 peaks
 
 
-K27peaks <- read.table(file="./All_Peak_files/peakcalls/136-1_ChIP_WT_H3K27me3_abcam_Rep2_peaks.broadPeak")
-K9peaks <- read.table(file="./All_peak_files/133-23_ChIP_WT_H3K9me3_Rep2_peaks.broadPeak")
-Regions <- rbind(K27peaks, K9peaks)
+#K27peaks <- read.table(file="./All_Peak_files/peakcalls/136-1_ChIP_WT_H3K27me3_abcam_Rep2_peaks.broadPeak")
+K27peaks_merged <- read.table(file="./bed_files/peak_beds/merged_sorted_2.bed")
+#K9peaks <- read.table(file="./All_peak_files/133-23_ChIP_WT_H3K9me3_Rep2_peaks.broadPeak")
+#Regions <- rbind(K27peaks, K9peaks)
 
-Regions.gr <- GRanges(Regions$V1, IRanges(Regions$V2, Regions$V3))
+#Regions.gr <- GRanges(Regions$V1, IRanges(Regions$V2, Regions$V3))
 
-K27_Peaks.gr <- GRanges(K27peaks$V1, IRanges(K27peaks$V2, K27peaks$V3))
-K9_Peaks.gr <- GRanges(K9peaks$V1, IRanges(K9peaks$V2, K9peaks$V3))
+#K27_Peaks.gr <- GRanges(K27peaks$V1, IRanges(K27peaks$V2, K27peaks$V3))
+K27peaks_merged.gr <- GRanges(K27peaks_merged$V1, IRanges(K27peaks_merged$V2, K27peaks_merged$V3))
+#K9_Peaks.gr <- GRanges(K9peaks$V1, IRanges(K9peaks$V2, K9peaks$V3))
 
-    suppressWarnings(keep <- overlapsAny(rowRanges(data_csaw), Regions.gr, type = "within"))
+    suppressWarnings(keep <- overlapsAny(rowRanges(data_csaw), K27peaks_merged.gr, type = "within"))
     summary(keep)
     
 #filtered data keeping all K9 and K27 regions
@@ -131,23 +132,23 @@ K9_Peaks.gr <- GRanges(K9peaks$V1, IRanges(K9peaks$V2, K9peaks$V3))
    
   
 #make a gRanges object and a dataframe object for K9 domains
-    suppressWarnings(keepK9 <- overlapsAny(rowRanges(data_csaw), K9_Peaks.gr, type="within"))
-    summary(keepK9)
-    filtered.data.K9 <- data_csaw[keepK9,]
-    K9.Windows.df <- as.data.frame(granges(filtered.data.K9))
+    #suppressWarnings(keepK9 <- overlapsAny(rowRanges(data_csaw), K9_Peaks.gr, type="within"))
+    #summary(keepK9)
+    #filtered.data.K9 <- data_csaw[keepK9,]
+    #K9.Windows.df <- as.data.frame(granges(filtered.data.K9))
     
 #make a gRanges object and a dataframe object for K27 domains
-    suppressWarnings(keepK27 <- overlapsAny(rowRanges(data_csaw), K27_Peaks.gr, type="within"))
+    suppressWarnings(keepK27 <- overlapsAny(rowRanges(data_csaw), K27peaks_merged.gr, type="within"))
     summary(keepK27)
     filtered.data.K27 <- data_csaw[keepK27,] 
     K27.Windows.df <- as.data.frame(granges(filtered.data.K27))
  
 #remove regions present in both K9 and K9 peaks e.g. subtelomeres
-    k9andk27_regions <-   filtered.data.K9[filtered.data.K9 %over% filtered.data.K27,]
-    minusShared <- filtered.data[!filtered.data %over% k9andk27_regions]
-    suppressWarnings(keep <- overlapsAny(rowRanges(data_csaw), minusShared, type = "within"))
-    summary(keep)
-    filtered.data <- data_csaw[keep,]
+    #k9andk27_regions <-   filtered.data.K9[filtered.data.K9 %over% filtered.data.K27,]
+    #minusShared <- filtered.data[!filtered.data %over% k9andk27_regions]
+    #suppressWarnings(keep <- overlapsAny(rowRanges(data_csaw), minusShared, type = "within"))
+    #summary(keep)
+    #filtered.data <- data_csaw[keep,]
 
 
 
@@ -207,10 +208,23 @@ plot(y$AveLogCPM[o], sqrt(y$trended.dispersion[o]), type="l", lwd=2,
      ylim=c(0, 1), xlab=expression("Ave."~Log[2]~"CPM"),
      ylab=("Biological coefficient of variation"))
 plotQLDisp(fit)
+```
 
-#PlotMDS
-plotMDS(cpm(y, log=TRUE), top=10000, labels=samples$Strain,
-    col=c("red", "blue")[as.integer(samples$Strain)])
+```{r correlation matrix}
+# #calculate cpm
+logCPM <- cpm(DGElist, log = TRUE)
+sample_cor <- cor(logCPM, method="pearson")  # Transpose because dist() works on rows
+cor_matrix <- as.matrix(sample_cor)
+
+
+# Heatmap of the sample distances
+pheatmap(
+    cor_matrix,
+    cluster_rows = TRUE,
+    cluster_cols = TRUE,
+    main = "Sample Distance Matrix"
+)
+
 ```
 
 
