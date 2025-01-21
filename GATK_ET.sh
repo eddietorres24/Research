@@ -6,12 +6,12 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=10gb
 #SBATCH --time=08:00:00
-#SBATCH --output=../GATK/logs/%j.out
-#SBATCH --error=../GATK/logs/%j.err
+#SBATCH --output=../GATK/logs/%x.out
+#SBATCH --error=../GATK/logs/%x.err
 
 #change directroy & load GATK
 cd $SLURM_SUBMIT_DIR
-ml GATK/4.6.0.0-GCCcore-12.3.0-Java-17
+ml GATK/3.8-1-Java-1.8.0_144
 
 #set working & output directories
 OUTDIR="/scratch/evt82290/Run136/GATK"
