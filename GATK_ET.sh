@@ -24,10 +24,7 @@ then
 fi
 
 #HaplotypeCaller (-T chooses what tool you want to use)
-gatk HaplotypeCaller \
--R ~/Research/Foxy_Ncrassa_Genome/Foxy_Ncrassa_merged.fasta \
--I ${BAMDIR}/6147_136-11_ChIP_WT_input.bam \
--O ${OUTDIR}/WT.vcf.gz\
+gatk HaplotypeCaller -R /home/evt82290/Research/Foxy_Ncrassa_Genome/Foxy_Ncrassa_merged.fasta -I ${BAMDIR}/6147_136-11_ChIP_WT_input.bam -O ${OUTDIR}/WT.vcf.gz\
 
 #6147_136-11_ChIP_WT_input.bam
 #6147_136-12_ChIP_cac-1_input.bam
