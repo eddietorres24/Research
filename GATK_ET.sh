@@ -25,7 +25,7 @@ then
 fi
 
 #Create dict & index files for genome (can comment out once done)
-gatk-launch CreateSequenceDictionary -R /home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta
+gatk CreateSequenceDictionary -R /home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta
 
 samtools faidx /home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta
 
