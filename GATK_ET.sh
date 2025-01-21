@@ -12,6 +12,7 @@
 #change directroy & load GATK
 cd $SLURM_SUBMIT_DIR
 ml GATK
+ml SAMtools
 
 #set working & output directories
 OUTDIR="/scratch/evt82290/Run136/GATK"
@@ -22,6 +23,11 @@ if [ ! -d $OUTDIR ]
 then
     mkdir -p $OUTDIR
 fi
+
+#Create dict & index files for genome (can comment out once done)
+gatk-launch CreateSequenceDictionary -R GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta
+
+samtools faidx GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta
 
 #HaplotypeCaller (-T chooses what tool you want to use)
 gatk HaplotypeCaller -R /home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta -I ${BAMDIR}/6147_136-11_ChIP_WT_input.bam -O ${OUTDIR}/WT.vcf.gz\
