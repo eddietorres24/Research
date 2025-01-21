@@ -11,7 +11,7 @@
 
 #change directroy & load GATK
 cd $SLURM_SUBMIT_DIR
-ml GATK/3.8-1-Java-1.8.0_144
+ml GATK
 
 #set working & output directories
 OUTDIR="/scratch/evt82290/Run136/GATK"
@@ -22,7 +22,6 @@ if [ ! -d $OUTDIR ]
 then
     mkdir -p $OUTDIR
 fi
-###
 
 #HaplotypeCaller (-T chooses what tool you want to use)
 java -jar $EBROOTGATK/GenomeAnalysisTK.jar -T HaplotypeCaller \
