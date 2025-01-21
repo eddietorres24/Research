@@ -24,7 +24,7 @@ then
 fi
 
 #HaplotypeCaller (-T chooses what tool you want to use)
-gatk --java-options HaplotypeCaller \
+gatk HaplotypeCaller \
 -R ~/Research/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
 -I ${BAMDIR}/6147_136-11_ChIP_WT_input.bam \
 -O ${OUTDIR}/WT.vcf.gz\
