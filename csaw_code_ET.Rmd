@@ -175,7 +175,8 @@ DGElist <- asDGEList(filtered.data, group=factor(grouping))
 colnames(DGElist$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
 rownames(DGElist$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
 #examine data
-plotMDS(DGElist, method="bcv", col=as.numeric(DGElist$samples$group))
+#plotMDS(DGElist, method="bcv", col=as.numeric(DGElist$samples$group))
+MDSdata <- plotMDS(DGElist, top=500, col=as.numeric(DGElist$samples$group))
     #plot shows replicates behave well.
 
 #d1 <- estimateCommonDisp(DGElist, verbose=T)
