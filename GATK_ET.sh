@@ -24,7 +24,7 @@ then
 fi
 ###
 
-#Submit job with the analysis that you want
+#HaplotypeCaller (-T chooses what tool you want to use)
 java -jar $EBROOTGATK/GenomeAnalysisTK.jar -T HaplotypeCaller \
 -R ~/Research/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
 -I ${BAMDIR}/6147_136-11_ChIP_WT_input.bam \
