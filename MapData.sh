@@ -6,8 +6,6 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=100gb
 #SBATCH --time=8:00:00
-#SBATCH --output=../MappingOutput/logs/%x.out
-#SBATCH --error=../MappingOutput/logs/%x.err
 
 
 cd $SLURM_SUBMIT_DIR
@@ -49,7 +47,7 @@ bam="${bamdir}/${accession}.bam"
 bigwig="${bwDir}/${accession}"
 peak="$PeakDir/${accession}"
 
-name=${bam/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
+name=${bam/%_S[1-12]*_L002_R1_001_val_1.fq.gz/}
 
 
 ############# Read Trimming ##############
