@@ -16,17 +16,17 @@ fi
 
 #iterates through list of accessions and passes to mapping script
 
-fastqPath="/scratch/evt82290/2024_Run139_ET"
-outdir="/scratch/evt82290/Run139"
+fastqPath="/scratch/evt82290/FastqFiles/2024_Run145_ET/Felicia"
+outdir="/scratch/evt82290/MappingOutputs/Run145_Felicia"
 
-#mkdir ${outdir}
-#mkdir ${outdir}/logs
+mkdir ${outdir}
+mkdir ${outdir}/logs
 
 #make output file folders
-#mkdir "${outdir}/TrimmedFastQs"
-#mkdir "${outdir}/bamFiles"
-#mkdir "${outdir}/bigWig"
-#mkdir "${outdir}/Peak"
+mkdir "${outdir}/TrimmedFastQs"
+mkdir "${outdir}/bamFiles"
+mkdir "${outdir}/bigWig"
+mkdir "${outdir}/Peak"
 
 
 while read -r line
