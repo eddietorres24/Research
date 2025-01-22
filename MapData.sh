@@ -15,8 +15,8 @@ source config.txt
 ###ADD a source file with path to FastqFiles
 #variables imported from submission script
 #accession=SRR#
-fastqPath="/scratch/evt82290/FastqFiles/2024_Run141_ET"
-outdir="/scratch/evt82290/MappingOutputs/Run141"
+fastqPath="/scratch/evt82290/FastqFiles/2024_Run139_ET"
+outdir="/scratch/evt82290/MappingOutputs/Run139"
 
 ###################
 #start
@@ -46,7 +46,7 @@ bam="${bamdir}/${accession}.bam"
 bigwig="${bwDir}/${accession}"
 peak="$PeakDir/${accession}"
 
-name=${bam/%_S[1-150]*_L007_R1_001_val_1.fq.gz/}
+name=${bam/%_S[1-150]*_L001_R1_001_val_1.fq.gz/}
 
 
 ############# Read Trimming ##############
