@@ -15,8 +15,8 @@ source config.txt
 ###ADD a source file with path to FastqFiles
 #variables imported from submission script
 #accession=SRR#
-fastqPath="/scratch/evt82290/FastqFiles/2024_Run145_ET"
-outdir="/scratch/evt82290/MappingOutputs/Run145_Felicia"
+fastqPath="/scratch/evt82290/FastqFiles/2024_Run144_ET"
+outdir="/scratch/evt82290/MappingOutputs/Run144"
 
 ###################
 #start
