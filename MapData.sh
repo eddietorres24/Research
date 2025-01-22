@@ -1,12 +1,11 @@
 #!/bin/bash
 #SBATCH --partition=batch
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=evt82290@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=100gb
 #SBATCH --time=8:00:00
-
+#SBATCH --output=../MappingOutputs/logs/%x.out
+#SBATCH --error=../MappingOutputs/logs/%x.err
 
 cd $SLURM_SUBMIT_DIR
 
