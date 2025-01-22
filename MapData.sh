@@ -1,5 +1,6 @@
 #!/bin/bash
 #SBATCH --partition=batch
+#SBATCH --mail-type=FAIL
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=100gb
@@ -15,8 +16,8 @@ source config.txt
 ###ADD a source file with path to FastqFiles
 #variables imported from submission script
 #accession=SRR#
-fastqPath="/scratch/evt82290/FastqFiles/2023_Run131_ET"
-outdir="/scratch/evt82290/MappingOutputs/Run131"
+fastqPath="/scratch/evt82290/FastqFiles/2024_Run145_ET"
+outdir="/scratch/evt82290/MappingOutputs/Run145"
 
 ###################
 #start
