@@ -16,8 +16,8 @@ fi
 
 #iterates through list of accessions and passes to mapping script
 
-fastqPath="/scratch/evt82290/FastqFiles/2023_Run131_ET"
-outdir="/scratch/evt82290/MappingOutputs/Run131"
+fastqPath="/scratch/evt82290/FastqFiles/2022_Run129_ET"
+outdir="/scratch/evt82290/MappingOutputs/Run129"
 
 mkdir ${outdir}
 mkdir ${outdir}/logs
