@@ -353,7 +353,7 @@ max <- quantile(K27_FilteredHeatmap_mat, 0.95) # identify the 98th percentile va
 K27_FilteredHeatmap_mat[K27_FilteredHeatmap_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
 
 library(circlize)
-col_fun<- colorRamp2(c(-1, 0, quantile(K27_FilteredHeatmap_mat, 0.99)), c("white","lightgreen", "darkgreen"))
+col_fun<- colorRamp2(c(-1, 0, quantile(K27_FilteredHeatmap_mat, 0.99)), c("white","white", "darkgreen"))
 col_fun(seq(-1, quantile(K27_FilteredHeatmap_mat, 0.99), length = 20))
 
 heatmap_sort_WT <- order(K27_FilteredHeatmap_mat[, 1], decreasing = TRUE)
@@ -361,8 +361,8 @@ heatmap_sort_WT <- order(K27_FilteredHeatmap_mat[, 1], decreasing = TRUE)
 K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat[heatmap_sort_WT, ]
 
 library(ComplexHeatmap)
-K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat, col = col_fun, cluster_columns = F, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", K27_FilteredHeatmap_mat$logFC_WTvInput_K27me3))) , heatmap_legend_param = list(title = "K27me3"))
-png("./Filtered_Heatmap_cacs.png", width = 800, height = 800)
+K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = F, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort)))) , heatmap_legend_param = list(title = "K27me3"))
+png("./Filtered_Heatmap_cacs_sort.png", width = 800, height = 800)
 # Draw the heatmap
 draw(K27_Filtered_hm)
 # Close the device to save the file
