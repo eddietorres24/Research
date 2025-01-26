@@ -26,8 +26,8 @@ outdir="/scratch/evt82290/RNAseq/cac_aberrant_transcripts"
 
 #notes
 # #generated a STAR genome index with the following call:
-# STAR --runMode genomeGenerate --runThreadN 1 --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR --genomeFastaFiles /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO.fna --sjdbGTFfile /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_WithExtras_GFFtoGTFconversion.gtf
-# need to rerun with normal genome assembly. The his-3 duplicated region will create multi-mappers
+STAR --runMode genomeGenerate --runThreadN 1 --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR --genomeFastaFiles /home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta --sjdbGTFfile /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_WithExtras_GFFtoGTFconversion.gtf
+#need to rerun with normal genome assembly. The his-3 duplicated region will create multi-mappers
 #
 
 ###################
@@ -159,6 +159,7 @@ elif [ -f $read2 ]; then
   	    --outFileNamePrefix ${bam} \
   	    --readFilesIn $trimmed/${accession}_val_1.fq.gz $trimmed/${accession}_val_2.fq.gz \
   	    --readFilesCommand zcat \
+        --strandFieldR FR \
         --alignIntronMax 10000 \
   	    --outSAMtype BAM SortedByCoordinate \
         --outBAMsortingBinsN 100 \
