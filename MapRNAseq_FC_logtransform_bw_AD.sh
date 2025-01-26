@@ -81,7 +81,7 @@ if [ ! -f $read1 ]; then
 #trim reads
   echo "${line} running as unpaired file only"
 
-#   module load Trim_Galore/0.6.7-GCCcore-11.2.0
+module load Trim_Galore/0.6.7-GCCcore-11.2.0
 
   trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $unpaired
 
