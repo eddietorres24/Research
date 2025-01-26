@@ -8,7 +8,7 @@
 #SBATCH --mem=20gb
 #SBATCH --time=8:00:00
 #SBATCH --output=../RNAseqMap/logs/MapRNAseq.%j.out
-#SBATCH --error=../RNAseqMAP/logs/MapRNAseq.%j.err
+#SBATCH --error=../RNAseqMap/logs/MapRNAseq.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
