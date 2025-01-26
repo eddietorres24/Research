@@ -1,14 +1,14 @@
 #!/bin/bash
-#SBATCH --job-name=ad_maprnaseq1
+#SBATCH --job-name=cac_aberrant
 #SBATCH --partition=batch
 #SBATCH --mail-type=END,FAIL
-#SBATCH --mail-user=ad45368@uga.edu
+#SBATCH --mail-user=evt82290@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=20gb
 #SBATCH --time=8:00:00
-#SBATCH --output=../MappingOutput/logs/MapRNAseq1.%j.out
-#SBATCH --error=./MappingOutput/logs/MapRNAseq1.%j.err
+#SBATCH --output=../MappingOutput/logs/MapRNAseq.%j.out
+#SBATCH --error=./MappingOutput/logs/MapRNAseq.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
