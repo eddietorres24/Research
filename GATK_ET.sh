@@ -16,7 +16,7 @@ ml SAMtools
 
 #set working & output directories
 OUTDIR="/scratch/evt82290/Run136/GATK"
-BAMDIR="/scratch/evt82290/Run136/SortedBamFiles"
+BAMDIR="/scratch/evt82290/MappingOutputs/Run136/bamFiles"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
