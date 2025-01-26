@@ -30,7 +30,7 @@ gatk CreateSequenceDictionary -R /home/evt82290/Research/GCA_000182925.2_NC12_ge
 samtools faidx /home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta
 
 #HaplotypeCaller (-T chooses what tool you want to use)
-gatk HaplotypeCaller -R /home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta -I ${BAMDIR}/6147_136-11_ChIP_WT_input.bam -O ${OUTDIR}/WT.vcf.gz\
+gatk HaplotypeCaller -R /home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta -I ${BAMDIR}/6147_136-11_ChIP_WT_input_S11.bam  -O ${OUTDIR}/WT.vcf.gz\
 
 #6147_136-11_ChIP_WT_input.b
 #6147_136-12_ChIP_cac-1_input.bam
