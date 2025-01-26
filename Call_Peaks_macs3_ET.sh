@@ -138,11 +138,11 @@ bedtools sort -i ${OUTDIR3}/merged_sorted.bed > ${OUTDIR3}/merged_sorted_2.bed
 bedtools merge -i ${OUTDIR3}/merged_sorted_2.bed > ${OUTDIR3}/merged_file.txt
 
 #determining which peaks overlap across peak files
-bedtools intersect -wa -wb \
-    -a ${OUTDIR3}/2024_04_23_WT_peaks.bed \
-    -b ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed ${OUTDIR3}/2024_04_23_24hr_peaks.bed \
-    -names cac-1 cac-2 cac-3 24hr \
-    -sorted > ${OUTDIR3}/intersect_peaks.txt
+# bedtools intersect -wa -wb \
+#     -a ${OUTDIR3}/2024_04_23_WT_peaks.bed \
+#     -b ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed ${OUTDIR3}/2024_04_23_24hr_peaks.bed \
+#     -names cac-1 cac-2 cac-3 24hr \
+#     -sorted > ${OUTDIR3}/intersect_peaks.txt
 
 
 # #Run129

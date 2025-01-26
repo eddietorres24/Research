@@ -17,8 +17,8 @@ THREADS=2
 ##ADD a source file with path to FastqFiles
 #variables imported from submission script
 #accession=SRR10916163
-#fastqPath="/scratch/evt82290/downSRA/FastqFiles"
-#outdir="/scratch/evt82290/RNAseqIGV"
+fastqPath="/scratch/evt82290/downSRA/FastqFiles"
+outdir="/scratch/evt82290/RNAseqIGV"
 
 # #if output directory doesn't exist, create it
 # if [ ! -d $outdir ]
@@ -174,7 +174,7 @@ elif [ -f $read2 ]; then
         -t CDS \
         -g gene_name \
         -s 0 --primary \
-        -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
+        -a /home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta \
         -o $counts \
         ${bam}Aligned.sortedByCoord.out.bam
 
