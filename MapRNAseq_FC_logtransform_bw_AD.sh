@@ -23,7 +23,7 @@ outdir="/scratch/evt82290/RNAseq/cac_aberrant_transcripts"
 
 
 #pipeaccession summary: trim reads, map with STAR, get Counts
-
+module load STAR/2.7.10b-GCC-11.3.0
 #notes
 # #generated a STAR genome index with the following call:
 STAR --runMode genomeGenerate --runThreadN 1 --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR --genomeFastaFiles /home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta --sjdbGTFfile /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_WithExtras_GFFtoGTFconversion.gtf
