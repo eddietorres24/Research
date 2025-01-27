@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
 #SBATCH --time=48:00:00
-#SBATCH --output=../CallPeak_homer.%j.out
+#SBATCH -${OUTDIR}/utput=../CallPeak_homer.%j.out
 #SBATCH --error=../CallPeak_homer.%j.err
 
 cd $SLURM_SUBMIT_DIR
@@ -19,10 +19,12 @@ cd $SLURM_SUBMIT_DIR
 source config.txt
 
 #Make Output Directory
-OUTDIR="/scratch/evt82290/Run137"
-CONDIR="/scratch/evt82290/Run136"
-TAGDIR="/scratch/evt82290/Run137/homertags"
-PEAKDIR="/scratch/evt82290/Run137/Peaks"
+OUTDIR="scratch/evt82290/Peaks/qa-suz12"
+BAMDIR="/scratch/evt82290/MappingOutputs/Run137/bamFiles"
+BAMDIR2="/scratch/evt82290/MappingOutputs/Run144/bamFiles"
+INPDIR="/scratch/evt82290/MappingOutputs/Run139/bamFiles"
+TAGDIR="/scratch/evt82290/Peaks/qa-suz12/homertags"
+#PEAKDIR="/scratch/evt82290/Run137/Peaks"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
@@ -34,7 +36,7 @@ fi
 ml SAMtools
 ml BWA
 # #
-# bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+# bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/tempReps ${OUTDIR}/ "$bam" -
 # samtools index "$bam"
 #
 # #samtools view -b -q 30 $bam > "$QualityBam"
@@ -48,20 +50,64 @@ ml deepTools
 #HOMER
 module load Homer/4.11-foss-2022a
 
+# 144-62_ChIP_WT_Input__S62.bam
+# 144-69_ChIP_suz12_Input__S69.bam
+# 144-6_ChIP_tetO_cac-1_p0_H3K27me3_Rep2_S6.bam
+# 144-71_ChIP_qa-suz12_Input__S71.bam
+# 144-73_ChIP_qa-suz12_Input__S73.bam
+# 144-79_ChIP_qa-suz12_Input__S79.bam
+# 144-132_ChIP_qa-suz12_Input__S132.bam
+
 #Make Tag Directories
-makeTagDirectory $TAGDIR/qasuz12_0hr $OUTDIR/SortedBamFiles/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam
-makeTagDirectory $TAGDIR/qasuz12_4hr $OUTDIR/SortedBamFiles/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bam
-makeTagDirectory $TAGDIR/qasuz12_8hr $OUTDIR/SortedBamFiles/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam
-makeTagDirectory $TAGDIR/qasuz12_12hr $OUTDIR/SortedBamFiles/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam
-makeTagDirectory $TAGDIR/qasuz12_24hr $OUTDIR/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam
-makeTagDirectory $TAGDIR/WT_ctrl $CONDIR/SortedBamFiles/6147_136-11_ChIP_WT_input.bam
+#Rep 1 qa-suz12
+makeTagDirectory $TAGDIR/WT_0hr_rep1 $BAMDIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bam
+makeTagDirectory $TAGDIR/qasuz12_0hr_rep1 $BAMDIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bam
+makeTagDirectory $TAGDIR/qasuz12_4hr_rep1 $BAMDIR/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66.bam
+makeTagDirectory $TAGDIR/qasuz12_8hr_rep1 $BAMDIR/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68.bam
+makeTagDirectory $TAGDIR/qasuz12_12hr_rep1 $BAMDIR/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70.bam
+makeTagDirectory $TAGDIR/qasuz12_24hr_rep1 $BAMDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72.bam
+makeTagDirectory $TAGDIR/WT_24hr_rep1 $BAMDIR/137-74_ChIP_WT_H3K27me3_Rep1_S71.bam
+makeTagDirectory $TAGDIR/WT_0hr_input_rep1 $INPDIR/139-29_ChIP_WT_Input__S29.bam
+makeTagDirectory $TAGDIR/qasuz12_0hr_input_rep1 $INPDIR/139-30_ChIP_qa-suz12_Input__S30.bam
+makeTagDirectory $TAGDIR/qasuz12_4hr_input_rep1 $INPDIR/139-32_ChIP_qa-suz12_Input__S32.bam
+makeTagDirectory $TAGDIR/qasuz12_8hr_input_rep1 $INPDIR/139-34_ChIP_qa-suz12_Input__S34.bam
+makeTagDirectory $TAGDIR/qasuz12_12hr_input_rep1 $INPDIR/139-36_ChIP_qa-suz12_Input__S36.bam
+makeTagDirectory $TAGDIR/qasuz12_24hr_input_rep1 $INPDIR/139-38_ChIP_qa-suz12_Input__S38.bam
+makeTagDirectory $TAGDIR/WT_24hr_input_rep1 $INPDIR/139-37_ChIP_WT_Input__S37.bam
+
+#Rep 2 qa-suz12
+makeTagDirectory $TAGDIR/WT_0hr_rep2 $BAMDIR2/144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam
+makeTagDirectory $TAGDIR/qasuz12_0hr_rep2 $BAMDIR2/144-48_ChIP_qa-suz12_0hr_H3K27me3_Rep4_S48.bam
+makeTagDirectory $TAGDIR/qasuz12_4hr_rep2 $BAMDIR2/144-49_ChIP_qa-suz12_4hr_H3K27me3_Rep3_S49.bam
+makeTagDirectory $TAGDIR/qasuz12_8hr_rep2 $BAMDIR2/144-50_ChIP_qa-suz12_8hr_H3K27me3_Rep3_S50.bam
+makeTagDirectory $TAGDIR/qasuz12_12hr_rep2 $BAMDIR2/144-51_ChIP_qa-suz12_12hr_H3K27me3_Rep3_S51.bam
+makeTagDirectory $TAGDIR/qasuz12_24hr_rep2 $BAMDIR2/144-52_ChIP_qa-suz12_24hr_H3K27me3_Rep4_S52.bam
+makeTagDirectory $TAGDIR/WT_24hr_rep2 $BAMDIR2/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bam
+makeTagDirectory $TAGDIR/WT_0hr_input_rep2 $BAMDIR2/144-62_ChIP_WT_Input__S62.bam
+makeTagDirectory $TAGDIR/qasuz12_0hr_input_rep2 $BAMDIR2/144-71_ChIP_qa-suz12_Input__S71.bam
+makeTagDirectory $TAGDIR/qasuz12_4hr_input_rep2 $BAMDIR2/144-73_ChIP_qa-suz12_Input__S73.bam
+makeTagDirectory $TAGDIR/qasuz12_8hr_input_rep2 $BAMDIR2/144-79_ChIP_qa-suz12_Input__S79.bam
+#makeTagDirectory $TAGDIR/qasuz12_12hr_input_rep2 $BAMDIR2/
+makeTagDirectory $TAGDIR/qasuz12_24hr_input_rep2 $BAMDIR2/144-132_ChIP_qa-suz12_Input__S132.bam
+#makeTagDirectory $TAGDIR/WT_24hr_input_rep2 $INPDIR/
 
 #call Peaks
-findPeaks $TAGDIR/qasuz12_0hr -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_ctrl
-findPeaks $TAGDIR/qasuz12_4hr -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_ctrl
-findPeaks $TAGDIR/qasuz12_8hr -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_ctrl
-findPeaks $TAGDIR/qasuz12_12hr -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_ctrl
-findPeaks $TAGDIR/qasuz12_24hr -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_ctrl
+#rep 1
+findPeaks $TAGDIR/WT_0hr_rep1 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/WT_0hr_input_rep1
+findPeaks $TAGDIR/qasuz12_0hr_rep1 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_0hr_input_rep1
+findPeaks $TAGDIR/qasuz12_4hr_rep1 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_4hr_input_rep1
+findPeaks $TAGDIR/qasuz12_8hr_rep1 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_8hr_input_rep1
+findPeaks $TAGDIR/qasuz12_12hr_rep1 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_12hr_input_rep1
+findPeaks $TAGDIR/qasuz12_24hr_rep1 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_24hr_input_rep1
+findPeaks $TAGDIR/WT_24hr_rep1 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/WT_24hr_rep1
+#rep 2
+findPeaks $TAGDIR/WT_0hr_rep2 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/WT_0hr_input_rep2
+findPeaks $TAGDIR/qasuz12_0hr_rep2 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_0hr_input_rep2
+findPeaks $TAGDIR/qasuz12_4hr_rep2 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_4hr_input_rep2
+findPeaks $TAGDIR/qasuz12_8hr_rep2 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_8hr_input_rep2
+findPeaks $TAGDIR/qasuz12_12hr_rep2 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_12hr_input_rep1
+findPeaks $TAGDIR/qasuz12_24hr_rep2 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_24hr_input_rep2
+findPeaks $TAGDIR/WT_24hr_rep2 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/WT_24hr_rep1
 
 #Find Motifs
 # findMotifsGenome.pl qasuz12_4hr_peaks.bed /scratch/evt82290/Foxy_Ncrassa_merged.fasta $OUTDIR/motifs/4hr -size given
@@ -70,18 +116,18 @@ findPeaks $TAGDIR/qasuz12_24hr -style histone -size 500 -minDist 530 -o auto -i 
 
 #bedtools
 
-module load BEDTools
+# module load BEDTools
 
 #Combining all overlapping peaks
-bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \
-                               ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed \
-                               ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed \
-                               ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
-                               ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
-
-
-bedtools sort -i ${OUTDIR3}/merged_sorted.bed > ${OUTDIR3}/merged_sorted_2.bed
-bedtools merge -i ${OUTDIR3}/merged_sorted_2.bed > ${OUTDIR3}/merged_file.txt
+# bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \
+#                                ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed \
+#                                ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed \
+#                                ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
+#                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
+#
+#
+# bedtools sort -i ${OUTDIR3}/merged_sorted.bed > ${OUTDIR3}/merged_sorted_2.bed
+# bedtools merge -i ${OUTDIR3}/merged_sorted_2.bed > ${OUTDIR3}/merged_file.txt
 
 #determining which peaks overlap across peak files
 # bedtools intersect -wa -wb \
@@ -90,100 +136,127 @@ bedtools merge -i ${OUTDIR3}/merged_sorted_2.bed > ${OUTDIR3}/merged_file.txt
 #     -names cac-1 cac-2 cac-3 24hr \
 #     -sorted > ${OUTDIR3}/intersect_peaks.txt
 
+#Run137 bams
+# 137-60_ChIP_WT_HA_Rep1_S57.bam
+# 137-61_ChIP_ETX51-cac-1-HA_HA_Rep1_S58.bam
+# 137-62_ChIP_ETX52-cac-1-HA_HA_Rep1_S59.bam
+# 137-63_ChIP_WT_input__S60.bam
+# 137-64_ChIP_ETX51-cac-1-HA_input__S61.bam
+# 137-65_ChIP_ETX52-cac-1-HA_input__S62.bam
+# 137-66_ChIP_WT_H3K27me3_Rep1_S63.bam
+# 137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bam
+# 137-68_ChIP_WT_H3K27me3_Rep1_S65.bam
+# 137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66.bam
+# 137-70_ChIP_WT_H3K27me3_Rep1_S67.bam
+# 137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68.bam
+# 137-72_ChIP_WT_H3K27me3_Rep1_S69.bam
+# 137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70.bam
+# 137-74_ChIP_WT_H3K27me3_Rep1_S71.bam
+# 137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72.bam
 
-# #Run129
-# 124228-2.bam                                                            129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam
-# 124228-2.bam.bai                                                        129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam.bai
-# 124228-2_S2_L002_R1_001_val_1.fq.gz.bam                                 129-43_ChIP_WT_input_S42_L001_R1_001_val_1.fq.gz.bam
-# 124228-2_S2_L002_R1_001_val_1.fq.gz.bam.bai                             129-43_ChIP_WT_input_S42_L001_R1_001_val_1.fq.gz.bam.bai
-# 124228-2_S2_L003_R1_001_val_1.fq.gz.bam                                 129-44_ChIP_cac-1_input_S43_L001_R1_001_val_1.fq.gz.bam
-# 124228-2_S2_L003_R1_001_val_1.fq.gz.bam.bai                             129-44_ChIP_cac-1_input_S43_L001_R1_001_val_1.fq.gz.bam.bai
-# 124228-2_S2_L004_R1_001_val_1.fq.gz.bam                                 129-45_ChIP_cac-2_input_S44_L001_R1_001_val_1.fq.gz.bam
-# 124228-2_S2_L004_R1_001_val_1.fq.gz.bam.bai                             129-45_ChIP_cac-2_input_S44_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-33_ChIP_WT_K27me3_AM_Rep_2_S32_L001_R1_001_val_1.fq.gz.bam          129-46_ChIP_cac-3_input_S45_L001_R1_001_val_1.fq.gz.bam
-# 129-33_ChIP_WT_K27me3_AM_Rep_2_S32_L001_R1_001_val_1.fq.gz.bam.bai      129-46_ChIP_cac-3_input_S45_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-34_ChIP_cac-1_K27me3_AM_Rep_2_S33_L001_R1_001_val_1.fq.gz.bam       129-47_ChIP_set-7_input_S46_L001_R1_001_val_1.fq.gz.bam
-# 129-34_ChIP_cac-1_K27me3_AM_Rep_2_S33_L001_R1_001_val_1.fq.gz.bam.bai   129-47_ChIP_set-7_input_S46_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-35_ChIP_cac-2_K27me3_AM_Rep_2_S34_L001_R1_001_val_1.fq.gz.bam       129-48_ChIP-seq_Dim-5_input_S47_L001_R1_001_val_1.fq.gz.bam
-# 129-35_ChIP_cac-2_K27me3_AM_Rep_2_S34_L001_R1_001_val_1.fq.gz.bam.bai   129-48_ChIP-seq_Dim-5_input_S47_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-36_ChIP_cac-3_K27me3_AM_Rep_2_S35_L001_R1_001_val_1.fq.gz.bam       129-90_ChIP_WT_H3K36me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bam
-# 129-36_ChIP_cac-3_K27me3_AM_Rep_2_S35_L001_R1_001_val_1.fq.gz.bam.bai   129-90_ChIP_WT_H3K36me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-37_ChIP_set-7_K27me3_AM_Rep_2_S36_L001_R1_001_val_1.fq.gz.bam       129-91_ChIP_cac-1_H3K36me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam
-# 129-37_ChIP_set-7_K27me3_AM_Rep_2_S36_L001_R1_001_val_1.fq.gz.bam.bai   129-91_ChIP_cac-1_H3K36me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bam         129-92_ChIP_cac-2_H3K36me3_Rep1_S73_L001_R1_001_val_1.fq.gz.bam
-# 129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bam.bai     129-92_ChIP_cac-2_H3K36me3_Rep1_S73_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bam      129-93_ChIP_cac-3_H3K36me3_Rep1_S74_L001_R1_001_val_1.fq.gz.bam
-# 129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bam.bai  129-93_ChIP_cac-3_H3K36me3_Rep1_S74_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bam      129-94_ChIP_set-7_H3K36me3_Rep1_S75_L001_R1_001_val_1.fq.gz.bam
-# 129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bam.bai  129-94_ChIP_set-7_H3K36me3_Rep1_S75_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bam      MV.bam
-# 129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bam.bai  MV.bam.bai
+#Run139 bam
+# 139-29_ChIP_WT_Input__S29.bam
+# 139-30_ChIP_qa-suz12_Input__S30.bam
+# 139-31_ChIP_WT_Input__S31.bam
+# 139-32_ChIP_qa-suz12_Input__S32.bam
+# 139-33_ChIP_WT_Input__S33.bam
+# 139-34_ChIP_qa-suz12_Input__S34.bam
+# 139-35_ChIP_WT_Input__S35.bam
+# 139-36_ChIP_qa-suz12_Input__S36.bam
+# 139-37_ChIP_WT_Input__S37.bam
+# 139-38_ChIP_qa-suz12_Input__S38.bam
+# 139-49_ChIP_qa-suz12_H3K27me3_Rep3_S40.bam
+# 139-50_ChIP_qa-suz12-cac-1_H3K27me3_Rep2_S41.bam
+# 139-51_ChIP_qa-suz12_H3K27me3_Rep1_S42.bam
+# 139-52_ChIP_qa-suz12-cac-1_H3K27me3_Rep1_S43.bam
+# 139-53_ChIP_qa-suz12_H3K27me3_Rep1_S44.bam
+# 139-54_ChIP_qa-suz12-cac-1_H3K27me3_Rep1_S45.bam
+# 139-55_ChIP_qa-suz12_H3K27me3_Rep3_S46.bam
+# 139-56_ChIP_qa-suz12-cac-1_H3K27me3_Rep2_S47.bam
+# 139-57_ChIP_WT_H3K27me3_Rep1_S48.bam
+# 139-58_ChIP_qa-suz12_H3K27me3_Rep1_S49.bam
+# 139-59_ChIP_qa-suz12-cac-1_H3K27me3_Rep1_S50.bam
+# 139-60_ChIP_WT_H3K27me2me3_Rep1_S51.bam
+# 139-61_ChIP_qa-suz12_H3K27me2me3_Rep1_S52.bam
+# 139-62_ChIP_qa-suz12-cac-1_H3K27me2me3_Rep1_S53.bam
+# 139-63_ChIP_qa-suz12_H3K27me2me3_Rep1_S54.bam
+# 139-64_ChIP_qa-suz12-cac-1_H3K27me2me3_Rep1_S55.bam
+# 139-65_ChIP_qa-suz12_H3K27me2me3_Rep1_S56.bam
+# 139-66_ChIP_qa-suz12-cac-1_H3K27me2me3_Rep1_S57.bam
+# 139-67_ChIP_qa-suz12_H3K27me2me3_Rep1_S58.bam
+# 139-68_ChIP_qa-suz12-cac-1_H3K27me2me3_Rep1_S59.bam
+# 139-69_ChIP_WT_H3K27me2me3_Rep1_S60.bam
+# 139-70_ChIP_qa-suz12_H3K27me2me3_Rep1_S61.bam
 
-#Run137
-
-# 137-60_ChIP_WT_HA_Rep1_S57_L001_R1_001_val_1.fq.gz.bam                  137-68_ChIP_WT_H3K27me3_Rep1_S65_L001_R1_001_val_1.fq.gz.bam
-# 137-60_ChIP_WT_HA_Rep1_S57_L001_R1_001_val_1.fq.gz.bam.bai              137-68_ChIP_WT_H3K27me3_Rep1_S65_L001_R1_001_val_1.fq.gz.bam.bai
-# 137-61_ChIP_ETX51-cac-1-HA_HA_Rep1_S58_L001_R1_001_val_1.fq.gz.bam      137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bam
-# 137-61_ChIP_ETX51-cac-1-HA_HA_Rep1_S58_L001_R1_001_val_1.fq.gz.bam.bai  137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bam.bai
-# 137-62_ChIP_ETX52-cac-1-HA_HA_Rep1_S59_L001_R1_001_val_1.fq.gz.bam      137-70_ChIP_WT_H3K27me3_Rep1_S67_L001_R1_001_val_1.fq.gz.bam
-# 137-62_ChIP_ETX52-cac-1-HA_HA_Rep1_S59_L001_R1_001_val_1.fq.gz.bam.bai  137-70_ChIP_WT_H3K27me3_Rep1_S67_L001_R1_001_val_1.fq.gz.bam.bai
-# 137-63_ChIP_WT_input__S60_L001_R1_001_val_1.fq.gz.bam                   137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam
-# 137-63_ChIP_WT_input__S60_L001_R1_001_val_1.fq.gz.bam.bai               137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam.bai
-# 137-64_ChIP_ETX51-cac-1-HA_input__S61_L001_R1_001_val_1.fq.gz.bam       137-72_ChIP_WT_H3K27me3_Rep1_S69_L001_R1_001_val_1.fq.gz.bam
-# 137-64_ChIP_ETX51-cac-1-HA_input__S61_L001_R1_001_val_1.fq.gz.bam.bai   137-72_ChIP_WT_H3K27me3_Rep1_S69_L001_R1_001_val_1.fq.gz.bam.bai
-# 137-65_ChIP_ETX52-cac-1-HA_input__S62_L001_R1_001_val_1.fq.gz.bam       137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam
-# 137-65_ChIP_ETX52-cac-1-HA_input__S62_L001_R1_001_val_1.fq.gz.bam.bai   137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam.bai
-# 137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bam            137-74_ChIP_WT_H3K27me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bam
-# 137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bam.bai        137-74_ChIP_WT_H3K27me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bam.bai
-# 137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam      137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam
-# 137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam.bai  137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam.bai
-
-
-# #Run136
-# 6147_136-10_ChIP_cac-1-2_H3K27me3_CS_Rep1.bam                                                6147_136-45_ChIP_set-7_H3K27me3_abcam_6hr_Rep1_S45_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-10_ChIP_cac-1-2_H3K27me3_CS_Rep1.bam.bai                                            6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-11_ChIP_WT_input.bam                                                                6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-11_ChIP_WT_input.bam.bai                                                            6147_136-58_ChIP_WT_H3K27me3_abcam_Rep3_S58_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-12_ChIP_cac-1_input.bam                                                             6147_136-58_ChIP_WT_H3K27me3_abcam_Rep3_S58_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-12_ChIP_cac-1_input.bam.bai                                                         6147_136-5_ChIP_cac-1-2_H3K27me3_abcam_Rep2_S5_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-13_ChIP_cac-2_input.bam                                                             6147_136-5_ChIP_cac-1-2_H3K27me3_abcam_Rep2_S5_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-13_ChIP_cac-2_input.bam.bai                                                         6147_136-6_ChIP_WT_H3K27me3_CS_Rep1_S6_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-14_ChIP_cac-3_input.bam                                                             6147_136-6_ChIP_WT_H3K27me3_CS_Rep1_S6_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-14_ChIP_cac-3_input.bam.bai                                                         6147_136-71_ChIP_cac-1_H3K27me3_abcam_Rep3_S70_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bam                                                   6147_136-71_ChIP_cac-1_H3K27me3_abcam_Rep3_S70_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bam.bai                                               6147_136-72_ChIP_cac-2_H3K27me3_abcam_Rep3_S71_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-21_ChIP_cac-1-2_input.bam                                                           6147_136-72_ChIP_cac-2_H3K27me3_abcam_Rep3_S71_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-21_ChIP_cac-1-2_input.bam.bai                                                       6147_136-75_ChIP_cac-3_H3K27me3_abcam_Rep3_S74_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-22_ChIP_WT_H3K27me3_CS_0hr_Rep1.bam                                                 6147_136-75_ChIP_cac-3_H3K27me3_abcam_Rep3_S74_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-22_ChIP_WT_H3K27me3_CS_0hr_Rep1.bam.bai                                             6147_136-76_ChIP_cac-1-2_H3K27me3_abcam_Rep3_S75_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-23_ChIP_qa-suz12_H3K27me3_CS_0hr_Rep1.bam                                           6147_136-76_ChIP_cac-1-2_H3K27me3_abcam_Rep3_S75_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-23_ChIP_qa-suz12_H3K27me3_CS_0hr_Rep1.bam.bai                                       6147_136-77_ChIP_set-7_H3K27me3_abcam_Rep3_S76_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-24_ChIP_qa-suz12_cac-1_H3K27me3_CS_0hr_Rep1.bam                                     6147_136-77_ChIP_set-7_H3K27me3_abcam_Rep3_S76_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-24_ChIP_qa-suz12_cac-1_H3K27me3_CS_0hr_Rep1.bam.bai                                 6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-25_ChIP_WT_H3K27me3_CS_8hr_Rep1.bam                                                 6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-25_ChIP_WT_H3K27me3_CS_8hr_Rep1.bam.bai                                             6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-26_ChIP_qa-suz12_H3K27me3_CS_8hr_Rep1.bam                                           6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-26_ChIP_qa-suz12_H3K27me3_CS_8hr_Rep1.bam.bai                                       6147_136-7_ChIP_cac-1_H3K27me3_CS_Rep1_S7_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-27_ChIP_qa-suz12_cac-1_H3K27me3_CS_8hr_Rep1.bam                                     6147_136-7_ChIP_cac-1_H3K27me3_CS_Rep1_S7_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-27_ChIP_qa-suz12_cac-1_H3K27me3_CS_8hr_Rep1.bam.bai                                 6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-28_ChIP_WT_H3K27me3_CS_24hr_Rep1.bam                                                6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-28_ChIP_WT_H3K27me3_CS_24hr_Rep1.bam.bai                                            6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-29_ChIP_qa-suz12_H3K27me3_CS_24hr_Rep1.bam                                          6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-29_ChIP_qa-suz12_H3K27me3_CS_24hr_Rep1.bam.bai                                      6147_136-82_ChIP_cac-1-2_H3K27me3_CS_Rep2_S81_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bam                                                6147_136-82_ChIP_cac-1-2_H3K27me3_CS_Rep2_S81_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bam.bai                                            6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-39_ChIP_qa-suz12_cac-1_H3K27me3_CS_24hr_Rep1_S39_L001_R1_001_val_1.fq.gz.bam        6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-39_ChIP_qa-suz12_cac-1_H3K27me3_CS_24hr_Rep1_S39_L001_R1_001_val_1.fq.gz.bam.bai    6147_136-84_ChIP_WT_input_S83_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bam                     6147_136-84_ChIP_WT_input_S83_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bam.bai                 6147_136-85_ChIP_cac-1_input_S84_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-40_ChIP_WT_H3K27me3_abcam_6hr_Rep1_S40_L001_R1_001_val_1.fq.gz.bam                  6147_136-85_ChIP_cac-1_input_S84_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-40_ChIP_WT_H3K27me3_abcam_6hr_Rep1_S40_L001_R1_001_val_1.fq.gz.bam.bai              6147_136-89_ChIP_cac-2_input_S88_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-41_ChIP_qa-suz12_H3K27me3_abcam_6hr_Rep1_S41_L001_R1_001_val_1.fq.gz.bam            6147_136-89_ChIP_cac-2_input_S88_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-41_ChIP_qa-suz12_H3K27me3_abcam_6hr_Rep1_S41_L001_R1_001_val_1.fq.gz.bam.bai        6147_136-8_ChIP_cac-2_H3K27me3_CS_Rep1_S8_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-42_ChIP_qa-suz12_H3K27me3_abcam_6hr_Rep1_S42_L001_R1_001_val_1.fq.gz.bam            6147_136-8_ChIP_cac-2_H3K27me3_CS_Rep1_S8_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-42_ChIP_qa-suz12_H3K27me3_abcam_6hr_Rep1_S42_L001_R1_001_val_1.fq.gz.bam.bai        6147_136-91_ChIP_cac-1-2_input_S90_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-43_ChIP_qa-suz12_cac-1_H3K27me3_abcam_6hr_Rep1_S43_L001_R1_001_val_1.fq.gz.bam      6147_136-91_ChIP_cac-1-2_input_S90_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-43_ChIP_qa-suz12_cac-1_H3K27me3_abcam_6hr_Rep1_S43_L001_R1_001_val_1.fq.gz.bam.bai  6147_136-92_ChIP_set-7_input_S91_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-44_ChIP_qa-suz12_cac-1_H3K27me3_abcam_6hr_Rep1_S44_L001_R1_001_val_1.fq.gz.bam      6147_136-92_ChIP_set-7_input_S91_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-44_ChIP_qa-suz12_cac-1_H3K27me3_abcam_6hr_Rep1_S44_L001_R1_001_val_1.fq.gz.bam.bai  6147_136-9_ChIP_cac-3_H3K27me3_CS_Rep1_S9_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-45_ChIP_set-7_H3K27me3_abcam_6hr_Rep1_S45_L001_R1_001_val_1.fq.gz.bam               6147_136-9_ChIP_cac-3_H3K27me3_CS_Rep1_S9_L001_R1_001_val_1.fq.gz.bam.bai
+# Run144 bams
+# 144-10_ChIP_tetO_p0_H3K27me3_Rep3_S10.bam
+# 144-11_ChIP_tetO_p1_H3K27me3_Rep3_S11.bam
+# 144-122_ChIP_tetO_p3_input__S122.bam
+# 144-124_ChIP_tetO_p1_input__S124.bam
+# 144-125_ChIP_tetO_p2_input__S125.bam
+# 144-126_ChIP_tetO_p3_input__S126.bam
+# 144-127_ChIP_tetO_p0_tet_input__S127.bam
+# 144-12_ChIP_tetO_p2_H3K27me3_Rep3_S12.bam
+# 144-132_ChIP_qa-suz12_Input__S132.bam
+# 144-13_ChIP_tetO_p3_H3K27me3_Rep3_S13.bam
+# 144-141_ChIP_qa-suz12_24hr_H3K27me2_Rep1_S141.bam
+# 144-14_ChIP_tetO_p0_H3K27me3_Rep4_S14.bam
+# 144-15_ChIP_tetO_p1_H3K27me3_Rep4_S15.bam
+# 144-16_ChIP_tetO_p2_H3K27me3_Rep4_S16.bam
+# 144-17_ChIP_tetO_p3_H3K27me3_Rep4_S17.bam
+# 144-18_ChIP_tetO_p0_H3K36me3_Rep1_S18.bam
+# 144-19_ChIP_tetO_p1_H3K36me3_Rep1_S19.bam
+# 144-1_ChIP_tetO_p0_H3K27me3_Rep2_S1.bam
+# 144-20_ChIP_tetO_p2_H3K36me3_Rep1_S20.bam
+# 144-21_ChIP_tetO_p3_H3K36me3_Rep1_S21.bam
+# 144-22_ChIP_tetO_p0_H3K36me3_Rep2_S22.bam
+# 144-23_ChIP_tetO_p1_H3K36me3_Rep2_S23.bam
+# 144-24_ChIP_tetO_p2_H3K36me3_Rep2_S24.bam
+# 144-25_ChIP_tetO_p3_H3K36me3_Rep2_S25.bam
+# 144-26_ChIP_tetO_p0_tet_H3K27me3_Rep2_S26.bam
+# 144-27_ChIP_tetO_p0_tet_H3K36me3_Rep2_S27.bam
+# 144-28_ChIP_WT_0hr_H3K27me3_Rep3_S28.bam
+# 144-29_ChIP_WT_24hr_H3K27me3_Rep2_S29.bam
+# 144-2_ChIP_tetO_p1_H3K27me3_Rep2_S2.bam
+# 144-30_ChIP_qa-suz12_0hr_H3K27me3_Rep3_S30.bam
+# 144-31_ChIP_qa-suz12_4hr_H3K27me3_Rep2_S31.bam
+# 144-32_ChIP_qa-suz12_8hr_H3K27me3_Rep2_S32.bam
+# 144-33_ChIP_qa-suz12_12hr_H3K27me3_Rep2_S33.bam
+# 144-34_ChIP_qa-suz12_24hr_H3K27me3_Rep3_S34.bam
+# 144-35_ChIP_qa-suz12_48hr_H3K27me3_Rep2_S35.bam
+# 144-37_ChIP_suz12_24hr_H3K27me3_Rep1_S37.bam
+# 144-38_ChIP_qa-suz12_cac-1_0hr_H3K27me3_Rep2_S38.bam
+# 144-39_ChIP_qa-suz12_cac-1_4hr_H3K27me3_Rep1_S39.bam
+# 144-3_ChIP_tetO_p2_H3K27me3_Rep2_S3.bam
+# 144-40_ChIP_qa-suz12_cac-1_8hr_H3K27me3_Rep1_S40.bam
+# 144-41_ChIP_qa-suz12_cac-1_12hr_H3K27me3_Rep2_S41.bam
+# 144-42_ChIP_qa-suz12_cac-1_24hr_H3K27me3_Rep2_S42.bam
+# 144-43_ChIP_qa-suz12_cac-1_48hr_H3K27me3_Rep2_S43.bam
+# 144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam
+# 144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bam
+# 144-46_ChIP_suz12_0hr_H3K27me3_Rep2_S46.bam
+# 144-47_ChIP_suz12_24hr_H3K27me3_Rep2_S47.bam
+# 144-48_ChIP_qa-suz12_0hr_H3K27me3_Rep4_S48.bam
+# 144-49_ChIP_qa-suz12_4hr_H3K27me3_Rep3_S49.bam
+# 144-4_ChIP_tetO_p3_H3K27me3_Rep2_S4.bam
+# 144-50_ChIP_qa-suz12_8hr_H3K27me3_Rep3_S50.bam
+# 144-51_ChIP_qa-suz12_12hr_H3K27me3_Rep3_S51.bam
+# 144-52_ChIP_qa-suz12_24hr_H3K27me3_Rep4_S52.bam
+# 144-53_ChIP_WT_0hr_H3K27me2_Rep1_S53.bam
+# 144-54_ChIP_WT_24hr_H3K27me2_Rep1_S54.bam
+# 144-55_ChIP_suz12_0hr_H3K27me2_Rep1_S55.bam
+# 144-56_ChIP_suz12_24hr_H3K27me2_Rep1_S56.bam
+# 144-57_ChIP_qa-suz12_0hr_H3K27me2_Rep1_S57.bam
+# 144-58_ChIP_qa-suz12_4hr_H3K27me2_Rep1_S58.bam
+# 144-59_ChIP_qa-suz12_8hr_H3K27me2_Rep1_S59.bam
+# 144-5_ChIP_tetO_p0_tet_H3K27me3_Rep2_S5.bam
+# 144-60_ChIP_qa-suz12_12hr_H3K27me2_Rep1_S60.bam
+# 144-62_ChIP_WT_Input__S62.bam
+# 144-69_ChIP_suz12_Input__S69.bam
+# 144-6_ChIP_tetO_cac-1_p0_H3K27me3_Rep2_S6.bam
+# 144-71_ChIP_qa-suz12_Input__S71.bam
+# 144-73_ChIP_qa-suz12_Input__S73.bam
+# 144-79_ChIP_qa-suz12_Input__S79.bam
+# 144-7_ChIP_tetO_cac-1_p1_H3K27me3_Rep2_S7.bam
+# 144-8_ChIP_tetO_cac-1_p2_H3K27me3_Rep2_S8.bam
+# 144-9_ChIP_tetO_cac-1_p3_H3K27me3_Rep2_S9.bam
