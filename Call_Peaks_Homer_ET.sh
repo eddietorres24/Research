@@ -16,7 +16,7 @@ cd $SLURM_SUBMIT_DIR
 
 #HOMER
 
-source config.txt
+#source config.txt
 
 #Make Output Directory
 OUTDIR="scratch/evt82290/Peaks/qa-suz12"

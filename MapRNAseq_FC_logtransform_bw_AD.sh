@@ -149,9 +149,7 @@ elif [ -f $read2 ]; then
   	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
   	  wait
 
-
   ##map with STAR
-
   	  module load STAR/2.7.10b-GCC-11.3.0
   	    STAR --runMode alignReads \
   	    --runThreadN $THREADS \
@@ -159,7 +157,6 @@ elif [ -f $read2 ]; then
   	    --outFileNamePrefix ${bam} \
   	    --readFilesIn $trimmed/${accession}_val_1.fq.gz $trimmed/${accession}_val_2.fq.gz \
   	    --readFilesCommand zcat \
-        --strandFieldR FR \
         --alignIntronMax 10000 \
   	    --outSAMtype BAM SortedByCoordinate \
         --outBAMsortingBinsN 100 \
@@ -184,7 +181,6 @@ elif [ -f $read2 ]; then
         -o $counts \
         ${bam}Aligned.sortedByCoord.out.bam
         cp ${bam}Aligned.sortedByCoord.out.bam ${outdir}/condensed
-
 
         ##Plot reads to visualize tracks if needed
              module load deepTools/3.5.2-foss-2022a

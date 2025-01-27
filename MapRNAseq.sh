@@ -73,14 +73,11 @@ bam="${bamdir}/${accession}_"
 counts="${countsdir}/${accession}_counts.txt"
 bw="${bwDir}/${accession}.bw"
 
-
-
 ############# Read Trimming ##############
 #remove adaptors, trim low quality reads (default = phred 20), length > 25
 
 ##fastq files from the ebi link are in folders that either have one file with a SRR##.fastq.gz or a SRR##_1.fastq.gz ending, or have two files with a SRR##_1.fastq.gz ending or a SRR##_2.fastq.gz ending
 #or have three files with a SRR##_1.fastq.gz, SRR##_2.fastq.gz and SRR##.fastq.gz ending. In this case, the third file corresponds to unpaired reads that the depositers mapped.
-
 
 #if read1 file does not exist, do single-end trimming using the only file in the folder i.e. SRR##.fastq.gz filename format
 ##This entire section can be simplified for JGI data
@@ -174,7 +171,7 @@ elif [ -f $read2 ]; then
         -t CDS \
         -g gene_name \
         -s 0 --primary \
-        -a /home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta \
+        -a /home/evt82290/Research/tetO_Genome_Files/Nc12wTetO_at_his3_CLEAN.gff \
         -o $counts \
         ${bam}Aligned.sortedByCoord.out.bam
 
