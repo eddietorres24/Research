@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=Call_Peaks_macs3_ET
+#SBATCH --job-name=Call_Peaks_Homer_ET
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=evt82290@uga.edu
@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
 #SBATCH --time=48:00:00
-#SBATCH -${OUTDIR}/utput=../CallPeak_homer.%j.out
-#SBATCH --error=../CallPeak_homer.%j.err
+#SBATCH --output=../Homer/logs/CallPeak.%j.out
+#SBATCH --error=../Homer/logs/CallPeak.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
