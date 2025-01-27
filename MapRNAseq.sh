@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=20gb
 #SBATCH --time=8:00:00
-#SBATCH --output=../MapRNAseq.%j.out
-#SBATCH --error=../MapRNAseq.%j.err
+#SBATCH --output=../RNAseqMap/logs/MapRNAseq.%j.out
+#SBATCH --error=../RNAseqMap/logs/MapRNAseq.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
@@ -18,13 +18,13 @@ THREADS=2
 #variables imported from submission script
 #accession=SRR10916163
 fastqPath="/scratch/evt82290/downSRA/FastqFiles"
-outdir="/scratch/evt82290/RNAseqIGV"
+outdir="/scratch/evt82290/RNAseq/cac_aberrant_transcripts"
 
 # #if output directory doesn't exist, create it
-# if [ ! -d $outdir ]
-# then
-#     mkdir -p $outdir
-# fi
+if [ ! -d $outdir ]
+then
+    mkdir -p $outdir
+fi
 # ###
 
 ###################
