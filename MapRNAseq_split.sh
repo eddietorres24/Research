@@ -161,9 +161,10 @@ elif [ -f $read2 ]; then
         --limitBAMsortRAM 19990000000
         #create index
         module load SAMtools/1.16.1-GCC-11.3.0
-        samtools view -b -f 0x40 ${bam}.bam > forward.bam
-        samtools view -b -f 0x80 ${bam}.bam > reverse.bam
-        samtools index "${bam}Aligned.sortedByCoord.out.bam"
+        samtools view -b -f 0x40 ${bam}Aligned.sortedByCoord.out.bam > forward.bam
+        samtools view -b -f 0x80 ${bam}Aligned.sortedByCoord.out.bam > reverse.bam
+        samtools index "forward.bam"
+        samtools index "reverse.bam"
 
         ##quantify with featureCounts
         module load Subread/2.0.6-GCC-11.3.0
@@ -174,16 +175,24 @@ elif [ -f $read2 ]; then
         -g gene_name \
         -s 0 --primary \
         -a /home/evt82290/Research/tetO_Genome_Files/Nc12wTetO_at_his3_CLEAN.gff \
-        -o $counts \
-        ${bam}Aligned.sortedByCoord.out.bam
+        -o ${counts}_fow \
+        forward.bam
 
+        featureCounts -T $THREADS \
+        -p \
+        -t CDS \
+        -g gene_name \
+        -s 0 --primary \
+        -a /home/evt82290/Research/tetO_Genome_Files/Nc12wTetO_at_his3_CLEAN.gff \
+        -o ${counts}_rev \
+        reverse.bam
 
         ##Plot reads to visualize tracks if needed
              module load deepTools/3.5.2-foss-2022a
 
              #Plot all reads
-             bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}Aligned.sortedByCoord.out.bam" -o "${bw}"
-
+             bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "forward.bam" -o "${bw}_fow"
+             bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "reverse.bam" -o "${bw}_rev"
 
 #in rare cases there will only be a SRR##_1.fastq.gz format. Use this if nothing else exists.
 else
