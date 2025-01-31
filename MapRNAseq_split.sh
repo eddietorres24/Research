@@ -157,7 +157,7 @@ elif [ -f $read2 ]; then
 
   	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
   	  wait
-
+#1
 
   ##map with STAR
   	  module load STAR/2.7.10b-GCC-11.3.0
