@@ -86,9 +86,9 @@ if [ ! -f $read1 ]; then
 #trim reads
   echo "${line} running as unpaired file only"
 
-  # module load Trim_Galore/0.6.7-GCCcore-11.2.0
-  #
-  # trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $unpaired
+  module load Trim_Galore/0.6.7-GCCcore-11.2.0
+
+  trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $unpaired
 
   wait
 
@@ -110,25 +110,39 @@ if [ ! -f $read1 ]; then
 
   #create index
   module load SAMtools/1.16.1-GCC-11.3.0
-  samtools index "${bam}Aligned.sortedByCoord.out.bam"
+  samtools view -b -f 0x40 ${bam}Aligned.sortedByCoord.out.bam > forward.bam
+  samtools view -b -f 0x80 ${bam}Aligned.sortedByCoord.out.bam > reverse.bam
+  samtools index "forward.bam"
+  samtools index "reverse.bam"
 
   ##quantify with featureCounts
   module load Subread/2.0.6-GCC-11.3.0
 
   featureCounts -T $THREADS \
+  -p \
   -t CDS \
   -g gene_name \
   -s 0 --primary \
-  -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
-  -o $counts \
-  ${bam}Aligned.sortedByCoord.out.bam
+  -a /home/evt82290/Research/tetO_Genome_Files/Nc12wTetO_at_his3_CLEAN.gff \
+  -o ${counts}_fow \
+  forward.bam
+
+  featureCounts -T $THREADS \
+  -p \
+  -t CDS \
+  -g gene_name \
+  -s 0 --primary \
+  -a /home/evt82290/Research/tetO_Genome_Files/Nc12wTetO_at_his3_CLEAN.gff \
+  -o ${counts}_rev \
+  reverse.bam
+
 
 
   ##Plot reads to visualize tracks if needed
        module load deepTools/3.5.2-foss-2022a
        #Plot all reads
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}Aligned.sortedByCoord.out.bam" -o "${bw}"
-
+       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "forward.bam" -o "${bw}_fow"
+       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "reverse.bam" -o "${bw}_rev"
 
 
 #elseif read2 exists, do paired-end Trimming and PE mapping
@@ -139,10 +153,10 @@ elif [ -f $read2 ]; then
   ##################
   #Trimming
   #################
-  	  # module load Trim_Galore/0.6.7-GCCcore-11.2.0
-      #
-  	  # trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
-  	  # wait
+  	  module load Trim_Galore/0.6.7-GCCcore-11.2.0
+
+  	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
+  	  wait
 
 
   ##map with STAR
