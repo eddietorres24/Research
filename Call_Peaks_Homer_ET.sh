@@ -12,14 +12,14 @@
 
 cd $SLURM_SUBMIT_DIR
 
-#read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
+#read in variables from the config file ($threads, $FASTQ, $auto, )
 
 #HOMER
 
 #source config.txt
 
 #Make Output Directory
-OUTDIR="/scratch/evt82290/Peaks/qa-suz12"
+auto="/scratch/evt82290/Peaks/qa-suz12"
 BAMDIR="/scratch/evt82290/MappingOutputs/Run137/bamFiles"
 BAMDIR2="/scratch/evt82290/MappingOutputs/Run144/bamFiles"
 INPDIR="/scratch/evt82290/MappingOutputs/Run139/bamFiles"
@@ -27,16 +27,16 @@ TAGDIR="/scratch/evt82290/Peaks/qa-suz12/homertags"
 #PEAKDIR="/scratch/evt82290/Run137/Peaks"
 
 #if output directory doesn't exist, create it
-if [ ! -d $OUTDIR ]
+if [ ! -d $auto ]
 then
-    mkdir -p $OUTDIR
+    mkdir -p $auto
 fi
 ###
 
 ml SAMtools
 ml BWA
 # #
-# bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/tempReps $OUTDIR/ "$bam" -
+# bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $autotempReps $auto "$bam" -
 # samtools index "$bam"
 #
 # #samtools view -b -q 30 $bam > "$QualityBam"
@@ -96,48 +96,48 @@ module load Homer/4.11-foss-2022a
 /scratch/evt82290/Peaks/qa-suz12/homertags/WT_0hr_rep1
 /scratch/evt82290/Peaks/qa-suz12/homertags
 
-findPeaks $TAGDIR/WT_0hr_rep1 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/WT_0hr_input_rep1
-findPeaks $TAGDIR/qasuz12_0hr_rep1 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_0hr_input_rep1
-findPeaks $TAGDIR/qasuz12_4hr_rep1 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_4hr_input_rep1
-findPeaks $TAGDIR/qasuz12_8hr_rep1 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_8hr_input_rep1
-findPeaks $TAGDIR/qasuz12_12hr_rep1 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_12hr_input_rep1
-findPeaks $TAGDIR/qasuz12_24hr_rep1 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_24hr_input_rep1
-findPeaks $TAGDIR/WT_24hr_rep1 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/WT_24hr_rep1
+findPeaks $TAGDIR/WT_0hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_0hr_input_rep1
+findPeaks $TAGDIR/qasuz12_0hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_0hr_input_rep1
+findPeaks $TAGDIR/qasuz12_4hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_4hr_input_rep1
+findPeaks $TAGDIR/qasuz12_8hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_8hr_input_rep1
+findPeaks $TAGDIR/qasuz12_12hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_12hr_input_rep1
+findPeaks $TAGDIR/qasuz12_24hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_24hr_input_rep1
+findPeaks $TAGDIR/WT_24hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_24hr_input_rep1
 #rep 2
-findPeaks $TAGDIR/WT_0hr_rep2 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/WT_0hr_input_rep2
-findPeaks $TAGDIR/qasuz12_0hr_rep2 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_0hr_input_rep2
-findPeaks $TAGDIR/qasuz12_4hr_rep2 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_4hr_input_rep2
-findPeaks $TAGDIR/qasuz12_8hr_rep2 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_8hr_input_rep2
-findPeaks $TAGDIR/qasuz12_12hr_rep2 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_12hr_input_rep1
-findPeaks $TAGDIR/qasuz12_24hr_rep2 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_24hr_input_rep2
-findPeaks $TAGDIR/WT_24hr_rep2 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/WT_24hr_rep1
+findPeaks $TAGDIR/WT_0hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_0hr_input_rep2
+findPeaks $TAGDIR/qasuz12_0hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_0hr_input_rep2
+findPeaks $TAGDIR/qasuz12_4hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_4hr_input_rep2
+findPeaks $TAGDIR/qasuz12_8hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_8hr_input_rep2
+findPeaks $TAGDIR/qasuz12_12hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_12hr_input_rep1
+findPeaks $TAGDIR/qasuz12_24hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_24hr_input_rep2
+findPeaks $TAGDIR/WT_24hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_24hr_input_rep1
 
 #Find Motifs
-# findMotifsGenome.pl qasuz12_4hr_peaks.bed /scratch/evt82290/Foxy_Ncrassa_merged.fasta $OUTDIR/motifs/4hr -size given
-# findMotifsGenome.pl qasuz12_12hr_peaks.bed /scratch/evt82290/Foxy_Ncrassa_merged.fasta $OUTDIR/motifs/12hr -size given
-# findMotifsGenome.pl qasuz12_8hr_no_telo_macs_peaks.bed /home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta $OUTDIR/motifs/nucsites -size given -len 8,9,10,11,12,13,14,15
+# findMotifsGenome.pl qasuz12_4hr_peaks.bed /scratch/evt82290/Foxy_Ncrassa_merged.fasta $automotifs/4hr -size given
+# findMotifsGenome.pl qasuz12_12hr_peaks.bed /scratch/evt82290/Foxy_Ncrassa_merged.fasta $automotifs/12hr -size given
+# findMotifsGenome.pl qasuz12_8hr_no_telo_macs_peaks.bed /home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta $automotifs/nucsites -size given -len 8,9,10,11,12,13,14,15
 
 #bedtools
 
 # module load BEDTools
 
 #Combining all overlapping peaks
-# bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \
-#                                ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed \
-#                                ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed \
-#                                ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
-#                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
+# bedtools multiinter -header -i ${auto3}/2024_04_23_WT_peaks.bed \
+#                                ${auto3}/2024_04_23_136_abcam_cac-1_peaks.bed \
+#                                ${auto3}/2024_04_23_136_abcam_cac-2_peaks.bed \
+#                                ${auto3}/2024_04_23_136_abcam_cac-3_peaks.bed \
+#                                ${auto3}/2024_04_23_24hr_peaks.bed > ${auto3}/merge_peaks.txt
 #
 #
-# bedtools sort -i ${OUTDIR3}/merged_sorted.bed > ${OUTDIR3}/merged_sorted_2.bed
-# bedtools merge -i ${OUTDIR3}/merged_sorted_2.bed > ${OUTDIR3}/merged_file.txt
+# bedtools sort -i ${auto3}/merged_sorted.bed > ${auto3}/merged_sorted_2.bed
+# bedtools merge -i ${auto3}/merged_sorted_2.bed > ${auto3}/merged_file.txt
 
 #determining which peaks overlap across peak files
 # bedtools intersect -wa -wb \
-#     -a ${OUTDIR3}/2024_04_23_WT_peaks.bed \
-#     -b ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed ${OUTDIR3}/2024_04_23_24hr_peaks.bed \
+#     -a ${auto3}/2024_04_23_WT_peaks.bed \
+#     -b ${auto3}/2024_04_23_136_abcam_cac-1_peaks.bed ${auto3}/2024_04_23_136_abcam_cac-2_peaks.bed ${auto3}/2024_04_23_136_abcam_cac-3_peaks.bed ${auto3}/2024_04_23_24hr_peaks.bed \
 #     -names cac-1 cac-2 cac-3 24hr \
-#     -sorted > ${OUTDIR3}/intersect_peaks.txt
+#     -sorted > ${auto3}/intersect_peaks.txt
 
 #Run137 bams
 # 137-60_ChIP_WT_HA_Rep1_S57.bam
