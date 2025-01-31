@@ -93,8 +93,6 @@ module load Homer/4.11-foss-2022a
 
 #call Peaks
 #rep 1
-/scratch/evt82290/Peaks/qa-suz12/homertags/WT_0hr_rep1
-/scratch/evt82290/Peaks/qa-suz12/homertags
 
 findPeaks $TAGDIR/WT_0hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_0hr_input_rep1
 findPeaks $TAGDIR/qasuz12_0hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_0hr_input_rep1
