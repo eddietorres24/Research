@@ -36,7 +36,7 @@ fi
 ml SAMtools
 ml BWA
 # #
-# bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/tempReps ${OUTDIR}/ "$bam" -
+# bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/tempReps $OUTDIR/ "$bam" -
 # samtools index "$bam"
 #
 # #samtools view -b -q 30 $bam > "$QualityBam"
@@ -60,54 +60,57 @@ module load Homer/4.11-foss-2022a
 
 #Make Tag Directories
 #Rep 1 qa-suz12
-makeTagDirectory $TAGDIR/WT_0hr_rep1 $BAMDIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bam
-makeTagDirectory $TAGDIR/qasuz12_0hr_rep1 $BAMDIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bam
-makeTagDirectory $TAGDIR/qasuz12_4hr_rep1 $BAMDIR/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66.bam
-makeTagDirectory $TAGDIR/qasuz12_8hr_rep1 $BAMDIR/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68.bam
-makeTagDirectory $TAGDIR/qasuz12_12hr_rep1 $BAMDIR/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70.bam
-makeTagDirectory $TAGDIR/qasuz12_24hr_rep1 $BAMDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72.bam
-makeTagDirectory $TAGDIR/WT_24hr_rep1 $BAMDIR/137-74_ChIP_WT_H3K27me3_Rep1_S71.bam
-makeTagDirectory $TAGDIR/WT_0hr_input_rep1 $INPDIR/139-29_ChIP_WT_Input__S29.bam
-makeTagDirectory $TAGDIR/qasuz12_0hr_input_rep1 $INPDIR/139-30_ChIP_qa-suz12_Input__S30.bam
-makeTagDirectory $TAGDIR/qasuz12_4hr_input_rep1 $INPDIR/139-32_ChIP_qa-suz12_Input__S32.bam
-makeTagDirectory $TAGDIR/qasuz12_8hr_input_rep1 $INPDIR/139-34_ChIP_qa-suz12_Input__S34.bam
-makeTagDirectory $TAGDIR/qasuz12_12hr_input_rep1 $INPDIR/139-36_ChIP_qa-suz12_Input__S36.bam
-makeTagDirectory $TAGDIR/qasuz12_24hr_input_rep1 $INPDIR/139-38_ChIP_qa-suz12_Input__S38.bam
-makeTagDirectory $TAGDIR/WT_24hr_input_rep1 $INPDIR/139-37_ChIP_WT_Input__S37.bam
-
-#Rep 2 qa-suz12
-makeTagDirectory $TAGDIR/WT_0hr_rep2 $BAMDIR2/144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam
-makeTagDirectory $TAGDIR/qasuz12_0hr_rep2 $BAMDIR2/144-48_ChIP_qa-suz12_0hr_H3K27me3_Rep4_S48.bam
-makeTagDirectory $TAGDIR/qasuz12_4hr_rep2 $BAMDIR2/144-49_ChIP_qa-suz12_4hr_H3K27me3_Rep3_S49.bam
-makeTagDirectory $TAGDIR/qasuz12_8hr_rep2 $BAMDIR2/144-50_ChIP_qa-suz12_8hr_H3K27me3_Rep3_S50.bam
-makeTagDirectory $TAGDIR/qasuz12_12hr_rep2 $BAMDIR2/144-51_ChIP_qa-suz12_12hr_H3K27me3_Rep3_S51.bam
-makeTagDirectory $TAGDIR/qasuz12_24hr_rep2 $BAMDIR2/144-52_ChIP_qa-suz12_24hr_H3K27me3_Rep4_S52.bam
-makeTagDirectory $TAGDIR/WT_24hr_rep2 $BAMDIR2/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bam
-makeTagDirectory $TAGDIR/WT_0hr_input_rep2 $BAMDIR2/144-62_ChIP_WT_Input__S62.bam
-makeTagDirectory $TAGDIR/qasuz12_0hr_input_rep2 $BAMDIR2/144-71_ChIP_qa-suz12_Input__S71.bam
-makeTagDirectory $TAGDIR/qasuz12_4hr_input_rep2 $BAMDIR2/144-73_ChIP_qa-suz12_Input__S73.bam
-makeTagDirectory $TAGDIR/qasuz12_8hr_input_rep2 $BAMDIR2/144-79_ChIP_qa-suz12_Input__S79.bam
-#makeTagDirectory $TAGDIR/qasuz12_12hr_input_rep2 $BAMDIR2/
-makeTagDirectory $TAGDIR/qasuz12_24hr_input_rep2 $BAMDIR2/144-132_ChIP_qa-suz12_Input__S132.bam
+# makeTagDirectory $TAGDIR/WT_0hr_rep1 $BAMDIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bam
+# makeTagDirectory $TAGDIR/qasuz12_0hr_rep1 $BAMDIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bam
+# makeTagDirectory $TAGDIR/qasuz12_4hr_rep1 $BAMDIR/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66.bam
+# makeTagDirectory $TAGDIR/qasuz12_8hr_rep1 $BAMDIR/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68.bam
+# makeTagDirectory $TAGDIR/qasuz12_12hr_rep1 $BAMDIR/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70.bam
+# makeTagDirectory $TAGDIR/qasuz12_24hr_rep1 $BAMDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72.bam
+# makeTagDirectory $TAGDIR/WT_24hr_rep1 $BAMDIR/137-74_ChIP_WT_H3K27me3_Rep1_S71.bam
+# makeTagDirectory $TAGDIR/WT_0hr_input_rep1 $INPDIR/139-29_ChIP_WT_Input__S29.bam
+# makeTagDirectory $TAGDIR/qasuz12_0hr_input_rep1 $INPDIR/139-30_ChIP_qa-suz12_Input__S30.bam
+# makeTagDirectory $TAGDIR/qasuz12_4hr_input_rep1 $INPDIR/139-32_ChIP_qa-suz12_Input__S32.bam
+# makeTagDirectory $TAGDIR/qasuz12_8hr_input_rep1 $INPDIR/139-34_ChIP_qa-suz12_Input__S34.bam
+# makeTagDirectory $TAGDIR/qasuz12_12hr_input_rep1 $INPDIR/139-36_ChIP_qa-suz12_Input__S36.bam
+# makeTagDirectory $TAGDIR/qasuz12_24hr_input_rep1 $INPDIR/139-38_ChIP_qa-suz12_Input__S38.bam
+# makeTagDirectory $TAGDIR/WT_24hr_input_rep1 $INPDIR/139-37_ChIP_WT_Input__S37.bam
+#
+# #Rep 2 qa-suz12
+# makeTagDirectory $TAGDIR/WT_0hr_rep2 $BAMDIR2/144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam
+# makeTagDirectory $TAGDIR/qasuz12_0hr_rep2 $BAMDIR2/144-48_ChIP_qa-suz12_0hr_H3K27me3_Rep4_S48.bam
+# makeTagDirectory $TAGDIR/qasuz12_4hr_rep2 $BAMDIR2/144-49_ChIP_qa-suz12_4hr_H3K27me3_Rep3_S49.bam
+# makeTagDirectory $TAGDIR/qasuz12_8hr_rep2 $BAMDIR2/144-50_ChIP_qa-suz12_8hr_H3K27me3_Rep3_S50.bam
+# makeTagDirectory $TAGDIR/qasuz12_12hr_rep2 $BAMDIR2/144-51_ChIP_qa-suz12_12hr_H3K27me3_Rep3_S51.bam
+# makeTagDirectory $TAGDIR/qasuz12_24hr_rep2 $BAMDIR2/144-52_ChIP_qa-suz12_24hr_H3K27me3_Rep4_S52.bam
+# makeTagDirectory $TAGDIR/WT_24hr_rep2 $BAMDIR2/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bam
+# makeTagDirectory $TAGDIR/WT_0hr_input_rep2 $BAMDIR2/144-62_ChIP_WT_Input__S62.bam
+# makeTagDirectory $TAGDIR/qasuz12_0hr_input_rep2 $BAMDIR2/144-71_ChIP_qa-suz12_Input__S71.bam
+# makeTagDirectory $TAGDIR/qasuz12_4hr_input_rep2 $BAMDIR2/144-73_ChIP_qa-suz12_Input__S73.bam
+# makeTagDirectory $TAGDIR/qasuz12_8hr_input_rep2 $BAMDIR2/144-79_ChIP_qa-suz12_Input__S79.bam
+# #makeTagDirectory $TAGDIR/qasuz12_12hr_input_rep2 $BAMDIR2/
+# makeTagDirectory $TAGDIR/qasuz12_24hr_input_rep2 $BAMDIR2/144-132_ChIP_qa-suz12_Input__S132.bam
 #makeTagDirectory $TAGDIR/WT_24hr_input_rep2 $INPDIR/
 
 #call Peaks
 #rep 1
-findPeaks $TAGDIR/WT_0hr_rep1 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/WT_0hr_input_rep1
-findPeaks $TAGDIR/qasuz12_0hr_rep1 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_0hr_input_rep1
-findPeaks $TAGDIR/qasuz12_4hr_rep1 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_4hr_input_rep1
-findPeaks $TAGDIR/qasuz12_8hr_rep1 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_8hr_input_rep1
-findPeaks $TAGDIR/qasuz12_12hr_rep1 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_12hr_input_rep1
-findPeaks $TAGDIR/qasuz12_24hr_rep1 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_24hr_input_rep1
-findPeaks $TAGDIR/WT_24hr_rep1 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/WT_24hr_rep1
+/scratch/evt82290/Peaks/qa-suz12/homertags/WT_0hr_rep1
+/scratch/evt82290/Peaks/qa-suz12/homertags
+
+findPeaks $TAGDIR/WT_0hr_rep1 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/WT_0hr_input_rep1
+findPeaks $TAGDIR/qasuz12_0hr_rep1 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_0hr_input_rep1
+findPeaks $TAGDIR/qasuz12_4hr_rep1 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_4hr_input_rep1
+findPeaks $TAGDIR/qasuz12_8hr_rep1 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_8hr_input_rep1
+findPeaks $TAGDIR/qasuz12_12hr_rep1 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_12hr_input_rep1
+findPeaks $TAGDIR/qasuz12_24hr_rep1 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_24hr_input_rep1
+findPeaks $TAGDIR/WT_24hr_rep1 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/WT_24hr_rep1
 #rep 2
-findPeaks $TAGDIR/WT_0hr_rep2 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/WT_0hr_input_rep2
-findPeaks $TAGDIR/qasuz12_0hr_rep2 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_0hr_input_rep2
-findPeaks $TAGDIR/qasuz12_4hr_rep2 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_4hr_input_rep2
-findPeaks $TAGDIR/qasuz12_8hr_rep2 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_8hr_input_rep2
-findPeaks $TAGDIR/qasuz12_12hr_rep2 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_12hr_input_rep1
-findPeaks $TAGDIR/qasuz12_24hr_rep2 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/qasuz12_24hr_input_rep2
-findPeaks $TAGDIR/WT_24hr_rep2 -style histone -size 500 -minDist 530 -o ${OUTDIR}/ -i $TAGDIR/WT_24hr_rep1
+findPeaks $TAGDIR/WT_0hr_rep2 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/WT_0hr_input_rep2
+findPeaks $TAGDIR/qasuz12_0hr_rep2 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_0hr_input_rep2
+findPeaks $TAGDIR/qasuz12_4hr_rep2 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_4hr_input_rep2
+findPeaks $TAGDIR/qasuz12_8hr_rep2 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_8hr_input_rep2
+findPeaks $TAGDIR/qasuz12_12hr_rep2 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_12hr_input_rep1
+findPeaks $TAGDIR/qasuz12_24hr_rep2 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/qasuz12_24hr_input_rep2
+findPeaks $TAGDIR/WT_24hr_rep2 -style histone -size 500 -minDist 530 -o $OUTDIR/ -i $TAGDIR/WT_24hr_rep1
 
 #Find Motifs
 # findMotifsGenome.pl qasuz12_4hr_peaks.bed /scratch/evt82290/Foxy_Ncrassa_merged.fasta $OUTDIR/motifs/4hr -size given
