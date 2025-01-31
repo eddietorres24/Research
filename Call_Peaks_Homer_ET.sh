@@ -19,7 +19,7 @@ cd $SLURM_SUBMIT_DIR
 #source config.txt
 
 #Make Output Directory
-OUTDIR="scratch/evt82290/Peaks/qa-suz12"
+OUTDIR="/scratch/evt82290/Peaks/qa-suz12"
 BAMDIR="/scratch/evt82290/MappingOutputs/Run137/bamFiles"
 BAMDIR2="/scratch/evt82290/MappingOutputs/Run144/bamFiles"
 INPDIR="/scratch/evt82290/MappingOutputs/Run139/bamFiles"
