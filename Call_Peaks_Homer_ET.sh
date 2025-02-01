@@ -118,8 +118,8 @@ findPeaks $TAGDIR/WT_24hr_rep2 -style histone -size 500 -minDist 530 -o auto -i 
 #bedtools
 
 # module load BEDTools
-
-#Combining all overlapping peaks
+#
+# Combining all overlapping peaks
 # bedtools multiinter -header -i ${auto3}/2024_04_23_WT_peaks.bed \
 #                                ${auto3}/2024_04_23_136_abcam_cac-1_peaks.bed \
 #                                ${auto3}/2024_04_23_136_abcam_cac-2_peaks.bed \
@@ -129,8 +129,8 @@ findPeaks $TAGDIR/WT_24hr_rep2 -style histone -size 500 -minDist 530 -o auto -i 
 #
 # bedtools sort -i ${auto3}/merged_sorted.bed > ${auto3}/merged_sorted_2.bed
 # bedtools merge -i ${auto3}/merged_sorted_2.bed > ${auto3}/merged_file.txt
-
-#determining which peaks overlap across peak files
+#
+# determining which peaks overlap across peak files
 # bedtools intersect -wa -wb \
 #     -a ${auto3}/2024_04_23_WT_peaks.bed \
 #     -b ${auto3}/2024_04_23_136_abcam_cac-1_peaks.bed ${auto3}/2024_04_23_136_abcam_cac-2_peaks.bed ${auto3}/2024_04_23_136_abcam_cac-3_peaks.bed ${auto3}/2024_04_23_24hr_peaks.bed \
