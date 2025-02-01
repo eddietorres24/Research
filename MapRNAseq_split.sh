@@ -141,8 +141,8 @@ if [ ! -f $read1 ]; then
   ##Plot reads to visualize tracks if needed
        module load deepTools/3.5.2-foss-2022a
        #Plot all reads
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}forward.bam" -o "${bw}_fow"
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}reverse.bam" -o "${bw}_rev"
+       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}forward.bam" -o "fow_${bw}"
+       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}reverse.bam" -o "rev_${bw}"
 
 
 #elseif read2 exists, do paired-end Trimming and PE mapping
@@ -205,8 +205,8 @@ elif [ -f $read2 ]; then
              module load deepTools/3.5.2-foss-2022a
 
              #Plot all reads
-             bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}forward.bam" -o "${bw}_fow"
-             bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}reverse.bam" -o "${bw}_rev"
+             bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}forward.bam" -o "fow_${bw}"
+             bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}reverse.bam" -o "rev_${bw}"
 
 #in rare cases there will only be a SRR##_1.fastq.gz format. Use this if nothing else exists.
 else
