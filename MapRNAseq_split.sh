@@ -27,6 +27,8 @@ then
 fi
 # ###
 
+#/scratch/evt82290/RNAseq/cac_aberrant_transcripts/bamFiles/SRR8269825/SRR8269825_Aligned.sortedByCoord.out.bam
+#/scratch/evt82290/RNAseq/cac_aberrant_transcripts/bamFiles/SRR8269825/SRR8269825_
 ###################
 #start
 ####################################################
@@ -72,6 +74,10 @@ mkdir "${bwDir}"
 bam="${bamdir}/${accession}_"
 counts="${countsdir}/${accession}"
 bw="${bwDir}/${accession}"
+
+#bam="${bamdir}/${accession}_"
+#counts="${countsdir}/${accession}_counts.txt"
+#bw="${bwDir}/${accession}.bw"
 
 ############# Read Trimming ##############
 #remove adaptors, trim low quality reads (default = phred 20), length > 25
