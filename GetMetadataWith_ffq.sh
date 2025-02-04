@@ -29,6 +29,6 @@ do
 #make a new directory for each accession
   mkdir "/scratch/evt82290/downSRA/${line}"
 #download metadata and store in a .JSON file
-  ffq -o "/scratch/evt82290/downSRA/${line}/${line}.json --ftp "$line""
+  ffq -o /scratch/evt82290/downSRA/${line}/${line}.json --ftp "$line"
 
 done <"${accession}"
