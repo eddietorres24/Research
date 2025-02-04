@@ -18,7 +18,7 @@ THREADS=2
 #variables imported from submission script
 # accession=SRR#
 
-fastqPath="/scratch/evt82290/downSRA/FastqFiles"
+fastqPath="/scratch/evt82290/SRA/FastqFiles"
 outdir="/scratch/evt82290/RNAseq/cac_aberrant_transcripts"
 
 

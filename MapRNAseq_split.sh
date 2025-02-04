@@ -17,7 +17,7 @@ THREADS=2
 ##ADD a source file with path to FastqFiles
 #variables imported from submission script
 #accession=SRR10916163
-fastqPath="/scratch/evt82290/downSRA/FastqFiles"
+fastqPath="/scratch/evt82290/SRA/FastqFiles"
 outdir="/scratch/evt82290/RNAseq/cac_aberrant_transcripts"
 
 # #if output directory doesn't exist, create it
