@@ -27,8 +27,8 @@ then
 fi
 # ###
 
-#/scratch/evt82290/RNAseq/cac_aberrant_transcripts/bamFiles/SRR8269825/SRR8269825_Aligned.sortedByCoord.out.bam
-#/scratch/evt82290/RNAseq/cac_aberrant_transcripts/bamFiles/SRR8269825/SRR8269825_
+# /scratch/evt82290/downSRA/FastqFiles/SRR7970631/SRR7970631.fastq.gz
+# /scratch/evt82290/downSRA/FastqFiles/SRR7970631
 ###################
 #start
 ####################################################

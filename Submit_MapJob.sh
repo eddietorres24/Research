@@ -25,8 +25,8 @@ then
 fi
 
 #iterates through list of accessions and passes to mapping script
-
-fastqPath="/scratch/evt82290/downSRA/FastqFiles" #fastq directory generate by https://github.com/UGALewisLab/downloadSRA.git
+#fastq directory generate by https://github.com/UGALewisLab/downloadSRA.git
+fastqPath="/scratch/evt82290/downSRA/FastqFiles"
 outdir="/scratch/evt82290/RNAseq/cac_aberrant_transcripts"
 
 mkdir ${outdir}
