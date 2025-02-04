@@ -27,7 +27,7 @@ fi
 #iterates through list of accessions and passes to mapping script
 #fastq directory generate by https://github.com/UGALewisLab/downloadSRA.git
 fastqPath="/scratch/evt82290/downSRA/FastqFiles"
-outdir="/scratch/evt82290/RNAseq/cac_aberrant_transcripts"
+outdir="/scratch/evt82290/RNAseq/CAF-1_Heatmap"
 
 mkdir ${outdir}
 mkdir ${outdir}/logs
@@ -43,4 +43,4 @@ while read -r line
 	do
 	sleep 5
 	echo "$line mapping job submitted"
-	sbatch --export=ALL,accession="${line}",fastqPath="${fastqPath}",outdir="${outdir}" MapRNAseq_split.sh & done <"$1"
+	sbatch --export=ALL,accession="${line}",fastqPath="${fastqPath}",outdir="${outdir}" MapRNAseq.sh & done <"$1"
