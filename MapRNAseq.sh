@@ -51,6 +51,11 @@ mkdir "${countsdir}"
 bwDir="${outdir}/bigWig/${accession}"
 mkdir "${bwDir}"
 
+bedgraphDir="${outdir}/bedGraph/${accession}"
+mkdir "${bedgraphDir}"
+
+mkdir ${outdir}/condensed
+
 #pipeaccession summary: trim reads, map with STAR, get Counts
 
 #notes
@@ -195,6 +200,13 @@ elif [ -f $read2 ]; then
              #Plot all reads
              bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}Aligned.sortedByCoord.out.bam" -o "${bw}"
 
+#log-transformed BigWigs
+module load ucsc/434
+
+bigWigToBedGraph ${bw} ${bg}
+awk '{ $4=(log($4+1)/log(2)); } 1' < ${bg} > ${bg2}
+sort -k1,1 -k2,2n ${bg2} > ${bg2_sort}
+bedGraphToBigWig ${bg2_sort} /home/ad45368/chrom_sizes.txt ${bw2}
 
 #in rare cases there will only be a SRR##_1.fastq.gz format. Use this if nothing else exists.
 else
