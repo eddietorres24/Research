@@ -15,7 +15,7 @@ cd $SLURM_SUBMIT_DIR
 ##This script takes an input of SRR accession #s one per line. For each accessiob. Edit last line to include path to your list of accessions.
 #Your accession file should include one accession per line with no other information.
 
-accession="../Research/accession_list_ET.txt"
+accession="/home/evt82290/Research/accession_list_ET.txt"
 
 module load ffq/0.3.0-foss-2022a
 
