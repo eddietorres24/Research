@@ -71,13 +71,12 @@ mkdir "${bwDir}"
 # bwDir= mkdir "${outdir}/bigWig/${accession}"
 
 #make variables for output file names
-bam="${bamdir}/${accession}_"
-counts="${countsdir}/${accession}"
-bw="${bwDir}/${accession}"
 
-#bam="${bamdir}/${accession}_"
-#counts="${countsdir}/${accession}_counts.txt"
-#bw="${bwDir}/${accession}.bw"
+bam="${bamdir}/${accession}_"
+fowcounts="${countsdir}/${accession}_counts_fow.txt"
+fowbw="${bwDir}/${accession}_fow.bw"
+revcounts="${countsdir}/${accession}_counts_rev.txt"
+revbw="${bwDir}/${accession}_rev.bw"
 
 ############# Read Trimming ##############
 #remove adaptors, trim low quality reads (default = phred 20), length > 25
@@ -90,13 +89,13 @@ bw="${bwDir}/${accession}"
 
 if [ ! -f $read1 ]; then
 #trim reads
-  # echo "${line} running as unpaired file only"
-  #
-  # module load Trim_Galore/0.6.7-GCCcore-11.2.0
-  #
-  # trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $unpaired
-  #
-  # wait
+  echo "${line} running as unpaired file only"
+
+  module load Trim_Galore/0.6.7-GCCcore-11.2.0
+
+  trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $unpaired
+
+  wait
 
 #map with STAR
   module load STAR/2.7.10b-GCC-11.3.0
@@ -130,7 +129,7 @@ if [ ! -f $read1 ]; then
   -g gene_name \
   -s 0 --primary \
   -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
-  -o ${counts}_fow_counts.txt \
+  -o ${fowcounts} \
   ${bam}forward.bam
 
   featureCounts -T $THREADS \
@@ -139,7 +138,7 @@ if [ ! -f $read1 ]; then
   -g gene_name \
   -s 0 --primary \
   -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
-  -o ${counts}_rev_counts.txt \
+  -o ${revcounts} \
   ${bam}reverse.bam
 
 
@@ -147,72 +146,71 @@ if [ ! -f $read1 ]; then
   ##Plot reads to visualize tracks if needed
        module load deepTools/3.5.2-foss-2022a
        #Plot all reads
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}forward.bam" -o "${bw}_fow.bw"
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}reverse.bam" -o "${bw}_rev.bw"
+       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}forward.bam" -o "${fowbw}"
+       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}reverse.bam" -o "${revbw}"
 
 
 #elseif read2 exists, do paired-end Trimming and PE mapping
 elif [ -f $read2 ]; then
-  echo "${line} running as PE file only"
+  echo "${line} running as unpaired file only"
+
+  module load Trim_Galore/0.6.7-GCCcore-11.2.0
+
+  trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $unpaired
+
+  wait
+
+#map with STAR
+  module load STAR/2.7.10b-GCC-11.3.0
+
+  STAR --runMode alignReads \
+  --runThreadN $THREADS \
+  --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
+  --outFileNamePrefix ${bam} \
+  --readFilesIn $trimmed/${accession}_trimmed.fq.gz \
+  --readFilesCommand zcat \
+  --alignIntronMax 10000 \
+  --outSAMtype BAM SortedByCoordinate \
+  --outBAMsortingBinsN 100 \
+  --outSAMunmapped Within \
+  --outSAMattributes Standard \
+  --limitBAMsortRAM 19990000000
+
+  #create index
+  module load SAMtools/1.16.1-GCC-11.3.0
+  samtools view -b -f 0x40 ${bam}Aligned.sortedByCoord.out.bam > ${bam}forward.bam
+  samtools view -b -f 0x80 ${bam}Aligned.sortedByCoord.out.bam > ${bam}reverse.bam
+  samtools index "${bam}forward.bam"
+  samtools index "${bam}reverse.bam"
+
+  ##quantify with featureCounts
+  module load Subread/2.0.6-GCC-11.3.0
+
+  featureCounts -T $THREADS \
+  -p \
+  -t CDS \
+  -g gene_name \
+  -s 0 --primary \
+  -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
+  -o ${fowcounts} \
+  ${bam}forward.bam
+
+  featureCounts -T $THREADS \
+  -p \
+  -t CDS \
+  -g gene_name \
+  -s 0 --primary \
+  -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
+  -o ${revcounts} \
+  ${bam}reverse.bam
 
 
-  ##################
-  #Trimming
-  #################
-  	  # module load Trim_Galore/0.6.7-GCCcore-11.2.0
-      #
-  	  # trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
-  	  # wait
-#1
 
-  ##map with STAR
-  	  # module load STAR/2.7.10b-GCC-11.3.0
-  	  #   STAR --runMode alignReads \
-  	  #   --runThreadN $THREADS \
-  	  #   --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
-  	  #   --outFileNamePrefix ${bam} \
-  	  #   --readFilesIn $trimmed/${accession}_val_1.fq.gz $trimmed/${accession}_val_2.fq.gz \
-  	  #   --readFilesCommand zcat \
-      #   --alignIntronMax 10000 \
-  	  #   --outSAMtype BAM SortedByCoordinate \
-      #   --outBAMsortingBinsN 100 \
-      #   --outSAMunmapped Within \
-      #   --outSAMattributes Standard \
-      #   --limitBAMsortRAM 19990000000
-        #create index
-        module load SAMtools/1.16.1-GCC-11.3.0
-        samtools view -b -f 0x40 ${bam}Aligned.sortedByCoord.out.bam > ${bam}forward.bam
-        samtools view -b -f 0x80 ${bam}Aligned.sortedByCoord.out.bam > ${bam}reverse.bam
-        samtools index "${bam}forward.bam"
-        samtools index "${bam}reverse.bam"
-
-        ##quantify with featureCounts
-        module load Subread/2.0.6-GCC-11.3.0
-
-        featureCounts -T $THREADS \
-        -p \
-        -t CDS \
-        -g gene_name \
-        -s 0 --primary \
-        -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
-        -o ${counts}_fow_counts.txt \
-        ${bam}forward.bam
-
-        featureCounts -T $THREADS \
-        -p \
-        -t CDS \
-        -g gene_name \
-        -s 0 --primary \
-        -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
-        -o ${counts}_rev_counts.txt \
-        ${bam}reverse.bam
-
-        ##Plot reads to visualize tracks if needed
-             module load deepTools/3.5.2-foss-2022a
-
-             #Plot all reads
-             bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}forward.bam" -o "fow_${bw}"
-             bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}reverse.bam" -o "rev_${bw}"
+  ##Plot reads to visualize tracks if needed
+       module load deepTools/3.5.2-foss-2022a
+       #Plot all reads
+       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}forward.bam" -o "${fowbw}"
+       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}reverse.bam" -o "${revbw}"
 
 #in rare cases there will only be a SRR##_1.fastq.gz format. Use this if nothing else exists.
 else

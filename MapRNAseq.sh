@@ -174,8 +174,6 @@ elif [ -f $read2 ]; then
         --limitBAMsortRAM 19990000000
         #create index
         module load SAMtools/1.16.1-GCC-11.3.0
-        samtools view -b -f 0x40 ${bam}.bam > forward.bam
-        samtools view -b -f 0x80 ${bam}.bam > reverse.bam
         samtools index "${bam}Aligned.sortedByCoord.out.bam"
 
         ##quantify with featureCounts
