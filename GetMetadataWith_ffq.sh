@@ -20,15 +20,15 @@ accession="/home/evt82290/Research/accession_list_ET.txt"
 module load ffq/0.3.0-foss-2022a
 
 #make a directory to store fastq metadata [.JSON] format and files.
-mkdir ../FastqFiles
+mkdir "scratch/evt82290/downSRA/FastqFiles"
 
 #For each line of the accession file, make a directory and fetch fastq metadata using ffq
 
 while read -r line
 do
 #make a new directory for each accession
-  mkdir ../FastqFiles/${line}
+  mkdir "scratch/evt82290/downSRA/${line}"
 #download metadata and store in a .JSON file
-  ffq -o ../FastqFiles/${line}/${line}.json --ftp "$line"
+  ffq -o scratch/evt82290/downSRA/${line}/${line}.json --ftp "$line"
 
 done <"${accession}"
