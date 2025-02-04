@@ -70,8 +70,8 @@ mkdir "${bwDir}"
 
 #make variables for output file names
 bam="${bamdir}/${accession}_"
-counts="${countsdir}/${accession}_counts.txt"
-bw="${bwDir}/${accession}.bw"
+counts="${countsdir}/${accession}"
+bw="${bwDir}/${accession}"
 
 ############# Read Trimming ##############
 #remove adaptors, trim low quality reads (default = phred 20), length > 25
@@ -124,7 +124,7 @@ if [ ! -f $read1 ]; then
   -g gene_name \
   -s 0 --primary \
   -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
-  -o ${counts}_fow \
+  -o ${counts}_fow_counts.txt \
   ${bam}forward.bam
 
   featureCounts -T $THREADS \
@@ -133,7 +133,7 @@ if [ ! -f $read1 ]; then
   -g gene_name \
   -s 0 --primary \
   -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
-  -o ${counts}_rev \
+  -o ${counts}_rev_counts.txt \
   ${bam}reverse.bam
 
 
@@ -141,8 +141,8 @@ if [ ! -f $read1 ]; then
   ##Plot reads to visualize tracks if needed
        module load deepTools/3.5.2-foss-2022a
        #Plot all reads
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}forward.bam" -o "fow_${bw}"
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}reverse.bam" -o "rev_${bw}"
+       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}forward.bam" -o "${bw}_fow.bw"
+       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}reverse.bam" -o "${bw}_rev.bw"
 
 
 #elseif read2 exists, do paired-end Trimming and PE mapping
@@ -189,7 +189,7 @@ elif [ -f $read2 ]; then
         -g gene_name \
         -s 0 --primary \
         -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
-        -o ${counts}_fow \
+        -o ${counts}_fow_counts.txt \
         ${bam}forward.bam
 
         featureCounts -T $THREADS \
@@ -198,7 +198,7 @@ elif [ -f $read2 ]; then
         -g gene_name \
         -s 0 --primary \
         -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
-        -o ${counts}_rev \
+        -o ${counts}_rev_counts.txt \
         ${bam}reverse.bam
 
         ##Plot reads to visualize tracks if needed

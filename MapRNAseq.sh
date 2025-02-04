@@ -73,6 +73,10 @@ mkdir "${bwDir}"
 bam="${bamdir}/${accession}_"
 counts="${countsdir}/${accession}_counts.txt"
 bw="${bwDir}/${accession}.bw"
+bg="${bedgraphDir}/${accession}.bedGraph"
+bg2="${bedgraphDir}/${accession}_log2.bedGraph"
+bg2_sort="${bedgraphDir}/${accession}_log2_sorted.bedGraph"
+bw2="${bwDir}/${accession}_log.bw"
 
 ############# Read Trimming ##############
 #remove adaptors, trim low quality reads (default = phred 20), length > 25
@@ -125,10 +129,18 @@ if [ ! -f $read1 ]; then
   ${bam}Aligned.sortedByCoord.out.bam
 
 
-  ##Plot reads to visualize tracks if needed
+##Plot reads to visualize tracks if needed
        module load deepTools/3.5.2-foss-2022a
        #Plot all reads
        bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}Aligned.sortedByCoord.out.bam" -o "${bw}"
+
+#log-transformed BigWigs
+module load ucsc/434
+
+bigWigToBedGraph ${bw} ${bg}
+awk '{ $4=(log($4+1)/log(2)); } 1' < ${bg} > ${bg2}
+sort -k1,1 -k2,2n ${bg2} > ${bg2_sort}
+bedGraphToBigWig ${bg2_sort} /home/ad45368/chrom_sizes.txt ${bw2}
 
 
 
