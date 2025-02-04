@@ -18,7 +18,7 @@ THREADS=2
 #variables imported from submission script
 #accession=SRR10916163
 fastqPath="/scratch/evt82290/downSRA/FastqFiles"
-outdir="/scratch/evt82290/RNAseq/cac_aberrant_transcripts"
+outdir="/scratch/evt82290/RNAseq/CAF-1_Heatmap"
 
 # #if output directory doesn't exist, create it
 if [ ! -d $outdir ]
@@ -56,6 +56,7 @@ mkdir "${bwDir}"
 #notes
 #generated a STAR genome index with the following call:
 #STAR --runMode genomeGenerate --runThreadN 1 --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR --genomeFastaFiles /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO.fna --sjdbGTFfile /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_WithExtras_GFFtoGTFconversion.gtf
+#STAR --runMode genomeGenerate --runThreadN 1 --genomeDir /home/evt82290/Research --genomeFastaFiles /home/evt82290/Research/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta --sjdbGTFfile /home/evt82290/Research/Nc12wTetO_at_his3_CLEAN.gff
 #need to rerun with normal genome assembly. The his-3 duplicated region will create multi-mappers
 
 
@@ -97,7 +98,7 @@ if [ ! -f $read1 ]; then
 
   STAR --runMode alignReads \
   --runThreadN $THREADS \
-  --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
+  --genomeDir /home/evt82290/Research \
   --outFileNamePrefix ${bam} \
   --readFilesIn $trimmed/${accession}_trimmed.fq.gz \
   --readFilesCommand zcat \
@@ -119,7 +120,7 @@ if [ ! -f $read1 ]; then
   -t CDS \
   -g gene_name \
   -s 0 --primary \
-  -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
+  -a /home/evt82290/Research/Nc12wTetO_at_his3_CLEAN.gff \
   -o $counts \
   ${bam}Aligned.sortedByCoord.out.bam
 
@@ -149,7 +150,7 @@ elif [ -f $read2 ]; then
   	  module load STAR/2.7.10b-GCC-11.3.0
   	    STAR --runMode alignReads \
   	    --runThreadN $THREADS \
-  	    --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
+  	    --genomeDir /home/evt82290/Research \
   	    --outFileNamePrefix ${bam} \
   	    --readFilesIn $trimmed/${accession}_val_1.fq.gz $trimmed/${accession}_val_2.fq.gz \
   	    --readFilesCommand zcat \
@@ -173,7 +174,7 @@ elif [ -f $read2 ]; then
         -t CDS \
         -g gene_name \
         -s 0 --primary \
-        -a /home/evt82290/Research/tetO_Genome_Files/Nc12wTetO_at_his3_CLEAN.gff \
+        -a /home/evt82290/Research/Nc12wTetO_at_his3_CLEAN.gff \
         -o $counts \
         ${bam}Aligned.sortedByCoord.out.bam
 
@@ -195,7 +196,7 @@ else
        #map with STAR
          STAR --runMode alignReads \
          --runThreadN $THREADS \
-         --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
+         --genomeDir /home/evt82290/Research \
          --outFileNamePrefix ${accession} \
          --readFilesIn ${accession}_trimmed.fq.gz  \
          --readFilesCommand zcat \
@@ -221,7 +222,7 @@ else
          -g gene_name \
          -s 0 --primary \
          -p \
-         -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
+         -a /home/evt82290/Research/Nc12wTetO_at_his3_CLEAN.gff \
          -o $counts \
          ${bam}Aligned.sortedByCoord.out.bam
 
