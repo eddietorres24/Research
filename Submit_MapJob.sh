@@ -37,6 +37,7 @@ mkdir "${outdir}/TrimmedFastQs"
 mkdir "${outdir}/bamFiles"
 mkdir "${outdir}/counts"
 mkdir "${outdir}/bigWig"
+mkdir "${outdir}/bedGraph/"
 
 while read -r line
 
