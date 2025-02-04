@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=RNAseq_Map
 #SBATCH --partition=batch
-#SBATCH --mail-type=ALL
+#SBATCH --mail-type=FAIL
 #SBATCH --mail-user=evt82290@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
@@ -96,9 +96,9 @@ if [ ! -f $read1 ]; then
 #trim reads
   echo "${line} running as unpaired file only"
 
-  # module load Trim_Galore/0.6.7-GCCcore-11.2.0
-  #
-  # trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $unpaired
+  module load Trim_Galore/0.6.7-GCCcore-11.2.0
+
+  trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $unpaired
 
   wait
 
@@ -157,10 +157,10 @@ elif [ -f $read2 ]; then
   ##################
   #Trimming
   #################
-  	  # module load Trim_Galore/0.6.7-GCCcore-11.2.0
-      #
-  	  # trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
-  	  # wait
+  	  module load Trim_Galore/0.6.7-GCCcore-11.2.0
+
+  	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
+  	  wait
 
 
   ##map with STAR
