@@ -107,7 +107,7 @@ if [ ! -f $read1 ]; then
 
   STAR --runMode alignReads \
   --runThreadN $THREADS \
-  --genomeDir /home/evt82290/Research \
+  --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
   --outFileNamePrefix ${bam} \
   --readFilesIn $trimmed/${accession}_trimmed.fq.gz \
   --readFilesCommand zcat \
@@ -129,7 +129,7 @@ if [ ! -f $read1 ]; then
   -t CDS \
   -g gene_name \
   -s 0 --primary \
-  -a /home/evt82290/Research/Nc12wTetO_at_his3_CLEAN.gff \
+  -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
   -o $counts \
   ${bam}Aligned.sortedByCoord.out.bam
 
@@ -157,17 +157,17 @@ elif [ -f $read2 ]; then
   ##################
   #Trimming
   #################
-  	  module load Trim_Galore/0.6.7-GCCcore-11.2.0
-
-  	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
-  	  wait
+  	  # module load Trim_Galore/0.6.7-GCCcore-11.2.0
+      #
+  	  # trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
+  	  # wait
 
 
   ##map with STAR
   	  module load STAR/2.7.10b-GCC-11.3.0
   	    STAR --runMode alignReads \
   	    --runThreadN $THREADS \
-  	    --genomeDir /home/evt82290/Research \
+  	    --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
   	    --outFileNamePrefix ${bam} \
   	    --readFilesIn $trimmed/${accession}_val_1.fq.gz $trimmed/${accession}_val_2.fq.gz \
   	    --readFilesCommand zcat \
@@ -189,7 +189,7 @@ elif [ -f $read2 ]; then
         -t CDS \
         -g gene_name \
         -s 0 --primary \
-        -a /home/evt82290/Research/Nc12wTetO_at_his3_CLEAN.gff \
+        -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
         -o $counts \
         ${bam}Aligned.sortedByCoord.out.bam
 
@@ -218,7 +218,7 @@ else
        #map with STAR
          STAR --runMode alignReads \
          --runThreadN $THREADS \
-         --genomeDir /home/evt82290/Research \
+         --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
          --outFileNamePrefix ${accession} \
          --readFilesIn ${accession}_trimmed.fq.gz  \
          --readFilesCommand zcat \
@@ -244,7 +244,7 @@ else
          -g gene_name \
          -s 0 --primary \
          -p \
-         -a /home/evt82290/Research/Nc12wTetO_at_his3_CLEAN.gff \
+         -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
          -o $counts \
          ${bam}Aligned.sortedByCoord.out.bam
 
