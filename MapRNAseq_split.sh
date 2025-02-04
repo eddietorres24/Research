@@ -27,8 +27,7 @@ then
 fi
 # ###
 
-# /scratch/evt82290/downSRA/FastqFiles/SRR7970631/SRR7970631.fastq.gz
-# /scratch/evt82290/downSRA/FastqFiles/SRR7970631
+
 ###################
 #start
 ####################################################
@@ -152,13 +151,16 @@ if [ ! -f $read1 ]; then
 
 #elseif read2 exists, do paired-end Trimming and PE mapping
 elif [ -f $read2 ]; then
-  echo "${line} running as unpaired file only"
+  echo "${line} running as PE file only"
 
-  module load Trim_Galore/0.6.7-GCCcore-11.2.0
 
-  trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $unpaired
+  ##################
+  #Trimming
+  #################
+  	  module load Trim_Galore/0.6.7-GCCcore-11.2.0
 
-  wait
+  	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
+  	  wait
 
 #map with STAR
   module load STAR/2.7.10b-GCC-11.3.0
@@ -167,7 +169,7 @@ elif [ -f $read2 ]; then
   --runThreadN $THREADS \
   --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
   --outFileNamePrefix ${bam} \
-  --readFilesIn $trimmed/${accession}_trimmed.fq.gz \
+  --readFilesIn $trimmed/${accession}_val_1.fq.gz $trimmed/${accession}_val_2.fq.gz \
   --readFilesCommand zcat \
   --alignIntronMax 10000 \
   --outSAMtype BAM SortedByCoordinate \
