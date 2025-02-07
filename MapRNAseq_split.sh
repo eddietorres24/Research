@@ -112,12 +112,43 @@ if [ ! -f $read1 ]; then
   --outSAMattributes Standard \
   --limitBAMsortRAM 19990000000
 
+#MAPPING READS BASED ON STRAND
+#Load samtools
+module load SAMtools/1.16.1-GCC-11.3.0
+
+# Forward strand.
+# 1. alignments of the second in pair if they map to the forward strand
+# 2. alignments of the first in pair if they map to the reverse  strand
+samtools view -b -f 128 -F 16 ${bam}Aligned.sortedByCoord.out.bam > ${bam}fow1.bam
+samtools index ${bam}fow1.bam
+
+samtools view -b -f 80 ${bam}Aligned.sortedByCoord.out.bam > ${bam}fow2.bam
+samtools index ${bam}fow2.bam
+
+# Combine alignments that originate on the forward strand.
+samtools merge -f ${bam}fwd.bam ${bam}fow1.bam ${bam}fow2.bam
+samtools index ${bam}fwd.bam
+
+# Reverse strand
+# 1. alignments of the second in pair if they map to the reverse strand
+# 2. alignments of the first in pair if they map to the forward strand
+samtools view -b -f 144 ${bam}Aligned.sortedByCoord.out.bam > ${bam}rev1.bam
+samtools index ${bam}rev1.bam
+
+samtools view -b -f 64 -F 16 ${bam}Aligned.sortedByCoord.out.bam > ${bam}rev2.bam
+samtools index ${bam}rev2.bam
+
+# Combine alignments that originate on the reverse strand.
+#
+samtools merge -f ${bam}rev.bam rev1.bam ${bam}rev2.bam
+samtools index ${bam}rev.bam
+
   #create index
-  module load SAMtools/1.16.1-GCC-11.3.0
-  samtools view -b -f 0x40 ${bam}Aligned.sortedByCoord.out.bam > ${bam}forward.bam
-  samtools view -b -f 0x80 ${bam}Aligned.sortedByCoord.out.bam > ${bam}reverse.bam
-  samtools index "${bam}forward.bam"
-  samtools index "${bam}reverse.bam"
+  # module load SAMtools/1.16.1-GCC-11.3.0
+  # samtools view -b -f 0x40 ${bam}Aligned.sortedByCoord.out.bam > ${bam}forward.bam
+  # samtools view -b -f 0x80 ${bam}Aligned.sortedByCoord.out.bam > ${bam}reverse.bam
+  # samtools index "${bam}forward.bam"
+  # samtools index "${bam}reverse.bam"
 
   ##quantify with featureCounts
   module load Subread/2.0.6-GCC-11.3.0
@@ -129,7 +160,7 @@ if [ ! -f $read1 ]; then
   -s 0 --primary \
   -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
   -o ${fowcounts} \
-  ${bam}forward.bam
+  ${bam}fwd.bam
 
   featureCounts -T $THREADS \
   -p \
@@ -138,15 +169,15 @@ if [ ! -f $read1 ]; then
   -s 0 --primary \
   -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
   -o ${revcounts} \
-  ${bam}reverse.bam
+  ${bam}rev.bam
 
 
 
   ##Plot reads to visualize tracks if needed
        module load deepTools/3.5.2-foss-2022a
        #Plot all reads
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}forward.bam" -o "${fowbw}"
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}reverse.bam" -o "${revbw}"
+       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}fwd.bam" -o "${fowbw}"
+       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}rev.bam" -o "${revbw}"
 
 
 #elseif read2 exists, do paired-end Trimming and PE mapping
@@ -157,33 +188,64 @@ elif [ -f $read2 ]; then
   ##################
   #Trimming
   #################
-  	  module load Trim_Galore/0.6.7-GCCcore-11.2.0
-
-  	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
-  	  wait
+  	  # module load Trim_Galore/0.6.7-GCCcore-11.2.0
+      #
+  	  # trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
+  	  # wait
 
 #map with STAR
-  module load STAR/2.7.10b-GCC-11.3.0
+  # module load STAR/2.7.10b-GCC-11.3.0
+  #
+  # STAR --runMode alignReads \
+  # --runThreadN $THREADS \
+  # --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
+  # --outFileNamePrefix ${bam} \
+  # --readFilesIn $trimmed/${accession}_val_1.fq.gz $trimmed/${accession}_val_2.fq.gz \
+  # --readFilesCommand zcat \
+  # --alignIntronMax 10000 \
+  # --outSAMtype BAM SortedByCoordinate \
+  # --outBAMsortingBinsN 100 \
+  # --outSAMunmapped Within \
+  # --outSAMattributes Standard \
+  # --limitBAMsortRAM 19990000000
 
-  STAR --runMode alignReads \
-  --runThreadN $THREADS \
-  --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
-  --outFileNamePrefix ${bam} \
-  --readFilesIn $trimmed/${accession}_val_1.fq.gz $trimmed/${accession}_val_2.fq.gz \
-  --readFilesCommand zcat \
-  --alignIntronMax 10000 \
-  --outSAMtype BAM SortedByCoordinate \
-  --outBAMsortingBinsN 100 \
-  --outSAMunmapped Within \
-  --outSAMattributes Standard \
-  --limitBAMsortRAM 19990000000
+  #MAPPING READS BASED ON STRAND
+  #Load samtools
+  module load SAMtools/1.16.1-GCC-11.3.0
+
+  # Forward strand.
+  # 1. alignments of the second in pair if they map to the forward strand
+  # 2. alignments of the first in pair if they map to the reverse  strand
+  samtools view -b -f 128 -F 16 ${bam}Aligned.sortedByCoord.out.bam > ${bam}fow1.bam
+  samtools index ${bam}fow1.bam
+
+  samtools view -b -f 80 ${bam}Aligned.sortedByCoord.out.bam > ${bam}fow2.bam
+  samtools index ${bam}fow2.bam
+
+  # Combine alignments that originate on the forward strand.
+  samtools merge -f ${bam}fwd.bam ${bam}fow1.bam ${bam}fow2.bam
+  samtools index ${bam}fwd.bam
+
+  # Reverse strand
+  # 1. alignments of the second in pair if they map to the reverse strand
+  # 2. alignments of the first in pair if they map to the forward strand
+  samtools view -b -f 144 ${bam}Aligned.sortedByCoord.out.bam > ${bam}rev1.bam
+  samtools index ${bam}rev1.bam
+
+  samtools view -b -f 64 -F 16 ${bam}Aligned.sortedByCoord.out.bam > ${bam}rev2.bam
+  samtools index ${bam}rev2.bam
+
+  # Combine alignments that originate on the reverse strand.
+  #
+  samtools merge -f ${bam}rev.bam rev1.bam ${bam}rev2.bam
+  samtools index ${bam}rev.bam
 
   #create index
-  module load SAMtools/1.16.1-GCC-11.3.0
-  samtools view -b -f 0x40 ${bam}Aligned.sortedByCoord.out.bam > ${bam}forward.bam
-  samtools view -b -f 0x80 ${bam}Aligned.sortedByCoord.out.bam > ${bam}reverse.bam
-  samtools index "${bam}forward.bam"
-  samtools index "${bam}reverse.bam"
+  # module load SAMtools/1.16.1-GCC-11.3.0
+  # samtools view -b -f 0x40 ${bam}Aligned.sortedByCoord.out.bam > ${bam}forward.bam
+  # samtools view -b -f 0x80 ${bam}Aligned.sortedByCoord.out.bam > ${bam}reverse.bam
+  # samtools index "${bam}forward.bam"
+  # samtools index "${bam}reverse.bam"
 
   ##quantify with featureCounts
   module load Subread/2.0.6-GCC-11.3.0
@@ -195,7 +257,7 @@ elif [ -f $read2 ]; then
   -s 0 --primary \
   -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
   -o ${fowcounts} \
-  ${bam}forward.bam
+  ${bam}fwd.bam
 
   featureCounts -T $THREADS \
   -p \
@@ -204,15 +266,15 @@ elif [ -f $read2 ]; then
   -s 0 --primary \
   -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
   -o ${revcounts} \
-  ${bam}reverse.bam
+  ${bam}rev.bam
 
 
 
   ##Plot reads to visualize tracks if needed
        module load deepTools/3.5.2-foss-2022a
        #Plot all reads
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}forward.bam" -o "${fowbw}"
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}reverse.bam" -o "${revbw}"
+       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}fwd.bam" -o "${fowbw}"
+       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}rev.bam" -o "${revbw}"
 
 #in rare cases there will only be a SRR##_1.fastq.gz format. Use this if nothing else exists.
 else
