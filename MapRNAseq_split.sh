@@ -237,7 +237,7 @@ elif [ -f $read2 ]; then
 
   # Combine alignments that originate on the reverse strand.
   #
-  samtools merge -f ${bam}rev.bam rev1.bam ${bam}rev2.bam
+  samtools merge -f ${bam}rev.bam ${bam}rev1.bam ${bam}rev2.bam
   samtools index ${bam}rev.bam
 
   #create index
