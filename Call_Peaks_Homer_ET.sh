@@ -59,6 +59,8 @@ module load Homer/4.11-foss-2022a
 # 144-132_ChIP_qa-suz12_Input__S132.bam
 
 #Make Tag Directories
+
+###QA-SUZ12###
 #Rep 1 qa-suz12
 # makeTagDirectory $TAGDIR/WT_0hr_rep1 $BAMDIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bam
 # makeTagDirectory $TAGDIR/qasuz12_0hr_rep1 $BAMDIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bam
@@ -91,9 +93,18 @@ module load Homer/4.11-foss-2022a
 # makeTagDirectory $TAGDIR/qasuz12_24hr_input_rep2 $BAMDIR2/144-132_ChIP_qa-suz12_Input__S132.bam
 #makeTagDirectory $TAGDIR/WT_24hr_input_rep2 $INPDIR/
 
-#call Peaks
-#rep 1
+###CAF-1###
 
+#H3K27me3
+#H3K27me2
+#H3K36me3
+#H3K9me3
+#H3K4me2
+#H4K20me3
+
+
+#call Peaks
+#qa-suz12
 findPeaks $TAGDIR/WT_0hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_0hr_input_rep1
 findPeaks $TAGDIR/qasuz12_0hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_0hr_input_rep1
 findPeaks $TAGDIR/qasuz12_4hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_4hr_input_rep1
