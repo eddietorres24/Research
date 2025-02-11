@@ -59,14 +59,6 @@ ml deepTools
 #HOMER
 module load Homer/4.11-foss-2022a
 
-# 144-62_ChIP_WT_Input__S62.bam
-# 144-69_ChIP_suz12_Input__S69.bam
-# 144-6_ChIP_tetO_cac-1_p0_H3K27me3_Rep2_S6.bam
-# 144-71_ChIP_qa-suz12_Input__S71.bam
-# 144-73_ChIP_qa-suz12_Input__S73.bam
-# 144-79_ChIP_qa-suz12_Input__S79.bam
-# 144-132_ChIP_qa-suz12_Input__S132.bam
-
 #Make Tag Directories
 
 ###QA-SUZ12###
