@@ -285,21 +285,21 @@ makeTagDirectory $TAGDIR/set-7_input_3 $144DIR/6147_136-92_ChIP_set-7_input_S91.
 
 #qa-suz12
 #rep 1
-findPeaks $TAGDIR/WT_0hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_0hr_input_rep1
-findPeaks $TAGDIR/qasuz12_0hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_0hr_input_rep1
-findPeaks $TAGDIR/qasuz12_4hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_4hr_input_rep1
-findPeaks $TAGDIR/qasuz12_8hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_8hr_input_rep1
-findPeaks $TAGDIR/qasuz12_12hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_12hr_input_rep1
-findPeaks $TAGDIR/qasuz12_24hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_24hr_input_rep1
-findPeaks $TAGDIR/WT_24hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_24hr_input_rep1
-#rep 2
-findPeaks $TAGDIR/WT_0hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_0hr_input_rep2
-findPeaks $TAGDIR/qasuz12_0hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_0hr_input_rep2
-findPeaks $TAGDIR/qasuz12_4hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_4hr_input_rep2
-findPeaks $TAGDIR/qasuz12_8hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_8hr_input_rep2
-findPeaks $TAGDIR/qasuz12_12hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_12hr_input_rep1
-findPeaks $TAGDIR/qasuz12_24hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_24hr_input_rep2
-findPeaks $TAGDIR/WT_24hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_24hr_input_rep1
+# findPeaks $TAGDIR/WT_0hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_0hr_input_rep1
+# findPeaks $TAGDIR/qasuz12_0hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_0hr_input_rep1
+# findPeaks $TAGDIR/qasuz12_4hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_4hr_input_rep1
+# findPeaks $TAGDIR/qasuz12_8hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_8hr_input_rep1
+# findPeaks $TAGDIR/qasuz12_12hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_12hr_input_rep1
+# findPeaks $TAGDIR/qasuz12_24hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_24hr_input_rep1
+# findPeaks $TAGDIR/WT_24hr_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_24hr_input_rep1
+# #rep 2
+# findPeaks $TAGDIR/WT_0hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_0hr_input_rep2
+# findPeaks $TAGDIR/qasuz12_0hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_0hr_input_rep2
+# findPeaks $TAGDIR/qasuz12_4hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_4hr_input_rep2
+# findPeaks $TAGDIR/qasuz12_8hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_8hr_input_rep2
+# findPeaks $TAGDIR/qasuz12_12hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_12hr_input_rep1
+# findPeaks $TAGDIR/qasuz12_24hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/qasuz12_24hr_input_rep2
+# findPeaks $TAGDIR/WT_24hr_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_24hr_input_rep1
 
 #CAF-1
 #H3K27me3
