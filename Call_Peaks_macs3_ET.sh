@@ -16,115 +16,54 @@ cd $SLURM_SUBMIT_DIR
 
 source config.txt
 
-#Make Output Directory
-OUTDIR="/scratch/evt82290/Run137"
-OUTDIR2="/scratch/evt82290/Run136"
-OUTDIR3="/scratch/evt82290/Peaks"
+#Make Directories
+OUTDIR="/scratch/evt82290/Peaks/qa-suz12/qa-suz12_Peaks_macs"
+P126DIR="/scratch/evt82290/MappingOutputs/Run126/bamFiles"
+P129DIR="/scratch/evt82290/MappingOutputs/Run129/bamFiles"
+P131DIR="/scratch/evt82290/MappingOutputs/Run131/bamFiles"
+P133DIR="/scratch/evt82290/MappingOutputs/Run133/bamFiles"
+P136DIR="/scratch/evt82290/MappingOutputs/Run136/bamFiles"
+P137DIR="/scratch/evt82290/MappingOutputs/Run137/bamFiles"
+P138DIR="/scratch/evt82290/MappingOutputs/Run138/bamFiles"
+P139DIR="/scratch/evt82290/MappingOutputs/Run139/bamFiles"
+P141DIR="/scratch/evt82290/MappingOutputs/Run141/bamFiles"
+P144DIR="/scratch/evt82290/MappingOutputs/Run144/bamFiles"
+P145DIR="/scratch/evt82290/MappingOutputs/Run145/bamFiles"
+P146DIR="/scratch/evt82290/MappingOutputs/Run146/bamFiles"
 
 #if output directory doesn't exist, create it
-# if [ ! -d $OUTDIR ]
-# then
-#     mkdir -p $OUTDIR
-# fi
+if [ ! -d $OUTDIR ]
+then
+    mkdir -p $OUTDIR
+fi
 ###
 
-#process reads using trimGalore
-
-#  ml Trim_Galore/0.6.7-GCCcore-11.2.0
-#  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
-# #
-# FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
-#
-# mkdir "${OUTDIR}/SortedBamFiles"
-# mkdir "${OUTDIR}/BigWigs"
-# mkdir "${OUTDIR}/Peaks"
-# #mkdir "$OUTDIR/HomerTagDirectories"
-# #mkdir "$OUTDIR/TdfFiles"
-# #
-# #Iterate over the files
-# for f in $FILES
-# do
-# #
-# # 	#Examples to Get Different parts of the file name
-# # 		#See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
-# 		#${string//substring/replacement}
-# # 		#dir=${f%/*}
-#
-# 	file=${f##*/}
-# 	#remove ending from file name to create shorter names for bam files and other downstream output
-# 	name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
-#
-# #
-# # 	# File Vars
-# # 	#use sed to get the name of the second read matching the input file
-# 	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
-# 	#variable for naming bam file
-#  	bam="${OUTDIR}/SortedBamFiles/${name}.bam"
-# 	#variable name for bigwig output
-# 	bigwig="${OUTDIR}/BigWigs/${name}"
-# 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
-# #
-
-ml SAMtools
-ml BWA
-# #
-# bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
-# samtools index "$bam"
-#
-# #samtools view -b -q 30 $bam > "$QualityBam"
-# #samtools index "$QualityBam"
-#
-# ############################
-# # # #deeptools
-#
-ml deepTools
-# #Plot all reads
-# bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
-
-#plot mononucleosomes (don't need to do for ChIP)
-#bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
-
-#call Peaks
+#load MACS
 module load MACS3
 
-#using --nolambda paramenter to call peaks without control
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-12_ChIP_cac-1_input.bam" -f BAMPE -n "136-2_ChIP_cac-1_H3K27me3_abcam_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-8_ChIP_cac-2_H3K27me3_CS_Rep1_S8_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-13_ChIP_cac-2_input.bam" -f BAMPE -n "136-8_ChIP_cac-2_H3K27me3_CS_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-#
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-14_ChIP_cac-3_input.bam" -f BAMPE -n "136-4_ChIP_cac-3_H3K27me3_abcam_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-9_ChIP_cac-3_H3K27me3_CS_Rep1_S9_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-14_ChIP_cac-3_input.bam" -f BAMPE -n "136-9_ChIP_cac-3_H3K27me3_CS_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-#
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-84_ChIP_WT_input_S83_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "136-78_ChIP_WT_H3K27me3_CS_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-85_ChIP_cac-1_input_S84_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "136-79_ChIP_cac-1_H3K27me3_CS_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-89_ChIP_cac-2_input_S88_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "136-80_ChIP_cac-2_H3K27me3_CS_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-14_ChIP_cac-3_input.bam" -f BAMPE -n "136-81_ChIP_cac-3_H3K27me3_CS_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/6147_136-92_ChIP_set-7_input_S91_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "136-83_ChIP_set-7_H3K27me3_CS_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+#Calling Peaks
+###QA-SUZ12###
+#Rep 1
+macs3 callpeak -t "${P137DIR}/SortedBamFiles/137-66_ChIP_WT_H3K27me3_Rep1_S63.bam" -c "${P139DIR}/139-29_ChIP_WT_Input__S29.bam" -f BAMPE -n "WT_0hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/WT_0hr" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P137DIR}/SortedBamFiles/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bam" -c "${P139DIR}/139-30_ChIP_qa-suz12_Input__S30.bam" -f BAMPE -n "qa-suz12_0hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_0hr" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P137DIR}/SortedBamFiles/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66.bam" -c "${P139DIR}/139-32_ChIP_qa-suz12_Input__S32.bam" -f BAMPE -n "qa-suz12_4hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_4hr" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P137DIR}/SortedBamFiles/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68.bam" -c "${P139DIR}/139-34_ChIP_qa-suz12_Input__S34.bam" -f BAMPE -n "qa-suz12_8hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_8hr" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P137DIR}/SortedBamFiles/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70.bam" -c "${P139DIR}/139-36_ChIP_qa-suz12_Input__S36.bam" -f BAMPE -n "qa-suz12_12hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_12hr" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P137DIR}/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72.bam" -c "${P139DIR}/139-38_ChIP_qa-suz12_Input__S38.bam" -f BAMPE -n "qa-suz12_24hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_24hr" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P137DIR}/SortedBamFiles/137-74_ChIP_WT_H3K27me3_Rep1_S71.bam" -c "${P139DIR}/139-37_ChIP_WT_Input__S37.bam" -f BAMPE -n "WT_24hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/WT_24hr" --min-length 650 --max-gap 375
 
-#Run137 callpeaks
-
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-66_ChIP_WT_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-67_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-69_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-71_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-73_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR2}/SortedBamFiles/6147_136-11_ChIP_WT_input.bam" -f BAMPE -n "137-75_ChIP_qa-suz12_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.05 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-
-#Run129
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-43_ChIP_WT_input_S42_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-38_ChIP_WT_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-44_ChIP_cac-1_input_S43_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-39_ChIP_cac-1_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-45_ChIP_cac-2_input_S44_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-40_ChIP_cac-2_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-46_ChIP_cac-3_input_S45_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-41_ChIP_cac-3_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-47_ChIP_set-7_input_S46_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-42_ChIP_set-7_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-43_ChIP_WT_input_S42_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-38_ChIP_WT_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-44_ChIP_cac-1_input_S43_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-39_ChIP_cac-1_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-45_ChIP_cac-2_input_S44_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-40_ChIP_cac-2_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-46_ChIP_cac-3_input_S45_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-41_ChIP_cac-3_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${OUTDIR}/SortedBamFiles/129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam" -c "${OUTDIR}/SortedBamFiles/129-47_ChIP_set-7_input_S46_L001_R1_001_val_1.fq.gz.bam" -f BAMPE -n "129-42_ChIP_set-7_H3K27me3_abcam_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/Peaks" --min-length 650 --max-gap 375
+#Rep 2
+macs3 callpeak -t "${P144DIR}/SortedBamFiles/144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam" -c "${P144DIR}/144-62_ChIP_WT_Input__S62.bam" -f BAMPE -n "WT_0hr_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/WT_0hr" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P144DIR}/SortedBamFiles/144-48_ChIP_qa-suz12_0hr_H3K27me3_Rep4_S48.bam" -c "${P144DIR}/144-71_ChIP_qa-suz12_Input__S71.bam" -f BAMPE -n "qa-suz12_0hr_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_0hr" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P144DIR}/SortedBamFiles/144-49_ChIP_qa-suz12_4hr_H3K27me3_Rep3_S49.bam" -c "${P144DIR}/144-73_ChIP_qa-suz12_Input__S73.bam" -f BAMPE -n "qa-suz12_4hr_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_4hr" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P144DIR}/SortedBamFiles/144-50_ChIP_qa-suz12_8hr_H3K27me3_Rep3_S50.bam" -c "${P144DIR}/144-79_ChIP_qa-suz12_Input__S79.bam" -f BAMPE -n "qa-suz12_8hr_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_8hr" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P144DIR}/SortedBamFiles/144-51_ChIP_qa-suz12_12hr_H3K27me3_Rep3_S51.bam" -c "${P139DIR}/139-36_ChIP_qa-suz12_Input__S36.bam" -f BAMPE -n "qa-suz12_12hr_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_12hr" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P144DIR}/SortedBamFiles/144-52_ChIP_qa-suz12_24hr_H3K27me3_Rep4_S52.bam" -c "${P144DIR}/144-132_ChIP_qa-suz12_Input__S132.bam" -f BAMPE -n "qa-suz12_24hr_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_24hr" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P144DIR}/SortedBamFiles/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bam" -c "${P139DIR}/139-38_ChIP_qa-suz12_Input__S38.bam" -f BAMPE -n "WT_24hr_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/WT_24hr" --min-length 650 --max-gap 375
 
 #bedtools
 
-module load BEDTools
+# module load BEDTools
 
 #Combining all overlapping peaks
 # bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \
@@ -134,8 +73,8 @@ module load BEDTools
 #                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 
 
-bedtools sort -i ${OUTDIR3}/merged_sorted.bed > ${OUTDIR3}/merged_sorted_2.bed
-bedtools merge -i ${OUTDIR3}/merged_sorted_2.bed > ${OUTDIR3}/merged_file.txt
+# bedtools sort -i ${OUTDIR3}/merged_sorted.bed > ${OUTDIR3}/merged_sorted_2.bed
+# bedtools merge -i ${OUTDIR3}/merged_sorted_2.bed > ${OUTDIR3}/merged_file.txt
 
 #determining which peaks overlap across peak files
 # bedtools intersect -wa -wb \
@@ -145,99 +84,375 @@ bedtools merge -i ${OUTDIR3}/merged_sorted_2.bed > ${OUTDIR3}/merged_file.txt
 #     -sorted > ${OUTDIR3}/intersect_peaks.txt
 
 
-# #Run129
-# 124228-2.bam                                                            129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam
-# 124228-2.bam.bai                                                        129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bam.bai
-# 124228-2_S2_L002_R1_001_val_1.fq.gz.bam                                 129-43_ChIP_WT_input_S42_L001_R1_001_val_1.fq.gz.bam
-# 124228-2_S2_L002_R1_001_val_1.fq.gz.bam.bai                             129-43_ChIP_WT_input_S42_L001_R1_001_val_1.fq.gz.bam.bai
-# 124228-2_S2_L003_R1_001_val_1.fq.gz.bam                                 129-44_ChIP_cac-1_input_S43_L001_R1_001_val_1.fq.gz.bam
-# 124228-2_S2_L003_R1_001_val_1.fq.gz.bam.bai                             129-44_ChIP_cac-1_input_S43_L001_R1_001_val_1.fq.gz.bam.bai
-# 124228-2_S2_L004_R1_001_val_1.fq.gz.bam                                 129-45_ChIP_cac-2_input_S44_L001_R1_001_val_1.fq.gz.bam
-# 124228-2_S2_L004_R1_001_val_1.fq.gz.bam.bai                             129-45_ChIP_cac-2_input_S44_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-33_ChIP_WT_K27me3_AM_Rep_2_S32_L001_R1_001_val_1.fq.gz.bam          129-46_ChIP_cac-3_input_S45_L001_R1_001_val_1.fq.gz.bam
-# 129-33_ChIP_WT_K27me3_AM_Rep_2_S32_L001_R1_001_val_1.fq.gz.bam.bai      129-46_ChIP_cac-3_input_S45_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-34_ChIP_cac-1_K27me3_AM_Rep_2_S33_L001_R1_001_val_1.fq.gz.bam       129-47_ChIP_set-7_input_S46_L001_R1_001_val_1.fq.gz.bam
-# 129-34_ChIP_cac-1_K27me3_AM_Rep_2_S33_L001_R1_001_val_1.fq.gz.bam.bai   129-47_ChIP_set-7_input_S46_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-35_ChIP_cac-2_K27me3_AM_Rep_2_S34_L001_R1_001_val_1.fq.gz.bam       129-48_ChIP-seq_Dim-5_input_S47_L001_R1_001_val_1.fq.gz.bam
-# 129-35_ChIP_cac-2_K27me3_AM_Rep_2_S34_L001_R1_001_val_1.fq.gz.bam.bai   129-48_ChIP-seq_Dim-5_input_S47_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-36_ChIP_cac-3_K27me3_AM_Rep_2_S35_L001_R1_001_val_1.fq.gz.bam       129-90_ChIP_WT_H3K36me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bam
-# 129-36_ChIP_cac-3_K27me3_AM_Rep_2_S35_L001_R1_001_val_1.fq.gz.bam.bai   129-90_ChIP_WT_H3K36me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-37_ChIP_set-7_K27me3_AM_Rep_2_S36_L001_R1_001_val_1.fq.gz.bam       129-91_ChIP_cac-1_H3K36me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam
-# 129-37_ChIP_set-7_K27me3_AM_Rep_2_S36_L001_R1_001_val_1.fq.gz.bam.bai   129-91_ChIP_cac-1_H3K36me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bam         129-92_ChIP_cac-2_H3K36me3_Rep1_S73_L001_R1_001_val_1.fq.gz.bam
-# 129-38_ChIP_WT_K27me3_AbC_Rep_1_S37_L001_R1_001_val_1.fq.gz.bam.bai     129-92_ChIP_cac-2_H3K36me3_Rep1_S73_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bam      129-93_ChIP_cac-3_H3K36me3_Rep1_S74_L001_R1_001_val_1.fq.gz.bam
-# 129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38_L001_R1_001_val_1.fq.gz.bam.bai  129-93_ChIP_cac-3_H3K36me3_Rep1_S74_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bam      129-94_ChIP_set-7_H3K36me3_Rep1_S75_L001_R1_001_val_1.fq.gz.bam
-# 129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bam.bai  129-94_ChIP_set-7_H3K36me3_Rep1_S75_L001_R1_001_val_1.fq.gz.bam.bai
-# 129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bam      MV.bam
-# 129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bam.bai  MV.bam.bai
+#Run129 bams
+# 129-33_ChIP_WT_K27me3_AM_Rep_2_S32.bam
+# 129-34_ChIP_cac-1_K27me3_AM_Rep_2_S33.bam
+# 129-35_ChIP_cac-2_K27me3_AM_Rep_2_S34.bam
+# 129-36_ChIP_cac-3_K27me3_AM_Rep_2_S35.bam
+# 129-37_ChIP_set-7_K27me3_AM_Rep_2_S36.bam
+# 129-38_ChIP_WT_K27me3_AbC_Rep_1_S37.bam
+# 129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38.bam
+# 129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39.bam
+# 129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40.bam
+# 129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41.bam
+# 129-43_ChIP_WT_input_S42.bam
+# 129-44_ChIP_cac-1_input_S43.bam
+# 129-45_ChIP_cac-2_input_S44.bam
+# 129-46_ChIP_cac-3_input_S45.bam
+# 129-47_ChIP_set-7_input_S46.bam
+# 129-48_ChIP-seq_Dim-5_input_S47.bam
+# 129-90_ChIP_WT_H3K36me3_Rep1_S71.bam
+# 129-91_ChIP_cac-1_H3K36me3_Rep1_S72.bam
+# 129-92_ChIP_cac-2_H3K36me3_Rep1_S73.bam
+# 129-93_ChIP_cac-3_H3K36me3_Rep1_S74.bam
+# 129-94_ChIP_set-7_H3K36me3_Rep1_S75.bam
 
-#Run137
+#Run131 bams
+# 131-22_ChIP_WT_H3K27me2me3_Rep1_S20.bam
+# 131-23_ChIP_cac-1_H3K27me2me3_Rep1_S21.bam
+# 131-24_ChIP_cac-2_H3K27me2me3_Rep1_S22.bam
+# 131-25_ChIP_cac-3_H3K27me2me3_Rep1_S23.bam
+# 131-26_ChIP_set-7_H3K27me2me3_Rep1_S24.bam
+# 131-27_ChIP_WT_H3K36me2_Rep1_S25.bam
+# 131-28_ChIP_cac-1_H3K36me2_Rep1_S26.bam
+# 131-37_ChIP_WT_input_Rep1_S27.bam
+# 131-38_ChIP_cac-1_input_Rep1_S28.bam
+# 131-39_ChIP_cac-2_input_Rep1_S29.bam
+# 131-40_ChIP_cac-3_input_Rep1_S30.bam
+# 131-41_ChIP_set-7_input_Rep1_S31.bam
+# 131-82_ChIP_WT_H3K27me3_Rep1_S70.bam
+# 131-83_ChIP_cac-1_H3K27me3_Rep1_S71.bam
+# 131-84_ChIP_cac-2_H3K27me3_Rep1_S72.bam
+# 131-85_ChIP_cac-3_H3K27me3_Rep1_S73.bam
+# 131-86_ChIP_set-7_H3K27me3_Rep1_S74.bam
+# 131-87_ChIP_WT_H3K27me2me3_Rep3_S75.bam
+# 131-88_ChIP_cac-1_H3K27me2me3_Rep3_S76.bam
+# 131-89_ChIP_cac-2_H3K27me2me3_Rep3_S77.bam
+# 131-90_ChIP_cac-3_H3K27me2me3_Rep3_S78.bam
+# 131-91_ChIP_set-7_H3K27me2me3_Rep3_S79.bam
 
-# 137-60_ChIP_WT_HA_Rep1_S57_L001_R1_001_val_1.fq.gz.bam                  137-68_ChIP_WT_H3K27me3_Rep1_S65_L001_R1_001_val_1.fq.gz.bam
-# 137-60_ChIP_WT_HA_Rep1_S57_L001_R1_001_val_1.fq.gz.bam.bai              137-68_ChIP_WT_H3K27me3_Rep1_S65_L001_R1_001_val_1.fq.gz.bam.bai
-# 137-61_ChIP_ETX51-cac-1-HA_HA_Rep1_S58_L001_R1_001_val_1.fq.gz.bam      137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bam
-# 137-61_ChIP_ETX51-cac-1-HA_HA_Rep1_S58_L001_R1_001_val_1.fq.gz.bam.bai  137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_L001_R1_001_val_1.fq.gz.bam.bai
-# 137-62_ChIP_ETX52-cac-1-HA_HA_Rep1_S59_L001_R1_001_val_1.fq.gz.bam      137-70_ChIP_WT_H3K27me3_Rep1_S67_L001_R1_001_val_1.fq.gz.bam
-# 137-62_ChIP_ETX52-cac-1-HA_HA_Rep1_S59_L001_R1_001_val_1.fq.gz.bam.bai  137-70_ChIP_WT_H3K27me3_Rep1_S67_L001_R1_001_val_1.fq.gz.bam.bai
-# 137-63_ChIP_WT_input__S60_L001_R1_001_val_1.fq.gz.bam                   137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam
-# 137-63_ChIP_WT_input__S60_L001_R1_001_val_1.fq.gz.bam.bai               137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_L001_R1_001_val_1.fq.gz.bam.bai
-# 137-64_ChIP_ETX51-cac-1-HA_input__S61_L001_R1_001_val_1.fq.gz.bam       137-72_ChIP_WT_H3K27me3_Rep1_S69_L001_R1_001_val_1.fq.gz.bam
-# 137-64_ChIP_ETX51-cac-1-HA_input__S61_L001_R1_001_val_1.fq.gz.bam.bai   137-72_ChIP_WT_H3K27me3_Rep1_S69_L001_R1_001_val_1.fq.gz.bam.bai
-# 137-65_ChIP_ETX52-cac-1-HA_input__S62_L001_R1_001_val_1.fq.gz.bam       137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam
-# 137-65_ChIP_ETX52-cac-1-HA_input__S62_L001_R1_001_val_1.fq.gz.bam.bai   137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_L001_R1_001_val_1.fq.gz.bam.bai
-# 137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bam            137-74_ChIP_WT_H3K27me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bam
-# 137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bam.bai        137-74_ChIP_WT_H3K27me3_Rep1_S71_L001_R1_001_val_1.fq.gz.bam.bai
-# 137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam      137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam
-# 137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64_L001_R1_001_val_1.fq.gz.bam.bai  137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bam.bai
+#Run133 bams
+# 133-10_ChIP_cac-1_H3K27me2me3_17hr_Rep1_S10.bam
+# 133-11_ChIP_cac-2_H3K27me2me3_17hr_Rep1_S11.bam
+# 133-14_ChIP_set-7_H3K27me2me3_17hr_Rep1_S12.bam
+# 133-15_ChIP_WT_H3K27me2me3_24hr_Rep1_S13.bam
+# 133-16_ChIP_cac-1_H3K27me2me3_24hr_Rep1_S14.bam
+# 133-17_ChIP_cac-2_H3K27me2me3_24hr_Rep1_S15.bam
+# 133-18_ChIP_set-7_H3K27me2me3_24hr_Rep1_S16.bam
+# 133-19_ChIP_WT_H4K20me3_Rep1_S17.bam
+# 133-1_ChIP_WT_H3K27me2me3_4hr_Rep1_S1.bam
+# 133-20_ChIP_cac-1_H4K20me3_Rep1_S18.bam
+# 133-21_ChIP_cac-2_H4K20me3_Rep1_S19.bam
+# 133-22_ChIP_set-7_H4K20me3_Rep1_S20.bam
+# 133-23_ChIP_WT_H3K9me3_Rep2_S21.bam
+# 133-24_ChIP_cac-1_H3K9me3_Rep2_S22.bam
+# 133-25_ChIP_cac-2_H3K9me3_Rep2_S23.bam
+# 133-26_ChIP_set-7_H3K9me3_Rep2_S24.bam
+# 133-27_ChIP_WT_H3K4me2_Rep1_S25.bam
+# 133-28_ChIP_cac-1_H3K4me2_Rep2_S26.bam
+# 133-29_ChIP_cac-2_H3K4me2_Rep1_S27.bam
+# 133-2_ChIP_cac-1_H3K27me2me3_4hr_Rep1_S2.bam
+# 133-30_ChIP_set-7_H3K4me2_Rep1_S28.bam
+# 133-31_ChIP_WT_H3K27me3_4hr_Rep1_S29.bam
+# 133-32_ChIP_cac-1_H3K27me3_4hr_Rep1_S30.bam
+# 133-33_ChIP_cac-2_H3K27me3_4hr_Rep1_S31.bam
+# 133-34_ChIP_set-7_H3K27me3_4hr_Rep1_S32.bam
+# 133-35_ChIP_WT_H3K27me3_8hr_Rep1_S33.bam
+# 133-36_ChIP_cac-1_H3K27me3_8hr_Rep1_S34.bam
+# 133-37_ChIP_cac-2_H3K27me3_8hr_Rep1_S35.bam
+# 133-38_ChIP_set-7_H3K27me3_8hr_Rep1_S36.bam
+# 133-3_ChIP_cac-2_H3K27me2me3_4hr_Rep1_S3.bam
+# 133-40_ChIP_cac-1_H3K27me3_17hr_Rep1_S37.bam
+# 133-41_ChIP_cac-2_H3K27me3_17hr_Rep1_S38.bam
+# 133-42_ChIP_set-7_H3K27me3_17hr_Rep1_S39.bam
+# 133-43_ChIP_WT_H3K27me3_24hr_Rep1_S40.bam
+# 133-44_ChIP_cac-1_H3K27me3_24hr_Rep1_S41.bam
+# 133-45_ChIP_cac-2_H3K27me3_24hr_Rep1_S42.bam
+# 133-46_ChIP_set-7_H3K27me3_24hr_Rep1_S43.bam
+# 133-47_ChIP_WT_Acetylated-Lysine_Rep1_S44.bam
+# 133-48_ChIP_cac-1_Acetylated-Lysine_Rep1_S45.bam
+# 133-49_ChIP_cac-2_Acetylated-Lysine_Rep1_S46.bam
+# 133-4_ChIP_set-7_H3K27me2me3_4hr_Rep1_S4.bam
+# 133-5_ChIP_WT_H3K27me2me3_8hr_Rep1_S5.bam
+# 133-6_ChIP_cac-1_H3K27me2me3_8hr_Rep1_S6.bam
+# 133-7_ChIP_cac-2_H3K27me2me3_8hr_Rep1_S7.bam
+# 133-8_ChIP_set-7_H3K27me2me3_8hr_Rep1_S8.bam
+# 133-95_ChIP_cac-3_Acetylated-Lysine_Rep1_S92.bam
+# 133-96_ChIP_set-7_Acetylated-Lysine_Rep1_S93.bam
+# 133-9_ChIP_WT_H3K27me2me3_17hr_Rep1_S9.bam
+
+#Run136 bams
+# 6147_136-10_ChIP_cac-1-2_H3K27me3_CS_Rep1_S10.bam
+# 6147_136-11_ChIP_WT_input_S11.bam
+# 6147_136-12_ChIP_cac-1_input_S12.bam
+# 6147_136-13_ChIP_cac-2_input_S13.bam
+# 6147_136-14_ChIP_cac-3_input_S14.bam
+# 6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2_S1.bam
+# 6147_136-21_ChIP_cac-1-2_input_S21.bam
+# 6147_136-22_ChIP_WT_H3K27me3_CS_0hr_Rep1_S22.bam
+# 6147_136-23_ChIP_qa-suz12_H3K27me3_CS_0hr_Rep1_S23.bam
+# 6147_136-24_ChIP_qa-suz12_cac-1_H3K27me3_CS_0hr_Rep1_S24.bam
+# 6147_136-25_ChIP_WT_H3K27me3_CS_8hr_Rep1_S25.bam
+# 6147_136-26_ChIP_qa-suz12_H3K27me3_CS_8hr_Rep1_S26.bam
+# 6147_136-27_ChIP_qa-suz12_cac-1_H3K27me3_CS_8hr_Rep1_S27.bam
+# 6147_136-28_ChIP_WT_H3K27me3_CS_24hr_Rep1_S28.bam
+# 6147_136-29_ChIP_qa-suz12_H3K27me3_CS_24hr_Rep1_S29.bam
+# 6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2_S2.bam
+# 6147_136-39_ChIP_qa-suz12_cac-1_H3K27me3_CS_24hr_Rep1_S39.bam
+# 6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3.bam
+# 6147_136-40_ChIP_WT_H3K27me3_abcam_6hr_Rep1_S40.bam
+# 6147_136-41_ChIP_qa-suz12_H3K27me3_abcam_6hr_Rep1_S41.bam
+# 6147_136-42_ChIP_qa-suz12_H3K27me3_abcam_6hr_Rep1_S42.bam
+# 6147_136-43_ChIP_qa-suz12_cac-1_H3K27me3_abcam_6hr_Rep1_S43.bam
+# 6147_136-44_ChIP_qa-suz12_cac-1_H3K27me3_abcam_6hr_Rep1_S44.bam
+# 6147_136-45_ChIP_set-7_H3K27me3_abcam_6hr_Rep1_S45.bam
+# 6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4.bam
+# 6147_136-58_ChIP_WT_H3K27me3_abcam_Rep3_S58.bam
+# 6147_136-5_ChIP_cac-1-2_H3K27me3_abcam_Rep2_S5.bam
+# 6147_136-6_ChIP_WT_H3K27me3_CS_Rep1_S6.bam
+# 6147_136-71_ChIP_cac-1_H3K27me3_abcam_Rep3_S70.bam
+# 6147_136-72_ChIP_cac-2_H3K27me3_abcam_Rep3_S71.bam
+# 6147_136-75_ChIP_cac-3_H3K27me3_abcam_Rep3_S74.bam
+# 6147_136-76_ChIP_cac-1-2_H3K27me3_abcam_Rep3_S75.bam
+# 6147_136-77_ChIP_set-7_H3K27me3_abcam_Rep3_S76.bam
+# 6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bam
+# 6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bam
+# 6147_136-7_ChIP_cac-1_H3K27me3_CS_Rep1_S7.bam
+# 6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bam
+# 6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bam
+# 6147_136-82_ChIP_cac-1-2_H3K27me3_CS_Rep2_S81.bam
+# 6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bam
+# 6147_136-84_ChIP_WT_input_S83.bam
+# 6147_136-85_ChIP_cac-1_input_S84.bam
+# 6147_136-89_ChIP_cac-2_input_S88.bam
+# 6147_136-8_ChIP_cac-2_H3K27me3_CS_Rep1_S8.bam
+# 6147_136-91_ChIP_cac-1-2_input_S90.bam
+# 6147_136-92_ChIP_set-7_input_S91.bam
+# 6147_136-9_ChIP_cac-3_H3K27me3_CS_Rep1_S9.bam
+
+#Run137 bams
+# 137-60_ChIP_WT_HA_Rep1_S57.bam
+# 137-61_ChIP_ETX51-cac-1-HA_HA_Rep1_S58.bam
+# 137-62_ChIP_ETX52-cac-1-HA_HA_Rep1_S59.bam
+# 137-63_ChIP_WT_input__S60.bam
+# 137-64_ChIP_ETX51-cac-1-HA_input__S61.bam
+# 137-65_ChIP_ETX52-cac-1-HA_input__S62.bam
+# 137-66_ChIP_WT_H3K27me3_Rep1_S63.bam
+# 137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bam
+# 137-68_ChIP_WT_H3K27me3_Rep1_S65.bam
+# 137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66.bam
+# 137-70_ChIP_WT_H3K27me3_Rep1_S67.bam
+# 137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68.bam
+# 137-72_ChIP_WT_H3K27me3_Rep1_S69.bam
+# 137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70.bam
+# 137-74_ChIP_WT_H3K27me3_Rep1_S71.bam
+# 137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72.bam
+
+#Run138 bams
+# 138-57_ChIP_WT_H3K27me3_Rep3_6252_S56.bam
+# 138-58_ChIP_cac-1_H3K27me3_Rep3_6252_S57.bam
+# 138-59_ChIP_cac-2_H3K27me3_Rep3_6252_S58.bam
+# 138-60_ChIP_cac-3_H3K27me3_Rep3_6252_S59.bam
+# 138-61_ChIP_set-7_H3K27me3_Rep3_6252_S60.bam
+# 138-62_ChIP_WT_H3K36me3_Rep2_6252_S61.bam
+# 138-63_ChIP_cac-1_H3K36me3_Rep2_6252_S62.bam
+# 138-64_ChIP_cac-2_H3K36me3_Rep2_6252_S63.bam
+# 138-65_ChIP_cac-3_H3K36me3_Rep2_6252_S64.bam
+# 138-66_ChIP_set-7_H3K36me3_Rep2_6252_S65.bam
+# 138-67_ChIP_WT_H4K20me3_Rep2_6252_S66.bam
+# 138-68_ChIP_cac-1_H4K20me3_Rep2_6252_S67.bam
+# 138-69_ChIP_cac-2_H4K20me3_Rep2_6252_S68.bam
+# 138-70_ChIP_cac-3_H4K20me3_Rep2_6252_S69.bam
+# 138-71_ChIP_set-7_H4K20me3_Rep2_6252_S70.bam
+# 138-72_ChIP_WT_input__6252_S71.bam
+# 138-73_ChIP_cac-1_input__6252_S72.bam
+# 138-74_ChIP_cac-2_input__6252_S73.bam
+# 138-75_ChIP_cac-3_input__6252_S74.bam
+# 138-76_ChIP_set-7_input__6252_S75.bam
+# 138-77_ChIP_WT_0hr_H3K27me3_Rep1_6252_S76.bam
+# 138-78_ChIP_tetO-cac-1_0hr_H3K27me3_Rep1_6252_S77.bam
+# 138-79_ChIP_tetO-cac-2_0hr_H3K27me3_Rep1_6252_S78.bam
+# 138-80_ChIP_tetO-cac-3_0hr_H3K27me3_Rep1_6252_S79.bam
+# 138-81_ChIP_tetO_0hr_H3K27me3_Rep1_6252_S80.bam
+# 138-82_ChIP_WT_6hr_H3K27me3_Rep1_6252_S81.bam
+# 138-83_ChIP_tetO-cac-1_6hr_H3K27me3_Rep1_6252_S82.bam
+# 138-84_ChIP_tetO-cac-2_6hr_H3K27me3_Rep1_6252_S83.bam
+# 138-85_ChIP_tetO-cac-3_6hr_H3K27me3_Rep1_6252_S84.bam
+# 138-86_ChIP_tetO_6hr_H3K27me3_Rep1_6252_S85.bam
+# 138-87_ChIP_WT_12hr_H3K27me3_Rep1_6252_S86.bam
+# 138-88_ChIP_tetO-cac-1_12hr_H3K27me3_Rep1_6252_S87.bam
+# 138-89_ChIP_tetO-cac-2_12hr_H3K27me3_Rep1_6252_S88.bam
+# 138-90_ChIP_tetO-cac-3_12hr_H3K27me3_Rep1_6252_S89.bam
+# 138-91_ChIP_tetO_12hr_H3K27me3_Rep1_6252_S90.bam
+# 138-92_ChIP_WT_24hr_H3K27me3_Rep1_6252_S91.bam
+# 138-93_ChIP_tetO-cac-1_24hr_H3K27me3_Rep1_6252_S92.bam
+# 138-94_ChIP_tetO-cac-2_24hr_H3K27me3_Rep1_6252_S93.bam
+# 138-95_ChIP_tetO-cac-3_24hr_H3K27me3_Rep1_6252_S94.bam
+# 138-96_ChIP_tetO_24hr_H3K27me3_Rep1_6252_S95.bam
+
+#Run139 bam
+# 139-29_ChIP_WT_Input__S29.bam
+# 139-30_ChIP_qa-suz12_Input__S30.bam
+# 139-31_ChIP_WT_Input__S31.bam
+# 139-32_ChIP_qa-suz12_Input__S32.bam
+# 139-33_ChIP_WT_Input__S33.bam
+# 139-34_ChIP_qa-suz12_Input__S34.bam
+# 139-35_ChIP_WT_Input__S35.bam
+# 139-36_ChIP_qa-suz12_Input__S36.bam
+# 139-37_ChIP_WT_Input__S37.bam
+# 139-38_ChIP_qa-suz12_Input__S38.bam
+# 139-49_ChIP_qa-suz12_H3K27me3_Rep3_S40.bam
+# 139-50_ChIP_qa-suz12-cac-1_H3K27me3_Rep2_S41.bam
+# 139-51_ChIP_qa-suz12_H3K27me3_Rep1_S42.bam
+# 139-52_ChIP_qa-suz12-cac-1_H3K27me3_Rep1_S43.bam
+# 139-53_ChIP_qa-suz12_H3K27me3_Rep1_S44.bam
+# 139-54_ChIP_qa-suz12-cac-1_H3K27me3_Rep1_S45.bam
+# 139-55_ChIP_qa-suz12_H3K27me3_Rep3_S46.bam
+# 139-56_ChIP_qa-suz12-cac-1_H3K27me3_Rep2_S47.bam
+# 139-57_ChIP_WT_H3K27me3_Rep1_S48.bam
+# 139-58_ChIP_qa-suz12_H3K27me3_Rep1_S49.bam
+# 139-59_ChIP_qa-suz12-cac-1_H3K27me3_Rep1_S50.bam
+# 139-60_ChIP_WT_H3K27me2me3_Rep1_S51.bam
+# 139-61_ChIP_qa-suz12_H3K27me2me3_Rep1_S52.bam
+# 139-62_ChIP_qa-suz12-cac-1_H3K27me2me3_Rep1_S53.bam
+# 139-63_ChIP_qa-suz12_H3K27me2me3_Rep1_S54.bam
+# 139-64_ChIP_qa-suz12-cac-1_H3K27me2me3_Rep1_S55.bam
+# 139-65_ChIP_qa-suz12_H3K27me2me3_Rep1_S56.bam
+# 139-66_ChIP_qa-suz12-cac-1_H3K27me2me3_Rep1_S57.bam
+# 139-67_ChIP_qa-suz12_H3K27me2me3_Rep1_S58.bam
+# 139-68_ChIP_qa-suz12-cac-1_H3K27me2me3_Rep1_S59.bam
+# 139-69_ChIP_WT_H3K27me2me3_Rep1_S60.bam
+# 139-70_ChIP_qa-suz12_H3K27me2me3_Rep1_S61.bam
+
+#Run141 bams
+# 141-58_ChIP_WT_H3K23me1_Rep1_S52.bam
+# 141-59_ChIP_cac-1_H3K23me1_Rep1_S53.bam
+# 141-60_ChIP_cac-2_H3K23me1_Rep1_S54.bam
+# 141-61_ChIP_cac-3_H3K23me1_Rep1_S55.bam
+# 141-62_ChIP_set-7_H3K23me1_Rep1_S56.bam
+# 141-63_ChIP_WT_teto_P0_H3K27me3_Rep1_S57.bam
+# 141-64_ChIP_WT_teto_P1_H3K27me3_Rep1_S58.bam
+# 141-65_ChIP_WT_teto_P2_H3K27me3_Rep1_S59.bam
+# 141-66_ChIP_WT_teto_P3_H3K27me3_Rep1_S60.bam
+# 141-67_ChIP_cac-1_teto_P0_H3K27me3_Rep1_S61.bam
+# 141-68_ChIP_cac-1_teto_P1_H3K27me3_Rep1_S62.bam
+# 141-69_ChIP_cac-1_teto_P2_H3K27me3_Rep1_S63.bam
+# 141-70_ChIP_cac-1_teto_P3_H3K27me3_Rep1_S64.bam
+# 141-88_ChIP_WT_H3K27me2_Rep1_S82.bam
+# 141-89_ChIP_cac-1_H3K27me2_Rep1_S83.bam
+# 141-90_ChIP_cac-2_H3K27me2_Rep1_S84.bam
+# 141-91_ChIP_cac-3_H3K27me2_Rep1_S85.bam
+# 141-92_ChIP_set-7_H3K27me2_Rep1_S86.bam
+# 141-93_ChIP_WT_H4K12ac_Rep1_S87.bam
+# 141-94_ChIP_cac-1_H4K12ac_Rep1_S88.bam
+# 141-95_ChIP_cac-2_H4K12ac_Rep1_S89.bam
+# 141-96_ChIP_set-7_H4K12ac_Rep1_S90.bam
+# 141-N11_ATAC_WT__Rep1_S100.bam
+# 141-N12_ATAC_cac-1__Rep1_S101.bam
+# 141-N13_ATAC_cac-2__Rep1_S102.bam
+# 141-N14_ATAC_cac-3__Rep1_S103.bam
+# 141-N15_ATAC_set-7__Rep1_S104.bam
 
 
-# #Run136
-# 6147_136-10_ChIP_cac-1-2_H3K27me3_CS_Rep1.bam                                                6147_136-45_ChIP_set-7_H3K27me3_abcam_6hr_Rep1_S45_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-10_ChIP_cac-1-2_H3K27me3_CS_Rep1.bam.bai                                            6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-11_ChIP_WT_input.bam                                                                6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-11_ChIP_WT_input.bam.bai                                                            6147_136-58_ChIP_WT_H3K27me3_abcam_Rep3_S58_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-12_ChIP_cac-1_input.bam                                                             6147_136-58_ChIP_WT_H3K27me3_abcam_Rep3_S58_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-12_ChIP_cac-1_input.bam.bai                                                         6147_136-5_ChIP_cac-1-2_H3K27me3_abcam_Rep2_S5_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-13_ChIP_cac-2_input.bam                                                             6147_136-5_ChIP_cac-1-2_H3K27me3_abcam_Rep2_S5_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-13_ChIP_cac-2_input.bam.bai                                                         6147_136-6_ChIP_WT_H3K27me3_CS_Rep1_S6_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-14_ChIP_cac-3_input.bam                                                             6147_136-6_ChIP_WT_H3K27me3_CS_Rep1_S6_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-14_ChIP_cac-3_input.bam.bai                                                         6147_136-71_ChIP_cac-1_H3K27me3_abcam_Rep3_S70_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bam                                                   6147_136-71_ChIP_cac-1_H3K27me3_abcam_Rep3_S70_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bam.bai                                               6147_136-72_ChIP_cac-2_H3K27me3_abcam_Rep3_S71_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-21_ChIP_cac-1-2_input.bam                                                           6147_136-72_ChIP_cac-2_H3K27me3_abcam_Rep3_S71_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-21_ChIP_cac-1-2_input.bam.bai                                                       6147_136-75_ChIP_cac-3_H3K27me3_abcam_Rep3_S74_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-22_ChIP_WT_H3K27me3_CS_0hr_Rep1.bam                                                 6147_136-75_ChIP_cac-3_H3K27me3_abcam_Rep3_S74_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-22_ChIP_WT_H3K27me3_CS_0hr_Rep1.bam.bai                                             6147_136-76_ChIP_cac-1-2_H3K27me3_abcam_Rep3_S75_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-23_ChIP_qa-suz12_H3K27me3_CS_0hr_Rep1.bam                                           6147_136-76_ChIP_cac-1-2_H3K27me3_abcam_Rep3_S75_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-23_ChIP_qa-suz12_H3K27me3_CS_0hr_Rep1.bam.bai                                       6147_136-77_ChIP_set-7_H3K27me3_abcam_Rep3_S76_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-24_ChIP_qa-suz12_cac-1_H3K27me3_CS_0hr_Rep1.bam                                     6147_136-77_ChIP_set-7_H3K27me3_abcam_Rep3_S76_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-24_ChIP_qa-suz12_cac-1_H3K27me3_CS_0hr_Rep1.bam.bai                                 6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-25_ChIP_WT_H3K27me3_CS_8hr_Rep1.bam                                                 6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-25_ChIP_WT_H3K27me3_CS_8hr_Rep1.bam.bai                                             6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-26_ChIP_qa-suz12_H3K27me3_CS_8hr_Rep1.bam                                           6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-26_ChIP_qa-suz12_H3K27me3_CS_8hr_Rep1.bam.bai                                       6147_136-7_ChIP_cac-1_H3K27me3_CS_Rep1_S7_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-27_ChIP_qa-suz12_cac-1_H3K27me3_CS_8hr_Rep1.bam                                     6147_136-7_ChIP_cac-1_H3K27me3_CS_Rep1_S7_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-27_ChIP_qa-suz12_cac-1_H3K27me3_CS_8hr_Rep1.bam.bai                                 6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-28_ChIP_WT_H3K27me3_CS_24hr_Rep1.bam                                                6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-28_ChIP_WT_H3K27me3_CS_24hr_Rep1.bam.bai                                            6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-29_ChIP_qa-suz12_H3K27me3_CS_24hr_Rep1.bam                                          6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-29_ChIP_qa-suz12_H3K27me3_CS_24hr_Rep1.bam.bai                                      6147_136-82_ChIP_cac-1-2_H3K27me3_CS_Rep2_S81_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bam                                                6147_136-82_ChIP_cac-1-2_H3K27me3_CS_Rep2_S81_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bam.bai                                            6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-39_ChIP_qa-suz12_cac-1_H3K27me3_CS_24hr_Rep1_S39_L001_R1_001_val_1.fq.gz.bam        6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-39_ChIP_qa-suz12_cac-1_H3K27me3_CS_24hr_Rep1_S39_L001_R1_001_val_1.fq.gz.bam.bai    6147_136-84_ChIP_WT_input_S83_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bam                     6147_136-84_ChIP_WT_input_S83_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bam.bai                 6147_136-85_ChIP_cac-1_input_S84_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-40_ChIP_WT_H3K27me3_abcam_6hr_Rep1_S40_L001_R1_001_val_1.fq.gz.bam                  6147_136-85_ChIP_cac-1_input_S84_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-40_ChIP_WT_H3K27me3_abcam_6hr_Rep1_S40_L001_R1_001_val_1.fq.gz.bam.bai              6147_136-89_ChIP_cac-2_input_S88_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-41_ChIP_qa-suz12_H3K27me3_abcam_6hr_Rep1_S41_L001_R1_001_val_1.fq.gz.bam            6147_136-89_ChIP_cac-2_input_S88_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-41_ChIP_qa-suz12_H3K27me3_abcam_6hr_Rep1_S41_L001_R1_001_val_1.fq.gz.bam.bai        6147_136-8_ChIP_cac-2_H3K27me3_CS_Rep1_S8_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-42_ChIP_qa-suz12_H3K27me3_abcam_6hr_Rep1_S42_L001_R1_001_val_1.fq.gz.bam            6147_136-8_ChIP_cac-2_H3K27me3_CS_Rep1_S8_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-42_ChIP_qa-suz12_H3K27me3_abcam_6hr_Rep1_S42_L001_R1_001_val_1.fq.gz.bam.bai        6147_136-91_ChIP_cac-1-2_input_S90_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-43_ChIP_qa-suz12_cac-1_H3K27me3_abcam_6hr_Rep1_S43_L001_R1_001_val_1.fq.gz.bam      6147_136-91_ChIP_cac-1-2_input_S90_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-43_ChIP_qa-suz12_cac-1_H3K27me3_abcam_6hr_Rep1_S43_L001_R1_001_val_1.fq.gz.bam.bai  6147_136-92_ChIP_set-7_input_S91_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-44_ChIP_qa-suz12_cac-1_H3K27me3_abcam_6hr_Rep1_S44_L001_R1_001_val_1.fq.gz.bam      6147_136-92_ChIP_set-7_input_S91_L001_R1_001_val_1.fq.gz.bam.bai
-# 6147_136-44_ChIP_qa-suz12_cac-1_H3K27me3_abcam_6hr_Rep1_S44_L001_R1_001_val_1.fq.gz.bam.bai  6147_136-9_ChIP_cac-3_H3K27me3_CS_Rep1_S9_L001_R1_001_val_1.fq.gz.bam
-# 6147_136-45_ChIP_set-7_H3K27me3_abcam_6hr_Rep1_S45_L001_R1_001_val_1.fq.gz.bam               6147_136-9_ChIP_cac-3_H3K27me3_CS_Rep1_S9_L001_R1_001_val_1.fq.gz.bam.bai
+# Run144 bams
+# 144-10_ChIP_tetO_p0_H3K27me3_Rep3_S10.bam
+# 144-11_ChIP_tetO_p1_H3K27me3_Rep3_S11.bam
+# 144-122_ChIP_tetO_p3_input__S122.bam
+# 144-124_ChIP_tetO_p1_input__S124.bam
+# 144-125_ChIP_tetO_p2_input__S125.bam
+# 144-126_ChIP_tetO_p3_input__S126.bam
+# 144-127_ChIP_tetO_p0_tet_input__S127.bam
+# 144-12_ChIP_tetO_p2_H3K27me3_Rep3_S12.bam
+# 144-132_ChIP_qa-suz12_Input__S132.bam
+# 144-13_ChIP_tetO_p3_H3K27me3_Rep3_S13.bam
+# 144-141_ChIP_qa-suz12_24hr_H3K27me2_Rep1_S141.bam
+# 144-14_ChIP_tetO_p0_H3K27me3_Rep4_S14.bam
+# 144-15_ChIP_tetO_p1_H3K27me3_Rep4_S15.bam
+# 144-16_ChIP_tetO_p2_H3K27me3_Rep4_S16.bam
+# 144-17_ChIP_tetO_p3_H3K27me3_Rep4_S17.bam
+# 144-18_ChIP_tetO_p0_H3K36me3_Rep1_S18.bam
+# 144-19_ChIP_tetO_p1_H3K36me3_Rep1_S19.bam
+# 144-1_ChIP_tetO_p0_H3K27me3_Rep2_S1.bam
+# 144-20_ChIP_tetO_p2_H3K36me3_Rep1_S20.bam
+# 144-21_ChIP_tetO_p3_H3K36me3_Rep1_S21.bam
+# 144-22_ChIP_tetO_p0_H3K36me3_Rep2_S22.bam
+# 144-23_ChIP_tetO_p1_H3K36me3_Rep2_S23.bam
+# 144-24_ChIP_tetO_p2_H3K36me3_Rep2_S24.bam
+# 144-25_ChIP_tetO_p3_H3K36me3_Rep2_S25.bam
+# 144-26_ChIP_tetO_p0_tet_H3K27me3_Rep2_S26.bam
+# 144-27_ChIP_tetO_p0_tet_H3K36me3_Rep2_S27.bam
+# 144-28_ChIP_WT_0hr_H3K27me3_Rep3_S28.bam
+# 144-29_ChIP_WT_24hr_H3K27me3_Rep2_S29.bam
+# 144-2_ChIP_tetO_p1_H3K27me3_Rep2_S2.bam
+# 144-30_ChIP_qa-suz12_0hr_H3K27me3_Rep3_S30.bam
+# 144-31_ChIP_qa-suz12_4hr_H3K27me3_Rep2_S31.bam
+# 144-32_ChIP_qa-suz12_8hr_H3K27me3_Rep2_S32.bam
+# 144-33_ChIP_qa-suz12_12hr_H3K27me3_Rep2_S33.bam
+# 144-34_ChIP_qa-suz12_24hr_H3K27me3_Rep3_S34.bam
+# 144-35_ChIP_qa-suz12_48hr_H3K27me3_Rep2_S35.bam
+# 144-37_ChIP_suz12_24hr_H3K27me3_Rep1_S37.bam
+# 144-38_ChIP_qa-suz12_cac-1_0hr_H3K27me3_Rep2_S38.bam
+# 144-39_ChIP_qa-suz12_cac-1_4hr_H3K27me3_Rep1_S39.bam
+# 144-3_ChIP_tetO_p2_H3K27me3_Rep2_S3.bam
+# 144-40_ChIP_qa-suz12_cac-1_8hr_H3K27me3_Rep1_S40.bam
+# 144-41_ChIP_qa-suz12_cac-1_12hr_H3K27me3_Rep2_S41.bam
+# 144-42_ChIP_qa-suz12_cac-1_24hr_H3K27me3_Rep2_S42.bam
+# 144-43_ChIP_qa-suz12_cac-1_48hr_H3K27me3_Rep2_S43.bam
+# 144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam
+# 144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bam
+# 144-46_ChIP_suz12_0hr_H3K27me3_Rep2_S46.bam
+# 144-47_ChIP_suz12_24hr_H3K27me3_Rep2_S47.bam
+# 144-48_ChIP_qa-suz12_0hr_H3K27me3_Rep4_S48.bam
+# 144-49_ChIP_qa-suz12_4hr_H3K27me3_Rep3_S49.bam
+# 144-4_ChIP_tetO_p3_H3K27me3_Rep2_S4.bam
+# 144-50_ChIP_qa-suz12_8hr_H3K27me3_Rep3_S50.bam
+# 144-51_ChIP_qa-suz12_12hr_H3K27me3_Rep3_S51.bam
+# 144-52_ChIP_qa-suz12_24hr_H3K27me3_Rep4_S52.bam
+# 144-53_ChIP_WT_0hr_H3K27me2_Rep1_S53.bam
+# 144-54_ChIP_WT_24hr_H3K27me2_Rep1_S54.bam
+# 144-55_ChIP_suz12_0hr_H3K27me2_Rep1_S55.bam
+# 144-56_ChIP_suz12_24hr_H3K27me2_Rep1_S56.bam
+# 144-57_ChIP_qa-suz12_0hr_H3K27me2_Rep1_S57.bam
+# 144-58_ChIP_qa-suz12_4hr_H3K27me2_Rep1_S58.bam
+# 144-59_ChIP_qa-suz12_8hr_H3K27me2_Rep1_S59.bam
+# 144-5_ChIP_tetO_p0_tet_H3K27me3_Rep2_S5.bam
+# 144-60_ChIP_qa-suz12_12hr_H3K27me2_Rep1_S60.bam
+# 144-62_ChIP_WT_Input__S62.bam
+# 144-69_ChIP_suz12_Input__S69.bam
+# 144-6_ChIP_tetO_cac-1_p0_H3K27me3_Rep2_S6.bam
+# 144-71_ChIP_qa-suz12_Input__S71.bam
+# 144-73_ChIP_qa-suz12_Input__S73.bam
+# 144-79_ChIP_qa-suz12_Input__S79.bam
+# 144-7_ChIP_tetO_cac-1_p1_H3K27me3_Rep2_S7.bam
+# 144-8_ChIP_tetO_cac-1_p2_H3K27me3_Rep2_S8.bam
+# 144-9_ChIP_tetO_cac-1_p3_H3K27me3_Rep2_S9.bam
+
+#Run145 bams
+# 145-10_ChIP_csr1_LGVI_2_nuc_H3K27me3_Rep1_S10.bam
+# 145-11_ChIP_WT_H3K27me3_nuc_S11.bam
+# 145-15_ChIP_tetO_0hr_H3K27me3_Rep1_S12.bam
+# 145-16_ChIP_tetO_6hr_H3K27me3_Rep1_S13.bam
+# 145-17_ChIP_tetO_12hr_H3K27me3_Rep1_S14.bam
+# 145-18_ChIP_tetO_18hr_H3K27me3_Rep1_S15.bam
+# 145-19_ChIP_tetO_24hr_H3K27me3_Rep1_S16.bam
+# 145-1_ChIP_csr1_LGIII_2_nuc_H3K27me3_Rep1_S1.bam
+# 145-20_ChIP_tetO_30hr_H3K27me3_Rep1_S17.bam
+# 145-21_ChIP_tetO_36hr_H3K27me3_Rep1_S18.bam
+# 145-22_ChIP_tetO_cac-1_0hr_H3K27me3_Rep1_S19.bam
+# 145-23_ChIP_tetO_cac-1_6hr_H3K27me3_Rep1_S20.bam
+# 145-24_ChIP_tetO_cac-1_12hr_H3K27me3_Rep1_S21.bam
+# 145-25_ChIP_tetO_cac-1_18hr_H3K27me3_Rep1_S22.bam
+# 145-26_ChIP_tetO_cac-1_24hr_H3K27me3_Rep1_S23.bam
+# 145-27_ChIP_tetO_cac-1_30hr_H3K27me3_Rep1_S24.bam
+# 145-28_ChIP_tetO_cac-1_36hr_H3K27me3_Rep1_S25.bam
+# 145-2_ChIP_csr1_LGIII_2_nuc_H3K27me3_Rep1_S2.bam
+# 145-3_ChIP_csr1_LGV_1_nuc_H3K27me3_Rep1_S3.bam
+# 145-4_ChIP_csr1_LGVI_1_nuc_H3K27me3_Rep1_S4.bam
+# 145-5_ChIP_csr1_LGIII_1_nuc_H3K27me3_Rep1_S5.bam
+# 145-60_ChIP_WT_0hr_input__S57.bam
+# 145-6_ChIP_csr1_LGIII_2_nuc_H3K27me3_Rep1_S6.bam
+# 145-7_ChIP_csr1_LGV_1_nuc_H3K27me3_Rep1_S7.bam
+# 145-8_ChIP_csr1_LGVI_1_nuc_H3K27me3_Rep1_S8.bam
+# 145-9_ChIP_csr1_LGVI_1_nuc_H3K27me3_Rep1_S9.bam
+
+#Run146 bams
