@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
 #SBATCH --time=48:00:00
-#SBATCH --output=../CallPeak.%j.out
-#SBATCH --error=../CallPeak.%j.err
+#SBATCH --output=../MACS3/logs/CallPeak.%j.out
+#SBATCH --error=../MACS3/logs/CallPeak.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
