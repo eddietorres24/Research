@@ -61,6 +61,7 @@ module load MACS3
 # macs3 callpeak -t "${P144DIR}/144-52_ChIP_qa-suz12_24hr_H3K27me3_Rep4_S52.bam" -c "${P144DIR}/144-132_ChIP_qa-suz12_Input__S132.bam" -f BAMPE -n "qa-suz12_24hr_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_24hr" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${P144DIR}/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bam" -c "${P139DIR}/139-38_ChIP_qa-suz12_Input__S38.bam" -f BAMPE -n "WT_24hr_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/WT_24hr" --min-length 650 --max-gap 375
 
+
 #Convert Broadkpeaks to bed format
 
 #Rep 1
@@ -74,9 +75,10 @@ cut -f $OUTDIR1/1-6 WT_24hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/WT_24hr_H3K
 #Rep 2
 
 #bedtools
+module load BEDTool
 
 #CAF-1
-module load BEDTools
+
 
 #Combining all overlapping peaks
 # bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \
