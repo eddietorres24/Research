@@ -76,7 +76,7 @@ cut -f $OUTDIR1/1-6 WT_24hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/WT_24hr_H3K
 #bedtools
 
 #CAF-1
-# module load BEDTools
+module load BEDTools
 
 #Combining all overlapping peaks
 # bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \
