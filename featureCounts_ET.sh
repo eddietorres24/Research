@@ -12,6 +12,10 @@
 
 #This code will only be used for building a count file across multiple Samples/Strains
 
+cd $SLURM_SUBMIT_DIR
+
+THREADS=2
+
 #Make & Assign Directories
 BAMDIR="/scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles"
 OUTDIR="/scratch/evt82290/RNAseq/CAF-1_Heatmap/counts"
