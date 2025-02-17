@@ -82,12 +82,12 @@ module load BEDTools
 #sort bed files by chromosome
 #qa-suz12
 #Rep1
-bedtools sort -i ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks.bed \
-                               ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks.bed \
-                               ${OUTDIR1}/qa-suz12_8hr_H3K27me3_Rep1_peaks.bed \
-                               ${OUTDIR1}/qa-suz12_12hr_H3K27me3_Rep1_peaks.bed \
-                               ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks.bed \
-                               ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks.bed
+bedtools sort -i ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks.bed > ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks.bed
+bedtools sort -i ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks.bed > ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks.bed
+bedtools sort -i ${OUTDIR1}/qa-suz12_8hr_H3K27me3_Rep1_peaks.bed > ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks.bed
+bedtools sort -i ${OUTDIR1}/qa-suz12_12hr_H3K27me3_Rep1_peaks.bed > ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks.bed
+bedtools sort -i ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks.bed > ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks.bed
+bedtools sort -i  ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks.bed > ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks.bed
 
 #CAF-1
 
