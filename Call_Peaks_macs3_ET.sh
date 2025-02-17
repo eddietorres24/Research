@@ -79,46 +79,25 @@ module load MACS3
 #bedtools
 module load BEDTools
 
-#sort bed files by chromosome
-#qa-suz12
-#Rep1
-bedtools sort -i ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks.bed > ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks_sorted.bed
-bedtools sort -i ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks.bed > ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks_sorted.bed
-bedtools sort -i ${OUTDIR1}/qa-suz12_8hr_H3K27me3_Rep1_peaks.bed > ${OUTDIR1}/qa-suz12_8hr_H3K27me3_Rep1_peaks_sorted.bed
-bedtools sort -i ${OUTDIR1}/qa-suz12_12hr_H3K27me3_Rep1_peaks.bed > ${OUTDIR1}/qa-suz12_12hr_H3K27me3_Rep1_peaks_sorted.bed
-bedtools sort -i ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks.bed > ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed
-bedtools sort -i  ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks.bed > ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed
-
+#Combining all overlapping peaks & merging
 #CAF-1
-
-
-#Combining all overlapping peaks
 # bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
-#
-#
-# bedtools sort -i ${OUTDIR3}/merged_sorted.bed > ${OUTDIR3}/merged_sorted_2.bed
-# bedtools merge -i ${OUTDIR3}/merged_sorted_2.bed > ${OUTDIR3}/merged_file.txt
 
-#determining which peaks overlap across peak files (Not very usefu, use multiinter instead)
-# bedtools intersect -wa -wb \
-#     -a ${OUTDIR3}/2024_04_23_WT_peaks.bed \
-#     -b ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed ${OUTDIR3}/2024_04_23_24hr_peaks.bed \
-#     -names cac-1 cac-2 cac-3 24hr \
-#     -sorted > ${OUTDIR3}/intersect_peaks.txt
 
 #qa-suz12
 #Rep1
-bedtools merge -i ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks_sorted.bed \
+bedtools multiinter -i ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks_sorted.bed \
                                ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks_sorted.bed \
                                ${OUTDIR1}/qa-suz12_8hr_H3K27me3_Rep1_peaks_sorted.bed \
                                ${OUTDIR1}/qa-suz12_12hr_H3K27me3_Rep1_peaks_sorted.bed \
                                ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed \
-                               ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_merge_peaks_sorted.bed
+                               ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_overlap_peaks.bed
 
+bedtools merge -i ${OUTDIR1}/qa-suz12_rep1_overlap_peaks.bed > qa-suz12_rep1_merge_peaks.bed 
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
