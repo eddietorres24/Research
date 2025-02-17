@@ -79,6 +79,16 @@ module load MACS3
 #bedtools
 module load BEDTools
 
+#sort bed files by chromosome
+#qa-suz12
+#Rep1
+bedtools sort -i ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks.bed \
+                               ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks.bed \
+                               ${OUTDIR1}/qa-suz12_8hr_H3K27me3_Rep1_peaks.bed \
+                               ${OUTDIR1}/qa-suz12_12hr_H3K27me3_Rep1_peaks.bed \
+                               ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks.bed \
+                               ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks.bed
+
 #CAF-1
 
 
@@ -101,7 +111,13 @@ module load BEDTools
 #     -sorted > ${OUTDIR3}/intersect_peaks.txt
 
 #qa-suz12
-bedtools merge -i ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks.bed ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks.bed ${OUTDIR1}/qa-suz12_8hr_H3K27me3_Rep1_peaks.bed ${OUTDIR1}/qa-suz12_12hr_H3K27me3_Rep1_peaks.bed ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks.bed ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks.bed > ${OUTDIR1}/qa-suz12_rep1_merge_peaks.bed
+#Rep1
+bedtools merge -i ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks.bed \
+                               ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks.bed \
+                               ${OUTDIR1}/qa-suz12_8hr_H3K27me3_Rep1_peaks.bed \
+                               ${OUTDIR1}/qa-suz12_12hr_H3K27me3_Rep1_peaks.bed \
+                               ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks.bed \
+                               ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks.bed > ${OUTDIR1}/qa-suz12_rep1_merge_peaks.bed
 
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
