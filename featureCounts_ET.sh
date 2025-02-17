@@ -28,12 +28,15 @@ fi
 ###
 
 #Run featureCounts
-module load Subread/2.0.6-GCC-11.3.0
+module load Subread/
+
+featureCounts -t exon -g gene_id -a annotation.gtf -o counts.txt library1.bam library2.bam library3.bam
 
 featureCounts -T $THREADS \
 -t CDS \
 -g gene_name \
 -s 0 --primary \
+--countReadPairs \
 -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
 -o $OUTDIR/readcounts_histchap.txt \
 $BAMDIR/SRR8444037/SRR8444037_Aligned.sortedByCoord.out.bam \
