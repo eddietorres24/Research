@@ -67,13 +67,13 @@ module load MACS3
 #Convert Broadpeaks to bed format
 
 #Rep 1
-cut -f 1-6 $OUTDIR1/WT_0hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/WT_0hr_H3K27me3_Rep1_peaks.bed
-cut -f 1-6 $OUTDIR1/qa-suz12_0hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_0hr_H3K27me3_Rep1_peaks.bed
-cut -f 1-6 $OUTDIR1/qa-suz12_4hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_4hr_H3K27me3_Rep1_peaks.bed
-cut -f 1-6 $OUTDIR1/qa-suz12_8hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_8hr_H3K27me3_Rep1_peaks.bed
-cut -f 1-6 $OUTDIR1/qa-suz12_12hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_12hr_H3K27me3_Rep1_peaks.bed
-cut -f 1-6 $OUTDIR1/qa-suz12_24hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_24hr_H3K27me3_Rep1_peaks.bed
-cut -f 1-6 $OUTDIR1/WT_24hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/WT_24hr_H3K27me3_Rep1_peaks.bed
+# cut -f 1-6 $OUTDIR1/WT_0hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/WT_0hr_H3K27me3_Rep1_peaks.bed
+# cut -f 1-6 $OUTDIR1/qa-suz12_0hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_0hr_H3K27me3_Rep1_peaks.bed
+# cut -f 1-6 $OUTDIR1/qa-suz12_4hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_4hr_H3K27me3_Rep1_peaks.bed
+# cut -f 1-6 $OUTDIR1/qa-suz12_8hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_8hr_H3K27me3_Rep1_peaks.bed
+# cut -f 1-6 $OUTDIR1/qa-suz12_12hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_12hr_H3K27me3_Rep1_peaks.bed
+# cut -f 1-6 $OUTDIR1/qa-suz12_24hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_24hr_H3K27me3_Rep1_peaks.bed
+# cut -f 1-6 $OUTDIR1/WT_24hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/WT_24hr_H3K27me3_Rep1_peaks.bed
 #Rep 2
 
 #bedtools
