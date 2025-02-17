@@ -17,7 +17,9 @@ cd $SLURM_SUBMIT_DIR
 source config.txt
 
 #Make Directories
+#Output
 OUTDIR1="/scratch/evt82290/Peaks/qa-suz12/qa-suz12_Peaks_macs"
+#bams
 P126DIR="/scratch/evt82290/MappingOutputs/Run126/bamFiles"
 P129DIR="/scratch/evt82290/MappingOutputs/Run129/bamFiles"
 P131DIR="/scratch/evt82290/MappingOutputs/Run131/bamFiles"
@@ -97,15 +99,15 @@ module load BEDTools
 #                                ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed \
 #                                ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_overlap_peaks.bed
 
-cat ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks_sorted.bed \
-                                ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks_sorted.bed \
-                                ${OUTDIR1}/qa-suz12_8hr_H3K27me3_Rep1_peaks_sorted.bed \
-                                ${OUTDIR1}/qa-suz12_12hr_H3K27me3_Rep1_peaks_sorted.bed \
-                                ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed \
-                                ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks.bed
-
-sort -k1,1 -k2,2n ${OUTDIR1}/qa-suz12_rep1_comb_peaks.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks_sorted.bed
-bedtools sort -i ${OUTDIR1}/qa-suz12_rep1_comb_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks_bed_sorted.bed
+# cat ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks_sorted.bed \
+#                                 ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks_sorted.bed \
+#                                 ${OUTDIR1}/qa-suz12_8hr_H3K27me3_Rep1_peaks_sorted.bed \
+#                                 ${OUTDIR1}/qa-suz12_12hr_H3K27me3_Rep1_peaks_sorted.bed \
+#                                 ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed \
+#                                 ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks.bed
+#
+# sort -k1,1 -k2,2n ${OUTDIR1}/qa-suz12_rep1_comb_peaks.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks_sorted.bed
+# bedtools sort -i ${OUTDIR1}/qa-suz12_rep1_comb_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks_bed_sorted.bed
 
 bedtools merge -i ${OUTDIR1}/qa-suz12_rep1_comb_peaks_bed_sorted.bed > qa-suz12_rep1_merge_peaks.bed
 
