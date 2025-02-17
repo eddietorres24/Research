@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
 #SBATCH --time=6:00:00
-#SBATCH --output=../HeatMap.%j.out
-#SBATCH --error=../HeatMap.%j.err
+#SBATCH --output=../Heatmap/logs/Heatmap.%j.out
+#SBATCH --error=../Heatmap/logs/Heatmap.%j.err
 
 #output directories
 OUTDIR1="/scratch/evt82290/Heatmaps/qa-suz12"
