@@ -58,7 +58,7 @@ BEDDIR="/scratch/evt82290/RNAseqIGV/bedgraph"
 ###
 # conda install -c bioconda deeptools
 
-module load deepTools/3.5.2-foss-2022a
+module load deepTools
 
 # computeMatrix scale-regions \
 #  --unscaled5prime 250 \
@@ -143,16 +143,16 @@ module load deepTools/3.5.2-foss-2022a
         #             --outFileSortedRegions heatmap.bed \
         #             --colorList 'white, royalblue' \
         #             --zMin 0 \
-        #             --zMax 20
+                     --zMax 20
 
 
 plotHeatmap -m matrix_qa-suz12.gz -out $OUTDIR1/2025-02-17_qa-suz12_time_scaled_2_ET \
             --samplesLabel WT_0hr WT_24hr 0hr 4hr 8hr 12hr 24hr \
             --clusterUsingSamples 1 2 \
             --sortUsingSamples 1 2 \
-            --hclust \
+            --hclust 2 \
             --outFileSortedRegions heatmap.bed \
-            --colorList 'white, green'
+            --colorList 'white, green' \
             --zMax 20
 
 
