@@ -153,7 +153,7 @@ plotHeatmap -m matrix_qa-suz12.gz -out $OUTDIR1/2025-02-17_qa-suz12_time_scaled_
             --hclust \
             --outFileSortedRegions heatmap.bed \
             --colorList 'white, green'
-            --zmax 20
+            --zMax 20
 
 
 #Run137
