@@ -90,7 +90,7 @@ module load BEDTools
 
 #qa-suz12
 #Rep1
-bedtools multicov -i ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks_sorted.bed \
+bedtools multicov -bams ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks_sorted.bed \
                                ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks_sorted.bed \
                                ${OUTDIR1}/qa-suz12_8hr_H3K27me3_Rep1_peaks_sorted.bed \
                                ${OUTDIR1}/qa-suz12_12hr_H3K27me3_Rep1_peaks_sorted.bed \
