@@ -104,7 +104,7 @@ cat ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks_sorted.bed \
                                 ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed \
                                 ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks.bed
 
-bedtools sort ${OUTDIR1}/qa-suz12_rep1_comb_peaks.bed
+bedtools sort -i ${OUTDIR1}/qa-suz12_rep1_comb_peaks.bed
 
 bedtools merge -i ${OUTDIR1}/qa-suz12_rep1_comb_peaks.bed > qa-suz12_rep1_merge_peaks.bed
 
