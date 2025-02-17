@@ -110,14 +110,14 @@ module load deepTools/3.5.2-foss-2022a
 #     $OUTDIR2/SRR10916163.bw \
 #     -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
 
-# computeMatrix reference-point --referencePoint center -b 10000 -a 10000 \
-#  -S $P137DIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bin_25.smooth_75Bulk.bw \
-#     $P137DIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bin_25.smooth_75Bulk.bw \
-#     $P137DIR/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66.bin_25.smooth_75Bulk.bw \
-#     $P137DIR/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68.bin_25.smooth_75Bulk.bw \
-#     $P137DIR/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70.bin_25.smooth_75Bulk.bw \
-#     $P137DIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72.bin_25.smooth_75Bulk.bw \
-#     -R $QABED/qa-suz12_rep1_merge_peaks.bed --skipZeros -o matrix_qa-suz12.gz
+computeMatrix reference-point scale-regions \
+ -S $P137DIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bin_25.smooth_75Bulk.bw \
+    $P137DIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bin_25.smooth_75Bulk.bw \
+    $P137DIR/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66.bin_25.smooth_75Bulk.bw \
+    $P137DIR/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68.bin_25.smooth_75Bulk.bw \
+    $P137DIR/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70.bin_25.smooth_75Bulk.bw \
+    $P137DIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72.bin_25.smooth_75Bulk.bw \
+    -R $QABED/qa-suz12_rep1_merge_peaks.bed --skipZeros -o matrix_qa-suz12.gz
 
     # computeMatrix reference-point --referencePoint center -b 3000 -a 3000 \
     #  -S $OUTDIR/137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw   \
