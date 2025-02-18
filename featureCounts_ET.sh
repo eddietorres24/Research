@@ -34,6 +34,7 @@ module load Subread/
 featureCounts -T $THREADS \
 -t CDS \
 -g gene_name \
+--countReadPairs \
 -s 0 --primary \
 -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
 -o $OUTDIR/readcounts_histchap.txt \
