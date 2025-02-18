@@ -44,6 +44,7 @@ $BAMDIR/SRR7970629/SRR7970629_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR7970630/SRR7970630_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR7970631/SRR7970631_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR7970598/SRR7970598_Aligned.sortedByCoord.out.bam \
+$BAMDIR/SRR7970598/SRR7970599_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR7970600/SRR7970600_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR8269830/SRR8269830_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR8269647/SRR8269647_Aligned.sortedByCoord.out.bam \
