@@ -18,7 +18,8 @@ source config.txt
 
 #Make Directories
 #Output
-OUTDIR1="/scratch/evt82290/Peaks/qa-suz12/qa-suz12_Peaks_macs"
+OUTDIR1="/scratch/evt82290/Peaks/qa-suz12"
+OUTDIR2="/scratch/evt82290/Peaks/CAF-1/ATAC"
 #bams
 P126DIR="/scratch/evt82290/MappingOutputs/Run126/bamFiles"
 P129DIR="/scratch/evt82290/MappingOutputs/Run129/bamFiles"
@@ -34,9 +35,9 @@ P145DIR="/scratch/evt82290/MappingOutputs/Run145/bamFiles"
 P146DIR="/scratch/evt82290/MappingOutputs/Run146/bamFiles"
 
 #if output directory doesn't exist, create it
-if [ ! -d $OUTDIR ]
+if [ ! -d $OUTDIR2 ]
 then
-    mkdir -p $OUTDIR
+    mkdir -p $OUTDIR2
 fi
 ###
 
@@ -64,7 +65,18 @@ module load MACS3
 # macs3 callpeak -t "${P144DIR}/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bam" -c "${P139DIR}/139-38_ChIP_qa-suz12_Input__S38.bam" -f BAMPE -n "WT_24hr_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/WT_24hr" --min-length 650 --max-gap 375
 
 ###CAF-1###
-
+#ATAC-seq
+# 141-N11_ATAC_WT__Rep1_S100.bam
+# 141-N12_ATAC_cac-1__Rep1_S101.bam
+# 141-N13_ATAC_cac-2__Rep1_S102.bam
+# 141-N14_ATAC_cac-3__Rep1_S103.bam
+# 141-N15_ATAC_set-7__Rep1_S104.bam
+macs3 callpeak -t "${P141DIR}/141-N11_ATAC_WT__Rep1_S100.bam" -n "WT_ATAC_Rep1" --outdir "${OUTDIR2}/WT_ATAC_Rep1" -f BAMPE -g 41037538 -q 0.01 --nomodel --shift -75 --extsize 150 --keep-dup all --nolambda
+macs3 callpeak -t "${P141DIR}/141-N12_ATAC_cac-1__Rep1_S101.bam" -n "cac-1_ATAC_Rep1" --outdir "${OUTDIR2}/cac-1_ATAC_Rep1" -f BAMPE -g 41037538 -q 0.01 --nomodel --shift -75 --extsize 150 --keep-dup all --nolambda
+macs3 callpeak -t "${P141DIR}/141-N13_ATAC_cac-2__Rep1_S102.bam" -n "cac-1_ATAC_Rep1" --outdir "${OUTDIR2}/cac-2_ATAC_Rep1" -f BAMPE -g 41037538 -q 0.01 --nomodel --shift -75 --extsize 150 --keep-dup all --nolambda
+macs3 callpeak -t "${P141DIR}/141-N14_ATAC_cac-3__Rep1_S103.bam" -n "cac-1_ATAC_Rep1" --outdir "${OUTDIR2}/cac-3_ATAC_Rep1" -f BAMPE -g 41037538 -q 0.01 --nomodel --shift -75 --extsize 150 --keep-dup all --nolambda
+macs3 callpeak -t "${P141DIR}/141-N15_ATAC_set-7__Rep1_S104.bam" -n "cac-1_ATAC_Rep1" --outdir "${OUTDIR2}/set-7_ATAC_Rep1" -f BAMPE -g 41037538 -q 0.01 --nomodel --shift -75 --extsize 150 --keep-dup all --nolambda
+#ChIP-seq
 
 #Convert Broadpeaks to bed format
 
@@ -109,7 +121,7 @@ module load BEDTools
 # sort -k1,1 -k2,2n ${OUTDIR1}/qa-suz12_rep1_comb_peaks.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks_sorted.bed
 # bedtools sort -i ${OUTDIR1}/qa-suz12_rep1_comb_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks_bed_sorted.bed
 
-bedtools merge -i ${OUTDIR1}/qa-suz12_rep1_comb_peaks_bed_sorted.bed > qa-suz12_rep1_merge_peaks.bed
+#bedtools merge -i ${OUTDIR1}/qa-suz12_rep1_comb_peaks_bed_sorted.bed > qa-suz12_rep1_merge_peaks.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
