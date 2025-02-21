@@ -73,9 +73,9 @@ module load MACS3
 # 141-N15_ATAC_set-7__Rep1_S104.bam
 macs3 callpeak -t "${P141DIR}/141-N11_ATAC_WT__Rep1_S100.bam" -n "WT_ATAC_Rep1" --outdir "${OUTDIR2}/WT_ATAC_Rep1" -f BAMPE -g 41037538 -q 0.01 --nomodel --shift -75 --extsize 150 --keep-dup all --nolambda
 macs3 callpeak -t "${P141DIR}/141-N12_ATAC_cac-1__Rep1_S101.bam" -n "cac-1_ATAC_Rep1" --outdir "${OUTDIR2}/cac-1_ATAC_Rep1" -f BAMPE -g 41037538 -q 0.01 --nomodel --shift -75 --extsize 150 --keep-dup all --nolambda
-macs3 callpeak -t "${P141DIR}/141-N13_ATAC_cac-2__Rep1_S102.bam" -n "cac-1_ATAC_Rep1" --outdir "${OUTDIR2}/cac-2_ATAC_Rep1" -f BAMPE -g 41037538 -q 0.01 --nomodel --shift -75 --extsize 150 --keep-dup all --nolambda
-macs3 callpeak -t "${P141DIR}/141-N14_ATAC_cac-3__Rep1_S103.bam" -n "cac-1_ATAC_Rep1" --outdir "${OUTDIR2}/cac-3_ATAC_Rep1" -f BAMPE -g 41037538 -q 0.01 --nomodel --shift -75 --extsize 150 --keep-dup all --nolambda
-macs3 callpeak -t "${P141DIR}/141-N15_ATAC_set-7__Rep1_S104.bam" -n "cac-1_ATAC_Rep1" --outdir "${OUTDIR2}/set-7_ATAC_Rep1" -f BAMPE -g 41037538 -q 0.01 --nomodel --shift -75 --extsize 150 --keep-dup all --nolambda
+macs3 callpeak -t "${P141DIR}/141-N13_ATAC_cac-2__Rep1_S102.bam" -n "cac-2_ATAC_Rep1" --outdir "${OUTDIR2}/cac-2_ATAC_Rep1" -f BAMPE -g 41037538 -q 0.01 --nomodel --shift -75 --extsize 150 --keep-dup all --nolambda
+macs3 callpeak -t "${P141DIR}/141-N14_ATAC_cac-3__Rep1_S103.bam" -n "cac-3_ATAC_Rep1" --outdir "${OUTDIR2}/cac-3_ATAC_Rep1" -f BAMPE -g 41037538 -q 0.01 --nomodel --shift -75 --extsize 150 --keep-dup all --nolambda
+macs3 callpeak -t "${P141DIR}/141-N15_ATAC_set-7__Rep1_S104.bam" -n "set-7_ATAC_Rep1" --outdir "${OUTDIR2}/set-7_ATAC_Rep1" -f BAMPE -g 41037538 -q 0.01 --nomodel --shift -75 --extsize 150 --keep-dup all --nolambda
 #ChIP-seq
 
 #Convert Broadpeaks to bed format
