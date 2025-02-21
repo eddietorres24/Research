@@ -207,25 +207,6 @@ macs3 callpeak -t "${P138DIR}/138-68_ChIP_cac-1_H4K20me3_Rep2_6252_S67.bam" -c "
 macs3 callpeak -t "${P138DIR}/138-69_ChIP_cac-2_H4K20me3_Rep2_6252_S68.bam" -c "${P138DIR}/138-74_ChIP_cac-2_input__6252_S73.bam" -f BAMPE -n "cac-2_H4K20me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-2_H4K20" --min-length 650 --max-gap 375
 macs3 callpeak -t "${P138DIR}/138-70_ChIP_cac-3_H4K20me3_Rep2_6252_S69.bam" -c "${P138DIR}/138-75_ChIP_cac-3_input__6252_S74.bam" -f BAMPE -n "cac-3_H4K20me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-3_H4K20" --min-length 650 --max-gap 375
 macs3 callpeak -t "${P138DIR}/138-71_ChIP_set-7_H4K20me3_Rep2_6252_S70.bam" -c "${P138DIR}/138-76_ChIP_set-7_input__6252_S75.bam" -f BAMPE -n "set-7_H4K20me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/set-7_H4K20" --min-length 650 --max-gap 375
-# makeTagDirectory $TAGDIR/WT_H4K20me3_rep1 $P133DIR/133-19_ChIP_WT_H4K20me3_Rep1_S17.bam
-# makeTagDirectory $TAGDIR/WT_H4K20me3_rep2 $P138DIR/138-67_ChIP_WT_H4K20me3_Rep2_6252_S66.bam
-# # makeTagDirectory $TAGDIR/WT_H4K20me3_rep3 $138DIR/
-#
-# makeTagDirectory $TAGDIR/cac-1_H4K20me3_rep1 $P133DIR/133-20_ChIP_cac-1_H4K20me3_Rep1_S18.bam
-# makeTagDirectory $TAGDIR/cac-1_H4K20me3_rep2 $P138DIR/138-68_ChIP_cac-1_H4K20me3_Rep2_6252_S67.bam
-# # makeTagDirectory $TAGDIR/cac-1_H4K20me3_rep3 $138DIR/
-#
-# makeTagDirectory $TAGDIR/cac-2_H4K20me3_rep1 $P133DIR/133-21_ChIP_cac-2_H4K20me3_Rep1_S19.bam
-# makeTagDirectory $TAGDIR/cac-2_H4K20me3_rep2 $P138DIR/138-69_ChIP_cac-2_H4K20me3_Rep2_6252_S68.bam
-# # makeTagDirectory $TAGDIR/cac-2_H4K20me3_rep3 $138DIR/
-#
-# # makeTagDirectory $TAGDIR/cac-3_H4K20me3_rep1 $138DIR/
-# makeTagDirectory $TAGDIR/cac-3_H4K20me3_rep2 $P138DIR/138-70_ChIP_cac-3_H4K20me3_Rep2_6252_S69.bam
-# # makeTagDirectory $TAGDIR/cac-3_H4K20me3_rep3 $138DIR/
-#
-# makeTagDirectory $TAGDIR/set-7_H4K20me3_rep1 $P133DIR/133-22_ChIP_set-7_H4K20me3_Rep1_S20.bam
-# makeTagDirectory $TAGDIR/set-7_H4K20me3_rep2 $P138DIR/138-71_ChIP_set-7_H4K20me3_Rep2_6252_S70.bam
-# makeTagDirectory $TAGDIR/set-7_H4K20me3_rep3 $138DIR/
 
 #Convert Broadpeaks to bed format
 #Rep 1
