@@ -188,26 +188,26 @@ elif [ -f $read2 ]; then
   ##################
   #Trimming
   #################
-  	  # module load Trim_Galore/0.6.7-GCCcore-11.2.0
-      #
-  	  # trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
-  	  # wait
+  	  module load Trim_Galore/0.6.7-GCCcore-11.2.0
+
+  	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
+  	  wait
 
 #map with STAR
-  # module load STAR/2.7.10b-GCC-11.3.0
-  #
-  # STAR --runMode alignReads \
-  # --runThreadN $THREADS \
-  # --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
-  # --outFileNamePrefix ${bam} \
-  # --readFilesIn $trimmed/${accession}_val_1.fq.gz $trimmed/${accession}_val_2.fq.gz \
-  # --readFilesCommand zcat \
-  # --alignIntronMax 10000 \
-  # --outSAMtype BAM SortedByCoordinate \
-  # --outBAMsortingBinsN 100 \
-  # --outSAMunmapped Within \
-  # --outSAMattributes Standard \
-  # --limitBAMsortRAM 19990000000
+  module load STAR/2.7.10b-GCC-11.3.0
+
+  STAR --runMode alignReads \
+  --runThreadN $THREADS \
+  --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
+  --outFileNamePrefix ${bam} \
+  --readFilesIn $trimmed/${accession}_val_1.fq.gz $trimmed/${accession}_val_2.fq.gz \
+  --readFilesCommand zcat \
+  --alignIntronMax 10000 \
+  --outSAMtype BAM SortedByCoordinate \
+  --outBAMsortingBinsN 100 \
+  --outSAMunmapped Within \
+  --outSAMattributes Standard \
+  --limitBAMsortRAM 19990000000
 
   #MAPPING READS BASED ON STRAND
   #Load samtools
