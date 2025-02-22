@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=RNAseq_Map
 #SBATCH --partition=batch
-#SBATCH --mail-type=ALL
+#SBATCH --mail-type=FAIL
 #SBATCH --mail-user=evt82290@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
@@ -140,7 +140,7 @@ samtools index ${bam}rev2.bam
 
 # Combine alignments that originate on the reverse strand.
 #
-samtools merge -f ${bam}rev.bam rev1.bam ${bam}rev2.bam
+samtools merge -f ${bam}rev.bam ${bam}rev1.bam ${bam}rev2.bam
 samtools index ${bam}rev.bam
 
   #create index
