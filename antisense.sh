@@ -93,8 +93,7 @@ module load BEDTools
 #MAP READS TO SENSE AND ANTISENSE
 # intersectBed -a genes.gff -b input.bam  -s  >  sense.bam
 # intersectBed -a genes.gff -b input.bam  -S  >  antisense.bam
-SRR8269810_out.99.147.antisense.bam
-SRR8269810_out.sorted.99.147.antisense.bam
+
 # first read in pair maps to reverse strand, read is mapped in proper pair, read is paired
 samtools view -f 83 -b ${bam}Aligned.sortedByCoord.out.bam > ${bam}out.sorted.83.bam
 samtools view -f 163 -b ${bam}Aligned.sortedByCoord.out.bam > ${bam}out.sorted.163.bam
