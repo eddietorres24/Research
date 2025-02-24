@@ -93,7 +93,8 @@ module load BEDTools
 #MAP READS TO SENSE AND ANTISENSE
 # intersectBed -a genes.gff -b input.bam  -s  >  sense.bam
 # intersectBed -a genes.gff -b input.bam  -S  >  antisense.bam
-
+SRR8269810_out.99.147.antisense.bam
+SRR8269810_out.sorted.99.147.antisense.bam
 # first read in pair maps to reverse strand, read is mapped in proper pair, read is paired
 samtools view -f 83 -b ${bam}Aligned.sortedByCoord.out.bam > ${bam}out.sorted.83.bam
 samtools view -f 163 -b ${bam}Aligned.sortedByCoord.out.bam > ${bam}out.sorted.163.bam
@@ -117,7 +118,7 @@ bedtools intersect -b forward_cds.gff -abam ${bam}out.sorted.99.147.bam > ${bam}
 bedtools intersect -b reverse_cds.gff -abam ${bam}out.sorted.99.147.bam > ${bam}out.sorted.99.147.sense.bam
 # merge the two sense and antisense files
 samtools merge ${bam}out_flags_sense.bam ${bam}out.sorted.83.163.sense.bam ${bam}out.sorted.99.147.sense.bam
-samtools merge ${bam}out_flags_antisense.bam ${bam}out.sorted.83.163.antisense.bam ${bam}out.99.147.antisense.bam
+samtools merge ${bam}out_flags_antisense.bam ${bam}out.sorted.83.163.antisense.bam ${bam}out.sorted.99.147.antisense.bam
 
 #bigwig
 module load deepTools/3.5.2-foss-2022a
