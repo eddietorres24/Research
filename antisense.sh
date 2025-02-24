@@ -118,7 +118,9 @@ bedtools intersect -b reverse_cds.gff -abam ${bam}out.sorted.99.147.bam > ${bam}
 # merge the two sense and antisense files
 samtools merge ${bam}out_flags_sense.bam ${bam}out.sorted.83.163.sense.bam ${bam}out.sorted.99.147.sense.bam
 samtools merge ${bam}out_flags_antisense.bam ${bam}out.sorted.83.163.antisense.bam ${bam}out.sorted.99.147.antisense.bam
-
+#index
+samtools index ${bam}out_flags_sense.bam
+samtools index ${bam}out_flags_antisense.bam
 #bigwig
 module load deepTools/3.5.2-foss-2022a
 #Plot all reads
