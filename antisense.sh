@@ -85,6 +85,10 @@ senbw="${bwDir}/${accession}_sen.bw"
 antcounts="${countsdir2}/${accession}_counts_ant.txt"
 antbw="${bwDir}/${accession}_ant.bw"
 
+#modules
+module load SAMtools/1.16.1-GCC-11.3.0
+module load StringTie
+module load BEDTools
 
 #MAP READS TO SENSE AND ANTISENSE
 # intersectBed -a genes.gff -b input.bam  -s  >  sense.bam
