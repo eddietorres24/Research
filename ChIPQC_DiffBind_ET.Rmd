@@ -4,6 +4,7 @@
 ## Load Libraries
 library(BiocManager)
 library(ChIPQC)
+library(ggplot2)
 ```
 
 ```{r, set wd, include=FALSE}
@@ -20,7 +21,7 @@ knitr::opts_knit$set(root.dir = "workingdir")
 
 ```{r, Load Data & Run QC}
 ## Load Sample Data
-samples <- read.csv('meta/samplesheet_chr12.csv')
+samples <- read.csv('meta/DiffBind_CAF-1_ET.csv')
 
 ## Make ChIPQC Object
 register(SerialParam())
@@ -31,9 +32,40 @@ ChIPQCreport(chipObj, reportName="ChIP_QC_report_cac_H3K27me3", reportFolder="Ch
 ```
 
 ### DiffBind (scratch)
-```{r, DiffBind}
-#Read in sample sheet containing CAF-1 mutant data
-caf_dba <- dba(sampleSheet = 'meta/DiffBind_CAF-1_ET')
+```{r, DiffBind Analysis}
+#Read in sample sheet containing CAF-1 mutant data *If running ChIP QC, you can use "samples" variable
+caf_dba <- dba(sampleSheet = samples)
+
+##Plot correlation plot between all samples included on data sheet, save in a file
+CorrPlot <- plot(caf_dba)
+ggsave(filename = "CAF-1_DBA_Corr_Plot.pdf", plot = CorrPlot, dpi=600)
+
+#Count Reads
+caf_dba <- dba.count(caf_dba)
+
+##Plot new correlation plot based on count data, save in a file
+CorrPlot_count <- plot(caf_dba)
+ggsave(filename = "CAF-1_DBA_Corr_Plot_counts.pdf", plot = CorrPlot_count, dpi=600)
+
+#Normalization
+caf_dba <- dba.normalize(caf_dba)
+
+#Model design & Contrast (whta comparisons do you want to make?)
+caf_dba <- dba.contrast(caf_dba)
+
+#Differential Analysis
+caf_dba <- dba.analyze(caf_dba)
+
+##Plot correlation plot based only on differentially bound sites, save in file
+CorrPlot_diff <- plot(caf_dba, contrast = 1)
+ggsave(filename = "CAF-1_DBA_Corr_Plot_diff.pdf", plot = CorrPlot_diff, dpi=600)
+
+#Retrieve differentially bound sites for downstream analysis (will return a GRanges object)
+caf_dba.DB <- dba.report(caf_dba)
+
+```
+
+```{r, DiffBind Plotting}
 
 ```
 
