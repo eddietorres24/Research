@@ -32,6 +32,7 @@ P141DIR="/scratch/evt82290/MappingOutputs/Run141/bamFiles"
 P144DIR="/scratch/evt82290/MappingOutputs/Run144/bamFiles"
 P145DIR="/scratch/evt82290/MappingOutputs/Run145/bamFiles"
 P146DIR="/scratch/evt82290/MappingOutputs/Run146/bamFiles"
+P148DIR="/scratch/evt82290/MappingOutputs/Run148/bamFiles"
 TAGDIR="/scratch/evt82290/Peaks/qa-suz12/homertags"
 #PEAKDIR="/scratch/evt82290/Run137/Peaks"
 
@@ -200,27 +201,27 @@ module load Homer/4.11-foss-2022a
 # makeTagDirectory $TAGDIR/set-7_H3K9me3_rep1 $P133DIR/133-26_ChIP_set-7_H3K9me3_Rep2_S24.bam
 # # makeTagDirectory $TAGDIR/set-7_H3K9me3_rep2 $138DIR/
 # # makeTagDirectory $TAGDIR/set-7_H3K9me3_rep3 $138DIR/
-#
+
 # #H3K4me2
-# # makeTagDirectory $TAGDIR/WT_H3K4me2_rep1 $138DIR/
-# # makeTagDirectory $TAGDIR/WT_H3K4me2_rep2 $138DIR/
-# # makeTagDirectory $TAGDIR/WT_H3K4me2_rep3 $138DIR/
-# #
-# # makeTagDirectory $TAGDIR/cac-1_H3K4me2_rep1 $138DIR/
-# # makeTagDirectory $TAGDIR/cac-1_H3K4me2_rep2 $138DIR/
-# # # makeTagDirectory $TAGDIR/cac-1_H3K4me2_rep3 $138DIR/
-# #
-# # makeTagDirectory $TAGDIR/cac-2_H3K4me2_rep1 $138DIR/
-# # makeTagDirectory $TAGDIR/cac-2_H3K4me2_rep2 $138DIR/
-# # makeTagDirectory $TAGDIR/cac-2_H3K4me2_rep3 $138DIR/
-# #
-# # makeTagDirectory $TAGDIR/cac-3_H3K4me2_rep1 $138DIR/
-# # makeTagDirectory $TAGDIR/cac-3_H3K4me2_rep2 $138DIR/
-# # makeTagDirectory $TAGDIR/cac-3_H3K4me2_rep3 $138DIR/
-# #
-# # makeTagDirectory $TAGDIR/set-7_H3K4me2_rep1 $138DIR/
-# # makeTagDirectory $TAGDIR/set-7_H3K4me2_rep2 $138DIR/
-# # makeTagDirectory $TAGDIR/set-7_H3K4me2_rep3 $138DIR/
+makeTagDirectory $TAGDIR/WT_H3K4me2_rep1 $146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bam
+makeTagDirectory $TAGDIR/WT_H3K4me2_rep2 $146DIR/146-29_ChIP_WT_H3K4me2_Rep2_S29.bam
+# makeTagDirectory $TAGDIR/WT_H3K4me2_rep3 $146DIR/
+
+makeTagDirectory $TAGDIR/cac-1_H3K4me2_rep1 $146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bam
+makeTagDirectory $TAGDIR/cac-1_H3K4me2_rep2 $146DIR/146-30_ChIP_cac-1_H3K4me2_Rep2_S30.bam
+# makeTagDirectory $TAGDIR/cac-1_H3K4me2_rep3 $146DIR/
+
+makeTagDirectory $TAGDIR/cac-2_H3K4me2_rep1 $146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bam
+makeTagDirectory $TAGDIR/cac-2_H3K4me2_rep2 $146DIR/146-31_ChIP_cac-2_H3K4me2_Rep2_S31.bam
+# makeTagDirectory $TAGDIR/cac-2_H3K4me2_rep3 $146DIR/
+
+makeTagDirectory $TAGDIR/cac-3_H3K4me2_rep1 $146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bam
+makeTagDirectory $TAGDIR/cac-3_H3K4me2_rep2 $146DIR/146-32_ChIP_cac-3_H3K4me2_Rep2_S32.bam
+# makeTagDirectory $TAGDIR/cac-3_H3K4me2_rep3 $146DIR/
+
+makeTagDirectory $TAGDIR/set-7_H3K4me2_rep1 $146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bam
+makeTagDirectory $TAGDIR/set-7_H3K4me2_rep2 $146DIR/146-33_ChIP_set-7_H3K4me2_Rep2_S33.bam
+# makeTagDirectory $TAGDIR/set-7_H3K4me2_rep3 $146DIR/
 #
 # #H4K20me3
 # makeTagDirectory $TAGDIR/WT_H4K20me3_rep1 $P133DIR/133-19_ChIP_WT_H4K20me3_Rep1_S17.bam
@@ -250,28 +251,33 @@ module load Homer/4.11-foss-2022a
 # makeTagDirectory $TAGDIR/WT_input_5 $P138DIR/138-72_ChIP_WT_input__6252_S71.bam
 # makeTagDirectory $TAGDIR/WT_input_4 $P136DIR/6147_136-84_ChIP_WT_input_S83.bam
 # makeTagDirectory $TAGDIR/WT_input_3 $P136DIR/6147_136-11_ChIP_WT_input_S11.bam
-# #cac-1
+makeTagDirectory $TAGDIR/WT_input_6 $P146DIR/146-34_ChIP_WT_input__S34.bam
+#cac-1
 # makeTagDirectory $TAGDIR/cac-1_input_1 $P129DIR/129-44_ChIP_cac-1_input_S43.bam
 # makeTagDirectory $TAGDIR/cac-1_input_2 $P131DIR/131-38_ChIP_cac-1_input_Rep1_S28.bam
 # makeTagDirectory $TAGDIR/cac-1_input_5 $P138DIR/138-73_ChIP_cac-1_input__6252_S72.bam
 # makeTagDirectory $TAGDIR/cac-1_input_4 $P136DIR/6147_136-85_ChIP_cac-1_input_S84.bam
 # makeTagDirectory $TAGDIR/cac-1_input_3 $P136DIR/6147_136-12_ChIP_cac-1_input_S12.bam
-# #cac-2
+makeTagDirectory $TAGDIR/cac-1_input_6 $P146DIR/146-35_ChIP_cac-1_input__S35.bam
+#cac-2
 # makeTagDirectory $TAGDIR/cac-2_input_1 $P129DIR/129-45_ChIP_cac-2_input_S44.bam
 # makeTagDirectory $TAGDIR/cac-2_input_2 $P131DIR/131-39_ChIP_cac-2_input_Rep1_S29.bam
 # makeTagDirectory $TAGDIR/cac-2_input_5 $P138DIR/138-74_ChIP_cac-2_input__6252_S73.bam
 # makeTagDirectory $TAGDIR/cac-2_input_4 $P136DIR/6147_136-89_ChIP_cac-2_input_S88.bam
 # makeTagDirectory $TAGDIR/cac-2_input_3 $P136DIR/6147_136-13_ChIP_cac-2_input_S13.bam
-# #cac-3
+makeTagDirectory $TAGDIR/cac-2_input_6 $P146DIR/146-36_ChIP_cac-2_input__S36.bam
+#cac-3
 # makeTagDirectory $TAGDIR/cac-3_input_1 $P129DIR/129-46_ChIP_cac-3_input_S45.bam
 # makeTagDirectory $TAGDIR/cac-3_input_2 $P131DIR/131-40_ChIP_cac-3_input_Rep1_S30.bam
 # makeTagDirectory $TAGDIR/cac-3_input_4 $P138DIR/138-75_ChIP_cac-3_input__6252_S74.bam
 # makeTagDirectory $TAGDIR/cac-3_input_3 $P136DIR/6147_136-14_ChIP_cac-3_input_S14.bam
-# #set-7
+makeTagDirectory $TAGDIR/cac-3_input_5 $P146DIR/146-37_ChIP_cac-3_input__S37.bam
+#set-7
 # makeTagDirectory $TAGDIR/set-7_input_1 $P129DIR/129-47_ChIP_set-7_input_S46.bam
 # makeTagDirectory $TAGDIR/set-7_input_2 $P131DIR/131-41_ChIP_set-7_input_Rep1_S31.bam
 # makeTagDirectory $TAGDIR/set-7_input_4 $P138DIR/138-76_ChIP_set-7_input__6252_S75.bam
 # makeTagDirectory $TAGDIR/set-7_input_3 $P136DIR/6147_136-92_ChIP_set-7_input_S91.bam
+makeTagDirectory $TAGDIR/set-7_input_5 $P146DIR/146-38_ChIP_set-7_input__S38.bam
 
 #call Peaks
 
@@ -315,7 +321,7 @@ module load Homer/4.11-foss-2022a
 # findPeaks $TAGDIR/cac-2_H3K27me3_CS_rep3 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-2_input_5
 # findPeaks $TAGDIR/cac-3_H3K27me3_CS_rep3 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-3_input_4
 # findPeaks $TAGDIR/set-7_H3K27me3_CS_rep3 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/set-7_input_4
-#
+
 # #Abcam
 # #rep 1
 # findPeaks $TAGDIR/WT_H3K27me3_abc_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_input_1
@@ -329,7 +335,7 @@ module load Homer/4.11-foss-2022a
 # findPeaks $TAGDIR/cac-2_H3K27me3_abc_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-2_input_3
 # findPeaks $TAGDIR/cac-3_H3K27me3_abc_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-3_input_3
 # findPeaks $TAGDIR/set-7_H3K27me3_abc_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/set-7_input_3
-#
+
 # #H3K36me3
 # #rep 1
 # findPeaks $TAGDIR/WT_H3K36me3_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_input_2
@@ -357,6 +363,20 @@ module load Homer/4.11-foss-2022a
 # findPeaks $TAGDIR/cac-2_H4K20me3_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-2_input_5
 # findPeaks $TAGDIR/cac-3_H4K20me3_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-3_input_4
 # findPeaks $TAGDIR/set-7_H4K20me3_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/set-7_input_4
+
+# #H3K4me2
+# #rep 1
+findPeaks $TAGDIR/WT_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_input_6
+findPeaks $TAGDIR/cac-1_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-1_input_6
+findPeaks $TAGDIR/cac-2_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-2_input_6
+findPeaks $TAGDIR/cac-3_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-3_input_5
+findPeaks $TAGDIR/set-7_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/set-7_input_5
+#rep 2
+findPeaks $TAGDIR/WT_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_input_6
+findPeaks $TAGDIR/cac-1_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-1_input_6
+findPeaks $TAGDIR/cac-2_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-2_input_6
+findPeaks $TAGDIR/cac-3_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-3_input_5
+findPeaks $TAGDIR/set-7_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/set-7_input_5
 
 #Find Motifs
 # findMotifsGenome.pl qasuz12_4hr_peaks.bed /scratch/evt82290/Foxy_Ncrassa_merged.fasta $OUTDIRmotifs/4hr -size given
@@ -757,3 +777,74 @@ module load Homer/4.11-foss-2022a
 # 145-9_ChIP_csr1_LGVI_1_nuc_H3K27me3_Rep1_S9.bam
 
 #Run146 bams
+# 146-106_ChIP_epr-1GFP_GFP-trap_Rep1_S125.bam
+# 146-10_ChIP_qa-suz12_72hr_H3K27me2_Rep1_S10.bam
+# 146-117_ChIP_qa-suz12_96hr_H3K27me2_Rep1_S136.bam
+# 146-118_ChIP_epr-1_GFP_H3K27me3_Rep1_S137.bam
+# 146-11_ChIP_qa-suz12_96hr_H3K27me2_Rep1_S11.bam
+# 146-123_ChIP_WT_H3K27me2_Rep1_S142.bam
+# 146-124_ChIP_suz12_0hr_H3K27me3_Rep1_S143.bam
+# 146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bam
+# 146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bam
+# 146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bam
+# 146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bam
+# 146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bam
+# 146-12_ChIP_WT_H3K27me2_Rep1_S12.bam
+# 146-130_ChIP_suz12_0hr_H3K36me3_Rep1_S149.bam
+# 146-131_ChIP_qa-suz12_0hr_H3K36me3_Rep1_S150.bam
+# 146-132_ChIP_qa-suz12_4hr_H3K36me3_Rep1_S151.bam
+# 146-133_ChIP_qa-suz12_8hr_H3K36me3_Rep1_S152.bam
+# 146-134_ChIP_qa-suz12_12hr_H3K36me3_Rep1_S153.bam
+# 146-135_ChIP_qa-suz12_24hr_H3K36me3_Rep1_S154.bam
+# 146-136_ChIP_cac-2-epr-1-GFP_GFP-trap_Rep1_S155.bam
+# 146-137_ChIP_cac-2-epr-1-GFP_GFP-trap_Rep1_S156.bam
+# 146-13_ChIP_qa-suz12_0hr_input__S13.bam
+# 146-14_ChIP_qa-suz12_24hr_input__S14.bam
+# 146-15_ChIP_qa-suz12_48hr_input__S15.bam
+# 146-16_ChIP_qa-suz12_72hr_input__S16.bam
+# 146-17_ChIP_qa-suz12_96hr_input__S17.bam
+# 146-18_ChIP_WT_input__S18.bam
+# 146-19_ChIP_WT_H3K4me2_Rep1_S19.bam
+# 146-1_ChIP_qa-suz12_0hr_H3K27me3_Rep4_S1.bam
+# 146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bam
+# 146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bam
+# 146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bam
+# 146-23_ChIP_set-7_H3K4me2_Rep1_S23.bam
+# 146-24_ChIP_WT_H3K27me2_Rep2_S24.bam
+# 146-25_ChIP_cac-1_H3K27me2_Rep2_S25.bam
+# 146-26_ChIP_cac-2_H3K27me2_Rep2_S26.bam
+# 146-27_ChIP_cac-3_H3K27me2_Rep2_S27.bam
+# 146-28_ChIP_set-7_H3K27me2_Rep2_S28.bam
+# 146-29_ChIP_WT_H3K4me2_Rep2_S29.bam
+# 146-2_ChIP_qa-suz12_24hr_H3K27me3_Rep4_S2.bam
+# 146-30_ChIP_cac-1_H3K4me2_Rep2_S30.bam
+# 146-31_ChIP_cac-2_H3K4me2_Rep2_S31.bam
+# 146-32_ChIP_cac-3_H3K4me2_Rep2_S32.bam
+# 146-33_ChIP_set-7_H3K4me2_Rep2_S33.bam
+# 146-34_ChIP_WT_input__S34.bam
+# 146-35_ChIP_cac-1_input__S35.bam
+# 146-36_ChIP_cac-2_input__S36.bam
+# 146-37_ChIP_cac-3_input__S37.bam
+# 146-38_ChIP_set-7_input__S38.bam
+# 146-39_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S39.bam
+# 146-3_ChIP_qa-suz12_48hr_H3K27me3_Rep1_S3.bam
+# 146-40_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S40.bam
+# 146-41_ChIP_qa-suz12_48hr_H3K27me3_Rep1_S41.bam
+# 146-42_ChIP_qa-suz12_72hr_H3K27me3_Rep1_S42.bam
+# 146-43_ChIP_qa-suz12_96hr_H3K27me3_Rep1_S43.bam
+# 146-44_ChIP_WT_H3K27me3_Rep1_S44.bam
+# 146-45_ChIP_qa-suz12_0hr_H3K27me2_Rep1_S45.bam
+# 146-46_ChIP_qa-suz12_24hr_H3K27me2_Rep1_S46.bam
+# 146-47_ChIP_qa-suz12_48hr_H3K27me2_Rep1_S47.bam
+# 146-48_ChIP_qa-suz12_72hr_H3K27me2_Rep1_S48.bam
+# 146-4_ChIP_qa-suz12_72hr_H3K27me3_Rep1_S4.bam
+# 146-5_ChIP_qa-suz12_96hr_H3K27me3_Rep1_S5.bam
+# 146-6_ChIP_WT_H3K27me3_Rep1_S6.bam
+# 146-7_ChIP_qa-suz12_0hr_H3K27me2_Rep1_S7.bam
+# 146-8_ChIP_qa-suz12_24hr_H3K27me2_Rep1_S8.bam
+# 146-9_ChIP_qa-suz12_48hr_H3K27me2_Rep1_S9.bam
+# 146-N1_ATAC_WT__Rep2_S97.bam
+# 146-N3_ATAC_cac-1__Rep2_S98.bam
+# 146-N4_ATAC_cac-2__Rep2_S99.bam
+# 146-N5_ATAC_set-7__Rep2_S100.bam
+# 146-N6_ATAC_cac-3__Rep2_S101.bam
