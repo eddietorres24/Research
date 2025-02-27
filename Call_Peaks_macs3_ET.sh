@@ -92,7 +92,7 @@ module load MACS3
 #abcam Rep1
 # macs3 callpeak -t "${P129DIR}/129-38_ChIP_WT_K27me3_AbC_Rep_1_S37.bam" -c "${P129DIR}/129-43_ChIP_WT_input_S42.bam" -f BAMPE -n "WT_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/WT_abc_K27" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${P129DIR}/129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38.bam" -c "${P129DIR}/129-44_ChIP_cac-1_input_S43.bam" -f BAMPE -n "cac-1_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-1_abc_K27" --min-length 650 --max-gap 375
-macs3 callpeak -t "${P129DIR}/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39.bam" -c "${P129DIR}/129-45_ChIP_cac-2_input_S44.bam " -f BAMPE -n "cac-2_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-2_abc_K27" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P129DIR}/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39.bam" -c "${P129DIR}/129-45_ChIP_cac-2_input_S44.bam" -f BAMPE -n "cac-2_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-2_abc_K27" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${P129DIR}/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40.bam" -c "${P129DIR}/129-46_ChIP_cac-3_input_S45.bam" -f BAMPE -n "cac-3_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-3_abc_K27" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${P129DIR}/129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41.bam" -c "${P129DIR}/129-47_ChIP_set-7_input_S46.bam" -f BAMPE -n "set-7_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/set-7_abc_K27" --min-length 650 --max-gap 375
 #abcam Rep2
