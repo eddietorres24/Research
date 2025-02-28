@@ -1,14 +1,14 @@
 #!/bin/bash
-#SBATCH --job-name=Lewislab_ATAC.%j.job
+#SBATCH --job-name=ATAC.%j.job
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=evt822908@uga.edu
+#SBATCH --mail-user=evt82290@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=100gb
 #SBATCH --time=48:00:00
-#SBATCH --output=./logs/ATAC.%j.out
-#SBATCH --error=./logs/ATAC.%j.err
+#SBATCH --output=../logs/ATAC.%j.out
+#SBATCH --error=../logs/ATAC.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
@@ -16,7 +16,7 @@ cd $SLURM_SUBMIT_DIR
 
 source config.txt
 
-OUTDIR=/path/to/directory/${OutputFolderName}
+OUTDIR=${OutputFolderName}
 mkdir ${OUTDIR}
 
 

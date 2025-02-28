@@ -15,7 +15,7 @@ fastqPath="/scratch/evt82290/FastqFiles/ATAC"
 #GENOME="/home/evt82290/Research/Foxy_Ncrassa_Genome/Foxy_Ncrassa_merged.fasta"
 
 #Bowtie Genome for ATAC mapping
-BWT_GENOME="/home/ad45368/NcGenome/bwt_Index/NC12_genomic" #bowtie2 genome index
+BWT_GENOME="/home/ad45368/NcGenome/bwt_Index/NC12_genomic"
 OutputFolderName="/scratch/evt82290/MappingOutputs/ATAC"
 
 #Normal genome
