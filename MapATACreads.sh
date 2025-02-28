@@ -2,7 +2,7 @@
 #SBATCH --job-name=Lewislab_ATAC.%j.job
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=ad45368@uga.edu
+#SBATCH --mail-user=evt822908@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=100gb
