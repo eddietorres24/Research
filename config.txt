@@ -3,7 +3,7 @@ THREADS=12
 
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 
-#fastqPath="/scratch/evt82290/FastqFiles/2024_Run145_ET"
+fastqPath="/scratch/evt82290/FastqFiles/ATAC"
 
 #Edit Code to add Q score option
 
@@ -13,6 +13,10 @@ THREADS=12
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
 
 #GENOME="/home/evt82290/Research/Foxy_Ncrassa_Genome/Foxy_Ncrassa_merged.fasta"
+
+#Bowtie Genome for ATAC mapping
+BWT_GENOME="/home/ad45368/NcGenome/bwt_Index/NC12_genomic" #bowtie2 genome index
+OutputFolderName="/scratch/evt82290/MappingOutputs/ATAC"
 
 #Normal genome
 #GENOME="/home/evt82290/Research/GCA_000182925.2_NC12_genomic.fna"
