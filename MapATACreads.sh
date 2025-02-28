@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=100gb
 #SBATCH --time=48:00:00
-#SBATCH --output=../logs/ATAC.%j.out
-#SBATCH --error=../logs/ATAC.%j.err
+#SBATCH --output=./logs/ATAC.%j.out
+#SBATCH --error=./logs/ATAC.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
