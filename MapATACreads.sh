@@ -14,32 +14,31 @@ cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $fastqPath, $OUTDIR, )
 
-source config.txt
+source config_bwt.txt
 
 OUTDIR=${OutputFolderName}
 mkdir ${OUTDIR}
 
+#make Directories
+mkdir "${OUTDIR}/TrimmedReads"
+mkdir "${OUTDIR}/SortedBamFiles"
+mkdir "${OUTDIR}/ShiftedBamFiles"
+mkdir "${OUTDIR}/FilteredBamFiles"
+mkdir "${OUTDIR}/BigWigs"
+mkdir "${OUTDIR}/Peaks"
+mkdir "${OUTDIR}/logs"
+mkdir "${OUTDIR}/SortedFilteredBamFiles"
+mkdir "${OUTDIR}/Bowtie2/SortedBamFiles"
+mkdir "${OUTDIR}/Bowtie2/FilteredBamFiles"
 
 # #process reads using trimGalore
- ml Trim_Galore/0.6.7-GCCcore-11.2.0
- trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${fastqPath}/*fastq\.gz
+ # ml Trim_Galore/0.6.7-GCCcore-11.2.0
+ # trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${fastqPath}/*fastq\.gz
 
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
-#
 
-mkdir "${OUTDIR}/TrimmedReads"
-
- mkdir "${OUTDIR}/SortedBamFiles"
- mkdir "${OUTDIR}/ShiftedBamFiles"
- mkdir "${OUTDIR}/FilteredBamFiles"
-
- mkdir "${OUTDIR}/BigWigs"
- mkdir "${OUTDIR}/Peaks"
- mkdir "${OUTDIR}/logs"
-
-
-#mkdir "$OUTDIR/HomerTagDirectories"
-#mkdir "$OUTDIR/TdfFiles"
+# mkdir "$OUTDIR/HomerTagDirectories"
+# mkdir "$OUTDIR/TdfFiles"
 #
 #Iterate over the files
 for f in $FILES
@@ -63,16 +62,17 @@ do
   deduped1="${OUTDIR}/SortedBamFiles/${name}_deduped.bam"
   markeddupes="${OUTDIR}/Bowtie2/SortedBamFiles/${name}_marked_dup_metrics.txt"
 
-	shifted="${OUTDIR}/ShiftedBamFile/${name}.shifted.bam"
+	shifted="${OUTDIR}/ShiftedBamFiles/${name}.shifted.bam"
   deduped2="${OUTDIR}/Bowtie2/FilteredBamFiles/${name}_shifted_deduped.bam"
 
-    # nfr="${OUTDIR}/SortedFilteredBamFiles/${name}_nfr.bam"
-    # mono="${OUTDIR}/SortedFilteredBamFiles/${name}_mono.bam"
-    # di="${OUTDIR}/SortedFilteredBamFiles/${name}_di.bam"
-    # tri="${OUTDIR}/SortedFilteredBamFiles/${name}_tri.bam"
+    nfr="${OUTDIR}/SortedFilteredBamFiles/${name}_nfr.bam"
+    mono="${OUTDIR}/SortedFilteredBamFiles/${name}_mono.bam"
+    di="${OUTDIR}/SortedFilteredBamFiles/${name}_di.bam"
+    tri="${OUTDIR}/SortedFilteredBamFiles/${name}_tri.bam"
 	#variable name for bigwig output
 	bwdir="${OUTDIR}/BigWigs"
 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
+
 
 ############ BWA Mapping #####################
 
@@ -144,7 +144,7 @@ bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 
 bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b ${mono} -o "${bwdir}/${name}.mono.ATAC_bin_3.smooth_6_Bulk.bw"
 bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b ${di} -o "${bwdir}/${name}.di.ATAC_bin_3.smooth_6_Bulk.bw"
 bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b ${tri} -o "${bwdir}/${name}.tri.ATAC_bin_3.smooth_6_Bulk.bw"
-bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b  ${deduped2} -o "${bwdir}/${name}.all.ATAC_bin_3.smooth_6_Bulk.bw"
+bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b ${deduped2} -o "${bwdir}/${name}.all.ATAC_bin_3.smooth_6_Bulk.bw"
 #
 
 module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
