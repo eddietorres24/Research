@@ -39,6 +39,8 @@ caf_dba <- dba(sampleSheet = samples)
 ##Plot correlation plot between all samples included on data sheet, save in a file
 CorrPlot <- plot(caf_dba)
 ggsave(filename = "CAF-1_DBA_Corr_Plot.pdf", plot = CorrPlot, dpi=600)
+#Using RPKM
+CorrPlot_RPKM <- dba.plotHeatmap(caf_dba, score=DBA_SCORE_RPKM_FOLD)
 
 #Count Reads
 caf_dba <- dba.count(caf_dba)
@@ -66,7 +68,55 @@ caf_dba.DB <- dba.report(caf_dba)
 ```
 
 ```{r, DiffBind Plotting}
+#Venn Diagram of Gain vs loss compared to WT control
+caf_venn <- dba.plotVenn(caf_dba, contrast = 1, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)
 
+#PCA Plots
+##All Peaks
+dba.plotPCA(caf_dba,DBA_TREATMENT,label=DBA_FACTOR)
+
+#Diff Bound Peaks
+dba.plotPCA(caf_dba, contrast = 1,label=DBA_FACTOR)
+
+#MA Plots
+dba.plotMA(caf_dba)
+
+#Volcano Plots
+dab.plotVolcano(caf_dba)
+
+#Box-Plots
+pvals <- dba.plotBox(caf_dba)
+plot(pvals)
+
+#Heatmaps
+##For Binding Affinity
+hmap <- colorRampPalette(c("red", "black", "green"))(n = 13) > readscores <- dba.plotHeatmap(caf_dba, contrast=1, correlations=FALSE, scale="row", colScheme = hmap)
+
+#Profiling
+###system.file(’extra/plotProfileDemo.Rmd’,package=’DiffBind’)
+
+#Basic
+profiles <- dba.plotProfile(caf_dba)
+dba.plotProfile(profiles)
+
+#split reps
+mask.K27abc <- caf_dba$masks$abcam_H3K27me3
+mask.K27CS <- caf_dba$masks$CS_H3K27me3
+profiles <- dba.plotProfile(caf_dba, samples=list(H3K27me3_abcam= mask.K27abc, H3K27me3_CS= mask.K27CS), merge=NULL)
+dba.plotProfile(profiles)
+```
+
+```{r, Multi-Factor Designs}
+#Area to write Multi-Factor designs (if motivated)
+```
+
+```{r, Blacklists & Greylists}
+#Use this code to create a greylist of peaks enriched in inputs
+
+#Use GreyListChIP
+
+#caf_dba <- dba.blacklist(caf_dba)
+#ChIP.greylist <- dba.blacklist(caf_dba, Retrieve=DBA_GREYLIST)
 ```
 
 ### DiffBind Script
