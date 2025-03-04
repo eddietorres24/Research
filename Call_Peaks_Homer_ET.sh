@@ -33,7 +33,7 @@ P144DIR="/scratch/evt82290/MappingOutputs/Run144/bamFiles"
 P145DIR="/scratch/evt82290/MappingOutputs/Run145/bamFiles"
 P146DIR="/scratch/evt82290/MappingOutputs/Run146/bamFiles"
 P148DIR="/scratch/evt82290/MappingOutputs/Run148/bamFiles"
-TAGDIR="/scratch/evt82290/Peaks/qa-suz12/homertags"
+TAGDIR="/scratch/evt82290/Peaks/CAF-1/homertags"
 #PEAKDIR="/scratch/evt82290/Run137/Peaks"
 
 #if output directory doesn't exist, create it
