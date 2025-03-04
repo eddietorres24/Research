@@ -203,24 +203,24 @@ module load Homer/4.11-foss-2022a
 # # makeTagDirectory $TAGDIR/set-7_H3K9me3_rep3 $138DIR/
 
 # #H3K4me2
-makeTagDirectory $TAGDIR/WT_H3K4me2_rep1 $146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bam
-makeTagDirectory $TAGDIR/WT_H3K4me2_rep2 $146DIR/146-29_ChIP_WT_H3K4me2_Rep2_S29.bam
+makeTagDirectory $TAGDIR/WT_H3K4me2_rep1 $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bam
+makeTagDirectory $TAGDIR/WT_H3K4me2_rep2 $P146DIR/146-29_ChIP_WT_H3K4me2_Rep2_S29.bam
 # makeTagDirectory $TAGDIR/WT_H3K4me2_rep3 $146DIR/
 
-makeTagDirectory $TAGDIR/cac-1_H3K4me2_rep1 $146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bam
-makeTagDirectory $TAGDIR/cac-1_H3K4me2_rep2 $146DIR/146-30_ChIP_cac-1_H3K4me2_Rep2_S30.bam
+makeTagDirectory $TAGDIR/cac-1_H3K4me2_rep1 $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bam
+makeTagDirectory $TAGDIR/cac-1_H3K4me2_rep2 $P146DIR/146-30_ChIP_cac-1_H3K4me2_Rep2_S30.bam
 # makeTagDirectory $TAGDIR/cac-1_H3K4me2_rep3 $146DIR/
 
-makeTagDirectory $TAGDIR/cac-2_H3K4me2_rep1 $146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bam
-makeTagDirectory $TAGDIR/cac-2_H3K4me2_rep2 $146DIR/146-31_ChIP_cac-2_H3K4me2_Rep2_S31.bam
+makeTagDirectory $TAGDIR/cac-2_H3K4me2_rep1 $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bam
+makeTagDirectory $TAGDIR/cac-2_H3K4me2_rep2 $P146DIR/146-31_ChIP_cac-2_H3K4me2_Rep2_S31.bam
 # makeTagDirectory $TAGDIR/cac-2_H3K4me2_rep3 $146DIR/
 
-makeTagDirectory $TAGDIR/cac-3_H3K4me2_rep1 $146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bam
-makeTagDirectory $TAGDIR/cac-3_H3K4me2_rep2 $146DIR/146-32_ChIP_cac-3_H3K4me2_Rep2_S32.bam
+makeTagDirectory $TAGDIR/cac-3_H3K4me2_rep1 $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bam
+makeTagDirectory $TAGDIR/cac-3_H3K4me2_rep2 $P146DIR/146-32_ChIP_cac-3_H3K4me2_Rep2_S32.bam
 # makeTagDirectory $TAGDIR/cac-3_H3K4me2_rep3 $146DIR/
 
-makeTagDirectory $TAGDIR/set-7_H3K4me2_rep1 $146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bam
-makeTagDirectory $TAGDIR/set-7_H3K4me2_rep2 $146DIR/146-33_ChIP_set-7_H3K4me2_Rep2_S33.bam
+makeTagDirectory $TAGDIR/set-7_H3K4me2_rep1 $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bam
+makeTagDirectory $TAGDIR/set-7_H3K4me2_rep2 $P146DIR/146-33_ChIP_set-7_H3K4me2_Rep2_S33.bam
 # makeTagDirectory $TAGDIR/set-7_H3K4me2_rep3 $146DIR/
 #
 # #H4K20me3
