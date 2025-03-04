@@ -64,6 +64,19 @@ ggsave(filename = "CAF-1_DBA_Corr_Plot_diff.pdf", plot = CorrPlot_diff, dpi=600)
 
 #Retrieve differentially bound sites for downstream analysis (will return a GRanges object)
 caf_dba.DB <- dba.report(caf_dba)
+```
+
+```{r, Analysis Info}
+#code to determine information that may be important/useful to your analysis
+
+##Determine amount of peaks that are gained or lost in your samples, Thi will need to be tweaked depending on normalization method used
+dbs <- dba.report(caf_dba, bDB=TRUE, bGain=TRUE, bLoss=TRUE)
+dbs$config$factor <- "normalize"
+dbs$class[DBA_ID,] <- colnames(dbs$class)[1] <- "LIB_Full"
+dbs$class[DBA_FACTOR,] <- DBA_NORM_LIB > dbs
+
+##Compare FRiP scores to determine if ChIP efficency is cause of differential bidning
+dba.show(caf_dba,attributes=c(DBA_ID,DBA_FRIP))
 
 ```
 
