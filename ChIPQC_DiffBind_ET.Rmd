@@ -28,7 +28,7 @@ register(SerialParam())
 chipObj <- ChIPQC(samples) 
 
 ## Make QC Report
-ChIPQCreport(chipObj, reportName="ChIP_QC_report_cac_H3K27me3", reportFolder="ChIPQCreport")
+ChIPQCreport(chipObj, reportName="ChIP_QC_report_CAF-1_mods", reportFolder="ChIPQCreport")
 ```
 
 ### DiffBind (scratch)
@@ -50,7 +50,7 @@ CorrPlot_count <- plot(caf_dba)
 ggsave(filename = "CAF-1_DBA_Corr_Plot_counts.pdf", plot = CorrPlot_count, dpi=600)
 
 #Normalization
-caf_dba <- dba.normalize(caf_dba)
+caf_dba <- dba.normalize(caf_dba, method = DBA_ALL_METHODS, background = TRUE)
 
 #Model design & Contrast (whta comparisons do you want to make?)
 caf_dba <- dba.contrast(caf_dba)
@@ -75,8 +75,22 @@ dbs$config$factor <- "normalize"
 dbs$class[DBA_ID,] <- colnames(dbs$class)[1] <- "LIB_Full"
 dbs$class[DBA_FACTOR,] <- DBA_NORM_LIB > dbs
 
-##Compare FRiP scores to determine if ChIP efficency is cause of differential bidning
+##Compare FRiP scores to determine if ChIP efficency is cause of differential binding
 dba.show(caf_dba,attributes=c(DBA_ID,DBA_FRIP))
+
+##Plot a heatmap to compare the identified Differentialy bound peaks across normalization methods
+deseq <- dba(dbs.all, mask=dbs.all$masks$DESeq2, minOverlap=1)
+binding <- dba.peakset(deseq, bRetrieve=TRUE)
+dba.plotHeatmap(deseq, maxSites=nrow(binding), bLog=FALSE, correlations=FALSE, minval=-5, maxval = 5, cexCol = 1.3, colScheme = hmap, main = "DESeq2 Differentially Bound Sites", ColAttributes = c(DBA_CONDITION, DBA_FACTOR), key.title = "LFC")
+
+##Plot Peak Overlaps
+olap.rate <- dba.overlap(caf_dba, mode=DBA_OLAP_RATE)
+plot(olap.rate, type='b', ylab='# peaks', xlab='Overlap at least this many peaksets')
+
+##Genrate Consensus Peaksets for each modification analyzed
+caf_consensus <- dba.peakset(caf_dba, consensus=-DBA_REPLICATE)
+###combine consensus peaksets
+caf_consensus <- dba(caf_consensus, mask=tamoxifen_consensus$masks$Consensus, minOverlap=1)
 
 ```
 
