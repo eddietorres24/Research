@@ -25,7 +25,7 @@ caf_dba <- dba(sampleSheet = samples)
 
 ##Plot correlation plot between all samples included on data sheet, save in a file
 CorrPlot <- plot(caf_dba)
-ggsave(filename = "CAF-1_DBA_Corr_Plot.pdf", plot = CorrPlot, dpi=600)
+ggsave(filename = "CAF-1_DBA_Corr_Plot.png")
 #Using RPKM
 CorrPlot_RPKM <- dba.plotHeatmap(caf_dba, score=DBA_SCORE_RPKM_FOLD)
 
@@ -51,9 +51,7 @@ ggsave(filename = "CAF-1_DBA_Corr_Plot_diff.pdf", plot = CorrPlot_diff, dpi=600)
 
 #Retrieve differentially bound sites for downstream analysis (will return a GRanges object)
 caf_dba.DB <- dba.report(caf_dba)
-```
 
-```{r, Analysis Info}
 #code to determine information that may be important/useful to your analysis
 
 ##Determine amount of peaks that are gained or lost in your samples, Thi will need to be tweaked depending on normalization method used
@@ -79,9 +77,7 @@ caf_consensus <- dba.peakset(caf_dba, consensus=-DBA_REPLICATE)
 ###combine consensus peaksets
 caf_consensus <- dba(caf_consensus, mask=tamoxifen_consensus$masks$Consensus, minOverlap=1)
 
-```
 
-```{r, DiffBind Plotting}
 #Venn Diagram of Gain vs loss compared to WT control
 caf_venn <- dba.plotVenn(caf_dba, contrast = 1, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)
 
@@ -118,20 +114,17 @@ mask.K27abc <- caf_dba$masks$abcam_H3K27me3
 mask.K27CS <- caf_dba$masks$CS_H3K27me3
 profiles <- dba.plotProfile(caf_dba, samples=list(H3K27me3_abcam= mask.K27abc, H3K27me3_CS= mask.K27CS), merge=NULL)
 dba.plotProfile(profiles)
-```
 
-```{r, Multi-Factor Designs}
 #Area to write Multi-Factor designs (if motivated)
-```
 
-```{r, Blacklists & Greylists}
 #Use this code to create a greylist of peaks enriched in inputs
 
 #Use GreyListChIP
 
 #caf_dba <- dba.blacklist(caf_dba)
 #ChIP.greylist <- dba.blacklist(caf_dba, Retrieve=DBA_GREYLIST)
-```
+
+
 
 ### DiffBind Script
 
