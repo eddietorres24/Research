@@ -1,25 +1,11 @@
 ### Script for ChIPQC
 
-```{r, load libraries, , include=FALSE}
+
 ## Load Libraries
 library(BiocManager)
 library(ChIPQC)
 library(ggplot2)
-```
 
-```{r, set wd, include=FALSE}
-#Set Working Directory
-knitr::opts_chunk$set(echo = TRUE)
-
-#Set working environment
-
-workingdir="C:\\Users\\eddie\\Research\\GitHub"
-
-#Set working directory to the correct location for working machine
-knitr::opts_knit$set(root.dir = "workingdir")
-```
-
-```{r, Load Data & Run QC}
 ## Load Sample Data
 setwd("C:\\Users\\eddie\\Research\\GitHub")
 samples <- read.csv("./DiffBind_CAF-1_ET.csv")
@@ -30,10 +16,10 @@ chipObj <- ChIPQC(samples)
 
 ## Make QC Report
 ChIPQCreport(chipObj, reportName="ChIP_QC_report_CAF-1_mods", reportFolder="ChIPQCreport")
-```
+
 
 ### DiffBind (scratch)
-```{r, DiffBind Analysis}
+
 #Read in sample sheet containing CAF-1 mutant data *If running ChIP QC, you can use "samples" variable
 caf_dba <- dba(sampleSheet = samples)
 
@@ -48,7 +34,7 @@ caf_dba <- dba.count(caf_dba)
 
 ##Plot new correlation plot based on count data, save in a file
 CorrPlot_count <- plot(caf_dba)
-ggsave(filename = "CAF-1_DBA_Corr_Plot_counts.pdf", plot = CorrPlot_count, dpi=600)
+ggsave(filename = "CAF-1_DBA_Corr_Plot_counts.pdf", plot = last_plot(), dpi=600)
 
 #Normalization
 caf_dba <- dba.normalize(caf_dba, method = DBA_ALL_METHODS, background = TRUE)

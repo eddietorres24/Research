@@ -355,28 +355,28 @@ makeTagDirectory $TAGDIR/set-7_input_5 $P146DIR/146-38_ChIP_set-7_input__S38.bam
 # findPeaks $TAGDIR/WT_H4K20me3_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_input_2
 # findPeaks $TAGDIR/cac-1_H4K20me3_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-1_input_2
 # findPeaks $TAGDIR/cac-2_H4K20me3_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-2_input_2
-# findPeaks $TAGDIR/cac-3_H4K20me3_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-3_input_2
+findPeaks $TAGDIR/cac-3_H4K20me3_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-3_input_2
 # findPeaks $TAGDIR/set-7_H4K20me3_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/set-7_input_2
 # #rep 2
 # findPeaks $TAGDIR/WT_H4K20me3_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_input_5
 # findPeaks $TAGDIR/cac-1_H4K20me3_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-1_input_5
 # findPeaks $TAGDIR/cac-2_H4K20me3_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-2_input_5
-# findPeaks $TAGDIR/cac-3_H4K20me3_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-3_input_4
+findPeaks $TAGDIR/cac-3_H4K20me3_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-3_input_4
 # findPeaks $TAGDIR/set-7_H4K20me3_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/set-7_input_4
 
 # #H3K4me2
 # #rep 1
-findPeaks $TAGDIR/WT_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_input_6
-findPeaks $TAGDIR/cac-1_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-1_input_6
-findPeaks $TAGDIR/cac-2_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-2_input_6
-findPeaks $TAGDIR/cac-3_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-3_input_5
-findPeaks $TAGDIR/set-7_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/set-7_input_5
-#rep 2
-findPeaks $TAGDIR/WT_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_input_6
-findPeaks $TAGDIR/cac-1_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-1_input_6
-findPeaks $TAGDIR/cac-2_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-2_input_6
-findPeaks $TAGDIR/cac-3_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-3_input_5
-findPeaks $TAGDIR/set-7_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/set-7_input_5
+# findPeaks $TAGDIR/WT_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_input_6
+# findPeaks $TAGDIR/cac-1_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-1_input_6
+# findPeaks $TAGDIR/cac-2_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-2_input_6
+# findPeaks $TAGDIR/cac-3_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-3_input_5
+# findPeaks $TAGDIR/set-7_H3K4me2_rep1 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/set-7_input_5
+# #rep 2
+# findPeaks $TAGDIR/WT_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/WT_input_6
+# findPeaks $TAGDIR/cac-1_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-1_input_6
+# findPeaks $TAGDIR/cac-2_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-2_input_6
+# findPeaks $TAGDIR/cac-3_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/cac-3_input_5
+# findPeaks $TAGDIR/set-7_H3K4me2_rep2 -style histone -size 500 -minDist 530 -o auto -i $TAGDIR/set-7_input_5
 
 #Find Motifs
 # findMotifsGenome.pl qasuz12_4hr_peaks.bed /scratch/evt82290/Foxy_Ncrassa_merged.fasta $OUTDIRmotifs/4hr -size given
