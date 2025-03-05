@@ -39,8 +39,8 @@ ggsave(filename = "CAF-1_DBA_Corr_Plot_counts.pdf", plot = last_plot(), dpi=600)
 #Normalization
 caf_dba <- dba.normalize(caf_dba, method = DBA_ALL_METHODS, background = TRUE)
 
-#Model design & Contrast (whta comparisons do you want to make?)
-caf_dba <- dba.contrast(caf_dba)
+#Model design & Contrast (what comparisons do you want to make?)
+caf_dba <- dba.contrast(caf_dba, design = "~Factor + Treatment")
 
 #Differential Analysis
 caf_dba <- dba.analyze(caf_dba)
@@ -52,9 +52,10 @@ ggsave(filename = "CAF-1_DBA_Corr_Plot_diff.pdf", plot = CorrPlot_diff, dpi=600)
 #Retrieve differentially bound sites for downstream analysis (will return a GRanges object)
 caf_dba.DB <- dba.report(caf_dba)
 
+
 #code to determine information that may be important/useful to your analysis
 
-##Determine amount of peaks that are gained or lost in your samples, Thi will need to be tweaked depending on normalization method used
+##Determine amount of peaks that are gained or lost in your samples, this will need to be tweaked depending on normalization method used
 dbs <- dba.report(caf_dba, bDB=TRUE, bGain=TRUE, bLoss=TRUE)
 dbs$config$factor <- "normalize"
 dbs$class[DBA_ID,] <- colnames(dbs$class)[1] <- "LIB_Full"
@@ -77,6 +78,7 @@ caf_consensus <- dba.peakset(caf_dba, consensus=-DBA_REPLICATE)
 ###combine consensus peaksets
 caf_consensus <- dba(caf_consensus, mask=tamoxifen_consensus$masks$Consensus, minOverlap=1)
 
+#PLOTS
 
 #Venn Diagram of Gain vs loss compared to WT control
 caf_venn <- dba.plotVenn(caf_dba, contrast = 1, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)

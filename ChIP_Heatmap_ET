@@ -86,13 +86,23 @@ module load deepTools
     #     $OUTDIR2/SRR10916163_log.bw \
     #     -R cac1_up.bed --skipZeros -o matrix_PRC2.gz
 
-# computeMatrix reference-point --referencePoint center -b 3000 -a 3000 \
-#  -S $OUTDIR2/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR2/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR2/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR2/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR2/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-#     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
+computeMatrix reference-point --referencePoint center -b 3000 -a 3000 \
+ -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw
+    $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw
+    $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw
+    $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw
+    $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw
+    $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw
+    $P141DIR/141-N12_ATAC_cac-1__Rep1_S101.bin_25.smooth_75Bulk.bw
+    $P141DIR/141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw
+    $P141DIR/141-N14_ATAC_cac-3__Rep1_S103.bin_25.smooth_75Bulk.bw
+    $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw
+    -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
 # computeMatrix scale-regions -b 1000 -a 1000 \
 #  -S $OUTDIR2/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
@@ -146,14 +156,14 @@ computeMatrix reference-point --referencePoint center -b 7500 -a 7500 \
         #             --zMax 20
 
 
-plotHeatmap -m matrix_qa-suz12.gz -out $OUTDIR1/2025-02-17_qa-suz12_time_1_ET \
-            --samplesLabel WT_0hr WT_24hr 0hr 4hr 8hr 12hr 24hr \
-            --missingDataColor 1 \
-            --clusterUsingSamples 1 2 \
-            --sortUsingSamples 1 2 \
-            --kmeans 3 \
-            --outFileSortedRegions heatmap.bed \
-            --colorMap Greens \
+# plotHeatmap -m matrix_qa-suz12.gz -out $OUTDIR1/2025-02-17_qa-suz12_time_1_ET \
+#             --samplesLabel WT_0hr WT_24hr 0hr 4hr 8hr 12hr 24hr \
+#             --missingDataColor 1 \
+#             --clusterUsingSamples 1 2 \
+#             --sortUsingSamples 1 2 \
+#             --kmeans 3 \
+#             --outFileSortedRegions heatmap.bed \
+#             --colorMap Greens \
 
 
 #Run137
@@ -262,5 +272,116 @@ plotHeatmap -m matrix_qa-suz12.gz -out $OUTDIR1/2025-02-17_qa-suz12_time_1_ET \
 # 6147_136-92_ChIP_set-7_input_S91_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
 # 6147_136-9_ChIP_cac-3_H3K27me3_CS_Rep1_S9_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
 
+#Run 141
+# 141-58_ChIP_WT_H3K23me1_Rep1_S52.bin_25.smooth_75Bulk.bw
+# 141-59_ChIP_cac-1_H3K23me1_Rep1_S53.bin_25.smooth_75Bulk.bw
+# 141-60_ChIP_cac-2_H3K23me1_Rep1_S54.bin_25.smooth_75Bulk.bw
+# 141-61_ChIP_cac-3_H3K23me1_Rep1_S55.bin_25.smooth_75Bulk.bw
+# 141-62_ChIP_set-7_H3K23me1_Rep1_S56.bin_25.smooth_75Bulk.bw
+# 141-63_ChIP_WT_teto_P0_H3K27me3_Rep1_S57.bin_25.smooth_75Bulk.bw
+# 141-64_ChIP_WT_teto_P1_H3K27me3_Rep1_S58.bin_25.smooth_75Bulk.bw
+# 141-65_ChIP_WT_teto_P2_H3K27me3_Rep1_S59.bin_25.smooth_75Bulk.bw
+# 141-66_ChIP_WT_teto_P3_H3K27me3_Rep1_S60.bin_25.smooth_75Bulk.bw
+# 141-67_ChIP_cac-1_teto_P0_H3K27me3_Rep1_S61.bin_25.smooth_75Bulk.bw
+# 141-68_ChIP_cac-1_teto_P1_H3K27me3_Rep1_S62.bin_25.smooth_75Bulk.bw
+# 141-69_ChIP_cac-1_teto_P2_H3K27me3_Rep1_S63.bin_25.smooth_75Bulk.bw
+# 141-70_ChIP_cac-1_teto_P3_H3K27me3_Rep1_S64.bin_25.smooth_75Bulk.bw
+# 141-88_ChIP_WT_H3K27me2_Rep1_S82.bin_25.smooth_75Bulk.bw
+# 141-89_ChIP_cac-1_H3K27me2_Rep1_S83.bin_25.smooth_75Bulk.bw
+# 141-90_ChIP_cac-2_H3K27me2_Rep1_S84.bin_25.smooth_75Bulk.bw
+# 141-91_ChIP_cac-3_H3K27me2_Rep1_S85.bin_25.smooth_75Bulk.bw
+# 141-92_ChIP_set-7_H3K27me2_Rep1_S86.bin_25.smooth_75Bulk.bw
+# 141-93_ChIP_WT_H4K12ac_Rep1_S87.bin_25.smooth_75Bulk.bw
+# 141-94_ChIP_cac-1_H4K12ac_Rep1_S88.bin_25.smooth_75Bulk.bw
+# 141-95_ChIP_cac-2_H4K12ac_Rep1_S89.bin_25.smooth_75Bulk.bw
+# 141-96_ChIP_set-7_H4K12ac_Rep1_S90.bin_25.smooth_75Bulk.bw
+# 141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw
+# 141-N12_ATAC_cac-1__Rep1_S101.bin_25.smooth_75Bulk.bw
+# 141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw
+# 141-N14_ATAC_cac-3__Rep1_S103.bin_25.smooth_75Bulk.bw
+# 141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw
 
-#$OUTDIR/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+#Run 146
+# 146-106_ChIP_epr-1GFP_GFP-trap_Rep1_S125.bin_25.smooth_75Bulk.bw
+# 146-10_ChIP_qa-suz12_72hr_H3K27me2_Rep1_S10.bin_25.smooth_75Bulk.bw
+# 146-117_ChIP_qa-suz12_96hr_H3K27me2_Rep1_S136.bin_25.smooth_75Bulk.bw
+# 146-118_ChIP_epr-1_GFP_H3K27me3_Rep1_S137.bin_25.smooth_75Bulk.bw
+# 146-11_ChIP_qa-suz12_96hr_H3K27me2_Rep1_S11.bin_25.smooth_75Bulk.bw
+# 146-123_ChIP_WT_H3K27me2_Rep1_S142.bin_25.smooth_75Bulk.bw
+# 146-124_ChIP_suz12_0hr_H3K27me3_Rep1_S143.bin_25.smooth_75Bulk.bw
+# 146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw
+# 146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw
+# 146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw
+# 146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw
+# 146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw
+# 146-12_ChIP_WT_H3K27me2_Rep1_S12.bin_25.smooth_75Bulk.bw
+# 146-130_ChIP_suz12_0hr_H3K36me3_Rep1_S149.bin_25.smooth_75Bulk.bw
+# 146-131_ChIP_qa-suz12_0hr_H3K36me3_Rep1_S150.bin_25.smooth_75Bulk.bw
+# 146-132_ChIP_qa-suz12_4hr_H3K36me3_Rep1_S151.bin_25.smooth_75Bulk.bw
+# 146-133_ChIP_qa-suz12_8hr_H3K36me3_Rep1_S152.bin_25.smooth_75Bulk.bw
+# 146-134_ChIP_qa-suz12_12hr_H3K36me3_Rep1_S153.bin_25.smooth_75Bulk.bw
+# 146-135_ChIP_qa-suz12_24hr_H3K36me3_Rep1_S154.bin_25.smooth_75Bulk.bw
+# 146-136_ChIP_cac-2-epr-1-GFP_GFP-trap_Rep1_S155.bin_25.smooth_75Bulk.bw
+# 146-137_ChIP_cac-2-epr-1-GFP_GFP-trap_Rep1_S156.bin_25.smooth_75Bulk.bw
+# 146-13_ChIP_qa-suz12_0hr_input__S13.bin_25.smooth_75Bulk.bw
+# 146-14_ChIP_qa-suz12_24hr_input__S14.bin_25.smooth_75Bulk.bw
+# 146-15_ChIP_qa-suz12_48hr_input__S15.bin_25.smooth_75Bulk.bw
+# 146-16_ChIP_qa-suz12_72hr_input__S16.bin_25.smooth_75Bulk.bw
+# 146-17_ChIP_qa-suz12_96hr_input__S17.bin_25.smooth_75Bulk.bw
+# 146-18_ChIP_WT_input__S18.bin_25.smooth_75Bulk.bw
+# 146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw
+# 146-1_ChIP_qa-suz12_0hr_H3K27me3_Rep4_S1.bin_25.smooth_75Bulk.bw
+# 146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw
+# 146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw
+# 146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw
+# 146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw
+# 146-24_ChIP_WT_H3K27me2_Rep2_S24.bin_25.smooth_75Bulk.bw
+# 146-25_ChIP_cac-1_H3K27me2_Rep2_S25.bin_25.smooth_75Bulk.bw
+# 146-26_ChIP_cac-2_H3K27me2_Rep2_S26.bin_25.smooth_75Bulk.bw
+# 146-27_ChIP_cac-3_H3K27me2_Rep2_S27.bin_25.smooth_75Bulk.bw
+# 146-28_ChIP_set-7_H3K27me2_Rep2_S28.bin_25.smooth_75Bulk.bw
+# 146-29_ChIP_WT_H3K4me2_Rep2_S29.bin_25.smooth_75Bulk.bw
+# 146-2_ChIP_qa-suz12_24hr_H3K27me3_Rep4_S2.bin_25.smooth_75Bulk.bw
+# 146-30_ChIP_cac-1_H3K4me2_Rep2_S30.bin_25.smooth_75Bulk.bw
+# 146-31_ChIP_cac-2_H3K4me2_Rep2_S31.bin_25.smooth_75Bulk.bw
+# 146-32_ChIP_cac-3_H3K4me2_Rep2_S32.bin_25.smooth_75Bulk.bw
+# 146-33_ChIP_set-7_H3K4me2_Rep2_S33.bin_25.smooth_75Bulk.bw
+# 146-34_ChIP_WT_input__S34.bin_25.smooth_75Bulk.bw
+# 146-35_ChIP_cac-1_input__S35.bin_25.smooth_75Bulk.bw
+# 146-36_ChIP_cac-2_input__S36.bin_25.smooth_75Bulk.bw
+# 146-37_ChIP_cac-3_input__S37.bin_25.smooth_75Bulk.bw
+# 146-38_ChIP_set-7_input__S38.bin_25.smooth_75Bulk.bw
+# 146-39_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S39.bin_25.smooth_75Bulk.bw
+# 146-3_ChIP_qa-suz12_48hr_H3K27me3_Rep1_S3.bin_25.smooth_75Bulk.bw
+# 146-40_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S40.bin_25.smooth_75Bulk.bw
+# 146-41_ChIP_qa-suz12_48hr_H3K27me3_Rep1_S41.bin_25.smooth_75Bulk.bw
+# 146-42_ChIP_qa-suz12_72hr_H3K27me3_Rep1_S42.bin_25.smooth_75Bulk.bw
+# 146-43_ChIP_qa-suz12_96hr_H3K27me3_Rep1_S43.bin_25.smooth_75Bulk.bw
+# 146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw
+# 146-45_ChIP_qa-suz12_0hr_H3K27me2_Rep1_S45.bin_25.smooth_75Bulk.bw
+# 146-46_ChIP_qa-suz12_24hr_H3K27me2_Rep1_S46.bin_25.smooth_75Bulk.bw
+# 146-47_ChIP_qa-suz12_48hr_H3K27me2_Rep1_S47.bin_25.smooth_75Bulk.bw
+# 146-48_ChIP_qa-suz12_72hr_H3K27me2_Rep1_S48.bin_25.smooth_75Bulk.bw
+# 146-4_ChIP_qa-suz12_72hr_H3K27me3_Rep1_S4.bin_25.smooth_75Bulk.bw
+# 146-50_ChIP_tet_R_SUZ12_H3K27me3__S50.bin_25.smooth_75Bulk.bw
+# 146-51_ChIP_tet_R_SUZ12_H3K27me3__S51.bin_25.smooth_75Bulk.bw
+# 146-52_ChIP_tet_R_SUZ12_H3K27me3__S52.bin_25.smooth_75Bulk.bw
+# 146-53_ChIP_tet_R_SUZ12_H3K27me3__S53.bin_25.smooth_75Bulk.bw
+# 146-54_ChIP_tet_R_SUZ12_H3K27me3__S54.bin_25.smooth_75Bulk.bw
+# 146-55_ChIP_tet_R_SUZ12_H3K27me3__S55.bin_25.smooth_75Bulk.bw
+# 146-56_ChIP_tet_R_SUZ12_iswi_mut_H3K27me3__S56.bin_25.smooth_75Bulk.bw
+# 146-57_ChIP_tet_R_SUZ12_iswi_mut_H3K27me3__S57.bin_25.smooth_75Bulk.bw
+# 146-58_ChIP_tet_R_SUZ12_iswi_mut_H3K27me3__S58.bin_25.smooth_75Bulk.bw
+# 146-59_ChIP_tet_R_SUZ12_iswi_mut_H3K27me3__S59.bin_25.smooth_75Bulk.bw
+# 146-5_ChIP_qa-suz12_96hr_H3K27me3_Rep1_S5.bin_25.smooth_75Bulk.bw
+# 146-60_ChIP_tet_R_SUZ12_iswi_mut_H3K27me3__S60.bin_25.smooth_75Bulk.bw
+# 146-61_ChIP_tet_R_SUZ12_iswi_mut_H3K27me3__S61.bin_25.smooth_75Bulk.bw
+# 146-6_ChIP_WT_H3K27me3_Rep1_S6.bin_25.smooth_75Bulk.bw
+# 146-7_ChIP_qa-suz12_0hr_H3K27me2_Rep1_S7.bin_25.smooth_75Bulk.bw
+# 146-8_ChIP_qa-suz12_24hr_H3K27me2_Rep1_S8.bin_25.smooth_75Bulk.bw
+# 146-9_ChIP_qa-suz12_48hr_H3K27me2_Rep1_S9.bin_25.smooth_75Bulk.bw
+# 146-N1_ATAC_WT__Rep2_S97.bin_25.smooth_75Bulk.bw
+# 146-N3_ATAC_cac-1__Rep2_S98.bin_25.smooth_75Bulk.bw
+# 146-N4_ATAC_cac-2__Rep2_S99.bin_25.smooth_75Bulk.bw
+# 146-N5_ATAC_set-7__Rep2_S100.bin_25.smooth_75Bulk.bw
+# 146-N6_ATAC_cac-3__Rep2_S101.bin_25.smooth_75Bulk.bw
