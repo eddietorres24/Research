@@ -29,6 +29,7 @@ P146DIR="/scratch/evt82290/MappingOutputs/Run146/bigWig"
 #bed file directories
 QABED="/scratch/evt82290/Peaks/qa-suz12/qa-suz12_Peaks_macs"
 BEDDIR="/scratch/evt82290/RNAseqIGV/bedgraph"
+BEDDIR2="/home/evt82290/Research/bed_files"
 
 #Log transforming bigwig files
 # module load ucsc/434
@@ -102,7 +103,7 @@ computeMatrix reference-point --referencePoint center -b 3000 -a 3000 \
     $P141DIR/141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw \
     $P141DIR/141-N14_ATAC_cac-3__Rep1_S103.bin_25.smooth_75Bulk.bw \
     $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
-    -R /bed_files/CAF-1_ectopic_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
+    -R $BEDDIR2/CAF-1_ectopic_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
 
     plotHeatmap -m matrix_PRC2.gz -out CAF_H3K27me3_H3K4me2_ATAC.png \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
