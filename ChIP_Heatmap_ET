@@ -167,7 +167,7 @@ computeMatrix reference-point --referencePoint center -b 7500 -a 7500 \
                     --startLabel "5'" \
               			--endLabel "3'" \
                     --clusterUsingSamples 1 \
-                    --sortUsingSamples 2  \
+                    --sortUsingSamples 1  \
                     --sortUsing sum \
                     --sortRegions descend \
                     --outFileSortedRegions heatmap.bed \
