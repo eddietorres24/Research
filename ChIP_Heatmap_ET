@@ -171,7 +171,7 @@ computeMatrix reference-point --referencePoint center -b 7500 -a 7500 \
                     --sortUsing sum \
                     --sortRegions descend \
                     --outFileSortedRegions heatmap.bed \
-                    --colorMAP 'bwr' \
+                    --colorMap 'bwr' \
                     --zMin 0
 
 
