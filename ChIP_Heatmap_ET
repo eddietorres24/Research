@@ -106,7 +106,7 @@ computeMatrix reference-point --referencePoint center -b 1500 -a 1500 \
     -R $BEDDIR2/CAF-1_K27_ectopic_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
 
     plotHeatmap -m matrix_PRC2.gz -out CAF_K27_K4_ATAC_K27_ectopic.png \
-                --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
+                --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
                 --startLabel "5'" \
           			--endLabel "3'" \
                 --clusterUsingSamples 1 \
