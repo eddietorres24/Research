@@ -186,16 +186,12 @@ module load MACS3
 
 cat WT_v_cac1_CS_enriched.bed \
                                 WT_v_cac2_CS_enriched.bed \
-                                WT_v_cac3_CS_enriched.bed \
-                                WT_v_cac1_H3K4_enriched.bed \
-                                WT_v_cac2_H3K4_enriched.bed \
-                                WT_v_cac3_H3K4_enriched.bed \
-                                WT_v_set-7_H3K4_enriched.bed > CAF_ectopic_peaks.bed
+                                WT_v_cac3_CS_enriched.bed  > CAF_K27_ectopic_peaks.bed
 
-sort -k1,1 -k2,2n CAF_ectopic_peaks.bed > CAF_ectopic_peaks_sorted.bed
-bedtools sort -i CAF_ectopic_peaks_sorted.bed > CAF_ectopic_peaks_bed_sorted.bed
+sort -k1,1 -k2,2n CAF_K27_ectopic_peaks.bed > CAF_K27_ectopic_peaks_sorted.bed
+bedtools sort -i CAF_K27_ectopic_peaks_sorted.bed > CAF_K27_ectopic_peaks_bed_sorted.bed
 
-bedtools merge -i CAF_ectopic_peaks_bed_sorted.bed > CAF-1_ectopic_merge_peaks.bed
+bedtools merge -i CAF_K27_ectopic_peaks_bed_sorted.bed > CAF-1_K27_ectopic_merge_peaks.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
