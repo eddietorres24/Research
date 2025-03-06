@@ -105,7 +105,7 @@ computeMatrix reference-point --referencePoint center -b 1500 -a 1500 \
                 --sortRegions descend \
                 --missingDataColor 1 \
                 --outFileSortedRegions heatmap.bed \
-                --colorList 'bwr' \
+                --colorList bwr \
                 --zMin 0 \
                 --zMax 40
 
