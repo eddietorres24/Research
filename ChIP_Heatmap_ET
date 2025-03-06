@@ -95,7 +95,7 @@ computeMatrix reference-point --referencePoint center -b 1500 -a 1500 \
     $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/CAF-1_K27_ectopic_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
 
-    plotHeatmap -m matrix_PRC2.gz -out CAF_H3K27me3_ectopic.png \
+    plotHeatmap -m matrix_PRC2.gz -out CAF_H3K27me3_bwr_ectopic.png \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                 --startLabel "5'" \
           			--endLabel "3'" \
