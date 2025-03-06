@@ -102,7 +102,19 @@ computeMatrix reference-point --referencePoint center -b 3000 -a 3000 \
     $P141DIR/141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw
     $P141DIR/141-N14_ATAC_cac-3__Rep1_S103.bin_25.smooth_75Bulk.bw
     $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw
-    -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
+    -R /bed_files/CAF-1_ectopic_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
+
+    plotHeatmap -m matrix_PRC2.gz -out CAF_H3K27me3_H3K4me2_ATAC.png \
+                --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
+                --startLabel "5'" \
+          			--endLabel "3'" \
+                --clusterUsingSamples 1 \
+                --sortUsingSamples 1  \
+                --sortUsing sum \
+                --sortRegions descend \
+                --outFileSortedRegions heatmap.bed \
+                --colorList 'white, green' 'white, green' 'white, green' 'white, green' 'white, green' 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' \
+                --zMin 0
 
 # computeMatrix scale-regions -b 1000 -a 1000 \
 #  -S $OUTDIR2/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
@@ -120,15 +132,15 @@ computeMatrix reference-point --referencePoint center -b 3000 -a 3000 \
 #     $OUTDIR2/SRR10916163.bw \
 #     -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
 
-computeMatrix reference-point --referencePoint center -b 7500 -a 7500 \
- -S $P137DIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bin_25.smooth_75Bulk.bw \
-    $P137DIR/137-74_ChIP_WT_H3K27me3_Rep1_S71.bin_25.smooth_75Bulk.bw \
-    $P137DIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bin_25.smooth_75Bulk.bw \
-    $P137DIR/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66.bin_25.smooth_75Bulk.bw \
-    $P137DIR/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68.bin_25.smooth_75Bulk.bw \
-    $P137DIR/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70.bin_25.smooth_75Bulk.bw \
-    $P137DIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72.bin_25.smooth_75Bulk.bw \
-    -R $QABED/qa-suz12_rep1_merge_peaks.bed --skipZeros -o matrix_qa-suz12.gz
+# computeMatrix reference-point --referencePoint center -b 7500 -a 7500 \
+#  -S $P137DIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bin_25.smooth_75Bulk.bw \
+#     $P137DIR/137-74_ChIP_WT_H3K27me3_Rep1_S71.bin_25.smooth_75Bulk.bw \
+#     $P137DIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bin_25.smooth_75Bulk.bw \
+#     $P137DIR/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66.bin_25.smooth_75Bulk.bw \
+#     $P137DIR/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68.bin_25.smooth_75Bulk.bw \
+#     $P137DIR/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70.bin_25.smooth_75Bulk.bw \
+#     $P137DIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72.bin_25.smooth_75Bulk.bw \
+#     -R $QABED/qa-suz12_rep1_merge_peaks.bed --skipZeros -o matrix_qa-suz12.gz
 
     # computeMatrix reference-point --referencePoint center -b 3000 -a 3000 \
     #  -S $OUTDIR/137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw   \

@@ -125,7 +125,7 @@ module load MACS3
 # macs3 callpeak -t "${P129DIR}/129-90_ChIP_WT_H3K36me3_Rep1_S71.bam" -c "${P138DIR}/138-72_ChIP_WT_input__6252_S71.bam" -f BAMPE -n "WT_H3K36me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/WT_H3K36" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${P129DIR}/129-91_ChIP_cac-1_H3K36me3_Rep1_S72.bam" -c "${P138DIR}/138-73_ChIP_cac-1_input__6252_S72.bam" -f BAMPE -n "cac-1_H3K36me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-1_H3K36" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${P129DIR}/129-92_ChIP_cac-2_H3K36me3_Rep1_S73.bam" -c "${P138DIR}/138-74_ChIP_cac-2_input__6252_S73.bam" -f BAMPE -n "cac-2_H3K36me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-2_H3K36" --min-length 650 --max-gap 375
-macs3 callpeak -t "${P129DIR}/129-93_ChIP_cac-3_H3K36me3_Rep1_S74.bam" -c "${P138DIR}/138-75_ChIP_cac-3_input__6252_S74.bam" -f BAMPE -n "cac-3_H3K36me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-3_H3K36" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${P129DIR}/129-93_ChIP_cac-3_H3K36me3_Rep1_S74.bam" -c "${P138DIR}/138-75_ChIP_cac-3_input__6252_S74.bam" -f BAMPE -n "cac-3_H3K36me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-3_H3K36" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${P129DIR}/129-94_ChIP_set-7_H3K36me3_Rep1_S75.bam" -c "${P138DIR}/138-76_ChIP_set-7_input__6252_S75.bam" -f BAMPE -n "set-7_H3K36me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/set-7_H3K36" --min-length 650 --max-gap 375
 #Rep2
 # macs3 callpeak -t "${P138DIR}/138-62_ChIP_WT_H3K36me3_Rep2_6252_S61.bam" -c "${P138DIR}/138-72_ChIP_WT_input__6252_S71.bam" -f BAMPE -n "WT_H3K36me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/WT_H3K36" --min-length 650 --max-gap 375
@@ -184,6 +184,21 @@ macs3 callpeak -t "${P129DIR}/129-93_ChIP_cac-3_H3K36me3_Rep1_S74.bam" -c "${P13
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 
+cat WT_v_cac1_CS_enriched.bed \
+                                WT_v_cac2_CS_enriched.bed \
+                                WT_v_cac3_CS_enriched.bed \
+                                WT_v_cac1_H3K4_enriched.bed \
+                                WT_v_cac2_H3K4_enriched.bed \
+                                WT_v_cac3_H3K4_enriched.bed \
+                                WT_v_set-7_H3K4_enriched.bed > CAF_ectopic_peaks.bed
+
+sort -k1,1 -k2,2n CAF_ectopic_peaks.bed > CAF_ectopic_peaks_sorted.bed
+bedtools sort -i CAF_ectopic_peaks_sorted.bed > CAF_ectopic_peaks_bed_sorted.bed
+
+bedtools merge -i CAF_ectopic_peaks_bed_sorted.bed > CAF-1_ectopic_merge_peaks.bed
+
+# bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
+# bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
 
 #qa-suz12
 #Rep1
@@ -194,17 +209,17 @@ macs3 callpeak -t "${P129DIR}/129-93_ChIP_cac-3_H3K36me3_Rep1_S74.bam" -c "${P13
 #                                ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed \
 #                                ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_overlap_peaks.bed
 
-# cat ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks_sorted.bed \
-#                                 ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks_sorted.bed \
-#                                 ${OUTDIR1}/qa-suz12_8hr_H3K27me3_Rep1_peaks_sorted.bed \
-#                                 ${OUTDIR1}/qa-suz12_12hr_H3K27me3_Rep1_peaks_sorted.bed \
-#                                 ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed \
-#                                 ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks.bed
-#
-# sort -k1,1 -k2,2n ${OUTDIR1}/qa-suz12_rep1_comb_peaks.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks_sorted.bed
-# bedtools sort -i ${OUTDIR1}/qa-suz12_rep1_comb_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks_bed_sorted.bed
+cat ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks_sorted.bed \
+                                ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks_sorted.bed \
+                                ${OUTDIR1}/qa-suz12_8hr_H3K27me3_Rep1_peaks_sorted.bed \
+                                ${OUTDIR1}/qa-suz12_12hr_H3K27me3_Rep1_peaks_sorted.bed \
+                                ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed \
+                                ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks.bed
 
-#bedtools merge -i ${OUTDIR1}/qa-suz12_rep1_comb_peaks_bed_sorted.bed > qa-suz12_rep1_merge_peaks.bed
+sort -k1,1 -k2,2n ${OUTDIR1}/qa-suz12_rep1_comb_peaks.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks_sorted.bed
+bedtools sort -i ${OUTDIR1}/qa-suz12_rep1_comb_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_comb_peaks_bed_sorted.bed
+
+bedtools merge -i ${OUTDIR1}/qa-suz12_rep1_comb_peaks_bed_sorted.bed > qa-suz12_rep1_merge_peaks.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
