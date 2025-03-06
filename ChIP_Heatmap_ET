@@ -103,6 +103,7 @@ computeMatrix reference-point --referencePoint center -b 1500 -a 1500 \
                 --sortUsingSamples 1  \
                 --sortUsing sum \
                 --sortRegions descend \
+                --missingDataColor 1 \
                 --outFileSortedRegions heatmap.bed \
                 --colorList 'white, green' 'white, green' 'white, green' 'white, green' 'white, green' \
                 --zMin 0
