@@ -106,7 +106,8 @@ computeMatrix reference-point --referencePoint center -b 1500 -a 1500 \
                 --missingDataColor 1 \
                 --outFileSortedRegions heatmap.bed \
                 --colorList 'white, green' 'white, green' 'white, green' 'white, green' 'white, green' \
-                --zMin 0
+                --zMin 0 \
+                --zMax 40
 
                 # $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
                 # $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
