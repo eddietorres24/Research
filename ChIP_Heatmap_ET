@@ -87,23 +87,23 @@ module load deepTools
     #     $OUTDIR2/SRR10916163_log.bw \
     #     -R cac1_up.bed --skipZeros -o matrix_PRC2.gz
 
-computeMatrix reference-point --referencePoint center -b 1500 -a 1500 \
- -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
-    $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw \
-    $P141DIR/141-N12_ATAC_cac-1__Rep1_S101.bin_25.smooth_75Bulk.bw \
-    $P141DIR/141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw \
-    $P141DIR/141-N14_ATAC_cac-3__Rep1_S103.bin_25.smooth_75Bulk.bw \
-    $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/CAF-1_K27_ectopic_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
+# computeMatrix reference-point --referencePoint center -b 1500 -a 1500 \
+#  -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+#     $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+#     $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+#     $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
+#     $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
+#     $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw \
+#     $P141DIR/141-N12_ATAC_cac-1__Rep1_S101.bin_25.smooth_75Bulk.bw \
+#     $P141DIR/141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw \
+#     $P141DIR/141-N14_ATAC_cac-3__Rep1_S103.bin_25.smooth_75Bulk.bw \
+#     $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
+#     -R $BEDDIR2/CAF-1_K27_ectopic_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
 
     plotHeatmap -m matrix_PRC2.gz -out CAF_K27_K4_ATAC_K27_ectopic.png \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
@@ -116,7 +116,8 @@ computeMatrix reference-point --referencePoint center -b 1500 -a 1500 \
                 --missingDataColor 1 \
                 --outFileSortedRegions heatmap.bed \
                 --colorList 'white, green' 'white, green' 'white, green' 'white, green' 'white, green' 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' \
-                --zMin 0
+                --zMin 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 \
+                --zMax 30 30 30 30 30 10 10 10 10 10 10 10 10 10 10
 
 
 
