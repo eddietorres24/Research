@@ -63,37 +63,103 @@ CorrPlot_count_H3K4me2 <- plot(caf_dba_H3K4me2)
 CorrPlot_count_ATAC <- plot(caf_dba_ATAC)
 
 #Normalization
-caf_dba_K27_abc_norm <- dba.normalize(caf_dba_K27_abc, normalize=DBA_NORM_LIB)
-caf_dba_K27_CS_norm <- dba.normalize(caf_dba_K27_CS, normalize=DBA_NORM_LIB)
-caf_dba_K36_norm <- dba.normalize(caf_dba_K36, normalize=DBA_NORM_LIB)
-caf_dba_H4K20_norm <- dba.normalize(caf_dba_H4K20, normalize=DBA_NORM_LIB)
-caf_dba_H3K4me2_norm <- dba.normalize(caf_dba_H3K4me2, normalize=DBA_NORM_LIB)
-caf_dba_ATAC_norm <- dba.normalize(caf_dba_ATAC, normalize=DBA_NORM_LIB)
+caf_dba_K27_abc_norm2 <- dba.normalize(caf_dba_K27_abc, normalize="RLE")
+caf_dba_K27_CS_norm2 <- dba.normalize(caf_dba_K27_CS, normalize="RLE")
+caf_dba_K36_norm2 <- dba.normalize(caf_dba_K36, normalize="RLE")
+caf_dba_H4K20_norm2 <- dba.normalize(caf_dba_H4K20, normalize="RLE")
+caf_dba_H3K4me2_norm2 <- dba.normalize(caf_dba_H3K4me2, normalize="RLE")
+caf_dba_ATAC_norm2 <- dba.normalize(caf_dba_ATAC, normalize="RLE")
 
 #Model design & Contrast (what comparisons do you want to make?)
-caf_dba_K27_abc_norm <- dba.contrast(caf_dba_K27_abc_norm, categories=DBA_FACTOR, minMembers = 2)
-caf_dba_K27_CS_norm <- dba.contrast(caf_dba_K27_CS_norm, categories=DBA_FACTOR, minMembers = 2)
-caf_dba_K36_norm <- dba.contrast(caf_dba_K36_norm, categories=DBA_FACTOR, minMembers = 2)
-caf_dba_H4K20_norm <- dba.contrast(caf_dba_H4K20_norm, categories=DBA_FACTOR, minMembers = 2)
-caf_dba_H3K4me2_norm <- dba.contrast(caf_dba_H3K4me2_norm, categories=DBA_FACTOR, minMembers = 2)
-caf_dba_ATAC_norm <- dba.contrast(caf_dba_ATAC_norm, categories=DBA_FACTOR, minMembers = 2)
+caf_dba_K27_abc_norm2 <- dba.contrast(caf_dba_K27_abc_norm2, categories=DBA_FACTOR, minMembers = 2)
+caf_dba_K27_CS_norm2 <- dba.contrast(caf_dba_K27_CS_norm2, categories=DBA_FACTOR, minMembers = 2)
+caf_dba_K36_norm2 <- dba.contrast(caf_dba_K36_norm2, categories=DBA_FACTOR, minMembers = 2)
+caf_dba_H4K20_norm2 <- dba.contrast(caf_dba_H4K20_norm2, categories=DBA_FACTOR, minMembers = 2)
+caf_dba_H3K4me2_norm2 <- dba.contrast(caf_dba_H3K4me2_norm2, categories=DBA_FACTOR, minMembers = 2)
+caf_dba_ATAC_norm2 <- dba.contrast(caf_dba_ATAC_norm2, categories=DBA_FACTOR, minMembers = 2)
 
 
 #Blacklist
 #caf_dba <- dba.blacklist(caf_dba, blacklist=FALSE, greylist=FALSE)
 
 #Differential Analysis
-caf_dba_K27_abc_norm <- dba.analyze(caf_dba_K27_abc_norm)
-caf_dba_K27_CS_norm <- dba.analyze(caf_dba_K27_CS_norm)
-caf_dba_K36_norm <- dba.analyze(caf_dba_K36_norm)
-caf_dba_H4K20_norm <- dba.analyze(caf_dba_H4K20_norm)
-caf_dba_H3K4me2_norm <- dba.analyze(caf_dba_H3K4me2_norm)
-caf_dba_ATAC_norm <- dba.analyze(caf_dba_ATAC_norm)
+caf_dba_K27_abc_norm2 <- dba.analyze(caf_dba_K27_abc_norm2)
+caf_dba_K27_CS_norm2 <- dba.analyze(caf_dba_K27_CS_norm2)
+caf_dba_K36_norm2 <- dba.analyze(caf_dba_K36_norm2)
+caf_dba_H4K20_norm2 <- dba.analyze(caf_dba_H4K20_norm2)
+caf_dba_H3K4me2_norm2 <- dba.analyze(caf_dba_H3K4me2_norm2)
+caf_dba_ATAC_norm2 <- dba.analyze(caf_dba_ATAC_norm2)
 
+#Plot PCA for All mods (normalized peak calls)
+dba.plotPCA(caf_dba_K27_abc_norm2, label=DBA_FACTOR)
+dba.plotPCA(caf_dba_K27_CS_norm2, label=DBA_FACTOR)
+dba.plotPCA(caf_dba_K36_norm2, label=DBA_FACTOR)
+dba.plotPCA(caf_dba_H4K20_norm2, label=DBA_FACTOR)
+dba.plotPCA(caf_dba_H3K4me2_norm2, label=DBA_FACTOR)
+dba.plotPCA(caf_dba_ATAC_norm2, label=DBA_FACTOR)
+
+#Venn Diagram of Gain vs loss compared to WT control
+dba.plotVenn(caf_dba_K27_abc_norm2, contrast = 4, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)
+dba.plotVenn(caf_dba_K27_CS_norm2, contrast = 4, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)
+dba.plotVenn(caf_dba_K36_norm2, contrast = 1, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)
+dba.plotVenn(caf_dba_H4K20_norm2, contrast = 1, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)
+dba.plotVenn(caf_dba_H3K4me2_norm2, contrast = 3, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)
+dba.plotVenn(caf_dba_ATAC_norm2, contrast = 1, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)
+
+#MA Plots
+dba.plotMA(caf_dba_K27_abc_norm2, contrast = 4)
+dba.plotMA(caf_dba_K27_CS_norm2, contrast = 4)
+dba.plotMA(caf_dba_K36_norm2)
+dba.plotMA(caf_dba_H4K20_norm2)
+dba.plotMA(caf_dba_H3K4me2_norm2, contrast = 3)
+dba.plotMA(caf_dba_ATAC_norm2)
+
+#Volcano Plots
+dba.plotVolcano(caf_dba_K27_abc_norm2, contrast = 4)
+dba.plotVolcano(caf_dba_K27_CS_norm2, contrast = 4)
+dba.plotVolcano(caf_dba_K36_norm2)
+dba.plotVolcano(caf_dba_H4K20_norm2)
+dba.plotVolcano(caf_dba_H3K4me2_norm2, contrast = 1)
+dba.plotVolcano(caf_dba_ATAC_norm2, contrast = 3)
+
+#Box Plots
+dba.plotBox(caf_dba_K27_abc_norm, contrast = 4)
+dba.plotBox(caf_dba_K27_CS_norm, contrast = 4)
+dba.plotBox(caf_dba_K36_norm)
+dba.plotBox(caf_dba_H4K20_norm)
+dba.plotBox(caf_dba_H3K4me2_norm, contrast = 3)
+dba.plotBox(caf_dba_ATAC_norm, contrast = 1)
+
+#Heatmaps
+##For Binding Affinity
+hmap <- colorRampPalette(c("red", "black", "green"))(n = 13)
+readscores <- dba.plotHeatmap(caf_dba_K27_abc_norm2, contrast=1, correlations=FALSE, scale="row", colScheme = hmap, cexCol = 0.9)
+readscores <- dba.plotHeatmap(caf_dba_K27_CS_norm2, contrast=1, correlations=FALSE, scale="row", colScheme = hmap, cexCol = 0.9)
+readscores <- dba.plotHeatmap(caf_dba_K36_norm, contrast=1, correlations=FALSE, scale="row", colScheme = hmap, cexCol = 0.9)
+readscores <- dba.plotHeatmap(caf_dba_H4K20_norm, contrast=1, correlations=FALSE, scale="row", colScheme = hmap, cexCol = 0.9)
+readscores <- dba.plotHeatmap(caf_dba_H3K4me2_norm, contrast=3, correlations=FALSE, scale="row", colScheme = hmap, cexCol = 0.9)
+readscores <- dba.plotHeatmap(caf_dba_ATAC_norm, contrast=1, correlations=FALSE, scale="row", colScheme = hmap, cexCol = 0.9)
+
+#Profiling
+###system.file(’extra/plotProfileDemo.Rmd’,package=’DiffBind’)
+
+#Basic
+dba.plotProfile(caf_dba_K27_abc_norm, contrast = 1)
+dba.plotProfile(caf_dba_K27_CS_norm, contrast = 1)
+dba.plotProfile(caf_dba_K36_norm)
+dba.plotProfile(caf_dba_H4K20_norm)
+dba.plotProfile(caf_dba_H3K4me2_norm, contrast = 3)
+dba.plotProfile(caf_dba_ATAC_norm, contrast = 1)
+
+#split reps
+mask.K27abc <- caf_dba$masks$abcam_H3K27me3
+mask.K27CS <- caf_dba$masks$CS_H3K27me3
+profiles <- dba.plotProfile(caf_dba, samples=list(H3K27me3_abcam= mask.K27abc, H3K27me3_CS= mask.K27CS), merge=NULL)
+dba.plotProfile(profiles)
 
 #Retrieve differentially bound sites for downstream analysis (will return a GRanges object)
 ## This is going to give me all sites that are different in each of the mutants vs. WT for each modification
-caf_dba_K27_abc_norm.DB1 <- dba.report(caf_dba_K27_abc_norm, method=DBA_DESEQ2, contrast = 1, th=1)
+caf_dba_K27_abc_norm.DB1 <- dba.report(caf_dba_K27_abc_norm, method=DBA_DESEQ2, contrast = 1, th=1, bGain=TRUE, bLoss=TRUE)
 caf_dba_K27_abc_norm.DB2 <- dba.report(caf_dba_K27_abc_norm, method=DBA_DESEQ2, contrast = 2, th=1)
 caf_dba_K27_abc_norm.DB3 <- dba.report(caf_dba_K27_abc_norm, method=DBA_DESEQ2, contrast = 3, th=1)
 caf_dba_K27_CS_norm.DB1 <- dba.report(caf_dba_K27_CS_norm, method=DBA_DESEQ2, contrast = 1, th=1)
@@ -118,8 +184,8 @@ caf_dba_ATAC_norm.DB4 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contra
 
 ###saving reports
 # Write to File
-out <- as.data.frame(caf_dba_K27_CS_norm.DB3)
-write.table(out, file="K27_CS_WT_v_cac-3_diff.txt", sep="\t", quote=F, row.names=F)
+out <- as.data.frame(caf_dba_K27_CS_norm.DB1)
+write.table(out, file="WT_v_cac-1_K27_CS_diff.txt", sep="\t", quote=F, row.names=F)
 
 # Create bed files for each keeping only significant peaks (p < 0.05)
 bed <- out %>% 
@@ -127,7 +193,7 @@ bed <- out %>%
   select(seqnames, start, end)
 
 # Write to file
-write.table(bed, file="WT_v_cac3_enriched.bed", sep="\t", quote=F, row.names=F, col.names=F)
+write.table(bed, file="WT_v_cac-3_ATAC_enriched.bed", sep="\t", quote=F, row.names=F, col.names=F)
 
 
 #########
