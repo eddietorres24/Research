@@ -22,10 +22,10 @@ ATAC_samples <- read.csv("./DiffBind_CAF-1_ATAC_ET.csv")
 
 ## Make ChIPQC Object
 register(SerialParam())
-chipObj <- ChIPQC(samples) 
+chipObj <- ChIPQC(K27_CS_samples) 
 
 ## Make QC Report
-ChIPQCreport(chipObj, reportName="ChIP_QC_report_CAF-1_mods", reportFolder="ChIPQCreport")
+ChIPQCreport(chipObj, reportName="ChIP_QC_report_H3K27me3_CS", reportFolder="ChIPQCreport")
 
 
 ### DiffBind (scratch)
@@ -47,7 +47,7 @@ CorrPlot_H3K4me2 <- plot(caf_dba_H3K4me2)
 CorrPlot_ATAC <- plot(caf_dba_ATAC)
 
 #Using RPKM
-CorrPlot_RPKM <- dba.plotHeatmap(caf_dba, score=DBA_SCORE_RPKM_FOLD)
+CorrPlot_RPKM <- dba.plotHeatmap(caf_dba_K27_CS, score=DBA_SCORE_RPKM_FOLD)
 
 #Count Reads
 caf_dba_K27_abc <- dba.count(caf_dba_K27_abc)
@@ -55,7 +55,7 @@ caf_dba_K27_CS <- dba.count(caf_dba_K27_CS)
 caf_dba_K36 <- dba.count(caf_dba_K36)
 caf_dba_H4K20 <- dba.count(caf_dba_H4K20)
 caf_dba_H3K4me2 <- dba.count(caf_dba_H3K4me2)
-caf_dba_ATAC <- dba.count(caf_dba_ATAC)
+caf_dba_ATAC <- dba.count(caf_dba_ATAC, summits=75)
 
 ##Plot new correlation plot based on count data, save in a file
 CorrPlot_count_K27_abc <- plot(caf_dba_K27_abc)
@@ -163,27 +163,27 @@ dba.plotProfile(profiles)
 #Retrieve differentially bound sites for downstream analysis (will return a GRanges object)
 ## This is going to give me all sites that are different in each of the mutants vs. WT for each modification
 caf_dba_K27_abc_norm.DB1 <- dba.report(caf_dba_K27_abc_norm, method=DBA_DESEQ2, contrast = 1, th=0.05, bDB = TRUE)
-caf_dba_K27_abc_norm.DB2 <- dba.report(caf_dba_K27_abc_norm, method=DBA_DESEQ2, contrast = 2, th=0.05, bDB = TRUE)
+caf_dba_K27_abc_norm.DB2 <- dba.report(caf_dba_K27_abc_norm, method=DBA_DESEQ2, contrast = 2, th=0.05,  bDB = TRUE)
 caf_dba_K27_abc_norm.DB3 <- dba.report(caf_dba_K27_abc_norm, method=DBA_DESEQ2, contrast = 3, th=0.05, bDB = TRUE)
 caf_dba_K27_CS_norm.DB1 <- dba.report(caf_dba_K27_CS_norm, method=DBA_DESEQ2, contrast = 1, th=0.05, bDB = TRUE)
 caf_dba_K27_CS_norm.DB2 <- dba.report(caf_dba_K27_CS_norm, method=DBA_DESEQ2, contrast = 2, th=0.05, bDB = TRUE)
 caf_dba_K27_CS_norm.DB3 <- dba.report(caf_dba_K27_CS_norm, method=DBA_DESEQ2, contrast = 3, th=0.05, bDB = TRUE)
-caf_dba_K36_norm.DB1 <- dba.report(caf_dba_K36_norm, method=DBA_DESEQ2, contrast = 1, th=0.05, bDB = TRUE)
-caf_dba_K36_norm.DB2 <- dba.report(caf_dba_K36_norm, method=DBA_DESEQ2, contrast = 2, th=0.05, bDB = TRUE)
-caf_dba_K36_norm.DB3 <- dba.report(caf_dba_K36_norm, method=DBA_DESEQ2, contrast = 3, th=0.05, bDB = TRUE)
-caf_dba_K36_norm.DB4 <- dba.report(caf_dba_K36_norm, method=DBA_DESEQ2, contrast = 4, th=0.05, bDB = TRUE)
+caf_dba_K36_norm.DB1 <- dba.report(caf_dba_K36_norm, method=DBA_DESEQ2, contrast = 1, th=0.05, fold = 0.8, bDB = TRUE)
+caf_dba_K36_norm.DB2 <- dba.report(caf_dba_K36_norm, method=DBA_DESEQ2, contrast = 2, th=0.05, fold = 0.8, bDB = TRUE)
+caf_dba_K36_norm.DB3 <- dba.report(caf_dba_K36_norm, method=DBA_DESEQ2, contrast = 3, th=0.05, fold = 0.8, bDB = TRUE)
+caf_dba_K36_norm.DB4 <- dba.report(caf_dba_K36_norm, method=DBA_DESEQ2, contrast = 4, th=0.05, fold = 0.8, bDB = TRUE)
 caf_dba_H4K20_norm.DB1 <- dba.report(caf_dba_H4K20_norm, method=DBA_DESEQ2, contrast = 1, th=0.05, bDB = TRUE)
 caf_dba_H4K20_norm.DB2 <- dba.report(caf_dba_H4K20_norm, method=DBA_DESEQ2, contrast = 2, th=0.05, bDB = TRUE)
 caf_dba_H4K20_norm.DB3 <- dba.report(caf_dba_H4K20_norm, method=DBA_DESEQ2, contrast = 3, th=0.05, bDB = TRUE)
-caf_dba_H3K4me2_norm.DB1 <- dba.report(caf_dba_H3K4me2_norm, method=DBA_DESEQ2, contrast = 1, th=0.05, bDB = TRUE)
-caf_dba_H3K4me2_norm.DB2 <- dba.report(caf_dba_H3K4me2_norm, method=DBA_DESEQ2, contrast = 2, th=0.05, bDB = TRUE)
-caf_dba_H3K4me2_norm.DB3 <- dba.report(caf_dba_H3K4me2_norm, method=DBA_DESEQ2, contrast = 3, th=0.05, bDB = TRUE)
-caf_dba_H3K4me2_norm.DB4 <- dba.report(caf_dba_H3K4me2_norm, method=DBA_DESEQ2, contrast = 4, th=0.05, bDB = TRUE)
-caf_dba_ATAC_norm.DB1 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 1, th=0.05, bDB = TRUE)
-caf_dba_ATAC_norm.DB2 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 2, th=0.05, bDB = TRUE)
-caf_dba_ATAC_norm.DB3 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 3, th=0.05, bDB = TRUE)
-caf_dba_ATAC_norm.DB4 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 4, th=0.05, bDB = TRUE)
-export.bed(caf_dba_ATAC_norm.DB3$peaks[[1]],"WT_v_cac-3_ATAC_DIFF.bed")
+caf_dba_H3K4me2_norm.DB1 <- dba.report(caf_dba_H3K4me2_norm, method=DBA_DESEQ2, contrast = 1, th=0.05, fold = 0.8, bDB = TRUE)
+caf_dba_H3K4me2_norm.DB2 <- dba.report(caf_dba_H3K4me2_norm, method=DBA_DESEQ2, contrast = 2, th=0.05, fold = 0.8, bDB = TRUE)
+caf_dba_H3K4me2_norm.DB3 <- dba.report(caf_dba_H3K4me2_norm, method=DBA_DESEQ2, contrast = 3, th=0.05, fold = 0.8, bDB = TRUE)
+caf_dba_H3K4me2_norm.DB4 <- dba.report(caf_dba_H3K4me2_norm, method=DBA_DESEQ2, contrast = 4, th=0.05, fold = 0.8, bDB = TRUE)
+caf_dba_ATAC_norm.DB1 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 1, th=0.05, fold = 0.8, bDB = TRUE)
+caf_dba_ATAC_norm.DB2 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 2, th=0.05, fold = 0.8, bDB = TRUE)
+caf_dba_ATAC_norm.DB3 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 3, th=0.05, fold = 0.8, bDB = TRUE)
+caf_dba_ATAC_norm.DB4 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 4, th=0.05, fold = 0.8, bDB = TRUE)
+export.bed(caf_dba_K27_abc_norm.DB3$peaks[[1]],"WT_v_cac-3_K27_abc_DIFF.bed")
 
 ###saving reports
 # Write to File
