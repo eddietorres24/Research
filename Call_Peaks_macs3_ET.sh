@@ -176,6 +176,8 @@ macs3 callpeak -t "${P146DIR}/146-33_ChIP_set-7_H3K4me2_Rep2_S33.bam" -c "${P146
 #bedtools
 # module load BEDTools
 
+bedtools intersect -a -b -wa
+
 #Combining all overlapping peaks & merging
 #CAF-1
 # bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \
@@ -184,14 +186,15 @@ macs3 callpeak -t "${P146DIR}/146-33_ChIP_set-7_H3K4me2_Rep2_S33.bam" -c "${P146
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 
-cat WT_v_cac-1_K4_0-8fold_DIFF.bed \
-                                WT_v_cac-2_K4_0-8fold_DIFF.bed \
-                                WT_v_set-7_K4_0-8fold_DIFF.bed > CAF_K4_noC3_DIFF_peaks.bed
+cat cac-1_noWT_K4.bed \
+                  cac-2_noWT_K4.bed \
+                  cac-3_noWT_K4.bed \
+                  set-7_noWT_K4.bed > CAF_K4_ectopic_peaks.bed
 
-sort -k1,1 -k2,2n CAF_K4_noC3_DIFF_peaks.bed > CAF_K4_noC3_DIFF_peaks_sorted.bed
-bedtools sort -i CAF_K4_noC3_DIFF_peaks_sorted.bed > CAF_K4_noC3_DIFF_peaks_bed_sorted.bed
+sort -k1,1 -k2,2n CAF_K4_ectopic_peaks.bed > CAF_K4_ectopic_peaks_sorted.bed
+bedtools sort -i CAF_K4_ectopic_peaks_sorted.bed > CAF_K4_ectopic_peaks_bed_sorted.bed
 
-bedtools merge -i CAF_K4_noC3_DIFF_peaks_bed_sorted.bed > CAF-1_K4_noC3_DIFF_merge_peaks.bed
+bedtools merge -i CAF_K4_ectopic_peaks_bed_sorted.bed > CAF-1_K4_ectopic_merge_peaks.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt

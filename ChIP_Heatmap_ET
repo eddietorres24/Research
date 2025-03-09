@@ -98,13 +98,13 @@ computeMatrix reference-point --referencePoint center -b 1000 -a 1000 \
     $OUTDIR2/SRR7970629.bw \
     $OUTDIR2/SRR7970598.bw \
     $OUTDIR2/SRR10916163.bw \
-    -R $BEDDIR2/CAF-1_K4_noC3_DIFF_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
+    -R $BEDDIR2/CAF-1_K4_ectopic_merge_DIFF.bed --skipZeros -o matrix_PRC2.gz
 
-    plotHeatmap -m matrix_PRC2.gz -out CAF_K4_noC3_DIFF_RNA.png \
+    plotHeatmap -m matrix_PRC2.gz -out CAF_K4_ectopic_DIFF_RNA.png \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
                 --startLabel "5'" \
           			--endLabel "3'" \
-                --clusterUsingSamples 1 \
+                --clusterUsingSamples 6 \
                 --sortUsingSamples 2 3 4 \
                 --kmeans 2 \
                 --sortUsing sum \
@@ -113,7 +113,7 @@ computeMatrix reference-point --referencePoint center -b 1000 -a 1000 \
                 --outFileSortedRegions heatmap.bed \
                 --colorList 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, red' 'white, red' 'white, red' 'white, red' 'white, red' \
                 --zMin 0 \
-                --zMax 20 20 20 20 20 40 40 40 40 40
+                --zMax 16 16 16 16 16 40 40 40 40 40
 
 # 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
 
