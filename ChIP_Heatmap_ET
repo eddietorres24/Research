@@ -87,7 +87,7 @@ module load deepTools
     #     $OUTDIR2/SRR10916163_log.bw \
     #     -R cac1_up.bed --skipZeros -o matrix_PRC2.gz
 
-computeMatrix reference-point --referencePoint center -b 1500 -a 1500 \
+computeMatrix reference-point --referencePoint center -b 1000 -a 1000 \
  -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
@@ -105,14 +105,15 @@ computeMatrix reference-point --referencePoint center -b 1500 -a 1500 \
                 --startLabel "5'" \
           			--endLabel "3'" \
                 --clusterUsingSamples 1 \
-                --sortUsingSamples 4 \
+                --sortUsingSamples 2 3 4 \
                 --kmeans 2 \
                 --sortUsing sum \
                 --sortRegions descend \
                 --missingDataColor 1 \
                 --outFileSortedRegions heatmap.bed \
                 --colorList 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, red' 'white, red' 'white, red' 'white, red' 'white, red' \
-                --zMin 0
+                --zMin 0 \
+                --zMax 20 20 20 20 20 6 6 6 6 6
 
 # 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
 
