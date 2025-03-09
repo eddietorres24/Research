@@ -104,16 +104,14 @@ computeMatrix reference-point --referencePoint center -b 1000 -a 1000 \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
                 --startLabel "5'" \
           			--endLabel "3'" \
-                --clusterUsingSamples 6 \
-                --sortUsingSamples 2 3 4 \
-                --kmeans 2 \
+                --sortUsingSamples 6 \
                 --sortUsing sum \
                 --sortRegions descend \
                 --missingDataColor 1 \
                 --outFileSortedRegions heatmap.bed \
                 --colorList 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, red' 'white, red' 'white, red' 'white, red' 'white, red' \
                 --zMin 0 \
-                --zMax 16 16 16 16 16 4 4 4 4 4
+                --zMax 16 16 16 16 16 2 2 2 2 2
 
 # 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
 
