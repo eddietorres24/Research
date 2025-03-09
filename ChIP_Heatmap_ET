@@ -107,16 +107,16 @@ computeMatrix scale-regions -b 750 -a 750 \
 
     plotHeatmap -m matrix_PRC2.gz -out CAF_K4_K27_ectopic_DIFF_RNA_TSS.png \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
-                --startLabel "5'" \
-          			--endLabel "3'" \
-                --sortUsingSamples 6 \
+                --startLabel "TSS" \
+          			--endLabel "TES" \
+                --sortUsingSamples 6 11 \
                 --sortUsing sum \
                 --sortRegions descend \
                 --missingDataColor 1 \
                 --outFileSortedRegions heatmap.bed \
                 --colorList 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, green' 'white, green' 'white, green' 'white, green' 'white, green' 'white, red' 'white, red' 'white, red' 'white, red' 'white, red' \
                 --zMin 0 \
-                --zMax 16 16 16 16 16 25 25 25 25 25 3 3 3 3 3
+                --zMax 16 16 16 16 16 20 20 20 20 20 4 4 4 4 4
 
 
 # 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
