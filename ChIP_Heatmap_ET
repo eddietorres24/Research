@@ -87,7 +87,7 @@ module load deepTools
     #     $OUTDIR2/SRR10916163_log.bw \
     #     -R cac1_up.bed --skipZeros -o matrix_PRC2.gz
 
-computeMatrix reference-point --referencePoint center -b 1000 -a 1000 \
+computeMatrix scale-regions -b 750 -a 750 \
  -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
@@ -105,11 +105,11 @@ computeMatrix reference-point --referencePoint center -b 1000 -a 1000 \
     $OUTDIR2/SRR10916163_log.bw \
     -R $BEDDIR2/CAF-1_K4_ectopic_merge_DIFF.bed --skipZeros -o matrix_PRC2.gz
 
-    plotHeatmap -m matrix_PRC2.gz -out CAF_K4_K27_ectopic_DIFF_RNA.png \
+    plotHeatmap -m matrix_PRC2.gz -out CAF_K4_K27_ectopic_DIFF_RNA_TSS.png \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
                 --startLabel "5'" \
           			--endLabel "3'" \
-                --sortUsingSamples 6 11 \
+                --sortUsingSamples 6 \
                 --sortUsing sum \
                 --sortRegions descend \
                 --missingDataColor 1 \
