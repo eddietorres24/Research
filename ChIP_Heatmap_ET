@@ -93,6 +93,11 @@ computeMatrix reference-point --referencePoint center -b 1000 -a 1000 \
     $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
     $OUTDIR2/SRR8269825_log.bw \
     $OUTDIR2/SRR8444038_log.bw \
     $OUTDIR2/SRR7970629_log.bw \
@@ -100,18 +105,19 @@ computeMatrix reference-point --referencePoint center -b 1000 -a 1000 \
     $OUTDIR2/SRR10916163_log.bw \
     -R $BEDDIR2/CAF-1_K4_ectopic_merge_DIFF.bed --skipZeros -o matrix_PRC2.gz
 
-    plotHeatmap -m matrix_PRC2.gz -out CAF_K4_ectopic_DIFF_RNA.png \
-                --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
+    plotHeatmap -m matrix_PRC2.gz -out CAF_K4_K27_ectopic_DIFF_RNA.png \
+                --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
                 --startLabel "5'" \
           			--endLabel "3'" \
-                --sortUsingSamples 6 \
+                --sortUsingSamples 11 \
                 --sortUsing sum \
                 --sortRegions descend \
                 --missingDataColor 1 \
                 --outFileSortedRegions heatmap.bed \
-                --colorList 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, red' 'white, red' 'white, red' 'white, red' 'white, red' \
+                --colorList 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, green' 'white, green' 'white, green' 'white, green' 'white, green' 'white, red' 'white, red' 'white, red' 'white, red' 'white, red' \
                 --zMin 0 \
-                --zMax 16 16 16 16 16 2 2 2 2 2
+                --zMax 16 16 16 16 16 40 40 40 40 40 3 3 3 3 3
+
 
 # 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
 
