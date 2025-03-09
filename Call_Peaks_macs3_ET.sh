@@ -186,13 +186,12 @@ macs3 callpeak -t "${P146DIR}/146-33_ChIP_set-7_H3K4me2_Rep2_S33.bam" -c "${P146
 
 cat WT_v_cac-1_K4_0-8fold_DIFF.bed \
                                 WT_v_cac-2_K4_0-8fold_DIFF.bed \
-                                WT_v_cac-3_K4_0-8fold_DIFF.bed \
-                                WT_v_set-7_K4_0-8fold_DIFF.bed > CAF_K4_DIFF_peaks.bed
+                                WT_v_set-7_K4_0-8fold_DIFF.bed > CAF_K4_noC3_DIFF_peaks.bed
 
-sort -k1,1 -k2,2n CAF_K4_DIFF_peaks.bed > CAF_K4_DIFF_peaks_sorted.bed
-bedtools sort -i CAF_K4_DIFF_peaks_sorted.bed > CAF_K4_DIFF_peaks_bed_sorted.bed
+sort -k1,1 -k2,2n CAF_K4_noC3_DIFF_peaks.bed > CAF_K4_noC3_DIFF_peaks_sorted.bed
+bedtools sort -i CAF_K4_noC3_DIFF_peaks_sorted.bed > CAF_K4_noC3_DIFF_peaks_bed_sorted.bed
 
-bedtools merge -i CAF_K4_DIFF_peaks_bed_sorted.bed > CAF-1_K4_DIFF_merge_peaks.bed
+bedtools merge -i CAF_K4_noC3_DIFF_peaks_bed_sorted.bed > CAF-1_K4_noC3_DIFF_merge_peaks.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
