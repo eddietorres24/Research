@@ -93,11 +93,11 @@ computeMatrix reference-point --referencePoint center -b 1000 -a 1000 \
     $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
-    $OUTDIR2/SRR8269825.bw \
-    $OUTDIR2/SRR8444038.bw \
-    $OUTDIR2/SRR7970629.bw \
-    $OUTDIR2/SRR7970598.bw \
-    $OUTDIR2/SRR10916163.bw \
+    $OUTDIR2/SRR8269825_log.bw \
+    $OUTDIR2/SRR8444038_log.bw \
+    $OUTDIR2/SRR7970629_log.bw \
+    $OUTDIR2/SRR7970598_log.bw \
+    $OUTDIR2/SRR10916163_log.bw \
     -R $BEDDIR2/CAF-1_K4_ectopic_merge_DIFF.bed --skipZeros -o matrix_PRC2.gz
 
     plotHeatmap -m matrix_PRC2.gz -out CAF_K4_ectopic_DIFF_RNA.png \
@@ -113,7 +113,7 @@ computeMatrix reference-point --referencePoint center -b 1000 -a 1000 \
                 --outFileSortedRegions heatmap.bed \
                 --colorList 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, red' 'white, red' 'white, red' 'white, red' 'white, red' \
                 --zMin 0 \
-                --zMax 16 16 16 16 16 40 40 40 40 40
+                --zMax 16 16 16 16 16 4 4 4 4 4
 
 # 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
 
