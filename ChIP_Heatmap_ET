@@ -105,7 +105,6 @@ computeMatrix reference-point --referencePoint center -b 1000 -a 1000 \
                 --startLabel "5'" \
           			--endLabel "3'" \
                 --clusterUsingSamples 1 \
-                --sortUsingSamples \
                 --kmeans 2 \
                 --sortUsing sum \
                 --sortRegions descend \
