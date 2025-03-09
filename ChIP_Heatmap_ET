@@ -105,6 +105,7 @@ computeMatrix reference-point --referencePoint center -b 1000 -a 1000 \
                 --startLabel "5'" \
           			--endLabel "3'" \
                 --clusterUsingSamples 1 \
+                --sortUsingSamples 1 2 3 4 5 \
                 --kmeans 2 \
                 --sortUsing sum \
                 --sortRegions descend \
@@ -112,7 +113,7 @@ computeMatrix reference-point --referencePoint center -b 1000 -a 1000 \
                 --outFileSortedRegions heatmap.bed \
                 --colorList 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, red' 'white, red' 'white, red' 'white, red' 'white, red' \
                 --zMin 0 \
-                --zMax 20 20 20 20 20 100 100 100 100 100
+                --zMax 20 20 20 20 20 50 50 50 50 50
 
 # 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
 
