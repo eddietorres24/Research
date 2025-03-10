@@ -103,9 +103,9 @@ computeMatrix scale-regions -b 500 -a 500 \
     $OUTDIR2/SRR7970629_log.bw \
     $OUTDIR2/SRR7970598_log.bw \
     $OUTDIR2/SRR10916163_log.bw \
-    -R $BEDDIR2/CAF-1_K4_ectopic_merge_DIFF.bed --skipZeros -o matrix_PRC2.gz
+    -R $BEDDIR2/WT_noC3_K4me2.bed --skipZeros -o matrix_PRC2.gz
 
-    plotHeatmap -m matrix_PRC2.gz -out CAF_K4_K27_ectopic_DIFF_RNA_TSS.png \
+    plotHeatmap -m matrix_PRC2.gz -out WT_no_cac-3_K4_K27_RNA_TSS.png \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
                 --startLabel "TSS" \
           			--endLabel "TES" \
