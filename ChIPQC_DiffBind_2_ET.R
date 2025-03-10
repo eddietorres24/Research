@@ -67,11 +67,11 @@ CorrPlot_count_ATAC <- plot(caf_dba_ATAC)
 
 #Normalization
 caf_dba_K27_abc_norm <- dba.normalize(caf_dba_K27_abc, normalize="RLE")
-caf_dba_K27_CS_norm <- dba.normalize(caf_dba_K27_CS, normalize="RLE")
+caf_dba_K27_CS_norm <- dba.normalize(caf_dba_K27_CS, normalize="lib")
 caf_dba_K36_norm <- dba.normalize(caf_dba_K36, normalize="RLE")
 caf_dba_H4K20_norm <- dba.normalize(caf_dba_H4K20, normalize="RLE")
 caf_dba_H3K4me2_norm <- dba.normalize(caf_dba_H3K4me2, normalize="RLE")
-caf_dba_ATAC_norm <- dba.normalize(caf_dba_ATAC, normalize="RLE")
+caf_dba_ATAC_norm <- dba.normalize(caf_dba_ATAC, normalize=DBA_NORM_NATIVE)
 
 #Model design & Contrast (what comparisons do you want to make?)
 caf_dba_K27_abc_norm <- dba.contrast(caf_dba_K27_abc_norm, categories=DBA_FACTOR, minMembers = 2)
@@ -80,7 +80,6 @@ caf_dba_K36_norm <- dba.contrast(caf_dba_K36_norm, categories=DBA_FACTOR, minMem
 caf_dba_H4K20_norm <- dba.contrast(caf_dba_H4K20_norm, categories=DBA_FACTOR, minMembers = 2)
 caf_dba_H3K4me2_norm <- dba.contrast(caf_dba_H3K4me2_norm, categories=DBA_FACTOR, minMembers = 2)
 caf_dba_ATAC_norm <- dba.contrast(caf_dba_ATAC_norm, categories=DBA_FACTOR, minMembers = 2)
-
 
 #Blacklist
 #caf_dba <- dba.blacklist(caf_dba, blacklist=FALSE, greylist=FALSE)
@@ -103,7 +102,7 @@ dba.plotPCA(caf_dba_ATAC_norm, label=DBA_FACTOR)
 
 #Venn Diagram of Gain vs loss compared to WT control
 dba.plotVenn(caf_dba_K27_abc_norm, contrast = 4, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)
-dba.plotVenn(caf_dba_K27_CS_norm, contrast = 4, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)
+dba.plotVenn(caf_dba_K27_CS_norm, contrast = 1, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)
 dba.plotVenn(caf_dba_K36_norm, contrast = 1, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)
 dba.plotVenn(caf_dba_H4K20_norm, contrast = 1, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)
 dba.plotVenn(caf_dba_H3K4me2_norm, contrast = 3, bDB = TRUE, bGain = TRUE, bLoss = TRUE, bAll = FALSE)
@@ -111,7 +110,7 @@ dba.plotVenn(caf_dba_ATAC_norm, contrast = 1, bDB = TRUE, bGain = TRUE, bLoss = 
 
 #MA Plots
 dba.plotMA(caf_dba_K27_abc_norm, contrast = 4)
-dba.plotMA(caf_dba_K27_CS_norm, contrast = 4)
+dba.plotMA(caf_dba_K27_CS_norm, contrast = 1)
 dba.plotMA(caf_dba_K36_norm)
 dba.plotMA(caf_dba_H4K20_norm)
 dba.plotMA(caf_dba_H3K4me2_norm, contrast = 3)
@@ -123,11 +122,11 @@ dba.plotVolcano(caf_dba_K27_CS_norm, contrast = 1)
 dba.plotVolcano(caf_dba_K36_norm)
 dba.plotVolcano(caf_dba_H4K20_norm)
 dba.plotVolcano(caf_dba_H3K4me2_norm, contrast = 1)
-dba.plotVolcano(caf_dba_ATAC_norm, contrast = 3)
+dba.plotVolcano(caf_dba_ATAC_norm, contrast = 1)
 
 #Box Plots
 dba.plotBox(caf_dba_K27_abc_norm, contrast = 4)
-dba.plotBox(caf_dba_K27_CS_norm, contrast = 4)
+dba.plotBox(caf_dba_K27_CS_norm, contrast = 1)
 dba.plotBox(caf_dba_K36_norm)
 dba.plotBox(caf_dba_H4K20_norm)
 dba.plotBox(caf_dba_H3K4me2_norm, contrast = 3)
@@ -179,11 +178,11 @@ caf_dba_H3K4me2_norm.DB1 <- dba.report(caf_dba_H3K4me2_norm, method=DBA_DESEQ2, 
 caf_dba_H3K4me2_norm.DB2 <- dba.report(caf_dba_H3K4me2_norm, method=DBA_DESEQ2, contrast = 2, th=0.05, fold = 0.8, bDB = TRUE)
 caf_dba_H3K4me2_norm.DB3 <- dba.report(caf_dba_H3K4me2_norm, method=DBA_DESEQ2, contrast = 3, th=0.05, fold = 0.8, bDB = TRUE)
 caf_dba_H3K4me2_norm.DB4 <- dba.report(caf_dba_H3K4me2_norm, method=DBA_DESEQ2, contrast = 4, th=0.05, fold = 0.8, bDB = TRUE)
-caf_dba_ATAC_norm.DB1 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 1, th=0.05, fold = 0.8, bDB = TRUE)
-caf_dba_ATAC_norm.DB2 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 2, th=0.05, fold = 0.8, bDB = TRUE)
-caf_dba_ATAC_norm.DB3 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 3, th=0.05, fold = 0.8, bDB = TRUE)
-caf_dba_ATAC_norm.DB4 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 4, th=0.05, fold = 0.8, bDB = TRUE)
-export.bed(caf_dba_K27_abc_norm.DB3$peaks[[1]],"WT_v_cac-3_K27_abc_DIFF.bed")
+caf_dba_ATAC_norm.DB1 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 1, th=0.05, bDB = TRUE)
+caf_dba_ATAC_norm.DB2 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 2, th=0.05, bDB = TRUE)
+caf_dba_ATAC_norm.DB3 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 3, th=0.05, bDB = TRUE)
+caf_dba_ATAC_norm.DB4 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 4, th=0.05, bDB = TRUE)
+export.bed(caf_dba_ATAC_norm.DB4$peaks[[1]],"WT_v_set-7_ATAC_DIFF.bed")
 
 ###saving reports
 # Write to File
