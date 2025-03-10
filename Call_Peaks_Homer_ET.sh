@@ -98,19 +98,19 @@ module load Homer/4.11-foss-2022a
 
 # #Rep 3 qa-suz12
 # makeTagDirectory $TAGDIR/WT_0hr_rep3 $P146DIR/
-makeTagDirectory $TAGDIR/qasuz12_0hr_rep3 $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bam
-makeTagDirectory $TAGDIR/qasuz12_4hr_rep3 $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bam
-makeTagDirectory $TAGDIR/qasuz12_8hr_rep3 $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bam
-makeTagDirectory $TAGDIR/qasuz12_12hr_rep3 $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bam
-makeTagDirectory $TAGDIR/qasuz12_24hr_rep3 $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bam
-makeTagDirectory $TAGDIR/WT_24hr_rep3 $P146DIR/146-6_ChIP_WT_H3K27me3_Rep1_S6.bam
+# makeTagDirectory $TAGDIR/qasuz12_0hr_rep3 $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bam
+# makeTagDirectory $TAGDIR/qasuz12_4hr_rep3 $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bam
+# makeTagDirectory $TAGDIR/qasuz12_8hr_rep3 $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bam
+# makeTagDirectory $TAGDIR/qasuz12_12hr_rep3 $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bam
+# makeTagDirectory $TAGDIR/qasuz12_24hr_rep3 $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bam
+# makeTagDirectory $TAGDIR/WT_24hr_rep3 $P146DIR/146-6_ChIP_WT_H3K27me3_Rep1_S6.bam
 # makeTagDirectory $TAGDIR/WT_0hr_input_rep3 $P139DIR/
 # makeTagDirectory $TAGDIR/qasuz12_0hr_input_rep3 $P139DIR/
 # makeTagDirectory $TAGDIR/qasuz12_4hr_input_rep3 $P139DIR/
 # makeTagDirectory $TAGDIR/qasuz12_8hr_input_rep3 $P139DIR/
 # makeTagDirectory $TAGDIR/qasuz12_12hr_input_rep3 $P139DIR/
 # makeTagDirectory $TAGDIR/qasuz12_24hr_input_rep3 $P139DIR/
-makeTagDirectory $TAGDIR/WT_24hr_input_rep3 $P146DIR/146-18_ChIP_WT_input__S18.bam
+# makeTagDirectory $TAGDIR/WT_24hr_input_rep3 $P146DIR/146-18_ChIP_WT_input__S18.bam
 
 #H3K27me3 96 hr
 #Rep 1
