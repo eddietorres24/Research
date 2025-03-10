@@ -196,15 +196,15 @@ macs3 callpeak -t "${P146DIR}/146-6_ChIP_WT_H3K27me3_Rep1_S6.bam" -c "${P146DIR}
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 #
-# cat cac-1_noWT_K4.bed \
-#                   cac-2_noWT_K4.bed \
-#                   cac-3_noWT_K4.bed \
-#                   set-7_noWT_K4.bed > CAF_K4_ectopic_peaks.bed
+cat WT_noC1_K4me2.bed \
+                  WT_noC2_K4me2.bed  \
+                  WT_noC3_K4me2.bed  \
+                  WT_noS7_K4me2.bed  > CAF_K4_lost_peaks.bed
 #
-# sort -k1,1 -k2,2n CAF_K4_ectopic_peaks.bed > CAF_K4_ectopic_peaks_sorted.bed
-# bedtools sort -i CAF_K4_ectopic_peaks_sorted.bed > CAF_K4_ectopic_peaks_bed_sorted.bed
-#
-# bedtools merge -i CAF_K4_ectopic_peaks_bed_sorted.bed > CAF-1_K4_ectopic_merge_peaks.bed
+sort -k1,1 -k2,2n CAF_K4_lost_peaks.bed > CAF_K4_lost_peaks_sorted.bed
+bedtools sort -i CAF_K4_lost_peaks_sorted.bed > CAF_K4_lost_peaks_bed_sorted.bed
+
+bedtools merge -i CAF_K4_lost_peaks_bed_sorted.bed > CAF-1_K4_lost_merge_peaks.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
