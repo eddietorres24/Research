@@ -182,7 +182,7 @@ caf_dba_ATAC_norm.DB1 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contra
 caf_dba_ATAC_norm.DB2 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 2, th=0.05, bDB = TRUE)
 caf_dba_ATAC_norm.DB3 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 3, th=0.05, bDB = TRUE)
 caf_dba_ATAC_norm.DB4 <- dba.report(caf_dba_ATAC_norm, method=DBA_DESEQ2, contrast = 4, th=0.05, bDB = TRUE)
-export.bed(caf_dba_ATAC_norm.DB4$peaks[[1]],"WT_v_set-7_ATAC_DIFF.bed")
+export.bed(caf_dba_ATAC_norm.DB3$peaks[[1]],"WT_v_cac-3_ATAC_DIFF.bed")
 
 ###saving reports
 # Write to File
