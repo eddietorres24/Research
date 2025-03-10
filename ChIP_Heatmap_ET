@@ -105,11 +105,11 @@ computeMatrix scale-regions -b 500 -a 500 \
     $OUTDIR2/SRR10916163_log.bw \
     -R $BEDDIR2/CAF-1_K4_lost_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
 
-    plotHeatmap -m matrix_PRC2.gz -out WT_no_cac-3_K4_K27_RNA_TSS.png \
+    plotHeatmap -m matrix_PRC2.gz -out WT_no_CAF_K4_K27_RNA_TSS.png \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
                 --startLabel "TSS" \
           			--endLabel "TES" \
-                --sortUsingSamples 6 11 \
+                --sortUsingSamples 1 \
                 --sortUsing sum \
                 --sortRegions descend \
                 --missingDataColor 1 \
