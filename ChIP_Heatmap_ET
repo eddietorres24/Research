@@ -185,7 +185,7 @@ computeMatrix scale-regions -b 500 -a 500 \
                     --sortUsing sum \
                     --sortRegions descend \
                     --outFileSortedRegions heatmap.bed \
-                    --colorMap 'green' \
+                    --colorMap 'Greens' \
                     --zMin 0
 
 
