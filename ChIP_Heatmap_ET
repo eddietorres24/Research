@@ -89,36 +89,36 @@ module load deepTools
 
 #####K4vsK27#######
 
-# computeMatrix scale-regions -b 500 -a 500 \
-#  -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
-#     $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-#     $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
-#     $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-#     $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
-#     $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR2/SRR8269825_log.bw \
-#     $OUTDIR2/SRR8444038_log.bw \
-#     $OUTDIR2/SRR7970629_log.bw \
-#     $OUTDIR2/SRR7970598_log.bw \
-#     $OUTDIR2/SRR10916163_log.bw \
-#     -R $BEDDIR2/CAF-1_K4_lost_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
+computeMatrix scale-regions -b 1000 -a 500 \
+ -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
+    $OUTDIR2/SRR8269825_log.bw \
+    $OUTDIR2/SRR8444038_log.bw \
+    $OUTDIR2/SRR7970629_log.bw \
+    $OUTDIR2/SRR7970598_log.bw \
+    $OUTDIR2/SRR10916163_log.bw \
+    -R $BEDDIR2/cac3_upregulated.bed --skipZeros -o matrix_PRC2.gz
 #
-#     plotHeatmap -m matrix_PRC2.gz -out WT_no_CAF_K4_K27_RNA_TSS.png \
-#                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
-#                 --startLabel "TSS" \
-#           			--endLabel "TES" \
-#                 --sortUsingSamples 1 \
-#                 --sortUsing sum \
-#                 --sortRegions descend \
-#                 --missingDataColor 1 \
-#                 --outFileSortedRegions heatmap.bed \
-#                 --colorList 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, green' 'white, green' 'white, green' 'white, green' 'white, green' 'white, red' 'white, red' 'white, red' 'white, red' 'white, red' \
-#                 --zMin 0 \
-#                 --zMax 16 16 16 16 16 20 20 20 20 20 4 4 4 4 4
+    plotHeatmap -m matrix_PRC2.gz -out WT_no_CAF_K4_K27_RNA_TSS.png \
+                --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
+                --startLabel "TSS" \
+          			--endLabel "TES" \
+                --sortUsingSamples 1 \
+                --sortUsing sum \
+                --sortRegions descend \
+                --missingDataColor 1 \
+                --outFileSortedRegions heatmap.bed \
+                --colorList 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, green' 'white, green' 'white, green' 'white, green' 'white, green' 'white, red' 'white, red' 'white, red' 'white, red' 'white, red' \
+                --zMin 0 \
+                --zMax 16 16 16 16 16 20 20 20 20 20 4 4 4 4 4
 
 
 # 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
@@ -151,17 +151,17 @@ module load deepTools
 #     $OUTDIR2/SRR10916163.bw \
 #     -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
 
-computeMatrix scale-regions -b 500 -a 500 \
- -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-40_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S40.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-41_ChIP_qa-suz12_48hr_H3K27me3_Rep1_S41.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-42_ChIP_qa-suz12_72hr_H3K27me3_Rep1_S42.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-43_ChIP_qa-suz12_96hr_H3K27me3_Rep1_S43.bin_25.smooth_75Bulk.bw \
-    -R $QABED/qa-suz12_no_WT_new.bed --skipZeros -o matrix_qa-suz12.gz
+# computeMatrix scale-regions -b 500 -a 500 \
+#  -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-40_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S40.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-41_ChIP_qa-suz12_48hr_H3K27me3_Rep1_S41.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-42_ChIP_qa-suz12_72hr_H3K27me3_Rep1_S42.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-43_ChIP_qa-suz12_96hr_H3K27me3_Rep1_S43.bin_25.smooth_75Bulk.bw \
+#     -R $QABED/qa-suz12_no_WT_new.bed --skipZeros -o matrix_qa-suz12.gz
 
     # computeMatrix reference-point --referencePoint center -b 3000 -a 3000 \
     #  -S $OUTDIR/137-66_ChIP_WT_H3K27me3_Rep1_S63_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw   \
@@ -175,17 +175,17 @@ computeMatrix scale-regions -b 500 -a 500 \
     #     $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_bwr_qa-suz12_No_WT.png \
-                    --samplesLabel WT 4hr 8hr 12hr 24hr1 24hr2 48hr 72hr 96hr \
-                    --startLabel "5'" \
-              			--endLabel "3'" \
-                    --clusterUsingSamples 1 2 \
-                    --sortUsingSamples 1  \
-                    --sortUsing sum \
-                    --sortRegions descend \
-                    --outFileSortedRegions heatmap.bed \
-                    --colorMap 'Greens' \
-                    --zMin 0
+        # plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_bwr_qa-suz12_No_WT.png \
+        #             --samplesLabel WT 4hr 8hr 12hr 24hr1 24hr2 48hr 72hr 96hr \
+        #             --startLabel "5'" \
+        #       			--endLabel "3'" \
+        #             --clusterUsingSamples 1 2 \
+        #             --sortUsingSamples 1  \
+        #             --sortUsing sum \
+        #             --sortRegions descend \
+        #             --outFileSortedRegions heatmap.bed \
+        #             --colorMap 'Greens' \
+        #             --zMin 0
 
 
 # plotHeatmap -m matrix_qa-suz12.gz -out $OUTDIR1/2025-02-17_qa-suz12_time_1_ET \
