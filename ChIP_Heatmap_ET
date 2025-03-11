@@ -111,14 +111,14 @@ computeMatrix scale-regions -b 1000 -a 500 \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
                 --startLabel "TSS" \
           			--endLabel "TES" \
-                --sortUsingSamples 1 \
+                --sortUsingSamples 4 14 \
                 --sortUsing sum \
                 --sortRegions descend \
                 --missingDataColor 1 \
                 --outFileSortedRegions heatmap.bed \
                 --colorList 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, green' 'white, green' 'white, green' 'white, green' 'white, green' 'white, red' 'white, red' 'white, red' 'white, red' 'white, red' \
                 --zMin 0 \
-                --zMax 16 16 16 16 16 20 20 20 20 20 4 4 4 4 4
+                --zMax 16 16 16 16 16 20 20 20 20 20 5 5 5 5 5
 
 
 # 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
