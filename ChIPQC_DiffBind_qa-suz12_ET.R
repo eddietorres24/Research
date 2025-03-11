@@ -63,7 +63,7 @@ dba.plotVenn(qa_dba_norm, contrast = 1, bDB = TRUE, bGain = TRUE, bLoss = TRUE, 
 dba.plotMA(qa_dba_norm, contrast = 1)
 
 #Volcano Plots
-dba.plotVolcano(qa_dba_norm, contrast = 1)
+dba.plotVolcano(qa_dba_norm, contrast = 4)
 
 #Box Plots
 dba.plotBox(qa_dba_norm, contrast = 1)
@@ -71,7 +71,7 @@ dba.plotBox(qa_dba_norm, contrast = 1)
 #Heatmaps
 ##For Binding Affinity
 hmap <- colorRampPalette(c("red", "black", "green"))(n = 13)
-readscores <- dba.plotHeatmap(qa_dba_norm, contrast=1, correlations=FALSE, scale="row", colScheme = hmap, cexCol = 0.9)
+readscores <- dba.plotHeatmap(qa_dba_norm, contrast=4, correlations=FALSE, scale="row", colScheme = hmap, cexCol = 0.9)
 
 #Profiling
 ###system.file(’extra/plotProfileDemo.Rmd’,package=’DiffBind’)
