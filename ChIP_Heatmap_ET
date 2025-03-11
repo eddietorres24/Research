@@ -153,7 +153,6 @@ module load deepTools
 
 computeMatrix scale-regions -b 500 -a 500 \
  -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
@@ -177,7 +176,7 @@ computeMatrix scale-regions -b 500 -a 500 \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
         plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_bwr_qa-suz12_No_WT.png \
-                    --samplesLabel WT 0hr 4hr 8hr 12hr 24hr1 24hr2 48hr 72hr 96hr \
+                    --samplesLabel WT 4hr 8hr 12hr 24hr1 24hr2 48hr 72hr 96hr \
                     --startLabel "5'" \
               			--endLabel "3'" \
                     --clusterUsingSamples 1 2 \
