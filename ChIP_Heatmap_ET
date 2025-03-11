@@ -107,7 +107,7 @@ computeMatrix scale-regions -b 1000 -a 500 \
     $OUTDIR2/SRR10916163_log.bw \
     -R $BEDDIR2/cac3_upregulated.bed --skipZeros -o matrix_PRC2.gz
 #
-    plotHeatmap -m matrix_PRC2.gz -out WT_no_CAF_K4_K27_RNA_TSS.png \
+    plotHeatmap -m matrix_PRC2.gz -out cac-3_upreg.png \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
                 --startLabel "TSS" \
           			--endLabel "TES" \
