@@ -45,7 +45,7 @@ CorrPlot_count_qa <- plot(qa_dba)
 qa_dba_norm <- dba.normalize(qa_dba, normalize="lib")
 
 #Model design & Contrast (what comparisons do you want to make?)
-qa_dba_norm <- dba.contrast(qa_dba_norm, categories=DBA_FACTOR, minMembers = 2)
+qa_dba_norm <- dba.contrast(qa_dba_norm, categories=~DBA_FACTOR + DBA_TISSUE, minMembers = 2)
 
 #Blacklist
 #qa_dba <- dba.blacklist(qa_dba, blacklist=FALSE, greylist=FALSE)
