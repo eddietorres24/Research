@@ -58,11 +58,10 @@ BiocManager::install("ComplexHeatmap")
 ```
 
 
-
 ```{r ReadBams and countWindows}
 #https://bioconductor.org/packages/release/bioc/manuals/csaw/man/csaw.pdf
 
-#MACS: Call peaks on WT K9me3 and WT K27me3
+#MACS: Call peaks on K27me3, K4me2, and ATAC for CAF mutants &b WT + set-7 controls
 library(csaw) 
 getwd()
 #read in sample sheet
@@ -83,18 +82,61 @@ data_csaw <- windowCounts(samples$bamReads, spacing=300, width=300, shift=0,
 filter=0, bin=TRUE, param=param)
 ```
 
+```{r filter based on K9 and K27 peaks}
+
+#K27peaks <- read.table(file="./All_Peak_files/peakcalls/136-1_ChIP_WT_H3K27me3_abcam_Rep2_peaks.broadPeak")
+K27peaks_merged <- read.table(file="./bed_files/CAF-1_All_K27_merge_peaks.bed")
+K4peaks_merged <- read.table(file="./bed_files/CAF-1_All_K4_merge_peaks.bed")
+ATACpeaks_merged <- read.table(file="./bed_files/CAF-1_All_ATAC_merge_peaks.bed")
+Regions <- read.table(file="./bed_files/CAF-1_All_peaks_K27_K4_ATAC_merge.bed")
+
+#Regions.gr <- GRanges(Regions$V1, IRanges(Regions$V2, Regions$V3))
+
+#K27_Peaks.gr <- GRanges(K27peaks$V1, IRanges(K27peaks$V2, K27peaks$V3))
+K27peaks_merged.gr <- GRanges(K27peaks_merged$V1, IRanges(K27peaks_merged$V2, K27peaks_merged$V3))
+K4peaks_merged.gr <- GRanges(K4peaks_merged$V1, IRanges(K4peaks_merged$V2, K4peaks_merged$V3))
+ATACpeaks_merged.gr <- GRanges(ATACpeaks_merged$V1, IRanges(ATACpeaks_merged$V2, ATACpeaks_merged$V3))
+Regions.gr <- GRanges(Regions$V1, IRanges(Regions$V2, Regions$V3))
+
+#Keep Regions within peaks
+suppressWarnings(keepK27 <- overlapsAny(rowRanges(data_csaw), K27peaks_merged.gr, type = "within"))
+summary(keepK27)
+
+suppressWarnings(keepK4 <- overlapsAny(rowRanges(data_csaw), K4peaks_merged.gr, type = "within"))
+summary(keepK4)
+
+suppressWarnings(keepATAC <- overlapsAny(rowRanges(data_csaw), ATACpeaks_merged.gr, type = "within"))
+summary(keepATAC)
+
+suppressWarnings(keep <- overlapsAny(rowRanges(data_csaw), Regions.gr, type = "within"))
+summary(keep)
+    
+#filter data keeping different regions for each modification
+filtered.dataK27 <- data_csaw[keepK27,]
+filtered.dataK4 <- data_csaw[keepK4,]
+filtered.dataATAC <- data_csaw[keepATAC,]
+##For all regions in K27, K4, ATAC
+filtered.data <- data_csaw[keep,]
+
+#Make dataframe objects for each modification
+K27.Windows.df <- as.data.frame(granges(filtered.dataK27))
+K4.Windows.df <- as.data.frame(granges(filtered.dataK4))
+ATAC.Windows.df <- as.data.frame(granges(filtered.dataATAC))
+All.windows.df <- as.data.frame(granges(filtered.data))
+```
+
 ```{r pre-process data}
 
 ##Filter by global background calculation
-bin.size <- 2000L
-binned <- windowCounts(samples$bamReads, bin=TRUE, width=bin.size, param=param)
+# bin.size <- 2000L
+# binned <- windowCounts(samples$bamReads, bin=TRUE, width=bin.size, param=param)
 
-filter.stat <- filterWindowsGlobal(data_csaw, background=binned)
-keep <- filter.stat$filter > log2(16)
-sum(keep)
+# filter.stat <- filterWindowsGlobal(data_csaw, background=binned)
+# keep <- filter.stat$filter > log2(2)
+# sum(keep)
 
 #filtered data keeping all regions > background
-    filtered.data <- data_csaw[keep,]
+    # filtered.data <- data_csaw[keep,]
 
 
 
@@ -104,12 +146,7 @@ abline(v=log2(2.2), col="red", lwd=2)
 
 
 ##Filter by negative controls #Try this second
-
-
 ```
-
-
-
 
 ```{r prepare edgeR}
 ####################### Analyze differential binding events
@@ -120,22 +157,33 @@ library(edgeR)
 
 grouping <- factor(paste(samples$Strain, samples$Antibody, sep="."))
 
-#create a DGElistK9regions object
+#create a DGElistregions object, this creates an object with a counts DF and a samples DF
+DGElistK27 <- asDGEList(filtered.dataK27, group=factor(grouping)) 
+DGElistK4 <- asDGEList(filtered.dataK4, group=factor(grouping))
+DGElistATAC <- asDGEList(filtered.dataATAC, group=factor(grouping)) 
 DGElist <- asDGEList(filtered.data, group=factor(grouping)) 
-                                        #this creates an object with a counts DF and a samples DF
 
-#replace generic "Sample1, Sample2" names with actual names of samples
+#replace generic "Sample1, Sample2" names with actual names of samples. Do for all mods
+#K27
+colnames(DGElistK27$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+rownames(DGElistK27$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+#K4
+colnames(DGElistK4$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+rownames(DGElistK4$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+#ATAC
+colnames(DGElistATAC$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+rownames(DGElistATAC$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+#All
 colnames(DGElist$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
 rownames(DGElist$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+```
 
-
-
-
-##make a correlation matrix based on counts
+```{r, Rochelle's Data Pre-Analysis}
+##make a correlation matrix based on counts, Rochelle's code to generate Correlation Plot
 #calculate normalization factors
 
 # #calculate cpm
-logCPM <- cpm(DGElist, log = TRUE)
+logCPM <- cpm(DGElistK27, log = TRUE)
 sample_cor <- cor(logCPM, method="pearson")  # Transpose because dist() works on rows
 cor_matrix <- as.matrix(sample_cor)
 
@@ -148,9 +196,8 @@ pheatmap(
     main = "Sample Distance Matrix"
 )
 
-
 #################################################
-#use MDS to plot similarity between samples
+#use MDS to plot similarity between samples, Rochelle's code for a PCA plot
 MDSdata <- plotMDS(DGElist, top=500, col=as.numeric(DGElist$samples$group))
     #plot shows replicates behave well.
 
@@ -160,19 +207,65 @@ mds_df <- data.frame(
 
 LABELS <- rownames(MDSdata@.Data[[5]])
 rownames(mds_df) <- LABELS
-rename_samples <- c("WT H3K27me3 Rep 1",
-                    "cac1 H3K27me3 Rep 1",
-                    "cac2 H3K27me3 Rep 1",
-                    "cac3 H3K27me3 Rep 1",
-                    "WT H3K27me3 Rep 2",
-                    "cac1 H3K27me3 Rep 2",
-                    "cac2 H3K27me3 Rep 2",
-                    "cac3 H3K27me3 Rep 2",
+rename_samples <- c("WT CS H3K27me3 Rep 1",
+                    "WT CS H3K27me3 Rep 2",
+                    "WT CS H3K27me3 Rep 3",
+                    "cac1 CS H3K27me3 Rep 1",
+                    "cac1 CS H3K27me3 Rep 2",
+                    "cac1 CS H3K27me3 Rep 3",
+                    "cac2 CS H3K27me3 Rep 1",
+                    "cac2 CS H3K27me3 Rep 2",
+                    "cac2 CS H3K27me3 Rep 3",
+                    "cac3 CS H3K27me3 Rep 1",
+                    "cac3 CS H3K27me3 Rep 2",
+                    "cac3 CS H3K27me3 Rep 3",
+                    "set7 CS H3K27me3 Rep 1",
+                    "set7 CS H3K27me3 Rep 2",
+                    "set7 CS H3K27me3 Rep 3",
+                    "WT abc H3K27me3 Rep 1",
+                    "WT abc H3K27me3 Rep 2",
+                    "cac1 abc H3K27me3 Rep 1",
+                    "cac1 abc H3K27me3 Rep 2",
+                    "cac2 abc H3K27me3 Rep 1",
+                    "cac2 abc H3K27me3 Rep 2",
+                    "cac3 abc H3K27me3 Rep 1",
+                    "cac3 abc H3K27me3 Rep 2",
+                    "set7 abc H3K27me3 Rep 1",
+                    "set7 abc H3K27me3 Rep 2",
+                    "WT H3K4me2 Rep 1",
+                    "WT H3K4me2 Rep 2",
+                    "cac1 H3K4me2 Rep 1",
+                    "cac1 H3K4me2 Rep 2",
+                    "cac2 H3K4me2 Rep 1",
+                    "cac2 H3K4me2 Rep 2",
+                    "cac3 H3K4me2 Rep 1",
+                    "cac3 H3K4me2 Rep 2",
+                    "set7 H3K4me2 Rep 1",
+                    "set7 H3K4me2 Rep 2",
+                    "WT ATAC Rep 1",
+                    "WT ATAC Rep 2",
+                    "cac1 ATAC Rep 1",
+                    "cac1 ATAC Rep 2",
+                    "cac2 ATAC Rep 1",
+                    "cac2 ATAC Rep 2",
+                    "cac3 ATAC Rep 1",
+                    "cac3 ATAC Rep 2",
+                    "set7 ATAC Rep 1",
+                    "set7 ATAC Rep 2",
                     "WT input Rep 1",
-                    "cac-1 input Rep 1",
-                    "cac-2 input Rep 1",
-                    "cac-3 input Rep 1")
-
+                    "WT input Rep 2",
+                    "WT input Rep 3",
+                    "cac1 input Rep 1",
+                    "cac1 input Rep 2",
+                    "cac1 input Rep 3",
+                    "cac2 input Rep 1",
+                    "cac2 input Rep 2",
+                    "cac2 input Rep 3",
+                    "cac3 input Rep 1",
+                    "cac3 input Rep 2",
+                    "cac3 input Rep 3",
+                    "set7 input Rep 1",
+                    "set7 input Rep 2")
 
 mds_df$label <- rename_samples
 
@@ -181,99 +274,151 @@ require("ggrepel")
 
 #make groups for differential coloring
 
-mds_df$group <- c("WT H3K27me3",
-                  "cac1 H3K27me3",
-                  "cac2 H3K27me3",
-                  "cac3 H3K27me3",
-                  "WT H3K27me3",
-                  "cac1 H3K27me3",
-                  "cac2 H3K27me3",
-                  "cac3 H3K27me3",
-                  "WT Input",
-                  "cac1 Input",
-                  "cac2 Input",
-                  "cac3 Input")
-
+mds_df$group <- c("WT CS H3K27me3",
+                  "WT CS H3K27me3",
+                  "WT CS H3K27me3",
+                  "cac1 CS H3K27me3",
+                  "cac1 CS H3K27me3",
+                  "cac1 CS H3K27me3",
+                  "cac2 CS H3K27me3",
+                  "cac2 CS H3K27me3",
+                  "cac2 CS H3K27me3",
+                  "cac3 CS H3K27me3",
+                  "cac3 CS H3K27me3",
+                  "cac3 CS H3K27me3",
+                  "set7 CS H3K27me3",
+                  "set7 CS H3K27me3",
+                  "set7 CS H3K27me3",
+                  "WT abc H3K27me3",
+                  "WT abc H3K27me3",
+                  "cac1 abc H3K27me3",
+                  "cac1 abc H3K27me3",
+                  "cac2 abc H3K27me3",
+                  "cac2 abc H3K27me3",
+                  "cac3 abc H3K27me3",
+                  "cac3 abc H3K27me3",
+                  "set7 abc H3K27me3",
+                  "set7 abc H3K27me3",
+                  "WT H3K4me2",
+                  "WT H3K4me2",
+                  "cac1 H3K4me2",
+                  "cac1 H3K4me2",
+                  "cac2 H3K4me2",
+                  "cac2 H3K4me2",
+                  "cac3 H3K4me2",
+                  "cac3 H3K4me2",
+                  "set7 H3K4me2",
+                  "set7 H3K4me2",
+                  "WT ATAC",
+                  "WT ATAC",
+                  "cac1 ATAC",
+                  "cac1 ATAC",
+                  "cac2 ATAC",
+                  "cac2 ATAC",
+                  "cac3 ATAC",
+                  "cac3 ATAC",
+                  "set7 ATAC",
+                  "set7 ATAC",
+                  "WT input",
+                  "WT input",
+                  "WT input",
+                  "cac1 input",
+                  "cac1 input",
+                  "cac1 input",
+                  "cac2 input",
+                  "cac2 input",
+                  "cac2 input",
+                  "cac3 input",
+                  "cac3 input",
+                  "cac3 input",
+                  "set7 input",
+                  "set7 input")
 
 #library(ggplot2)
 #require("ggrepel")
 
 #make groups for differential coloring
-input <- subset(mds_df, group %in% c("WT input", "cac1 input", "cac2 input", "cac3 input"))
-K27 <- subset(mds_df, group %in% c("WT H3K27me3", "cac1 H3K27me3", "cac2 H3K27me3", "cac3 H3K27me3"))
+K27 <- subset(mds_df, group %in% c("WT H3K27me3", "cac-1 H3K27me3", "cac-2 H3K27me3", "cac-3 H3K27me3"))
+K4 <- subset(mds_df, group %in% c("WT H4Kme2", "cac-1 H4Kme2", "cac-2 H4Kme2", "cac-3 H4Kme2", "set-7 H4Kme2"))
+ATAC <- subset(mds_df, group %in% c("WT ATAC", "cac-1 ATAC", "cac-2 ATAC", "cac-3 ATAC", "set-7 ATAC"))
+input <- subset(mds_df, group %in% c("WT input", "cac-1 input", "cac-2 input", "cac-3 input", "set-7 input"))
 
-#wt_K9 <- subset(mds_df, label %in% c("WT H3K9me3 rep 1", "WT H3K9me3 rep 2"))
-#set7_K27 <- subset(mds_df, label %in% c("WT H3K27me3 rep 1", "WT H3K27me3 rep 2"))
-#hda_K9 <- subset(mds_df, label %in% c("hda-1 H3K9me3 rep 1", "hda-1 H3K9me3 rep 2"))
-#hda_K27<-  subset(mds_df, label %in% c("hda-1 H3K27me3 rep 1", "hda-1 H3K27me3 rep 2", "hda-1 H3K27me3 rep 3"))
+wt_K9 <- subset(mds_df, label %in% c("WT H3K9me3 rep 1", "WT H3K9me3 rep 2"))
+set7_K27 <- subset(mds_df, label %in% c("WT H3K27me3 rep 1", "WT H3K27me3 rep 2"))
+hda_K9 <- subset(mds_df, label %in% c("hda-1 H3K9me3 rep 1", "hda-1 H3K9me3 rep 2"))
+hda_K27<-  subset(mds_df, label %in% c("hda-1 H3K27me3 rep 1", "hda-1 H3K27me3 rep 2", "hda-1 H3K27me3 rep 3"))
 
 
-#MDSplot_Formated <- ggplot(mds_df, aes(Dimension1, Dimension2)) + geom_point(colour="black", size= 1) +
-   # geom_point(data=wt_IG, colour="grey", size=3) +
- #    geom_point(data=wt_K9, colour="blue", size=3)+
-  #   geom_point(data=wt_K27, colour="darkgreen", size=3)+
-    # geom_point(data=hda_IG, colour="grey", size=3)+
-   #  geom_point(data=hda_K9, colour="blue", size=3)+
-    # geom_point(data=hda_K27, colour="darkgreen", size=3)+
+MDSplot_Formated <- ggplot(mds_df, aes(Dimension1, Dimension2)) + geom_point(colour="black", size= 1) +
+    geom_point(data=K27, colour="darkgreen", size=3) +
+     geom_point(data=K4, colour="pink", size=3)+
+     geom_point(data=ATAC, colour="grey", size=3)+
+      geom_point(data=input, colour="black", size=3)+
+       geom_text_repel(data=K27, direction="both",fontface="italic", nudge_x = -0.5,
+aes(K27$Dimension1, K27$Dimension2,label=K27$label), min.segment.length = .5, point.padding = .7, box.padding = .8, max.overlaps = Inf, size = 4, colour="darkgreen") +
+    geom_text_repel(data=K4, direction="both",fontface="italic",
+aes(K4$Dimension1, K4$Dimension2,label=K4$label), min.segment.length = .5, point.padding = .3, box.padding = .8, max.overlaps = Inf, size = 4, colour="pink") +
+     geom_text_repel(data=ATAC, direction="both",fontface="italic",
+aes(ATAC$Dimension1, ATAC$Dimension2,label=ATAC$label, sep=""), min.segment.length = .5, point.padding = .3, box.padding = .8, max.overlaps = Inf, size = 4, colour="grey") +
+  theme_minimal() +
+    theme(
+    axis.text = element_text(size = 14),   # Adjust tick label size
+    axis.title = element_text(size = 16), # Adjust axis title size
+    plot.title = element_text(size = 18)) + # Adjust plot title size) +
+    labs(
+    title = "MDS Plot",
+    x = "Dimension 1",
+    y = "Dimension 2" )
 
-     #  geom_text_repel(data=wt_K9, direction="both",fontface="italic", nudge_x = -0.5,
-#aes(wt_K9$Dimension1, wt_K9$Dimension2,label=wt_K9$label), min.segment.length = .5, point.padding = .7, box.padding = .8, max.overlaps = Inf, size = 4, colour="blue") +
-#    geom_text_repel(data=wt_K27, direction="both",fontface="italic",
-#aes(wt_K27$Dimension1, wt_K27$Dimension2,label=wt_K27$label), min.segment.length = .5, point.padding = .3, box.padding = .8, max.overlaps = Inf, size = 4, colour="darkgreen") +
- #    geom_text_repel(data=hda_K9, direction="both",fontface="italic",
-#aes(hda_K9$Dimension1, hda_K9$Dimension2,label=paste("\u0394",hda_K9$label, sep="")), min.segment.length = .5, point.padding = .3, box.padding = .8, max.overlaps = Inf, size = 4, colour="blue") +
- #     geom_text_repel(data=hda_K27, direction="both",fontface="italic", nudge_x = 1,
-#aes(hda_K27$Dimension1, hda_K27$Dimension2,label=paste("\u0394",hda_K27$label, sep="")), min.segment.length = .5, point.padding = .3, box.padding = .8, max.overlaps = Inf, size = 4, colour="darkgreen") +
- # theme_minimal() +
-  #  theme(
-   # axis.text = element_text(size = 14),   # Adjust tick label size
-    #axis.title = element_text(size = 16), # Adjust axis title size
-    #plot.title = element_text(size = 18)) + # Adjust plot title size) + 
-    #labs(
-  #  title = "MDS Plot",
-   # x = "Dimension 1 (25%)",
-    #y = "Dimension 2 (34%)" )
-
-#ggsave(filename = "~/Dropbox/DropBOX Documents/2. Zack Papers/2024_HDA1_paper/DataForFigures/Figure 2/FigureS1A_MDSplot.pdf", plot = MDSplot_Formated, dpi=600, height=5, width=5)
+ggsave(filename = "MDSplot.pdf", plot = MDSplot_Formated, dpi=600, height=10, width=10)
 #d1 <- estimateCommonDisp(DGElist, verbose=T)
 
-#design a model matrix to compare groups
+```
+
+```{r, Designing the matrix}
+#design a model matrix to compare groups, This Should be the same for all mods, as it depends on you sample sheet
 design.mat <- model.matrix(~0 + DGElist$samples$group)
 #replace wonky column names with readable ones
 colnames(design.mat) <- levels(DGElist$samples$group)
 ```
 
-
 ```{r Estimate Dispersion}
-y <- estimateDisp(DGElist, design.mat)
+#We need to do this separately for each modification
+yK27 <- estimateDisp(DGElistK27, design.mat)
+yK4 <- estimateDisp(DGElistK4, design.mat)
+yATAC <- estimateDisp(DGElistATAC, design.mat)
+yAll <- estimateDisp(DGElist, design.mat)
+
+#See summary if you want
 summary(y$trended.dispersion)
 
-fit <- glmQLFit(y, design.mat, robust=TRUE)
-summary(fit$var.post)
+#assign fit variable, THIS WILL BE USED FOR DOWNSTREAM ANALYSIS, need to do for each mod
+fitK27 <- glmQLFit(yK27, design.mat, robust=TRUE)
+fitK4 <- glmQLFit(yK4, design.mat, robust=TRUE)
+fitATAC <- glmQLFit(yATAC, design.mat, robust=TRUE)
+fitAll <- glmQLFit(yAll, design.mat, robust=TRUE)
 
+#See summary & head of counts table
+summary(fit$var.post)
 head(y$counts)
 
-
-#plot fit
+#plot fit, replace "y" variables to see fit for different mods
 par(mfrow=c(1,2))
-o <- order(y$AveLogCPM)
-plot(y$AveLogCPM[o], sqrt(y$trended.dispersion[o]), type="l", lwd=2,
+o <- order(yK27$AveLogCPM)
+plot(yK27$AveLogCPM[o], sqrt(yK27$trended.dispersion[o]), type="l", lwd=2,
      ylim=c(0, 1), xlab=expression("Ave."~Log[2]~"CPM"),
      ylab=("Biological coefficient of variation"))
-plotQLDisp(fit)
-
+plotQLDisp(fitK27)
 ```
 
 
-```{r START OF K27 chips}
-
-
+```{r START OF CS K27 chips}
 #set up pairwise contrast
-FC_WTvInput.K27.contrast <- makeContrasts(K27vWT=WT.H3K27me3-WT.input, levels=design.mat)
+FC_WTvInput.K27.contrast <- makeContrasts(K27vWT=WT.H3K27me3_CS-WT.input, levels=design.matK27)
 #analyze data
-FC_WTvI.K27.res <- glmQLFTest(fit, contrast=FC_WTvInput.K27.contrast)
+FC_WTvI.K27.res <- glmQLFTest(fitK27, contrast=FC_WTvInput.K27.contrast)
 #merge results to generate FDR; #calculates FRD on a per-region basis. This is not appropriate here since you have set the window size to 1000
-FC_WTvI.K27.merged <- mergeResults(filtered.data, FC_WTvI.K27.res$table, tol=300, 
+FC_WTvI.K27.merged <- mergeResults(filtered.dataK27, FC_WTvI.K27.res$table, tol=300, 
                             merge.args=list(max.width=300))
 #move FC data into a dataframe
 WTvI.K27.tabular <- FC_WTvI.K27.merged$combined
@@ -282,35 +427,44 @@ WTvI.K27.out.ranges <- FC_WTvI.K27.merged$regions
 #add data to mcols of gRanges object
 mcols(WTvI.K27.out.ranges) <- DataFrame(WTvI.K27.tabular)
 
-##set7 mistakes in naming here- use the WT example 
-FC_cac1vInput.K27.contrast <- makeContrasts(K27vcac1=cac1.H3K27me3-cac1.input,levels=design.mat)
-FC_cac1vInput.res <- glmQLFTest(fit, contrast=FC_cac1vInput.K27.contrast)
-FC_cac1vInput.merged <- mergeResults(filtered.data, FC_cac1vInput.res$table, tol=300, 
+#cac-1
+FC_cac1vInput.K27.contrast <- makeContrasts(K27vcac1=cac1.H3K27me3_CS-cac1.input,levels=design.mat)
+FC_cac1vInput.res <- glmQLFTest(fitK27, contrast=FC_cac1vInput.K27.contrast)
+FC_cac1vInput.merged <- mergeResults(filtered.dataK27, FC_cac1vInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_cac1vInput.K27.tabular <- FC_cac1vInput.merged$combined
 FC_cac1vInput.K27.out.ranges <- FC_cac1vInput.merged$regions
 mcols(FC_cac1vInput.K27.out.ranges) <- DataFrame(FC_cac1vInput.K27.tabular)
 
-#P2
-FC_cac2vInput.K27.contrast <- makeContrasts(K27vcac2=cac2.H3K27me3-cac2.input,levels=design.mat)
-FC_cac2vI.K27.res <- glmQLFTest(fit, contrast=FC_cac2vInput.K27.contrast)
-FC_cac2vI.K27.merged <- mergeResults(filtered.data, FC_cac2vI.K27.res$table, tol=300, 
+#cac-2
+FC_cac2vInput.K27.contrast <- makeContrasts(K27vcac2=cac2.H3K27me3_CS-cac2.input,levels=design.mat)
+FC_cac2vI.K27.res <- glmQLFTest(fitK27, contrast=FC_cac2vInput.K27.contrast)
+FC_cac2vI.K27.merged <- mergeResults(filtered.dataK27, FC_cac2vI.K27.res$table, tol=300, 
                             merge.args=list(max.width=300))
 cac2vI.K27.tabular <- FC_cac2vI.K27.merged$combined
 cac2vI.K27.out.ranges <- FC_cac2vI.K27.merged$regions
 mcols(cac2vI.K27.out.ranges) <- DataFrame(cac2vI.K27.tabular)
 
-#P3
-FC_cac3vInput.K27.contrast <- makeContrasts(K27vcac3=cac3.H3K27me3-cac3.input,levels=design.mat)
-FC_cac3vInput.K27.res <- glmQLFTest(fit, contrast=FC_cac3vInput.K27.contrast)
-FC_cac3vInput.K27.merged <- mergeResults(filtered.data, FC_cac3vInput.K27.res$table, tol=300, 
+#cac-3
+FC_cac3vInput.K27.contrast <- makeContrasts(K27vcac3=cac3.H3K27me3_CS-cac3.input,levels=design.mat)
+FC_cac3vInput.K27.res <- glmQLFTest(fitK27, contrast=FC_cac3vInput.K27.contrast)
+FC_cac3vInput.K27.merged <- mergeResults(filtered.dataK27, FC_cac3vInput.K27.res$table, tol=300, 
                             merge.args=list(max.width=300))
 cac3vInput.K27.tabular <- FC_cac3vInput.K27.merged$combined
 cac3vInput.K27.out.ranges <- FC_cac3vInput.K27.merged$regions
 mcols(cac3vInput.K27.out.ranges) <- DataFrame(cac3vInput.K27.tabular)
 
+#set-7
+FC_set7vInput.K27.contrast <- makeContrasts(K27vset7=set7.H3K27me3_CS-set7.input,levels=design.mat)
+FC_set7vInput.K27.res <- glmQLFTest(fitK27, contrast=FC_set7vInput.K27.contrast)
+FC_set7vInput.K27.merged <- mergeResults(filtered.dataK27, FC_set7vInput.K27.res$table, tol=300,
+                            merge.args=list(max.width=300))
+set7vInput.K27.tabular <- FC_set7vInput.K27.merged$combined
+set7vInput.K27.out.ranges <- FC_set7vInput.K27.merged$regions
+mcols(set7vInput.K27.out.ranges) <- DataFrame(set7vInput.K27.tabular)
 
-K27.chip.Filteredres.df <-data.frame(seqnames=seqnames(WTvI.K27.out.ranges),
+#combine
+K27.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K27.out.ranges),
   start=start(WTvI.K27.out.ranges),
   end=end(WTvI.K27.out.ranges),
   names=c(rep(".", length(WTvI.K27.out.ranges))),
@@ -327,7 +481,10 @@ K27.chip.Filteredres.df <-data.frame(seqnames=seqnames(WTvI.K27.out.ranges),
   FDR_cac2vInput_K27me3 = cac2vI.K27.out.ranges$FDR,
    logFC_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$rep.logFC,
   PValue_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$PValue,
-  FDR_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$FDR)
+  FDR_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$FDR,
+  logFC_set7vInput_K27me3 = set7vInput.K27.out.ranges$rep.logFC,
+  PValue_set7vInput_K27me3 = set7vInput.K27.out.ranges$PValue,
+  FDR_set7vInput_K27me3 = set7vInput.K27.out.ranges$FDR)
 
 
 ##convert all non-sig values to 0
@@ -339,8 +496,9 @@ K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , log
 
 K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K27me3[FDR_cac3vInput_K27me3 > 0.05] <- 0.1)
 
+K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_set7vInput_K27me3[FDR_set7vInput_K27me3 > 0.05] <- 0.1)
 
-K27_FilteredHeatmap_df <- dplyr::select(K27.chip.Filteredres.df_SigOnly,7,10,13,16)
+K27_FilteredHeatmap_df <- dplyr::select(K27.chip.Filteredres.df_SigOnly,7,10,13,16,19)
 
 rownames(K27_FilteredHeatmap_df) <- paste(K27.chip.Filteredres.df_SigOnly$seqnames, K27.chip.Filteredres.df_SigOnly$start, K27.chip.Filteredres.df_SigOnly$end, sep=".")
 ```
@@ -362,7 +520,7 @@ K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat[heatmap_sort_WT, ]
 
 library(ComplexHeatmap)
 K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = F, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort)))) , heatmap_legend_param = list(title = "K27me3"))
-png("./Filtered_Heatmap_cacs_sort.png", width = 800, height = 800)
+png("./Filtered_Heatmap_cacs_K27_WT_sort.png", width = 800, height = 800)
 # Draw the heatmap
 draw(K27_Filtered_hm)
 # Close the device to save the file
@@ -430,6 +588,15 @@ cac3vWT.K27.tabular <- FC_cac3vWT.K27.merged$combined
 cac3vWT.K27.out.ranges <- FC_cac3vWT.K27.merged$regions
 mcols(cac3vWT.K27.out.ranges) <- DataFrame(cac3vWT.K27.tabular)
 
+##set7 versus WT
+# FC_set7vWT.K27.contrast <- makeContrasts(K27_set7vWT=set7.H3K27me3-WT.H3K27me3,levels=design.mat)
+# FC_set7vWT.K27.res <- glmQLFTest(fit, contrast=FC_set7vWT.K27.contrast)
+# FC_set7vWT.K27.merged <- mergeResults(filtered.data, FC_set7vWT.K27.res$table, tol=300, 
+#                             merge.args=list(max.width=300))
+# set7vWT.K27.tabular <- FC_set7vWT.K27.merged$combined
+# set7vWT.K27.out.ranges <- FC_set7vWT.K27.merged$regions
+# mcols(set7vWT.K27.out.ranges) <- DataFrame(set7vWT.K27.tabular)
+
 K27.chip.V.WT.Filteredres.df <-data.frame(seqnames=seqnames(FC_cac1vWT.K27.out.ranges),
                                   start=start(FC_cac1vWT.K27.out.ranges),
                                   end=end(FC_cac1vWT.K27.out.ranges),
@@ -451,7 +618,7 @@ K27.chip.V.WT.Filteredres.df_SigOnly  <- within(K27.chip.V.WT.Filteredres.df, lo
 K27.chip.V.WT.Filteredres.df_SigOnly  <- within(K27.chip.V.WT.Filteredres.df_SigOnly, logFC_cac2vWT_K27[FDR_cac2vWT_K27 > 0.05] <- -.1)
 K27.chip.V.WT.Filteredres.df_SigOnly <- within(K27.chip.V.WT.Filteredres.df_SigOnly, logFC_cac3vWT_K27[FDR_cac3vWT_K27 > 0.05] <- -.1)
 
-###I HAD TO REMOVE THE 16 HERE
+###
 K27Vwt_FilteredHeatmap_df <- dplyr::select(K27.chip.V.WT.Filteredres.df_SigOnly,7,10,13)
 rownames(K27Vwt_FilteredHeatmap_df) <- paste(K27.chip.V.WT.Filteredres.df_SigOnly$seqnames, K27.chip.V.WT.Filteredres.df_SigOnly$start, K27.chip.V.WT.Filteredres.df_SigOnly$end, sep=".")
 
@@ -466,17 +633,18 @@ max <- quantile(K27Vwt_FilteredHeatmap_mat, 0.99) # identify the 98th percentile
 K27Vwt_FilteredHeatmap_mat[K27Vwt_FilteredHeatmap_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
 
 library(circlize)
-col_fun<- colorRamp2(c(-1, 0, quantile(K27Vwt_FilteredHeatmap_mat, 0.99)), c("white","lightgreen", "darkgreen"))
+col_fun<- colorRamp2(c(-1, 0, quantile(K27Vwt_FilteredHeatmap_mat, 0.99)), c("white","white", "darkgreen"))
 col_fun(seq(-1, quantile(K27Vwt_FilteredHeatmap_mat, 0.99), length = 20))
 
-
 K27Vwt_Filtered_hm <- Heatmap(K27Vwt_FilteredHeatmap_mat, col = col_fun, cluster_columns = F, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "K27me3"))
-png("./Filtered_Heatmap_cacs_K27.png", width = 800, height = 800)
+png("Filtered_Heatmap_cacs_v_WT_new_green.png", width = 800, height = 800)
 # Draw the heatmap
 draw(K27Vwt_Filtered_hm)
 # Close the device to save the file
 dev.off()
+
 ```
+
 
 ```{r export K27 vs WT to a bed file for IGV}
 # List of logFC columns to export

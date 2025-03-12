@@ -215,15 +215,14 @@ macs3 callpeak -t "${P146DIR}/146-6_ChIP_WT_H3K27me3_Rep1_S6.bam" -c "${P146DIR}
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 #
-# cat WT_CS_H3K27me3_Rep1_peaks.bed \
-#                   cac-1_CS_H3K27me3_Rep1_peaks.bed \
-#                   cac-2_CS_H3K27me3_Rep1_peaks.bed \
-#                   cac-3_CS_H3K27me3_Rep1_peaks.bed > CAF_All_K27_peaks.bed
+# cat CAF-1_All_ATAC_merge_peaks.bed \
+#                   CAF-1_All_K27_merge_peaks.bed \
+#                   CAF-1_All_K4_merge_peaks.bed  > CAF_All_peaks_K27_K4_ATAC.bed
 # #
-# sort -k1,1 -k2,2n CAF_All_K27_peaks.bed > CAF_All_K27_peaks_sorted.bed
-# bedtools sort -i CAF_All_K27_peaks_sorted.bed > CAF_All_K27_peaks_bed_sorted.bed
+# sort -k1,1 -k2,2n CAF_All_peaks_K27_K4_ATAC.bed > CAF_All_peaks_K27_K4_ATAC_sorted.bed
+# bedtools sort -i CAF_All_peaks_K27_K4_ATAC_sorted.bed > CAF_All_peaks_K27_K4_ATAC_bed_sorted.bed
 #
-# bedtools merge -i CAF_All_K27_peaks_bed_sorted.bed > CAF-1_All_K27_merge_peaks.bed
+# bedtools merge -i CAF_All_peaks_K27_K4_ATAC_bed_sorted.bed > CAF-1_All_peaks_K27_K4_ATAC_merge.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt

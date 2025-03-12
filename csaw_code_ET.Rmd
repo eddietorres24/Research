@@ -149,10 +149,6 @@ K27peaks_merged.gr <- GRanges(K27peaks_merged$V1, IRanges(K27peaks_merged$V2, K2
     #suppressWarnings(keep <- overlapsAny(rowRanges(data_csaw), minusShared, type = "within"))
     #summary(keep)
     #filtered.data <- data_csaw[keep,]
-
-
-
-
 ```
 
 
