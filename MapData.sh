@@ -32,8 +32,8 @@ fi
 
 ###################################
 #input file variables
-  read1="${fastqPath}/${accession}*_R1_001.fastq.gz"
-  read2="${fastqPath}/${accession}*_R2_001.fastq.gz"
+  read1="${fastqPath}/${accession}*.fastq.gz"
+  read2="${fastqPath}/${accession}*.fastq.gz"
 
 #make output file folders
 trimmed="${outdir}/TrimmedFastQs/${accession}"
@@ -54,7 +54,7 @@ bam="${bamdir}/${accession}.bam"
 bigwig="${bwDir}/${accession}"
 peak="$PeakDir/${accession}"
 
-name=${bam/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}
+name=${bam/*_val_1.fq.gz/}
 
 
 ############# Read Trimming ##############
