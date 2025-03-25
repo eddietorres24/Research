@@ -151,8 +151,74 @@ K27peaks_merged.gr <- GRanges(K27peaks_merged$V1, IRanges(K27peaks_merged$V2, K2
     #filtered.data <- data_csaw[keep,]
 ```
 
+```{r, my filtering}
 
+#https://bioconductor.org/packages/release/bioc/manuals/csaw/man/csaw.pdf
 
+#MACS: Call peaks on K27me3, K4me2, and ATAC for CAF mutants &b WT + set-7 controls
+library(csaw) 
+getwd()
+#read in sample sheet
+samples <- read.csv("./csaw_samples_files/cac_csaw.csv")
+
+#samples$bamReads <- paste("~/Desktop/COMPASS/SortedBamFiles/",samples$bamReads, sep="")
+
+##Step 1: create counts for all bins excluding the mat locus, which may be different in different strains
+
+###########remove mat locus               1856250. 1862401 36 - 37
+matLocus <- GRanges("CM002236.1", IRanges(1856288, 1862459)) # mat
+
+##set parameters for windowCounts
+param <- readParam(discard = matLocus, pe="both", max.frag=1500, minq=20 )
+
+#read counts from bam files
+data_csaw <- windowCounts(samples$bamReads, spacing=300, width=300, shift=0,
+filter=0, bin=TRUE, param=param)
+```
+
+```{r filter based on K9 and K27 peaks}
+
+#K27peaks <- read.table(file="./All_Peak_files/peakcalls/136-1_ChIP_WT_H3K27me3_abcam_Rep2_peaks.broadPeak")
+K27peaks_merged <- read.table(file="./bed_files/CAF-1_All_K27_merge_peaks.bed")
+K4peaks_merged <- read.table(file="./bed_files/CAF-1_All_K4_merge_peaks.bed")
+ATACpeaks_merged <- read.table(file="./bed_files/CAF-1_All_ATAC_merge_peaks.bed")
+Regions <- read.table(file="./bed_files/CAF-1_All_peaks_K27_K4_ATAC_merge.bed")
+
+#Regions.gr <- GRanges(Regions$V1, IRanges(Regions$V2, Regions$V3))
+
+#K27_Peaks.gr <- GRanges(K27peaks$V1, IRanges(K27peaks$V2, K27peaks$V3))
+K27peaks_merged.gr <- GRanges(K27peaks_merged$V1, IRanges(K27peaks_merged$V2, K27peaks_merged$V3))
+K4peaks_merged.gr <- GRanges(K4peaks_merged$V1, IRanges(K4peaks_merged$V2, K4peaks_merged$V3))
+ATACpeaks_merged.gr <- GRanges(ATACpeaks_merged$V1, IRanges(ATACpeaks_merged$V2, ATACpeaks_merged$V3))
+Regions.gr <- GRanges(Regions$V1, IRanges(Regions$V2, Regions$V3))
+
+#Keep Regions within peaks
+suppressWarnings(keepK27 <- overlapsAny(rowRanges(data_csaw), K27peaks_merged.gr, type = "within"))
+summary(keepK27)
+
+suppressWarnings(keepK4 <- overlapsAny(rowRanges(data_csaw), K4peaks_merged.gr, type = "within"))
+summary(keepK4)
+
+suppressWarnings(keepATAC <- overlapsAny(rowRanges(data_csaw), ATACpeaks_merged.gr, type = "within"))
+summary(keepATAC)
+
+suppressWarnings(keep <- overlapsAny(rowRanges(data_csaw), Regions.gr, type = "within"))
+summary(keep)
+    
+#filter data keeping different regions for each modification
+filtered.dataK27 <- data_csaw[keepK27,]
+filtered.dataK4 <- data_csaw[keepK4,]
+filtered.dataATAC <- data_csaw[keepATAC,]
+##For all regions in K27, K4, ATAC
+filtered.data <- data_csaw[keep,]
+
+#Make dataframe objects for each modification
+K27.Windows.df <- as.data.frame(granges(filtered.dataK27))
+K4.Windows.df <- as.data.frame(granges(filtered.dataK4))
+ATAC.Windows.df <- as.data.frame(granges(filtered.dataATAC))
+All.windows.df <- as.data.frame(granges(filtered.data))
+```
+```
 ##Try setting up edgeR for each modification. This should better estimate dispersion
 ```{r prepare edgeR}
 ####################### Analyze differential binding events
