@@ -235,14 +235,14 @@ module load MACS3
 #                                ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed \
 #                                ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_overlap_peaks.bed
 
-cat qa-suz12_12hr_H3K27me3_Rep3_peaks.bed \
-    qa-suz12_24hr_H3K27me3_Rep3_peaks.bed \
-    WT_24hr_rep2.bed > qa-suz12_plus_WT.bed
-
-sort -k1,1 -k2,2n qa-suz12_plus_WT.bed > qa-suz12_plus_WT_sorted.bed
-bedtools sort -i qa-suz12_plus_WT_sorted.bed > qa-suz12_plus_WT_bed_sorted.bed
-
-bedtools merge -i qa-suz12_plus_WT_bed_sorted.bed > qa-suz12_WT_merge_peaks.bed
+# cat qa-suz12_12hr_H3K27me3_Rep3_peaks.bed \
+#     qa-suz12_24hr_H3K27me3_Rep3_peaks.bed \
+#     WT_macs_24hr_rep2.bed > qa-suz12_plus_WT.bed
+#
+# sort -k1,1 -k2,2n qa-suz12_plus_WT.bed > qa-suz12_plus_WT_sorted.bed
+# bedtools sort -i qa-suz12_plus_WT_sorted.bed > qa-suz12_plus_WT_bed_sorted.bed
+#
+# bedtools merge -i qa-suz12_plus_WT_bed_sorted.bed > qa-suz12_WT_merge_peaks.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
