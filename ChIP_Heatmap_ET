@@ -216,7 +216,7 @@ computeMatrix scale-regions --scale 0.5 \
                     --clusterUsingSamples 1 2 3 \
                     --sortUsingSamples 1 2 3 \
                     --sortUsing sum \
-                    --hclust 2 \
+                    --hclust 3 \
                     --sortRegions descend \
                     --outFileSortedRegions heatmap.bed \
                     --colorMap 'Greens' \
