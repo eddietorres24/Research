@@ -50,13 +50,13 @@ module load MACS3
 
 #H3K27me3 24 hr
 #Rep 1
-macs3 callpeak -t "${P137DIR}/137-66_ChIP_WT_H3K27me3_Rep1_S63.bam" -c "${P139DIR}/139-29_ChIP_WT_Input__S29.bam" -f BAMPE -n "WT_0hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/WT_0hr" --min-length 650 --max-gap 375
-macs3 callpeak -t "${P137DIR}/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bam" -c "${P139DIR}/139-30_ChIP_qa-suz12_Input__S30.bam" -f BAMPE -n "qa-suz12_0hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_0hr" --min-length 650 --max-gap 375
-macs3 callpeak -t "${P137DIR}/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66.bam" -c "${P139DIR}/139-32_ChIP_qa-suz12_Input__S32.bam" -f BAMPE -n "qa-suz12_4hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_4hr" --min-length 650 --max-gap 375
-macs3 callpeak -t "${P137DIR}/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68.bam" -c "${P139DIR}/139-34_ChIP_qa-suz12_Input__S34.bam" -f BAMPE -n "qa-suz12_8hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_8hr" --min-length 650 --max-gap 375
-macs3 callpeak -t "${P137DIR}/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70.bam" -c "${P139DIR}/139-36_ChIP_qa-suz12_Input__S36.bam" -f BAMPE -n "qa-suz12_12hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_12hr" --min-length 650 --max-gap 375
-macs3 callpeak -t "${P137DIR}/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72.bam" -c "${P139DIR}/139-38_ChIP_qa-suz12_Input__S38.bam" -f BAMPE -n "qa-suz12_24hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_24hr" --min-length 650 --max-gap 375
-macs3 callpeak -t "${P137DIR}/137-74_ChIP_WT_H3K27me3_Rep1_S71.bam" -c "${P139DIR}/139-37_ChIP_WT_Input__S37.bam" -f BAMPE -n "WT_24hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/WT_24hr" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${P137DIR}/137-66_ChIP_WT_H3K27me3_Rep1_S63.bam" -c "${P139DIR}/139-29_ChIP_WT_Input__S29.bam" -f BAMPE -n "WT_0hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/WT_0hr" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${P137DIR}/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bam" -c "${P139DIR}/139-30_ChIP_qa-suz12_Input__S30.bam" -f BAMPE -n "qa-suz12_0hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_0hr" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${P137DIR}/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66.bam" -c "${P139DIR}/139-32_ChIP_qa-suz12_Input__S32.bam" -f BAMPE -n "qa-suz12_4hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_4hr" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${P137DIR}/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68.bam" -c "${P139DIR}/139-34_ChIP_qa-suz12_Input__S34.bam" -f BAMPE -n "qa-suz12_8hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_8hr" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${P137DIR}/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70.bam" -c "${P139DIR}/139-36_ChIP_qa-suz12_Input__S36.bam" -f BAMPE -n "qa-suz12_12hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_12hr" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${P137DIR}/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72.bam" -c "${P139DIR}/139-38_ChIP_qa-suz12_Input__S38.bam" -f BAMPE -n "qa-suz12_24hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/qa-suz12_24hr" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${P137DIR}/137-74_ChIP_WT_H3K27me3_Rep1_S71.bam" -c "${P139DIR}/139-37_ChIP_WT_Input__S37.bam" -f BAMPE -n "WT_24hr_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/WT_24hr" --min-length 650 --max-gap 375
 #
 # #Rep 2
 # macs3 callpeak -t "${P144DIR}/144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam" -c "${P144DIR}/144-62_ChIP_WT_Input__S62.bam" -f BAMPE -n "WT_0hr_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/WT_0hr" --min-length 650 --max-gap 375
@@ -68,12 +68,12 @@ macs3 callpeak -t "${P137DIR}/137-74_ChIP_WT_H3K27me3_Rep1_S71.bam" -c "${P139DI
 # macs3 callpeak -t "${P144DIR}/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bam" -c "${P139DIR}/139-38_ChIP_qa-suz12_Input__S38.bam" -f BAMPE -n "WT_24hr_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/WT_24hr" --min-length 650 --max-gap 375
 
 #Rep 3
-macs3 callpeak -t "${P146DIR}/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bam" -c "${P139DIR}/139-30_ChIP_qa-suz12_Input__S30.bam" -f BAMPE -n "qa-suz12_0hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/qa-suz12_0hr" --min-length 650 --max-gap 250
-macs3 callpeak -t "${P146DIR}/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bam" -c "${P139DIR}/139-32_ChIP_qa-suz12_Input__S32.bam" -f BAMPE -n "qa-suz12_4hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/qa-suz12_4hr" --min-length 650 --max-gap 250
-macs3 callpeak -t "${P146DIR}/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bam" -c "${P139DIR}/139-34_ChIP_qa-suz12_Input__S34.bam" -f BAMPE -n "qa-suz12_8hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/qa-suz12_8hr" --min-length 650 --max-gap 250
-macs3 callpeak -t "${P146DIR}/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bam" -c "${P139DIR}/139-36_ChIP_qa-suz12_Input__S36.bam" -f BAMPE -n "qa-suz12_12hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/qa-suz12_12hr" --min-length 650 --max-gap 250
-macs3 callpeak -t "${P146DIR}/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bam" -c "${P139DIR}/139-38_ChIP_qa-suz12_Input__S38.bam" -f BAMPE -n "qa-suz12_24hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/qa-suz12_24hr" --min-length 650 --max-gap 250
-macs3 callpeak -t "${P146DIR}/146-6_ChIP_WT_H3K27me3_Rep1_S6.bam" -c "${P146DIR}/146-18_ChIP_WT_input__S18.bam" -f BAMPE -n "WT_24hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/WT_24hr" --min-length 650 --max-gap 250
+# macs3 callpeak -t "${P146DIR}/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bam" -c "${P139DIR}/139-30_ChIP_qa-suz12_Input__S30.bam" -f BAMPE -n "qa-suz12_0hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/qa-suz12_0hr" --min-length 650 --max-gap 250
+# macs3 callpeak -t "${P146DIR}/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bam" -c "${P139DIR}/139-32_ChIP_qa-suz12_Input__S32.bam" -f BAMPE -n "qa-suz12_4hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/qa-suz12_4hr" --min-length 650 --max-gap 250
+# macs3 callpeak -t "${P146DIR}/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bam" -c "${P139DIR}/139-34_ChIP_qa-suz12_Input__S34.bam" -f BAMPE -n "qa-suz12_8hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/qa-suz12_8hr" --min-length 650 --max-gap 250
+# macs3 callpeak -t "${P146DIR}/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bam" -c "${P139DIR}/139-36_ChIP_qa-suz12_Input__S36.bam" -f BAMPE -n "qa-suz12_12hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/qa-suz12_12hr" --min-length 650 --max-gap 250
+# macs3 callpeak -t "${P146DIR}/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bam" -c "${P139DIR}/139-38_ChIP_qa-suz12_Input__S38.bam" -f BAMPE -n "qa-suz12_24hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/qa-suz12_24hr" --min-length 650 --max-gap 250
+macs3 callpeak -t "${P146DIR}/144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam" -c "${P146DIR}/146-18_ChIP_WT_input__S18.bam" -f BAMPE -n "WT_24hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/WT_24hr" --min-length 650 --max-gap 250
 
 #H3K27me3 96 hr
 #Rep 1
