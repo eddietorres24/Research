@@ -199,7 +199,6 @@ module load deepTools
                     --samplesLabel WT0hr WT24hr 0hr 4hr 8hr 12hr 24hr \
                     --startLabel "5'" \
               			--endLabel "3'" \
-                    --clusterUsingSamples 1 2 \
                     --sortUsingSamples 1 \
                     --sortUsing sum \
                     --hclust 2 \
