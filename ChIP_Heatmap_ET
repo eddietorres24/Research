@@ -195,7 +195,7 @@ computeMatrix scale-regions \
                     --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
                     --startLabel "5'" \
               			--endLabel "3'" \
-                    --clusterUsingSamples 1 2 \
+                    --clusterUsingSamples 1 6 \
                     --sortUsingSamples 1  \
                     --sortUsing sum \
                     --hclust 3 \
