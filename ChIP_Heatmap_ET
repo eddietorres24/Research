@@ -213,6 +213,7 @@ computeMatrix scale-regions -bs 2 --scale 0.5 \
                     --startLabel "3'" \
               			--endLabel "5'" \
                     --missingDataColor 1 \
+                    --clusterUsingSamples 1 2 \
                     --sortUsing sum \
                     --hclust 2 \
                     --sortRegions descend \
