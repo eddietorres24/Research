@@ -191,14 +191,14 @@ module load deepTools
     #     $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_green_qa-suz12_kmeans_3_clust1.png \
+        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_green_qa-suz12_kmeans_2.png \
                     --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
                     --startLabel "5'" \
               			--endLabel "3'" \
-                    --clusterUsingSamples 1 \
+                    --clusterUsingSamples 1 5 6 \
                     --sortUsingSamples 1 \
                     --sortUsing sum \
-                    --kmeans 3 \
+                    --kmeans 2 \
                     --sortRegions descend \
                     --outFileSortedRegions heatmap.bed \
                     --colorMap 'Greens' \
