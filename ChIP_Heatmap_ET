@@ -210,9 +210,9 @@ computeMatrix reference-point --referencePoint center -a 1500 -b 1500 -bs 5 \
 
         plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_green_qa-suz12_ref_hclust.png \
                     --samplesLabel WT0hr WT24hr 0hr 4hr 8hr 12hr 24hr \
-                    --startLabel "-1.5kb" \
-              			--endLabel "1.5kb'" \
-                    --missingDataColor "white" \
+                    --startLabel "3'" \
+              			--endLabel "5'" \
+                    --missingDataColor 1 \
                     --clusterUsingSamples 1 2 \
                     --sortUsingSamples 1 \
                     --sortUsing sum \
