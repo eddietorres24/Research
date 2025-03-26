@@ -184,7 +184,7 @@ computeMatrix scale-regions \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
         plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_green_qa-suz12_reps.png \
-                    --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
+                    --samplesLabel WT 0hr 4hr 8hr 12hr 24hr WT 0hr 4hr 8hr 12hr 24hr \
                     --startLabel "5'" \
               			--endLabel "3'" \
                     --clusterUsingSamples 1 2 \
