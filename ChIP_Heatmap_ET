@@ -152,13 +152,17 @@ module load deepTools
 #     -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
 
 computeMatrix scale-regions \
- -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
+ -S $P144DIR/144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam \
+    $P144DIR/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bam \
     $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
-    -R $QABED/qa-suz12_rep3_merge_peaks.bed  --skipZeros -o matrix_qa-suz12.gz
+    -R $QABED/qa-suz12_WT_merge_peaks --skipZeros -o matrix_qa-suz12.gz
+
+    # 144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam
+    # 144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bam
 
     # $P137DIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bin_25.smooth_75Bulk.bw \
     #    $P137DIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bin_25.smooth_75Bulk.bw \
@@ -192,10 +196,10 @@ computeMatrix scale-regions \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
         plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_green_qa-suz12_hclust.png \
-                    --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
+                    --samplesLabel WT0hr WT24hr 0hr 4hr 8hr 12hr 24hr \
                     --startLabel "5'" \
               			--endLabel "3'" \
-                    --clusterUsingSamples 1 5 6 \
+                    --clusterUsingSamples 1 2 6 7 \
                     --sortUsingSamples 1 \
                     --sortUsing sum \
                     --hclust 2 \
@@ -349,6 +353,80 @@ computeMatrix scale-regions \
 # 141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw
 # 141-N14_ATAC_cac-3__Rep1_S103.bin_25.smooth_75Bulk.bw
 # 141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw
+
+#Run144
+# 144-10_ChIP_tetO_p0_H3K27me3_Rep3_S10.bam
+# 144-11_ChIP_tetO_p1_H3K27me3_Rep3_S11.bam
+# 144-122_ChIP_tetO_p3_input__S122.bam
+# 144-124_ChIP_tetO_p1_input__S124.bam
+# 144-125_ChIP_tetO_p2_input__S125.bam
+# 144-126_ChIP_tetO_p3_input__S126.bam
+# 144-127_ChIP_tetO_p0_tet_input__S127.bam
+# 144-12_ChIP_tetO_p2_H3K27me3_Rep3_S12.bam
+# 144-132_ChIP_qa-suz12_Input__S132.bam
+# 144-13_ChIP_tetO_p3_H3K27me3_Rep3_S13.bam
+# 144-141_ChIP_qa-suz12_24hr_H3K27me2_Rep1_S141.bam
+# 144-14_ChIP_tetO_p0_H3K27me3_Rep4_S14.bam
+# 144-15_ChIP_tetO_p1_H3K27me3_Rep4_S15.bam
+# 144-16_ChIP_tetO_p2_H3K27me3_Rep4_S16.bam
+# 144-17_ChIP_tetO_p3_H3K27me3_Rep4_S17.bam
+# 144-18_ChIP_tetO_p0_H3K36me3_Rep1_S18.bam
+# 144-19_ChIP_tetO_p1_H3K36me3_Rep1_S19.bam
+# 144-1_ChIP_tetO_p0_H3K27me3_Rep2_S1.bam
+# 144-20_ChIP_tetO_p2_H3K36me3_Rep1_S20.bam
+# 144-21_ChIP_tetO_p3_H3K36me3_Rep1_S21.bam
+# 144-22_ChIP_tetO_p0_H3K36me3_Rep2_S22.bam
+# 144-23_ChIP_tetO_p1_H3K36me3_Rep2_S23.bam
+# 144-24_ChIP_tetO_p2_H3K36me3_Rep2_S24.bam
+# 144-25_ChIP_tetO_p3_H3K36me3_Rep2_S25.bam
+# 144-26_ChIP_tetO_p0_tet_H3K27me3_Rep2_S26.bam
+# 144-27_ChIP_tetO_p0_tet_H3K36me3_Rep2_S27.bam
+# 144-28_ChIP_WT_0hr_H3K27me3_Rep3_S28.bam
+# 144-29_ChIP_WT_24hr_H3K27me3_Rep2_S29.bam
+# 144-2_ChIP_tetO_p1_H3K27me3_Rep2_S2.bam
+# 144-30_ChIP_qa-suz12_0hr_H3K27me3_Rep3_S30.bam
+# 144-31_ChIP_qa-suz12_4hr_H3K27me3_Rep2_S31.bam
+# 144-32_ChIP_qa-suz12_8hr_H3K27me3_Rep2_S32.bam
+# 144-33_ChIP_qa-suz12_12hr_H3K27me3_Rep2_S33.bam
+# 144-34_ChIP_qa-suz12_24hr_H3K27me3_Rep3_S34.bam
+# 144-35_ChIP_qa-suz12_48hr_H3K27me3_Rep2_S35.bam
+# 144-37_ChIP_suz12_24hr_H3K27me3_Rep1_S37.bam
+# 144-38_ChIP_qa-suz12_cac-1_0hr_H3K27me3_Rep2_S38.bam
+# 144-39_ChIP_qa-suz12_cac-1_4hr_H3K27me3_Rep1_S39.bam
+# 144-3_ChIP_tetO_p2_H3K27me3_Rep2_S3.bam
+# 144-40_ChIP_qa-suz12_cac-1_8hr_H3K27me3_Rep1_S40.bam
+# 144-41_ChIP_qa-suz12_cac-1_12hr_H3K27me3_Rep2_S41.bam
+# 144-42_ChIP_qa-suz12_cac-1_24hr_H3K27me3_Rep2_S42.bam
+# 144-43_ChIP_qa-suz12_cac-1_48hr_H3K27me3_Rep2_S43.bam
+# 144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam
+# 144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bam
+# 144-46_ChIP_suz12_0hr_H3K27me3_Rep2_S46.bam
+# 144-47_ChIP_suz12_24hr_H3K27me3_Rep2_S47.bam
+# 144-48_ChIP_qa-suz12_0hr_H3K27me3_Rep4_S48.bam
+# 144-49_ChIP_qa-suz12_4hr_H3K27me3_Rep3_S49.bam
+# 144-4_ChIP_tetO_p3_H3K27me3_Rep2_S4.bam
+# 144-50_ChIP_qa-suz12_8hr_H3K27me3_Rep3_S50.bam
+# 144-51_ChIP_qa-suz12_12hr_H3K27me3_Rep3_S51.bam
+# 144-52_ChIP_qa-suz12_24hr_H3K27me3_Rep4_S52.bam
+# 144-53_ChIP_WT_0hr_H3K27me2_Rep1_S53.bam
+# 144-54_ChIP_WT_24hr_H3K27me2_Rep1_S54.bam
+# 144-55_ChIP_suz12_0hr_H3K27me2_Rep1_S55.bam
+# 144-56_ChIP_suz12_24hr_H3K27me2_Rep1_S56.bam
+# 144-57_ChIP_qa-suz12_0hr_H3K27me2_Rep1_S57.bam
+# 144-58_ChIP_qa-suz12_4hr_H3K27me2_Rep1_S58.bam
+# 144-59_ChIP_qa-suz12_8hr_H3K27me2_Rep1_S59.bam
+# 144-5_ChIP_tetO_p0_tet_H3K27me3_Rep2_S5.bam
+# 144-60_ChIP_qa-suz12_12hr_H3K27me2_Rep1_S60.bam
+# 144-62_ChIP_WT_Input__S62.bam
+# 144-69_ChIP_suz12_Input__S69.bam
+# 144-6_ChIP_tetO_cac-1_p0_H3K27me3_Rep2_S6.bam
+# 144-71_ChIP_qa-suz12_Input__S71.bam
+# 144-73_ChIP_qa-suz12_Input__S73.bam
+# 144-79_ChIP_qa-suz12_Input__S79.bam
+# 144-7_ChIP_tetO_cac-1_p1_H3K27me3_Rep2_S7.bam
+# 144-8_ChIP_tetO_cac-1_p2_H3K27me3_Rep2_S8.bam
+# 144-9_ChIP_tetO_cac-1_p3_H3K27me3_Rep2_S9.bam
+
 
 #Run 146
 # 146-106_ChIP_epr-1GFP_GFP-trap_Rep1_S125.bin_25.smooth_75Bulk.bw

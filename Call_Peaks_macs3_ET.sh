@@ -73,7 +73,7 @@ module load MACS3
 # macs3 callpeak -t "${P146DIR}/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bam" -c "${P139DIR}/139-34_ChIP_qa-suz12_Input__S34.bam" -f BAMPE -n "qa-suz12_8hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/qa-suz12_8hr" --min-length 650 --max-gap 250
 # macs3 callpeak -t "${P146DIR}/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bam" -c "${P139DIR}/139-36_ChIP_qa-suz12_Input__S36.bam" -f BAMPE -n "qa-suz12_12hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/qa-suz12_12hr" --min-length 650 --max-gap 250
 # macs3 callpeak -t "${P146DIR}/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bam" -c "${P139DIR}/139-38_ChIP_qa-suz12_Input__S38.bam" -f BAMPE -n "qa-suz12_24hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/qa-suz12_24hr" --min-length 650 --max-gap 250
-macs3 callpeak -t "${P146DIR}/144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam" -c "${P146DIR}/146-18_ChIP_WT_input__S18.bam" -f BAMPE -n "WT_24hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/WT_24hr" --min-length 650 --max-gap 250
+# macs3 callpeak -t "${P146DIR}/ -c "${P146DIR}/146-18_ChIP_WT_input__S18.bam" -f BAMPE -n "WT_24hr_H3K27me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/WT_24hr" --min-length 650 --max-gap 250
 
 #H3K27me3 96 hr
 #Rep 1
@@ -215,13 +215,13 @@ macs3 callpeak -t "${P146DIR}/144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam" -c "${P1
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 #
-cat CAF-1_All_K27_merge_peaks.bed \
-                  CAF-1_All_K4_merge_peaks.bed  > CAF_All_peaks_K27_K4.bed
+# cat CAF-1_All_K27_merge_peaks.bed \
+#                   CAF-1_All_K4_merge_peaks.bed  > CAF_All_peaks_K27_K4.bed
+# #
+# sort -k1,1 -k2,2n CAF_All_peaks_K27_K4.bed > CAF_All_peaks_K27_K4_sorted.bed
+# bedtools sort -i CAF_All_peaks_K27_K4_sorted.bed > CAF_All_peaks_K27_K4_bed_sorted.bed
 #
-sort -k1,1 -k2,2n CAF_All_peaks_K27_K4.bed > CAF_All_peaks_K27_K4_sorted.bed
-bedtools sort -i CAF_All_peaks_K27_K4_sorted.bed > CAF_All_peaks_K27_K4_bed_sorted.bed
-
-bedtools merge -i CAF_All_peaks_K27_K4_bed_sorted.bed > CAF-1_All_peaks_K27_K4_merge.bed
+# bedtools merge -i CAF_All_peaks_K27_K4_bed_sorted.bed > CAF-1_All_peaks_K27_K4_merge.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
@@ -235,13 +235,14 @@ bedtools merge -i CAF_All_peaks_K27_K4_bed_sorted.bed > CAF-1_All_peaks_K27_K4_m
 #                                ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed \
 #                                ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_overlap_peaks.bed
 
-# cat qa-suz12_12hr_H3K27me3_Rep3_peaks.bed \
-#                                 qa-suz12_24hr_H3K27me3_Rep3_peaks.bed  > qa-suz12_rep3_comb_peaks.bed
-#
-# sort -k1,1 -k2,2n qa-suz12_rep3_comb_peaks.bed > qa-suz12_rep3_comb_peaks_sorted.bed
-# bedtools sort -i qa-suz12_rep3_comb_peaks_sorted.bed > qa-suz12_rep3_comb_peaks_bed_sorted.bed
-#
-# bedtools merge -i qa-suz12_rep3_comb_peaks_bed_sorted.bed > qa-suz12_rep3_merge_peaks.bed
+cat qa-suz12_12hr_H3K27me3_Rep3_peaks.bed \
+    qa-suz12_24hr_H3K27me3_Rep3_peaks.bed \
+    WT_24hr_rep2.bed > qa-suz12_plus_WT.bed
+
+sort -k1,1 -k2,2n qa-suz12_plus_WT.bed > qa-suz12_plus_WT_sorted.bed
+bedtools sort -i qa-suz12_plus_WT_sorted.bed > qa-suz12_plus_WT_bed_sorted.bed
+
+bedtools merge -i qa-suz12_plus_WT_bed_sorted.bed > qa-suz12_WT_merge_peaks.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
