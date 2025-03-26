@@ -163,15 +163,15 @@ module load deepTools
 #     -R $QABED/qa-suz12_WT_merge_peaks.bed --skipZeros -o matrix_qa-suz12.gz
 
 ###scale-regions
-computeMatrix scale-regions -bs 2 --scale 0.5 \
- -S $P144DIR/144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bin_25.smooth_75Bulk.bw \
-    $P144DIR/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
-    -R $QABED/qa-suz12_WT_merge_peaks.bed --skipZeros -o matrix_qa-suz12.gz
+# computeMatrix scale-regions -bs 2 --scale 0.5 \
+#  -S $P144DIR/144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bin_25.smooth_75Bulk.bw \
+#     $P144DIR/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
+#     -R $QABED/qa-suz12_WT_merge_peaks.bed --skipZeros -o matrix_qa-suz12.gz
 
 
     # 144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam
@@ -208,14 +208,14 @@ computeMatrix scale-regions -bs 2 --scale 0.5 \
     #     $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_green_qa-suz12_0.5scale_hclust_All.png \
+        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_green_qa-suz12_0.5scale_kmeans_All.png \
                     --samplesLabel WT0hr WT24hr 0hr 4hr 8hr 12hr 24hr \
                     --startLabel "3'" \
               			--endLabel "5'" \
                     --missingDataColor 1 \
                     --clusterUsingSamples 1 2 \
                     --sortUsing sum \
-                    --hclust 2 \
+                    --kmeans 2 \
                     --sortRegions descend \
                     --outFileSortedRegions heatmap.bed \
                     --colorMap 'Greens' \
