@@ -32,8 +32,8 @@ fi
 
 ###################################
 #input file variables
-  read1="${fastqPath}/${accession}*.fastq.gz"
-  read2="${fastqPath}/${accession}*.fastq.gz"
+  read1="${fastqPath}/${accession}*_1.fastq.gz"
+  read2="${fastqPath}/${accession}*_2.fastq.gz"
 
 #make output file folders
 trimmed="${outdir}/TrimmedFastQs/${accession}"
