@@ -221,7 +221,7 @@ computeMatrix scale-regions -bs 4 \
                     --sortRegions descend \
                     --legendLocation none \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, lightgreen, g, darkgreen' \
+                    --colorList 'white, darkseagreen, g, darkgreen' \
                     --zMin 0
 
 
