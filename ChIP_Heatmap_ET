@@ -210,7 +210,7 @@ computeMatrix scale-regions -bs 4 \
     #     $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_green_qa-suz12_0.25scale_manual_noleg.pdf \
+        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_greens_qa-suz12_manual.pdf \
                     --samplesLabel WT0hr WT24hr 0hr 4hr 8hr 12hr 24hr \
                     --startLabel "5'" \
               			--endLabel "3'" \
