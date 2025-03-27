@@ -218,12 +218,12 @@ module load deepTools
                     --missingDataColor 1 \
                     --sortUsing sum \
                     --sortRegions descend \
-                    --sortUsingSamples 1 2 \
+                    --sortUsingSamples 1 2 7 \
                     --legendLocation none \
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'white, darkseagreen, g' \
                     --zMin 0 \
-                    --zMax 70
+                    --zMax 60
 
 
 # plotHeatmap -m matrix_qa-suz12.gz -out $OUTDIR1/2025-02-17_qa-suz12_time_1_ET \
