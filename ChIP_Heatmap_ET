@@ -217,7 +217,6 @@ module load deepTools
                     --whatToShow "heatmap and colorbar" \
                     --missingDataColor 1 \
                     --sortUsing sum \
-                    --sortUsingSamples 1 2 \
                     --sortRegions descend \
                     --legendLocation none \
                     --outFileSortedRegions heatmap.bed \
