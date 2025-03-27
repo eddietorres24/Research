@@ -205,7 +205,7 @@ module load MACS3
 
 # bedtools intersect -a -b -wa
 # bedtools intersect -a -b -v
-
+# bedtools intersect -a qa-suz12_WT_merge_peaks.bed -b WT_macs_0hr_rep2.bed -v > qa-suz12_no_WT.bed
 
 #Combining all overlapping peaks & merging
 #CAF-1
@@ -235,9 +235,10 @@ module load MACS3
 #                                ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed \
 #                                ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_overlap_peaks.bed
 
-# cat qa-suz12_12hr_H3K27me3_Rep3_peaks.bed \
+# cat qa-suz12_8hr_H3K27me3_Rep3_peaks.bed \
+#     qa-suz12_12hr_H3K27me3_Rep3_peaks.bed \
 #     qa-suz12_24hr_H3K27me3_Rep3_peaks.bed \
-#     WT_macs_24hr_rep2.bed > qa-suz12_plus_WT.bed
+#     WT_macs_0hr_rep2.bed > qa-suz12_plus_WT.bed
 #
 # sort -k1,1 -k2,2n qa-suz12_plus_WT.bed > qa-suz12_plus_WT_sorted.bed
 # bedtools sort -i qa-suz12_plus_WT_sorted.bed > qa-suz12_plus_WT_bed_sorted.bed
