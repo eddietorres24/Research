@@ -222,7 +222,7 @@ module load deepTools
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'white, darkseagreen, g, darkgreen' \
                     --zMin 0 \
-                    --zMax 40
+                    --zMax 60
 
 
 # plotHeatmap -m matrix_qa-suz12.gz -out $OUTDIR1/2025-02-17_qa-suz12_time_1_ET \
