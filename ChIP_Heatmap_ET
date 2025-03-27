@@ -171,7 +171,7 @@ computeMatrix scale-regions -bs 2 --scale 0.5 \
     $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
-    -R $QABED/WT_macs_0hr_rep2.bed $QABED/qa-suz12_no_WT --skipZeros -o matrix_qa-suz12.gz
+    -R $QABED/WT_macs_0hr_rep2.bed $QABED/qa-suz12_no_WT.bed --skipZeros -o matrix_qa-suz12.gz
 
 
 
