@@ -173,7 +173,7 @@ computeMatrix scale-regions -bs 4 \
     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
     $MISCDIR/SRR11806698.bin_25.smooth_75Bulk.bw \
     $P136DIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4.bin_25.smooth_75Bulk.bw \
-    -R $QABED/WT_macs_0hr_rep2.bed $QABED/qa-suz12_no_WT.bed --skipZeros -o matrix_qa-suz12.gz
+    -R $QABED/qa-suz12_no_cac-3.bed $QABED/qa-suz12_and_cac-3.bed --skipZeros -o matrix_qa-suz12.gz
 
 
 
@@ -223,9 +223,8 @@ computeMatrix scale-regions -bs 4 \
                     --sortUsingSamples 1 2 3 4 5 6 \
                     --legendLocation none \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, lightseagreen, darkcyan' 'white, lightcyan, cyan' \
+                    --colorList 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, lightseagreen, darkcyan' 'white, paleturquoise, turquoise' \
                     --zMin 0 \
-                    --zMax 60
 
 
 # plotHeatmap -m matrix_qa-suz12.gz -out $OUTDIR1/2025-02-17_qa-suz12_time_1_ET \
