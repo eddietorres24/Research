@@ -26,6 +26,7 @@ P141DIR="/scratch/evt82290/MappingOutputs/Run141/bigWig"
 P144DIR="/scratch/evt82290/MappingOutputs/Run144/bigWig"
 P145DIR="/scratch/evt82290/MappingOutputs/Run145/bigWig"
 P146DIR="/scratch/evt82290/MappingOutputs/Run146/bigWig"
+MISCDIR="/scratch/evt82290/MappingOutputs/iswi_ash1/bigWig"
 #bed file directories
 QABED="/home/evt82290/Research/bed_files/qa-suz12"
 BEDDIR="/scratch/evt82290/RNAseqIGV/bedgraph"
@@ -162,16 +163,17 @@ module load deepTools
 #     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
 #     -R $QABED/qa-suz12_WT_merge_peaks.bed --skipZeros -o matrix_qa-suz12.gz
 
-###scale-regions
-# computeMatrix scale-regions -bs 4 \
-#  -S $P144DIR/144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bin_25.smooth_75Bulk.bw \
-#     $P144DIR/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
-#     -R $QABED/WT_macs_0hr_rep2.bed $QABED/qa-suz12_no_WT.bed --skipZeros -o matrix_qa-suz12.gz
+##scale-regions
+computeMatrix scale-regions -bs 4 \
+ -S $P144DIR/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
+    $MISCDIR/SRR11806698.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+    -R $QABED/WT_macs_0hr_rep2.bed $QABED/qa-suz12_no_WT.bed --skipZeros -o matrix_qa-suz12.gz
 
 
 
@@ -210,17 +212,18 @@ module load deepTools
     #     $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_greens_qa-suz12_TEST2.pdf \
-                    --samplesLabel WT0hr WT24hr 0hr 4hr 8hr 12hr 24hr \
+        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_mutants.pdf \
+                    --samplesLabel WT24hr 0hr 4hr 8hr 12hr 24hr isw cac-3 \
                     --startLabel "5'" \
               			--endLabel "3'" \
                     --whatToShow "heatmap and colorbar" \
                     --missingDataColor 1 \
                     --sortUsing sum \
                     --sortRegions descend \
+                    --sortUsingSamples 1 2 3 4 5 6 \
                     --legendLocation none \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, g, darkgreen' \
+                    --colorList 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, lightseagreen, darkcyan' 'white, lightcyan, cyan' \
                     --zMin 0 \
                     --zMax 60
 
