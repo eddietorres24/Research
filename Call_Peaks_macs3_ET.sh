@@ -207,7 +207,7 @@ module load MACS3
 
 # bedtools intersect -a -b -wa
 # bedtools intersect -a -b -v
-# bedtools intersect -a qa-suz12_WT_merge_peaks.bed -b WT_macs_0hr_rep2.bed -v > qa-suz12_no_WT.bed
+ # bedtools intersect -a qa-suz12_WT_merge_peaks.bed -b internal_K27_cac3_peaks.bed -v > subtelomeric_K27_no_cac-3.bed
 
 #Combining all overlapping peaks & merging
 #CAF-1
@@ -237,13 +237,14 @@ module load MACS3
 #                                ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed \
 #                                ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_overlap_peaks.bed
 
-cat WT_macs_0hr_rep2.bed \
-    qa-suz12_no_WT.bed > qa-suz12_WT_K27.bed
-
-sort -k1,1 -k2,2n qa-suz12_WT_K27.bed > qa-suz12_WT_K27_sorted.bed
-bedtools sort -i qa-suz12_WT_K27_sorted.bed > qa-suz12_WT_K27_bed_sorted.bed
-
-bedtools merge -i qa-suz12_WT_K27_bed_sorted.bed > qa-suz12_K27_merge_peaks.bed
+# cat WT_macs_0hr_rep2.bed \
+#     qa-suz12_24hr_H3K27me3_Rep3_peaks.bed \
+#     qa-suz12_12hr_H3K27me3_Rep3_peaks.bed > qa-suz12_WT_K27.bed
+#
+# sort -k1,1 -k2,2n qa-suz12_WT_K27.bed > qa-suz12_WT_K27_sorted.bed
+# bedtools sort -i qa-suz12_WT_K27_sorted.bed > qa-suz12_WT_K27_bed_sorted.bed
+#
+# bedtools merge -i qa-suz12_WT_K27_bed_sorted.bed > qa-suz12_K27_merge_peaks.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
