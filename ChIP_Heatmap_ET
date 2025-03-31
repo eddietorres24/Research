@@ -212,10 +212,10 @@ module load deepTools
                     --startLabel "5'" \
               			--endLabel "3'" \
                     --whatToShow "heatmap and colorbar" \
-                    --missingDataColor 1 2 \
+                    --missingDataColor 1 \
                     --sortUsing sum \
                     --sortRegions descend \
-                    --sortUsingSamples 1 \
+                    --sortUsingSamples 1 2 \
                     --legendLocation none \
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, lightseagreen, darkcyan' 'white, paleturquoise, turquoise' \
