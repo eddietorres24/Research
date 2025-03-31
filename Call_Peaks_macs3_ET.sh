@@ -50,8 +50,8 @@ module load MACS3
 ###QA-SUZ12###
 
 #masayuki isw peack calls for paper
-macs3 callpeak -t "${MISCDIR}/SRR11806698.bam" -f BAMPE -n "isw_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/isw" --min-length 650 --max-gap 375 --nolambda
-macs3 callpeak -t "${MISCDIR}/SRR11806688.bam" -f BAMPE -n "isw_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/isw" --min-length 650 --max-gap 375 --nolambda
+macs3 callpeak -t "${MISCDIR}/SRR11806698.bam" -f BAMPE -n "isw_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/isw" --min-length 650 --max-gap 375 --nolambda
+macs3 callpeak -t "${MISCDIR}/SRR11806688.bam" -f BAMPE -n "isw_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR1}/isw" --min-length 650 --max-gap 375 --nolambda
 
 #H3K27me3 24 hr
 #Rep 1
