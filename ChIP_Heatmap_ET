@@ -215,7 +215,7 @@ module load deepTools
                     --missingDataColor 1 \
                     --sortUsing sum \
                     --sortRegions descend \
-                    --sortUsingSamples 1 2 4 \
+                    --sortUsingSamples 1 \
                     --legendLocation none \
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, lightseagreen, darkcyan' 'white, paleturquoise, turquoise' \
