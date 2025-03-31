@@ -166,14 +166,11 @@ module load deepTools
 ##scale-regions
 computeMatrix scale-regions -bs 4 \
  -S $P144DIR/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
     $MISCDIR/SRR11806698.bin_25.smooth_75Bulk.bw \
     $P136DIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4.bin_25.smooth_75Bulk.bw \
-    -R $QABED/subtelomeric_K27_normal.bed $QABED/subtelomeric_K27_ectopic.bed $QABED/internal_K27_normal.bed $QABED/internal_K27_ectopic.bed --skipZeros -o matrix_qa-suz12.gz
+    -R $QABED/ssubtelomeric_K27_no_cac-3 $QABED/internal_K27_normal.bed $QABED/internal_K27_ectopic.bed --skipZeros -o matrix_qa-suz12.gz
 
 
     # 144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam
@@ -211,17 +208,17 @@ computeMatrix scale-regions -bs 4 \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
         plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_mutants.pdf \
-                    --samplesLabel WT24hr 0hr 4hr 8hr 12hr 24hr isw cac3 \
+                    --samplesLabel WT24hr 4hr 24hr isw cac3 \
                     --startLabel "5'" \
               			--endLabel "3'" \
                     --whatToShow "heatmap and colorbar" \
                     --missingDataColor 1 \
                     --sortUsing sum \
                     --sortRegions descend \
-                    --sortUsingSamples 1 2 3 4 5 6 \
+                    --sortUsingSamples 1 2 3 4 \
                     --legendLocation none \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, lightseagreen, darkcyan' 'white, paleturquoise, turquoise' \
+                    --colorList 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, lightseagreen, darkcyan' 'white, paleturquoise, turquoise' \
                     --zMin 0 \
 
 
