@@ -207,7 +207,11 @@ module load MACS3
 
 # bedtools intersect -a -b -wa
 # bedtools intersect -a -b -v
- # bedtools intersect -a qa-suz12_WT_merge_peaks.bed -b internal_K27_cac3_peaks.bed -v > subtelomeric_K27_no_cac-3.bed
+# bedtools intersect -a qa-suz12_WT_merge_peaks.bed -b internal_K27_cac3_peaks.bed -v > subtelomeric_K27_no_cac-3.bed
+bedtools intersect -a internal_K27_cac3_peaks.bed -b WT_macs_0hr_rep2.bed -v > internal_K27_ectopic.bed
+bedtools intersect -a internal_K27_cac3_peaks.bed -b WT_macs_0hr_rep2.bed -wa > internal_K27_normal.bed
+bedtools intersect -a subtelomeric_K27_no_cac-3.bed -b WT_macs_0hr_rep2.bed -v > subtelomeric_K27_ectopic.bed
+bedtools intersect -a subtelomeric_K27_no_cac-3.bed -b WT_macs_0hr_rep2.bed -wa > subtelomeric_K27_normal.bed
 
 #Combining all overlapping peaks & merging
 #CAF-1
