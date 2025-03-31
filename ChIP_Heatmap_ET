@@ -164,13 +164,13 @@ module load deepTools
 #     -R $QABED/qa-suz12_WT_merge_peaks.bed --skipZeros -o matrix_qa-suz12.gz
 
 ##scale-regions
-computeMatrix scale-regions -bs 4 \
- -S $P144DIR/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
-    $MISCDIR/SRR11806698.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4.bin_25.smooth_75Bulk.bw \
-    -R $QABED/subtelomeric_K27_no_cac-3.bed $QABED/internal_K27_normal.bed $QABED/internal_K27_ectopic.bed --skipZeros -o matrix_qa-suz12.gz
+# computeMatrix scale-regions -bs 4 \
+#  -S $P144DIR/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
+#     $MISCDIR/SRR11806698.bin_25.smooth_75Bulk.bw \
+#     $P136DIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4.bin_25.smooth_75Bulk.bw \
+#     -R $QABED/subtelomeric_K27_no_cac-3.bed $QABED/internal_K27_normal.bed $QABED/internal_K27_ectopic.bed --skipZeros -o matrix_qa-suz12.gz
 
 
     # 144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam
@@ -207,12 +207,12 @@ computeMatrix scale-regions -bs 4 \
     #     $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_mutants_2cluster_scale_WTsort_split.pdf \
+        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_mutants_2cluster_scale_sort_split.pdf \
                     --samplesLabel WT24hr 4hr 24hr isw cac3 \
                     --startLabel "5'" \
               			--endLabel "3'" \
                     --whatToShow "heatmap and colorbar" \
-                    --missingDataColor 1 \
+                    --missingDataColor 1 2 \
                     --sortUsing sum \
                     --sortRegions descend \
                     --sortUsingSamples 1 \
