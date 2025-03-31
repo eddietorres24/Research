@@ -207,7 +207,7 @@ computeMatrix scale-regions -bs 4 \
     #     $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_mutants_2cluster_scale_sort_split.pdf \
+        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_mutants_2cluster_WTsort_Fig4.pdf \
                     --samplesLabel WT24hr 4hr 24hr isw cac3 \
                     --startLabel "5'" \
               			--endLabel "3'" \
@@ -215,7 +215,8 @@ computeMatrix scale-regions -bs 4 \
                     --missingDataColor 1 \
                     --sortUsing sum \
                     --sortRegions descend \
-                    --sortUsingSamples 1 2 \
+                    --sortUsingSamples 1 \
+                    --heatmapHeight 20 \
                     --legendLocation none \
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, lightseagreen, darkcyan' 'white, paleturquoise, turquoise' \
