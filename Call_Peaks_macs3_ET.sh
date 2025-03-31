@@ -34,7 +34,7 @@ P141DIR="/scratch/evt82290/MappingOutputs/Run141/bamFiles"
 P144DIR="/scratch/evt82290/MappingOutputs/Run144/bamFiles"
 P145DIR="/scratch/evt82290/MappingOutputs/Run145/bamFiles"
 P146DIR="/scratch/evt82290/MappingOutputs/Run146/bamFiles"
-MISCDIR=
+MISCDIR="/scratch/evt82290/MappingOutputs/iswi_ash1/bamFiles"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR3 ]
@@ -49,6 +49,9 @@ module load MACS3
 #Calling Peaks
 ###QA-SUZ12###
 
+#masayuki isw peack calls for paper
+macs3 callpeak -t "${MISCDIR}/SRR11806698.bam" -f BAMPE -n "isw_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/isw" --min-length 650 --max-gap 375 --nolambda
+macs3 callpeak -t "${MISCDIR}/SRR11806688.bam" -f BAMPE -n "isw_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR}/isw" --min-length 650 --max-gap 375 --nolambda
 
 #H3K27me3 24 hr
 #Rep 1
@@ -208,10 +211,10 @@ module load MACS3
 # bedtools intersect -a -b -wa
 # bedtools intersect -a -b -v
 # bedtools intersect -a qa-suz12_WT_merge_peaks.bed -b internal_K27_cac3_peaks.bed -v > subtelomeric_K27_no_cac-3.bed
-bedtools intersect -a internal_K27_cac3_peaks.bed -b WT_macs_0hr_rep2.bed -v > internal_K27_ectopic.bed
-bedtools intersect -a internal_K27_cac3_peaks.bed -b WT_macs_0hr_rep2.bed -wa > internal_K27_normal.bed
-bedtools intersect -a subtelomeric_K27_no_cac-3.bed -b WT_macs_0hr_rep2.bed -v > subtelomeric_K27_ectopic.bed
-bedtools intersect -a subtelomeric_K27_no_cac-3.bed -b WT_macs_0hr_rep2.bed -wa > subtelomeric_K27_normal.bed
+# bedtools intersect -a internal_K27_cac3_peaks.bed -b WT_macs_0hr_rep2.bed -v > internal_K27_ectopic.bed
+# bedtools intersect -a internal_K27_cac3_peaks.bed -b WT_macs_0hr_rep2.bed -wa > internal_K27_normal.bed
+# bedtools intersect -a subtelomeric_K27_no_cac-3.bed -b WT_macs_0hr_rep2.bed -v > subtelomeric_K27_ectopic.bed
+# bedtools intersect -a subtelomeric_K27_no_cac-3.bed -b WT_macs_0hr_rep2.bed -wa > subtelomeric_K27_normal.bed
 
 #Combining all overlapping peaks & merging
 #CAF-1
