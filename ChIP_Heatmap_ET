@@ -137,12 +137,10 @@ module load deepTools
 
 # 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
 computeMatrix scale-regions \
- -S $OUTDIR2/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
-    $OUTDIR2/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
-    $OUTDIR2/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-    $OUTDIR2/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-    $OUTDIR2/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-    -R  Figure2_K27regions_Scaledcenter_FileToCheckOrderFINAL_ZL.txt --skipZeros -o matrix_PRC2.gz --missingDataAsZero -bs 10 --sortRegions keep
+ -S $OUTDIR2/133-23_ChIP_WT_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw \
+    $P133DIR/133-24_ChIP_cac-1_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw \
+    $P133DIR/133-25_ChIP_cac-2_H3K9me3_Rep2.bin_25.smooth_75Bulk.bw \
+    -R WT_H3K9me3_Rep1_peaks.bed --skipZeros -o matrix_PRC2.gz --skipZeros -bs 4
 
 # computeMatrix scale-regions \
 # -S  $OUTDIR2/SRR8269825.bw \
@@ -151,6 +149,19 @@ computeMatrix scale-regions \
 #     $OUTDIR2/SRR7970598.bw \
 #     $OUTDIR2/SRR10916163.bw \
 #     -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
+
+plotHeatmap -m matrix_PRC2.gz -out CAF-1_H3K9me3.pdf \
+                --samplesLabel WT cac-1 cac-2 \
+                --startLabel "5'" \
+          			--endLabel "3'" \
+                --sortUsingSamples 1 \
+                --sortUsing sum \
+                --sortRegions descend \
+                --missingDataColor 1 \
+                --outFileSortedRegions heatmap.bed \
+                --colorList 'white, orange, darkorange' \
+                --zMin 0 \
+
 
 ###referencePoint
 # computeMatrix reference-point --referencePoint center -a 2500 -b 2500 -bs 2 --scale 0.5 \
