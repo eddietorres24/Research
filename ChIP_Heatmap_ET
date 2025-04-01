@@ -166,15 +166,13 @@ module load deepTools
 ##scale-regions
 computeMatrix scale-regions -bs 4 \
  -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
-    $P144DIR/144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam \
+    $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-40_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S40.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-41_ChIP_qa-suz12_48hr_H3K27me3_Rep1_S41.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-42_ChIP_qa-suz12_72hr_H3K27me3_Rep1_S42.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-43_ChIP_qa-suz12_96hr_H3K27me3_Rep1_S43.bin_25.smooth_75Bulk.bw \
     -R $QABED/WT_0_24_hr_qa_merge.bed $QABED/qa-suz12_no_WT_0_or_24.bed --skipZeros -o matrix_qa-suz12.gz
 
-    # 144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam
-    # 144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bam
 
     #$MISCDIR/SRR11806698.bin_25.smooth_75Bulk.bw \
     #$P136DIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4.bin_25.smooth_75Bulk.bw \
