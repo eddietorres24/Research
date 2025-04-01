@@ -164,17 +164,20 @@ module load deepTools
 #     -R $QABED/qa-suz12_WT_merge_peaks.bed --skipZeros -o matrix_qa-suz12.gz
 
 ##scale-regions
-# computeMatrix scale-regions -bs 4 \
-#  -S $P144DIR/144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
-#     $MISCDIR/SRR11806698.bin_25.smooth_75Bulk.bw \
-#     $P136DIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4.bin_25.smooth_75Bulk.bw \
-#     -R $QABED/subtelomeric_K27_no_cac-3.bed $QABED/internal_K27_cac3_peaks.bed --skipZeros -o matrix_qa-suz12.gz
-
+computeMatrix scale-regions -bs 4 \
+ -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-39_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S39.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-40_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S40.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-41_ChIP_qa-suz12_48hr_H3K27me3_Rep1_S41.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-42_ChIP_qa-suz12_72hr_H3K27me3_Rep1_S42.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-43_ChIP_qa-suz12_96hr_H3K27me3_Rep1_S43.bin_25.smooth_75Bulk.bw \
+    -R $QABED/WT_macs_0hr_rep2.bed $QABED/qa-suz12_no_WT.bed --skipZeros -o matrix_qa-suz12.gz
 
     # 144-44_ChIP_WT_0hr_H3K27me3_Rep4_S44.bam
     # 144-45_ChIP_WT_24hr_H3K27me3_Rep3_S45.bam
+
+    #$MISCDIR/SRR11806698.bin_25.smooth_75Bulk.bw \
+    #$P136DIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4.bin_25.smooth_75Bulk.bw \
 
     # $P137DIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bin_25.smooth_75Bulk.bw \
     #    $P137DIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bin_25.smooth_75Bulk.bw \
@@ -207,22 +210,19 @@ module load deepTools
     #     $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_mutants_2cluster_WTsort_Fig4.pdf \
-                    --samplesLabel WT24hr 4hr 24hr isw cac3 \
+        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_96hr.pdf \
+                    --samplesLabel WT 0hr 24hr 48hr 72hr 96hr \
                     --startLabel "5'" \
               			--endLabel "3'" \
-                    --whatToShow "heatmap and colorbar" \
                     --missingDataColor 1 \
                     --sortUsing sum \
                     --sortRegions descend \
-                    --sortUsingSamples 1 \
-                    --heatmapHeight 20 \
                     --legendLocation none \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, g, darkgreen' 'white, g, darkgreen' 'white, g, darkgreen' 'white, lightseagreen, darkcyan' 'white, paleturquoise, turquoise' \
+                    --colorList 'white, g, darkgreen' \
                     --zMin 0 \
-                    --zMax 60 60 60 30 30
 
+                    # --whatToShow "heatmap and colorbar" \
 
 # plotHeatmap -m matrix_qa-suz12.gz -out $OUTDIR1/2025-02-17_qa-suz12_time_1_ET \
 #             --samplesLabel WT_0hr WT_24hr 0hr 4hr 8hr 12hr 24hr \
