@@ -213,7 +213,7 @@ macs3 callpeak -t "${P133DIR}/133-26_ChIP_set-7_H3K9me3_Rep2_S24.bam" -c "${P146
 # cut -f 1-6 qa-suz12_24hr_H3K27me3_Rep3_250_peaks.broadPeak > qa-suz12_24hr_H3K27me3_Rep3_peaks.bed
 # cut -f 1-6 WT_24hr_H3K27me3_Rep3_250_peaks.broadPeak > WT_24hr_H3K27me3_Rep3_peaks.bed
 
-cut -f 1-6 WT_H3K9me3_Rep1_peaks.broadPeak > WT_H3K9me3_Rep1_peaks.bed
+# cut -f 1-6 cac-1_H3K9me3_Rep1_peaks.broadPeak > cac-1_H3K9me3_Rep1_peaks.bed
 
 #bedtools
 # module load BEDTools
