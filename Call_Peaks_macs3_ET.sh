@@ -210,7 +210,7 @@ module load MACS3
 
 # bedtools intersect -a -b -wa
 # bedtools intersect -a -b -v
-# bedtools intersect -a qa-suz12_WT_merge_peaks.bed -b internal_K27_cac3_peaks.bed -v > subtelomeric_K27_no_cac-3.bed
+# bedtools intersect -a qa-suz12_no_WT.bed -b WT_macs_24hr_rep2.bed -v > qa-suz12_no_WT_0_or_24.bed
 # bedtools intersect -a internal_K27_cac3_peaks.bed -b WT_macs_0hr_rep2.bed -v > internal_K27_ectopic.bed
 # bedtools intersect -a internal_K27_cac3_peaks.bed -b WT_macs_0hr_rep2.bed -wa > internal_K27_normal.bed
 # bedtools intersect -a subtelomeric_K27_no_cac-3.bed -b WT_macs_0hr_rep2.bed -v > subtelomeric_K27_ectopic.bed
@@ -224,13 +224,13 @@ module load MACS3
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 #
-# cat CAF-1_All_K27_merge_peaks.bed \
-#                   CAF-1_All_K4_merge_peaks.bed  > CAF_All_peaks_K27_K4.bed
-# #
-# sort -k1,1 -k2,2n CAF_All_peaks_K27_K4.bed > CAF_All_peaks_K27_K4_sorted.bed
-# bedtools sort -i CAF_All_peaks_K27_K4_sorted.bed > CAF_All_peaks_K27_K4_bed_sorted.bed
+cat WT_macs_0hr_rep2.bed \
+                  WT_macs_24hr_rep2.bed  > WT_0_24_hr_qa.bed
 #
-# bedtools merge -i CAF_All_peaks_K27_K4_bed_sorted.bed > CAF-1_All_peaks_K27_K4_merge.bed
+sort -k1,1 -k2,2n WT_0_24_hr_qa.bed > WT_0_24_hr_qa_sorted.bed
+bedtools sort -i WT_0_24_hr_qa_sorted.bed >WT_0_24_hr_qa_bed_sorted.bed
+
+bedtools merge -i WT_0_24_hr_qa_bed_sorted.bed > WT_0_24_hr_qa_merge.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
