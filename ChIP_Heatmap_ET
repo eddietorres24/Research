@@ -164,14 +164,14 @@ module load deepTools
 #     -R $QABED/qa-suz12_WT_merge_peaks.bed --skipZeros -o matrix_qa-suz12.gz
 
 ##scale-regions
-computeMatrix scale-regions -bs 4 \
- -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-40_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S40.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-41_ChIP_qa-suz12_48hr_H3K27me3_Rep1_S41.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-42_ChIP_qa-suz12_72hr_H3K27me3_Rep1_S42.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-43_ChIP_qa-suz12_96hr_H3K27me3_Rep1_S43.bin_25.smooth_75Bulk.bw \
-    -R $QABED/WT_0_24_hr_qa_merge.bed $QABED/qa-suz12_no_WT_0_or_24.bed --skipZeros -o matrix_qa-suz12.gz
+# computeMatrix scale-regions -bs 4 \
+#  -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-40_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S40.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-41_ChIP_qa-suz12_48hr_H3K27me3_Rep1_S41.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-42_ChIP_qa-suz12_72hr_H3K27me3_Rep1_S42.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-43_ChIP_qa-suz12_96hr_H3K27me3_Rep1_S43.bin_25.smooth_75Bulk.bw \
+#     -R $QABED/WT_0_24_hr_qa_merge.bed $QABED/qa-suz12_no_WT_0_or_24.bed --skipZeros -o matrix_qa-suz12.gz
 
 
     #$MISCDIR/SRR11806698.bin_25.smooth_75Bulk.bw \
@@ -208,7 +208,7 @@ computeMatrix scale-regions -bs 4 \
     #     $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_96hr.pdf \
+        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_96hr_bwr.pdf \
                     --samplesLabel WT 0hr 24hr 48hr 72hr 96hr \
                     --startLabel "5'" \
               			--endLabel "3'" \
@@ -218,7 +218,7 @@ computeMatrix scale-regions -bs 4 \
                     --sortRegions descend \
                     --legendLocation none \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, g, darkgreen' \
+                    --colorMap "bwr" \
                     --zMin 0 \
 
 # plotHeatmap -m matrix_qa-suz12.gz -out $OUTDIR1/2025-02-17_qa-suz12_time_1_ET \
