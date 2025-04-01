@@ -277,6 +277,7 @@ makeTagDirectory $TAGDIR/WT_96hr_rep1 $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.
 # makeTagDirectory $TAGDIR/set-7_H4K20me3_rep2 $P138DIR/138-71_ChIP_set-7_H4K20me3_Rep2_6252_S70.bam
 # makeTagDirectory $TAGDIR/set-7_H4K20me3_rep3 $138DIR/
 
+####DO NOT USE RUN131 INPUT
 #input
 #WT
 # makeTagDirectory $TAGDIR/WT_input_1 $P129DIR/129-43_ChIP_WT_input_S42.bam

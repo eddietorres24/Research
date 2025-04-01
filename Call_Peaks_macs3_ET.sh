@@ -188,6 +188,14 @@ module load MACS3
 # macs3 callpeak -t "${P146DIR}/146-32_ChIP_cac-3_H3K4me2_Rep2_S32.bam" -c "${P146DIR}/146-37_ChIP_cac-3_input__S37.bam" -f BAMPE -n "cac-3_H3K4me2_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-3_H3K4" --min-length 650 --max-gap 375
 # macs3 callpeak -t "${P146DIR}/146-33_ChIP_set-7_H3K4me2_Rep2_S33.bam" -c "${P146DIR}/146-38_ChIP_set-7_input__S38.bam" -f BAMPE -n "set-7_H3K4me2_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/set-7_H3K4" --min-length 650 --max-gap 375
 
+#H3K9me3
+#Rep1
+# Rep2
+macs3 callpeak -t "${P133DIR}/133-23_ChIP_WT_H3K9me3_Rep2_S21.bam" -c "${P146DIR}/146-34_ChIP_WT_input__S34.bam" -f BAMPE -n "WT_H3K9me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/WT_H3K9" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P133DIR}/133-24_ChIP_cac-1_H3K9me3_Rep2_S22.bam" -c "${P146DIR}/146-35_ChIP_cac-1_input__S35.bam" -f BAMPE -n "cac-1_H3K9me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-1_H3K9" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P133DIR}/133-25_ChIP_cac-2_H3K9me3_Rep2_S23.bam" -c "${P146DIR}/146-36_ChIP_cac-2_input__S36.bam" -f BAMPE -n "cac-2_H3K9me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-2_H3K9" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P133DIR}/133-26_ChIP_set-7_H3K9me3_Rep2_S24.bam" -c "${P146DIR}/146-38_ChIP_set-7_input__S38.bam" -f BAMPE -n "set-7_H3K9me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/set-7_H3K9" --min-length 650 --max-gap 375
+
 #Convert Broadpeaks to bed format
 #Rep 1
 # cut -f 1-6 $OUTDIR1/WT_0hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/WT_0hr_H3K27me3_Rep1_peaks.bed
@@ -224,13 +232,13 @@ module load MACS3
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 #
-cat WT_macs_0hr_rep2.bed \
-                  WT_macs_24hr_rep2.bed  > WT_0_24_hr_qa.bed
+# cat WT_macs_0hr_rep2.bed \
+#                   WT_macs_24hr_rep2.bed  > WT_0_24_hr_qa.bed
+# #
+# sort -k1,1 -k2,2n WT_0_24_hr_qa.bed > WT_0_24_hr_qa_sorted.bed
+# bedtools sort -i WT_0_24_hr_qa_sorted.bed >WT_0_24_hr_qa_bed_sorted.bed
 #
-sort -k1,1 -k2,2n WT_0_24_hr_qa.bed > WT_0_24_hr_qa_sorted.bed
-bedtools sort -i WT_0_24_hr_qa_sorted.bed >WT_0_24_hr_qa_bed_sorted.bed
-
-bedtools merge -i WT_0_24_hr_qa_bed_sorted.bed > WT_0_24_hr_qa_merge.bed
+# bedtools merge -i WT_0_24_hr_qa_bed_sorted.bed > WT_0_24_hr_qa_merge.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt

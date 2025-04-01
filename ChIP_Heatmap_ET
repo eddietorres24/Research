@@ -136,13 +136,13 @@ module load deepTools
                 # $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
 
 # 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
-# computeMatrix scale-regions -b 1000 -a 1000 \
-#  -S $OUTDIR2/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR2/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR2/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR2/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR2/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-#     -R  Figure2_K27regions_Scaledcenter_FileToCheckOrderFINAL_ZL.txt --skipZeros -o matrix_PRC2.gz --missingDataAsZero -bs 10 --sortRegions keep
+computeMatrix scale-regions \
+ -S $OUTDIR2/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
+    $OUTDIR2/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
+    $OUTDIR2/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+    $OUTDIR2/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+    $OUTDIR2/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
+    -R  Figure2_K27regions_Scaledcenter_FileToCheckOrderFINAL_ZL.txt --skipZeros -o matrix_PRC2.gz --missingDataAsZero -bs 10 --sortRegions keep
 
 # computeMatrix scale-regions \
 # -S  $OUTDIR2/SRR8269825.bw \
@@ -208,18 +208,18 @@ module load deepTools
     #     $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_96hr_bwr.pdf \
-                    --samplesLabel WT 0hr 24hr 48hr 72hr 96hr \
-                    --startLabel "5'" \
-              			--endLabel "3'" \
-                    --missingDataColor 1 \
-                    --whatToShow "heatmap and colorbar" \
-                    --sortUsing sum \
-                    --sortRegions descend \
-                    --legendLocation none \
-                    --outFileSortedRegions heatmap.bed \
-                    --colorMap "bwr" \
-                    --zMin 0 \
+        # plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_96hr_bwr.pdf \
+        #             --samplesLabel WT 0hr 24hr 48hr 72hr 96hr \
+        #             --startLabel "5'" \
+        #       			--endLabel "3'" \
+        #             --missingDataColor 1 \
+        #             --whatToShow "heatmap and colorbar" \
+        #             --sortUsing sum \
+        #             --sortRegions descend \
+        #             --legendLocation none \
+        #             --outFileSortedRegions heatmap.bed \
+        #             --colorMap "bwr" \
+        #             --zMin 0 \
 
 # plotHeatmap -m matrix_qa-suz12.gz -out $OUTDIR1/2025-02-17_qa-suz12_time_1_ET \
 #             --samplesLabel WT_0hr WT_24hr 0hr 4hr 8hr 12hr 24hr \
