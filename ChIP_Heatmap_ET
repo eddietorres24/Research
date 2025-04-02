@@ -96,11 +96,10 @@ module load deepTools
     #     $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
     #     -R $BEDDIR2/WT_ATAC_No_CAF_merge.bed $BEDDIR2/CAF1_ATAC_NoWT.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_PRC2.gz -out CAF-1_ATAC.pdf \
+        plotHeatmap -m matrix_PRC2.gz -out CAF-1_ATAC_change_All_sort.pdf \
                         --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                         --startLabel "5'" \
                   			--endLabel "3'" \
-                        --sortUsingSamples 1 \
                         --sortUsing sum \
                         --sortRegions descend \
                         --missingDataColor 1 \
