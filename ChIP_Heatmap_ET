@@ -140,7 +140,7 @@ computeMatrix scale-regions \
  -S $P133DIR/133-23_ChIP_WT_H3K9me3_Rep2_S21.bin_25.smooth_75Bulk.bw \
     $P133DIR/133-24_ChIP_cac-1_H3K9me3_Rep2_S22.bin_25.smooth_75Bulk.bw  \
     $P133DIR/133-25_ChIP_cac-2_H3K9me3_Rep2_S23.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o matrix_PRC2.gz --skipZeros
+    -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o matrix_PRC2.gz
 
 # computeMatrix scale-regions \
 # -S  $OUTDIR2/SRR8269825.bw \
