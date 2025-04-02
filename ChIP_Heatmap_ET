@@ -127,7 +127,7 @@ computeMatrix scale-regions \
     $OUTDIR2/SRR7970629_log.bw \
     $OUTDIR2/SRR7970598_log.bw \
     $OUTDIR2/SRR10916163_log.bw \
-    -R $BEDDIR2/CAF-1_K4_ectopic_merge_peaks.bed--skipZeros -o matrix_PRC2.gz
+    -R $BEDDIR2/CAF-1_K4_ectopic_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
 # #
     plotHeatmap -m matrix_PRC2.gz -out K4_ectopic_H3K27me3_RNA.pdf \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
