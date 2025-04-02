@@ -111,29 +111,29 @@ module load deepTools
 
 #####K4vsK27#######
 
-computeMatrix scale-regions \
- -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-    $OUTDIR2/SRR8269825_log.bw \
-    $OUTDIR2/SRR8444038_log.bw \
-    $OUTDIR2/SRR7970629_log.bw \
-    $OUTDIR2/SRR7970598_log.bw \
-    $OUTDIR2/SRR10916163_log.bw \
-    -R $BEDDIR2/CAF-1_K4_ectopic_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
+# computeMatrix scale-regions \
+#  -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
+#     $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+#     $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+#     $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+#     $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
+#     $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
+#     $OUTDIR2/SRR8269825_log.bw \
+#     $OUTDIR2/SRR8444038_log.bw \
+#     $OUTDIR2/SRR7970629_log.bw \
+#     $OUTDIR2/SRR7970598_log.bw \
+#     $OUTDIR2/SRR10916163_log.bw \
+#     -R $BEDDIR2/CAF-1_K4_ectopic_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
 # #
     plotHeatmap -m matrix_PRC2.gz -out K4_ectopic_H3K27me3_RNA_Test2.pdf \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
                 --startLabel "5'" \
           			--endLabel "3'" \
-                --sortUsingSamples 14 \
+                --sortUsingSamples 6 \
                 --sortUsing sum \
                 --sortRegions descend \
                 --whatToShow "heatmap and colorbar" \
@@ -141,7 +141,7 @@ computeMatrix scale-regions \
                 --outFileSortedRegions heatmap.bed \
                 --colorList 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'mediumblue, cornflowerblue, white, salmon, red' 'mediumblue, cornflowerblue, white, salmon, red' 'mediumblue, cornflowerblue, white, salmon, red' 'mediumblue, cornflowerblue, white, salmon, red' 'mediumblue, cornflowerblue, white, salmon, red' \
                 --zMin 0 \
-                --zMax 15 15 15 15 15 20 20 20 20 20 6 6 6 6 6
+                --zMax 15 15 15 15 15 20 20 20 20 20 5 5 5 5 5
 
 
 # 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
