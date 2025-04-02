@@ -94,7 +94,7 @@ module load deepTools
         $P141DIR/141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw \
         $P141DIR/141-N14_ATAC_cac-3__Rep1_S103.bin_25.smooth_75Bulk.bw \
         $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
-        -R $BEDDIR2/CAF-1_All_ATAC_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
+        -R $BEDDIR2/CAF1_ATAC_WT.bed $BEDDIR2/CAF1_ATAC_NoWT.bed --skipZeros -o matrix_PRC2.gz
 
         plotHeatmap -m matrix_PRC2.gz -out CAF-1_ATAC.pdf \
                         --samplesLabel WT cac-1 cac-2 cac-3 set-7 \

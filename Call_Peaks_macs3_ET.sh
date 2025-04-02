@@ -191,10 +191,10 @@ module load MACS3
 #H3K9me3
 #Rep1
 # Rep2
-macs3 callpeak -t "${P133DIR}/133-23_ChIP_WT_H3K9me3_Rep2_S21.bam" -c "${P146DIR}/146-34_ChIP_WT_input__S34.bam" -f BAMPE -n "WT_H3K9me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/WT_H3K9" --min-length 650 --max-gap 375
-macs3 callpeak -t "${P133DIR}/133-24_ChIP_cac-1_H3K9me3_Rep2_S22.bam" -c "${P146DIR}/146-35_ChIP_cac-1_input__S35.bam" -f BAMPE -n "cac-1_H3K9me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-1_H3K9" --min-length 650 --max-gap 375
-macs3 callpeak -t "${P133DIR}/133-25_ChIP_cac-2_H3K9me3_Rep2_S23.bam" -c "${P146DIR}/146-36_ChIP_cac-2_input__S36.bam" -f BAMPE -n "cac-2_H3K9me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-2_H3K9" --min-length 650 --max-gap 375
-macs3 callpeak -t "${P133DIR}/133-26_ChIP_set-7_H3K9me3_Rep2_S24.bam" -c "${P146DIR}/146-38_ChIP_set-7_input__S38.bam" -f BAMPE -n "set-7_H3K9me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/set-7_H3K9" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${P133DIR}/133-23_ChIP_WT_H3K9me3_Rep2_S21.bam" -c "${P146DIR}/146-34_ChIP_WT_input__S34.bam" -f BAMPE -n "WT_H3K9me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/WT_H3K9" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${P133DIR}/133-24_ChIP_cac-1_H3K9me3_Rep2_S22.bam" -c "${P146DIR}/146-35_ChIP_cac-1_input__S35.bam" -f BAMPE -n "cac-1_H3K9me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-1_H3K9" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${P133DIR}/133-25_ChIP_cac-2_H3K9me3_Rep2_S23.bam" -c "${P146DIR}/146-36_ChIP_cac-2_input__S36.bam" -f BAMPE -n "cac-2_H3K9me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-2_H3K9" --min-length 650 --max-gap 375
+# macs3 callpeak -t "${P133DIR}/133-26_ChIP_set-7_H3K9me3_Rep2_S24.bam" -c "${P146DIR}/146-38_ChIP_set-7_input__S38.bam" -f BAMPE -n "set-7_H3K9me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/set-7_H3K9" --min-length 650 --max-gap 375
 
 #Convert Broadpeaks to bed format
 #Rep 1
@@ -206,24 +206,32 @@ macs3 callpeak -t "${P133DIR}/133-26_ChIP_set-7_H3K9me3_Rep2_S24.bam" -c "${P146
 # cut -f 1-6 $OUTDIR1/qa-suz12_24hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_24hr_H3K27me3_Rep1_peaks.bed
 # cut -f 1-6 $OUTDIR1/WT_24hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/WT_24hr_H3K27me3_Rep1_peaks.bed
 #Rep 3
-# cut -f 1-6 qa-suz12_0hr_H3K27me3_Rep3_peaks.broadPeak > qa-suz12_0hr_H3K27me3_Rep3_peaks.bed
-# cut -f 1-6 qa-suz12_4hr_H3K27me3_Rep3_250_peaks.broadPeak > qa-suz12_4hr_H3K27me3_Rep3_peaks.bed
-# cut -f 1-6 qa-suz12_8hr_H3K27me3_Rep3_250_peaks.broadPeak > qa-suz12_8hr_H3K27me3_Rep3_peaks.bed
-# cut -f 1-6 qa-suz12_12hr_H3K27me3_Rep3_250_peaks.broadPeak > qa-suz12_12hr_H3K27me3_Rep3_peaks.bed
-# cut -f 1-6 qa-suz12_24hr_H3K27me3_Rep3_250_peaks.broadPeak > qa-suz12_24hr_H3K27me3_Rep3_peaks.bed
+# cut -f 1-6 WT_ATAC_Rep1_peaks.narrowPeak > WT_ATAC_peaks.bed
+# cut -f 1-6 cac-1_ATAC_Rep1_peaks.narrowPeak > cac-1_ATAC_peaks.bed
+# cut -f 1-6 cac-2_ATAC_Rep1_peaks.narrowPeak > cac-2_ATAC_peaks.bed
+# cut -f 1-6 cac-3_ATAC_Rep1_peaks.narrowPeak > cac-3_ATAC_peaks.bed
+# cut -f 1-6 set-7_ATAC_Rep1_peaks.narrowPeak > set-7_ATAC_peaks.bed
 # cut -f 1-6 WT_24hr_H3K27me3_Rep3_250_peaks.broadPeak > WT_24hr_H3K27me3_Rep3_peaks.bed
 
 # cut -f 1-6 cac-1_H3K9me3_Rep1_peaks.broadPeak > cac-1_H3K9me3_Rep1_peaks.bed
 
+
+
+
+
+
+
+
 #bedtools
 # module load BEDTools
+
 
 # bedtools intersect -a -b -wa
 # bedtools intersect -a -b -v
 # bedtools intersect -a qa-suz12_no_WT.bed -b WT_macs_24hr_rep2.bed -v > qa-suz12_no_WT_0_or_24.bed
 # bedtools intersect -a internal_K27_cac3_peaks.bed -b WT_macs_0hr_rep2.bed -v > internal_K27_ectopic.bed
 # bedtools intersect -a internal_K27_cac3_peaks.bed -b WT_macs_0hr_rep2.bed -wa > internal_K27_normal.bed
-# bedtools intersect -a subtelomeric_K27_no_cac-3.bed -b WT_macs_0hr_rep2.bed -v > subtelomeric_K27_ectopic.bed
+# bedtools intersect -a CAF-1_ATAC_Peaks_merge_2.bed -b WT_ATAC_peaks.bed -wa > CAF1_ATAC_WT.bed
 # bedtools intersect -a subtelomeric_K27_no_cac-3.bed -b WT_macs_0hr_rep2.bed -wa > subtelomeric_K27_normal.bed
 
 #Combining all overlapping peaks & merging
@@ -234,13 +242,16 @@ macs3 callpeak -t "${P133DIR}/133-26_ChIP_set-7_H3K9me3_Rep2_S24.bam" -c "${P146
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 #
-# cat WT_macs_0hr_rep2.bed \
-#                   WT_macs_24hr_rep2.bed  > WT_0_24_hr_qa.bed
-# #
-# sort -k1,1 -k2,2n WT_0_24_hr_qa.bed > WT_0_24_hr_qa_sorted.bed
-# bedtools sort -i WT_0_24_hr_qa_sorted.bed >WT_0_24_hr_qa_bed_sorted.bed
+#  cat WT_ATAC_peaks.bed \
+#      cac-1_ATAC_peaks.bed \
+#      cac-2_ATAC_peaks.bed \
+#      cac-3_ATAC_peaks.bed \
+#      set-7_ATAC_peaks.bed > CAF-1_ATAC_Peaks.bed
 #
-# bedtools merge -i WT_0_24_hr_qa_bed_sorted.bed > WT_0_24_hr_qa_merge.bed
+# sort -k1,1 -k2,2n CAF-1_ATAC_Peaks.bed > CAF-1_ATAC_Peaks_sorted.bed
+# bedtools sort -i CAF-1_ATAC_Peaks_sorted.bed > CAF-1_ATAC_Peaks_bed_sorted.bed
+#
+# bedtools merge -i CAF-1_ATAC_Peaks_bed_sorted.bed -d 350 > CAF-1_ATAC_Peaks_merge_2.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
