@@ -88,13 +88,13 @@ module load deepTools
     #     $OUTDIR2/SRR10916163_log.bw \
     #     -R cac1_up.bed --skipZeros -o matrix_PRC2.gz
 
-    computeMatrix scale-regions \
-     -S $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw \
-        $P141DIR/141-N12_ATAC_cac-1__Rep1_S101.bin_25.smooth_75Bulk.bw \
-        $P141DIR/141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw \
-        $P141DIR/141-N14_ATAC_cac-3__Rep1_S103.bin_25.smooth_75Bulk.bw \
-        $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
-        -R $BEDDIR2/WT_ATAC_No_CAF_merge.bed $BEDDIR2/CAF1_ATAC_NoWT.bed --skipZeros -o matrix_PRC2.gz
+    # computeMatrix scale-regions \
+    #  -S $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw \
+    #     $P141DIR/141-N12_ATAC_cac-1__Rep1_S101.bin_25.smooth_75Bulk.bw \
+    #     $P141DIR/141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw \
+    #     $P141DIR/141-N14_ATAC_cac-3__Rep1_S103.bin_25.smooth_75Bulk.bw \
+    #     $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
+    #     -R $BEDDIR2/WT_ATAC_No_CAF_merge.bed $BEDDIR2/CAF1_ATAC_NoWT.bed --skipZeros -o matrix_PRC2.gz
 
         plotHeatmap -m matrix_PRC2.gz -out CAF-1_ATAC.pdf \
                         --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
@@ -104,8 +104,9 @@ module load deepTools
                         --sortUsing sum \
                         --sortRegions descend \
                         --missingDataColor 1 \
+                        --whatToShow "heatmap and colorbar" \
                         --outFileSortedRegions heatmap.bed \
-                        --colorList 'white, dodgerblue' \
+                        --colorMap 'seismic' \
                         --zMin 0 \
 
 
