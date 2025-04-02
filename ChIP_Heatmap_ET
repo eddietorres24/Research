@@ -159,6 +159,7 @@ plotHeatmap -m matrix_PRC2.gz -out CAF-1_H3K9me3.pdf \
                 --sortRegions descend \
                 --missingDataColor 1 \
                 --whatToShow "heatmap and colorbar" \
+                --heatmapHeight 20 \
                 --outFileSortedRegions heatmap.bed \
                 --colorList 'white, darkorange' \
                 --zMin 0 \
