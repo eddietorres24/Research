@@ -129,11 +129,11 @@ computeMatrix scale-regions \
     $OUTDIR2/SRR10916163_log.bw \
     -R $BEDDIR2/CAF-1_K4_ectopic_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
 # #
-    plotHeatmap -m matrix_PRC2.gz -out K4_ectopic_H3K27me3_RNA.pdf \
+    plotHeatmap -m matrix_PRC2.gz -out K4_ectopic_H3K27me3_RNA_Test.pdf \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
                 --startLabel "5'" \
           			--endLabel "3'" \
-                --sortUsingSamples 6 \
+                --sortUsingSamples 6 14 \
                 --sortUsing sum \
                 --sortRegions descend \
                 --whatToShow "heatmap and colorbar" \
@@ -141,7 +141,7 @@ computeMatrix scale-regions \
                 --outFileSortedRegions heatmap.bed \
                 --colorList 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'blue, white, red' 'blue, white, red' 'blue, white, red' 'blue, white, red' 'blue, white, red' \
                 --zMin 0 \
-                --zMax 15 15 15 15 15 20 20 20 20 20 4 4 4 4 4
+                --zMax 15 15 15 15 15 20 20 20 20 20 5 5 5 5 5
 
 
 # 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
