@@ -96,51 +96,51 @@ module load deepTools
     #     $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
     #     -R $BEDDIR2/WT_ATAC_No_CAF_merge.bed $BEDDIR2/CAF1_ATAC_NoWT.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_PRC2.gz -out CAF-1_ATAC_change_All_sort.pdf \
-                        --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
-                        --startLabel "5'" \
-                  			--endLabel "3'" \
-                        --sortUsing sum \
-                        --sortRegions descend \
-                        --missingDataColor 1 \
-                        --whatToShow "heatmap and colorbar" \
-                        --outFileSortedRegions heatmap.bed \
-                        --colorMap 'seismic' \
-                        --zMin 0 \
+        # plotHeatmap -m matrix_PRC2.gz -out CAF-1_ATAC_change_All_sort.pdf \
+        #                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
+        #                 --startLabel "5'" \
+        #           			--endLabel "3'" \
+        #                 --sortUsing sum \
+        #                 --sortRegions descend \
+        #                 --missingDataColor 1 \
+        #                 --whatToShow "heatmap and colorbar" \
+        #                 --outFileSortedRegions heatmap.bed \
+        #                 --colorMap 'seismic' \
+        #                 --zMin 0 \
 
 
 #####K4vsK27#######
 
-# computeMatrix scale-regions -b 1000 -a 500 \
-#  -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
-#     $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-#     $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
-#     $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-#     $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
-#     $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR2/SRR8269825_log.bw \
-#     $OUTDIR2/SRR8444038_log.bw \
-#     $OUTDIR2/SRR7970629_log.bw \
-#     $OUTDIR2/SRR7970598_log.bw \
-#     $OUTDIR2/SRR10916163_log.bw \
-#     -R $BEDDIR2/cac3_upregulated.bed --skipZeros -o matrix_PRC2.gz
+computeMatrix scale-regions -b 1000 -a 500 \
+ -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
+    $OUTDIR2/SRR8269825_log.bw \
+    $OUTDIR2/SRR8444038_log.bw \
+    $OUTDIR2/SRR7970629_log.bw \
+    $OUTDIR2/SRR7970598_log.bw \
+    $OUTDIR2/SRR10916163_log.bw \
+    -R $BEDDIR2/CAF-1_K4_ectopic_merge_peaks.bed--skipZeros -o matrix_PRC2.gz
 # #
-#     plotHeatmap -m matrix_PRC2.gz -out cac-3_upreg.png \
-#                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
-#                 --startLabel "TSS" \
-#           			--endLabel "TES" \
-#                 --sortUsingSamples 4 14 \
-#                 --sortUsing sum \
-#                 --sortRegions descend \
-#                 --missingDataColor 1 \
-#                 --outFileSortedRegions heatmap.bed \
-#                 --colorList 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, magenta' 'white, green' 'white, green' 'white, green' 'white, green' 'white, green' 'white, red' 'white, red' 'white, red' 'white, red' 'white, red' \
-#                 --zMin 0 \
-#                 --zMax 16 16 16 16 16 20 20 20 20 20 5 5 5 5 5
+    plotHeatmap -m matrix_PRC2.gz -out K4_ectopic_H3K27me3_RNA.pdf \
+                --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
+                --startLabel "5'" \
+          			--endLabel "3'" \
+                --sortUsingSamples 4 14 \
+                --sortUsing sum \
+                --sortRegions descend \
+                --whatToShow "heatmap and colorbar" \
+                --missingDataColor 1 \
+                --outFileSortedRegions heatmap.bed \
+                --colorList 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'blue, white, red' 'blue, white, red' 'blue, white, red' 'blue, white, red' 'blue, white, red' \
+                --zMin 0 \
 
 
 # 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
