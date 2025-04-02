@@ -136,11 +136,11 @@ module load deepTools
                 # $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
 
 # 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, fuchsia' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
-computeMatrix scale-regions \
- -S $P133DIR/133-23_ChIP_WT_H3K9me3_Rep2_S21.bin_25.smooth_75Bulk.bw \
-    $P133DIR/133-24_ChIP_cac-1_H3K9me3_Rep2_S22.bin_25.smooth_75Bulk.bw  \
-    $P133DIR/133-25_ChIP_cac-2_H3K9me3_Rep2_S23.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o matrix_PRC2.gz
+# computeMatrix scale-regions \
+#  -S $P133DIR/133-23_ChIP_WT_H3K9me3_Rep2_S21.bin_25.smooth_75Bulk.bw \
+#     $P133DIR/133-24_ChIP_cac-1_H3K9me3_Rep2_S22.bin_25.smooth_75Bulk.bw  \
+#     $P133DIR/133-25_ChIP_cac-2_H3K9me3_Rep2_S23.bin_25.smooth_75Bulk.bw \
+#     -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o matrix_PRC2.gz
 
 # computeMatrix scale-regions \
 # -S  $OUTDIR2/SRR8269825.bw \
@@ -150,19 +150,19 @@ computeMatrix scale-regions \
 #     $OUTDIR2/SRR10916163.bw \
 #     -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
 
-plotHeatmap -m matrix_PRC2.gz -out CAF-1_H3K9me3.pdf \
-                --samplesLabel WT cac-1 cac-2 \
-                --startLabel "5'" \
-          			--endLabel "3'" \
-                --sortUsingSamples 1 \
-                --sortUsing sum \
-                --sortRegions descend \
-                --missingDataColor 1 \
-                --whatToShow "heatmap and colorbar" \
-                --heatmapHeight 20 \
-                --outFileSortedRegions heatmap.bed \
-                --colorList 'white, darkorange' \
-                --zMin 0 \
+# plotHeatmap -m matrix_PRC2.gz -out CAF-1_H3K9me3.pdf \
+#                 --samplesLabel WT cac-1 cac-2 \
+#                 --startLabel "5'" \
+#           			--endLabel "3'" \
+#                 --sortUsingSamples 1 \
+#                 --sortUsing sum \
+#                 --sortRegions descend \
+#                 --missingDataColor 1 \
+#                 --whatToShow "heatmap and colorbar" \
+#                 --heatmapHeight 20 \
+#                 --outFileSortedRegions heatmap.bed \
+#                 --colorList 'white, darkorange' \
+#                 --zMin 0 \
 
 
 ###referencePoint
@@ -221,18 +221,19 @@ plotHeatmap -m matrix_PRC2.gz -out CAF-1_H3K9me3.pdf \
     #     $OUTDIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
     #     -R merged_sorted_no_telo_2.bed --skipZeros -o matrix_PRC2.gz
 
-        # plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_96hr_bwr.pdf \
-        #             --samplesLabel WT 0hr 24hr 48hr 72hr 96hr \
-        #             --startLabel "5'" \
-        #       			--endLabel "3'" \
-        #             --missingDataColor 1 \
-        #             --whatToShow "heatmap and colorbar" \
-        #             --sortUsing sum \
-        #             --sortRegions descend \
-        #             --legendLocation none \
-        #             --outFileSortedRegions heatmap.bed \
-        #             --colorMap "bwr" \
-        #             --zMin 0 \
+        plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_96hr_bw_TEST.pdf \
+                    --samplesLabel WT 0hr 24hr 48hr 72hr 96hr \
+                    --startLabel "5'" \
+              			--endLabel "3'" \
+                    --missingDataColor 1 \
+                    --whatToShow "heatmap and colorbar" \
+                    --sortUsing sum \
+                    --sortRegions descend \
+                    --legendLocation none \
+                    --outFileSortedRegions heatmap.bed \
+                    --colorMap "bwr" \
+                    --zMin 0 \
+                    --zMax 50
 
 # plotHeatmap -m matrix_qa-suz12.gz -out $OUTDIR1/2025-02-17_qa-suz12_time_1_ET \
 #             --samplesLabel WT_0hr WT_24hr 0hr 4hr 8hr 12hr 24hr \
