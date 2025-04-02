@@ -133,7 +133,7 @@ computeMatrix scale-regions \
                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 WT cac-1 cac-2 cac-3 set-7 \
                 --startLabel "5'" \
           			--endLabel "3'" \
-                --sortUsingSamples 4 14 \
+                --sortUsingSamples 6 \
                 --sortUsing sum \
                 --sortRegions descend \
                 --whatToShow "heatmap and colorbar" \
@@ -141,6 +141,7 @@ computeMatrix scale-regions \
                 --outFileSortedRegions heatmap.bed \
                 --colorList 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'blue, white, red' 'blue, white, red' 'blue, white, red' 'blue, white, red' 'blue, white, red' \
                 --zMin 0 \
+                --zMax 15 15 15 15 15 20 20 20 20 20 4 4 4 4 4
 
 
 # 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
