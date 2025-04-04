@@ -103,7 +103,7 @@ module load deepTools
                         --sortUsing sum \
                         --sortRegions descend \
                         --missingDataColor 1 \
-                        --hclust 4 \
+                        --hclust 5 \
                         --clusterUsingSamples 1 2 3 4 5 \
                         --whatToShow "heatmap and colorbar" \
                         --outFileSortedRegions heatmap.bed \
