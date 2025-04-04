@@ -96,14 +96,14 @@ module load deepTools
         $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
         -R $BEDDIR2/CAF-1_ATAC_All_change_merge.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_PRC2.gz -out CAF-1_ATAC_change_All_kmeans.pdf \
+        plotHeatmap -m matrix_PRC2.gz -out CAF-1_ATAC_change_All_hclust.pdf \
                         --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                         --startLabel "5'" \
                   			--endLabel "3'" \
                         --sortUsing sum \
                         --sortRegions descend \
                         --missingDataColor 1 \
-                        --kmeans 4 \
+                        --hclust 4 \
                         --clusterUsingSamples 1 2 3 4 \
                         --whatToShow "heatmap and colorbar" \
                         --outFileSortedRegions heatmap.bed \
