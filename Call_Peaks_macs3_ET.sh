@@ -247,13 +247,13 @@ module load MACS3
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 #
- cat WT_ATAC_No_CAF_merge.bed \
-     CAF1_ATAC_NoWT.bed > CAF-1_ATAC_All_change.bed
-
-sort -k1,1 -k2,2n CAF-1_ATAC_All_change.bed > CAF-1_ATAC_All_change_sorted.bed
-bedtools sort -i CAF-1_ATAC_All_change_sorted.bed > CAF-1_ATAC_All_change_bed_sorted.bed
-
-bedtools merge -i CAF-1_ATAC_All_change_bed_sorted.bed -d 350 > CAF-1_ATAC_All_change_merge.bed
+#  cat WT_ATAC_No_CAF_merge.bed \
+#      CAF1_ATAC_NoWT.bed > CAF-1_ATAC_All_change.bed
+#
+# sort -k1,1 -k2,2n CAF-1_ATAC_All_change.bed > CAF-1_ATAC_All_change_sorted.bed
+# bedtools sort -i CAF-1_ATAC_All_change_sorted.bed > CAF-1_ATAC_All_change_bed_sorted.bed
+#
+# bedtools merge -i CAF-1_ATAC_All_change_bed_sorted.bed -d 350 > CAF-1_ATAC_All_change_merge.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
