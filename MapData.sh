@@ -16,7 +16,7 @@ source config.txt
 ###ADD a source file with path to FastqFiles
 #variables imported from submission script
 fastqPath="/scratch/evt82290/FastqFiles/2025_Run148_ET"
-accession="148-59_ChIP_LGIII_1_4670kb_H3K27me3_Rep1_S59"
+accession="148-60_ChIP_LGVI_3_H3K27me3_Rep1_S60"
 outdir="/scratch/evt82290/MappingOutputs/Run148"
 
 # #if output directory doesn't exist, create it
@@ -68,10 +68,10 @@ name=${bam/%_S[1-170]*_L001_R1_001_val_1.fq.gz/}
 ##################
 #Trimming
 #################
-	  ml Trim_Galore/0.6.7-GCCcore-11.2.0
-
-	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
-	  wait
+	  # ml Trim_Galore/0.6.7-GCCcore-11.2.0
+    #
+	  # trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
+	  # wait
 
 ml SAMtools
 ml BWA
