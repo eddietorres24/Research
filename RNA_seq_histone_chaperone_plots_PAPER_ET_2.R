@@ -58,7 +58,7 @@ countdataInteractors <- read.table("./text_files/readcounts_FINAL.txt",skip=1, h
 #create matrix containing count data only; i.e. eliminate contig, start, stop, length fields
 Interactors_countsOnly <- data.matrix(countdataInteractors[ ,6:ncol(countdataInteractors)])
 
-##Run calculateRPM function - must load "scater" library
+##Run calculateTPM function - must load "scater" library
 library("scater")
 Interactors_tpm <- calculateTPM(Interactors_countsOnly, lengths = countdataInteractors[,5])
 
