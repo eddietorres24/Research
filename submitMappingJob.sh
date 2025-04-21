@@ -12,12 +12,12 @@ then
 		"
 
 		exit
-fi
+	fi
 
 #iterates through list of accessions and passes to mapping script
 
-fastqPath="/scratch/evt82290/FastqFiles/2025_Run148_ET"
-outdir="/scratch/evt82290/MappingOutputs/Run148"
+fastqPath="/scratch/evt82290/FastqFiles/2024_Run136_ET"
+outdir="/scratch/evt82290/MappingOutputs/Run136"
 
 mkdir ${outdir}
 mkdir ${outdir}/logs

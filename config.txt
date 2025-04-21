@@ -3,12 +3,12 @@ THREADS=12
 
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 
-fastqPath="/scratch/evt82290/FastqFiles/2025_Run148_ET"
+fastqPath="/scratch/evt82290/FastqFiles/2024_Run136_ET"
 
 #Edit Code to add Q score option
 
 #OUTDIR should be the path a folder for writing output
-#outdir="/scratch/evt82290/MappingOutputs/Run145"
+#outdir="/scratch/evt82290/MappingOutputs/Run136"
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
 
@@ -19,13 +19,13 @@ fastqPath="/scratch/evt82290/FastqFiles/2025_Run148_ET"
 #OutputFolderName="/scratch/evt82290/MappingOutputs/ATAC"
 
 #Normal genome
-#GENOME="/home/evt82290/Research/GCA_000182925.2_NC12_genomic.fna"
+GENOME="/home/evt82290/Research/fasta_genome_files/GCA_000182925.2_NC12_genomic.fna"
 
 #New tetO genome
 #GENOME="/home/evt82290/Research/fasta_genome_files/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta"
 
 #genome w nucleation site at csr-1
-GENOME="/home/evt82290/Research/fasta_genome_files/LGVI_3_nuc_csr-1.fasta"
+#GENOME="/home/evt82290/Research/fasta_genome_files/LGVI_3_nuc_csr-1.fasta"
 
 #tetO Genome with hph fragment
 #GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"
