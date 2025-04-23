@@ -130,14 +130,14 @@ Export genes with statistically significant differential expression when compare
 ```{r coldata}
 alpha = 0.05
 
-cac1 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1", "WT"))
-cac2 <- results(dds2, alpha=alpha, contrast=c("condition", "cac2", "WT"))
-cac3 <- results(dds2, alpha=alpha, contrast=c("condition", "cac3", "WT"))
-naf1 <- results(dds2, alpha=alpha, contrast=c("condition", "naf1", "WT"))
-naf2 <- results(dds2, alpha=alpha, contrast=c("condition", "naf2", "WT"))
-asf1 <- results(dds2, alpha=alpha, contrast=c("condition", "asf1", "WT"))
-ATRX <- results(dds2, alpha=alpha, contrast=c("condition", "ATRX", "WT"))
-set7 <- results(dds2, alpha=alpha, contrast=c("condition", "set7", "WT"))
+cac1_sig <- results(dds2, alpha=alpha, contrast=c("condition", "cac1", "WT"))
+cac2_sig <- results(dds2, alpha=alpha, contrast=c("condition", "cac2", "WT"))
+cac3_sig <- results(dds2, alpha=alpha, contrast=c("condition", "cac3", "WT"))
+naf1_sig <- results(dds2, alpha=alpha, contrast=c("condition", "naf1", "WT"))
+naf2_sig <- results(dds2, alpha=alpha, contrast=c("condition", "naf2", "WT"))
+asf1_sig <- results(dds2, alpha=alpha, contrast=c("condition", "asf1", "WT"))
+ATRX_sig <- results(dds2, alpha=alpha, contrast=c("condition", "ATRX", "WT"))
+set7_sig <- results(dds2, alpha=alpha, contrast=c("condition", "set7", "WT"))
 #set3 <- results(dds2, alpha=alpha, contrast=c("condition", "set3", "WT"))
 
 ```
@@ -145,14 +145,14 @@ set7 <- results(dds2, alpha=alpha, contrast=c("condition", "set7", "WT"))
 Subset to only export significant differentially expressed genes
 
 ```{r}
-cac1_sig <- subset(cac1, padj < 0.01)
-cac2_sig <- subset(cac2, padj < 0.01)
-cac3_sig <- subset(cac3, padj < 0.01)
-naf1_sig <- subset(naf1, padj < 0.01)
-naf2_sig <- subset(naf2, padj < 0.01)
-asf1_sig <- subset(asf1, padj < 0.01)
-ATRX_sig <- subset(ATRX, padj < 0.01)
-set7_sig <- subset(set7, padj < 0.01)
+cac1_sig <- subset(cac1, padj < 0.05)
+cac2_sig <- subset(cac2, padj < 0.05)
+cac3_sig <- subset(cac3, padj < 0.05)
+naf1_sig <- subset(naf1, padj < 0.05)
+naf2_sig <- subset(naf2, padj < 0.05)
+asf1_sig <- subset(asf1, padj < 0.05)
+ATRX_sig <- subset(ATRX, padj < 0.05)
+set7_sig <- subset(set7, padj < 0.05)
 #set3 <- subset(set3, padj < 0.05)
 
 write.csv(as.data.frame(cac1_sig), file = "cac1.csv")
@@ -263,7 +263,7 @@ ngenes = read.csv("../csv_files/neurospora_genes.csv")
 combine <- transform(merge(ngenes, l2fc, by = "VALUE"))
 track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", "asf1.csv", "ATRX.csv", "cac1.csv", "cac2.csv", "cac3.csv", "naf1.csv", "naf2.csv", "set7.csv")
 
-write.table(track, file="histchaps_all.igv", sep="\t", row.names = FALSE, quote = FALSE)
+write.table(track, file="histchaps_TEST.igv", sep="\t", row.names = FALSE, quote = FALSE)
 ```
 
 #Subsetting DEG by which strain they are up- or downregulated in CAF-1 mutants. Also extracting a list of ALL DEG for GO Analysis
