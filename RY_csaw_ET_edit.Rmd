@@ -91,6 +91,8 @@ ATACpeaks_merged <- read.table(file="./bed_files/CAF-1_All_ATAC_merge_peaks.bed"
 Regions <- read.table(file="./bed_files/CAF-1_All_peaks_K27_K4_ATAC_merge.bed")
 K4_27peaks_merged <- read.table(file="./bed_files/CAF-1_All_peaks_K27_K4_merge.bed")
 
+K27_genes <- read.table(file="./bed_files/K27_narrow_genes_sorted.bed")
+
 #Regions.gr <- GRanges(Regions$V1, IRanges(Regions$V2, Regions$V3))
 
 #K27_Peaks.gr <- GRanges(K27peaks$V1, IRanges(K27peaks$V2, K27peaks$V3))
@@ -99,6 +101,7 @@ K4peaks_merged.gr <- GRanges(K4peaks_merged$V1, IRanges(K4peaks_merged$V2, K4pea
 ATACpeaks_merged.gr <- GRanges(ATACpeaks_merged$V1, IRanges(ATACpeaks_merged$V2, ATACpeaks_merged$V3))
 Regions.gr <- GRanges(Regions$V1, IRanges(Regions$V2, Regions$V3))
 K4_27peaks_merged.gr <- GRanges(K4_27peaks_merged$V1, IRanges(K4_27peaks_merged$V2, K4_27peaks_merged$V3))
+K27_genes.gr <- GRanges(K27_genes$V1, IRanges(K27_genes$V2, K27_genes$V3))
 
 #Keep Regions within peaks
 suppressWarnings(keepK27 <- overlapsAny(rowRanges(data_csaw), K27peaks_merged.gr, type = "within"))
@@ -115,12 +118,16 @@ summary(keep)
 
 suppressWarnings(keepK4_27 <- overlapsAny(rowRanges(data_csaw), K4_27peaks_merged.gr, type = "within"))
 summary(keepK4_27)
+
+suppressWarnings(keepK27_genes <- overlapsAny(rowRanges(data_csaw), K27_genes.gr, type = "within"))
+summary(keepK27_genes)
     
 #filter data keeping different regions for each modification
 filtered.dataK27 <- data_csaw[keepK27,]
 filtered.dataK4 <- data_csaw[keepK4,]
 filtered.dataATAC <- data_csaw[keepATAC,]
 filtered.dataK4_27 <- data_csaw[keepK4_27,]
+filtered.dataK27_genes <- data_csaw[keepK27_genes,]
 ##For all regions in K27, K4, ATAC
 filtered.data <- data_csaw[keep,]
 
@@ -130,6 +137,7 @@ K4.Windows.df <- as.data.frame(granges(filtered.dataK4))
 ATAC.Windows.df <- as.data.frame(granges(filtered.dataATAC))
 All.windows.df <- as.data.frame(granges(filtered.data))
 K4_27.windows.df <- as.data.frame(granges(filtered.dataK4_27))
+K27_genes.Windows.df <- as.data.frame(granges(filtered.dataK27_genes))
 ```
 
 ```{r pre-process data}
@@ -170,6 +178,7 @@ DGElistK4 <- asDGEList(filtered.dataK4, group=factor(grouping))
 DGElistATAC <- asDGEList(filtered.dataATAC, group=factor(grouping)) 
 DGElist <- asDGEList(filtered.data, group=factor(grouping)) 
 DGElistK4_27 <- asDGEList(filtered.dataK4_27, group=factor(grouping))
+DGElistK27_gene <- asDGEList(filtered.dataK27_genes, group=factor(grouping))
 
 #replace generic "Sample1, Sample2" names with actual names of samples. Do for all mods
 #K27
@@ -187,6 +196,9 @@ rownames(DGElist$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", 
 #K4_27
 colnames(DGElistK4_27$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
 rownames(DGElistK4_27$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+#K4_27
+colnames(DGElistK27_gene$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+rownames(DGElistK27_gene$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
 
 ```
 
@@ -395,9 +407,10 @@ yK4 <- estimateDisp(DGElistK4, design.mat)
 yATAC <- estimateDisp(DGElistATAC, design.mat)
 yAll <- estimateDisp(DGElist, design.mat)
 yK4_27 <- estimateDisp(DGElistK4_27, design.mat)
+yK27_gene <- estimateDisp(DGElistK27_gene, design.mat)
 
 #See summary if you want
-summary(y$trended.dispersion)
+summary(yK27_gene$trended.dispersion)
 
 #assign fit variable, THIS WILL BE USED FOR DOWNSTREAM ANALYSIS, need to do for each mod
 fitK27 <- glmQLFit(yK27, design.mat, robust=TRUE)
@@ -405,18 +418,19 @@ fitK4 <- glmQLFit(yK4, design.mat, robust=TRUE)
 fitATAC <- glmQLFit(yATAC, design.mat, robust=TRUE)
 fitAll <- glmQLFit(yAll, design.mat, robust=TRUE)
 fitK4_27 <- glmQLFit(yK4_27, design.mat, robust=TRUE)
+fitK27_gene <- glmQLFit(yK27_gene, design.mat, robust=TRUE)
 
 #See summary & head of counts table
-summary(fit$var.post)
-head(y$counts)
+summary(fitK27_gene$var.post)
+head(yK27_gene$counts)
 
 #plot fit, replace "y" variables to see fit for different mods
 par(mfrow=c(1,2))
-o <- order(yK27$AveLogCPM)
-plot(yK27$AveLogCPM[o], sqrt(yK27$trended.dispersion[o]), type="l", lwd=2,
+o <- order(yK27_gene$AveLogCPM)
+plot(yK27_gene$AveLogCPM[o], sqrt(yK27_gene$trended.dispersion[o]), type="l", lwd=2,
      ylim=c(0, 1), xlab=expression("Ave."~Log[2]~"CPM"),
      ylab=("Biological coefficient of variation"))
-plotQLDisp(fitK27)
+plotQLDisp(fitK27_gene)
 ```
 
 
@@ -487,9 +501,9 @@ K27.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K27.out.ranges),
    logFC_cac2vInput_K27me3 = cac2vI.K27.out.ranges$rep.logFC,
   PValue_cac2vInput_K27me3 = cac2vI.K27.out.ranges$PValue,
   FDR_cac2vInput_K27me3 = cac2vI.K27.out.ranges$FDR,
-   logFC_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$rep.logFC,
-  PValue_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$PValue,
-  FDR_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$FDR,
+   #logFC_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$rep.logFC,
+  #PValue_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$PValue,
+  #FDR_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$FDR,
   logFC_set7vInput_K27me3 = set7vInput.K27.out.ranges$rep.logFC,
   PValue_set7vInput_K27me3 = set7vInput.K27.out.ranges$PValue,
   FDR_set7vInput_K27me3 = set7vInput.K27.out.ranges$FDR)
@@ -502,11 +516,11 @@ K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logF
 
 K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac2vInput_K27me3[FDR_cac2vInput_K27me3 > 0.05] <- 0.1)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K27me3[FDR_cac3vInput_K27me3 > 0.05] <- 0.1)
+#K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K27me3[FDR_cac3vInput_K27me3 > 0.05] <- 0.1)
 
 K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_set7vInput_K27me3[FDR_set7vInput_K27me3 > 0.05] <- 0.1)
 
-K27_FilteredHeatmap_df <- dplyr::select(K27.chip.Filteredres.df_SigOnly,7,10,13,16,19)
+K27_FilteredHeatmap_df <- dplyr::select(K27.chip.Filteredres.df_SigOnly,7,10,13,16)
 
 rownames(K27_FilteredHeatmap_df) <- paste(K27.chip.Filteredres.df_SigOnly$seqnames, K27.chip.Filteredres.df_SigOnly$start, K27.chip.Filteredres.df_SigOnly$end, sep=".")
 
@@ -578,9 +592,9 @@ K4.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K4.out.ranges),
    logFC_cac2vInput_K4me2 = cac2vI.K4.out.ranges$rep.logFC,
   PValue_cac2vInput_K4me2 = cac2vI.K4.out.ranges$PValue,
   FDR_cac2vInput_K4me2 = cac2vI.K4.out.ranges$FDR,
-   logFC_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$rep.logFC,
-  PValue_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$PValue,
-  FDR_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$FDR,
+   #logFC_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$rep.logFC,
+  #PValue_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$PValue,
+  #FDR_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$FDR,
   logFC_set7vInput_K4me2 = set7vInput.K4.out.ranges$rep.logFC,
   PValue_set7vInput_K4me2 = set7vInput.K4.out.ranges$PValue,
   FDR_set7vInput_K4me2 = set7vInput.K4.out.ranges$FDR)
@@ -593,11 +607,11 @@ K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly, logFC_
 
 K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_cac2vInput_K4me2[FDR_cac2vInput_K4me2 > 0.05] <- 0.1)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K4me2[FDR_cac3vInput_K4me2 > 0.05] <- 0.1)
+#K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K4me2[FDR_cac3vInput_K4me2 > 0.05] <- 0.1)
 
 K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_set7vInput_K4me2[FDR_set7vInput_K4me2 > 0.05] <- 0.1)
 
-K4_FilteredHeatmap_df <- dplyr::select(K4.chip.Filteredres.df_SigOnly,7,10,13,16,19)
+K4_FilteredHeatmap_df <- dplyr::select(K4.chip.Filteredres.df_SigOnly,7,10,13,16)
 
 rownames(K4_FilteredHeatmap_df) <- paste(K4.chip.Filteredres.df_SigOnly$seqnames, K4.chip.Filteredres.df_SigOnly$start, K4.chip.Filteredres.df_SigOnly$end, sep=".")
 
@@ -611,7 +625,7 @@ max <- quantile(K27_FilteredHeatmap_mat, 0.98) # identify the 98th percentile va
 K27_FilteredHeatmap_mat[K27_FilteredHeatmap_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
 
 library(circlize)
-col_fun<- colorRamp2(c(-1, 0, quantile(K27_FilteredHeatmap_mat, 0.99)), c("white","white", "darkgreen"))
+col_fun<- colorRamp2(c(0, quantile(K27_FilteredHeatmap_mat, 0.99)), c("white", "darkgreen"))
 col_fun(seq(-1, quantile(K27_FilteredHeatmap_mat, 0.99), length = 20))
 
 heatmap_sort_WT <- order(K27_FilteredHeatmap_mat[, 1], decreasing = TRUE)
@@ -619,12 +633,14 @@ heatmap_sort_WT <- order(K27_FilteredHeatmap_mat[, 1], decreasing = TRUE)
 K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat[heatmap_sort_WT, ]
 
 library(ComplexHeatmap)
-K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = F, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort)))) , heatmap_legend_param = list(title = "K27me3"))
-png("./Filtered_Heatmap_cacs_K27_K27regions_K27sort.png", width = 800, height = 800)
+K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, clustering_method_rows = "single", show_column_dend = FALSE, show_row_dend = FALSE, km = 3, heatmap_legend_param = list(title = "K27me3"))
+png("./K27_gene_K27_heatmap_cluster_TEST.png", width = 800, height = 800)
 # Draw the heatmap
 draw(K27_Filtered_hm)
 # Close the device to save the file
 dev.off()
+
+#row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort))))
 
 #K4 Heatmap
 K4_FilteredHeatmap_mat <- as.matrix(K4_FilteredHeatmap_df)
@@ -633,14 +649,14 @@ max <- quantile(K4_FilteredHeatmap_mat, 0.98) # identify the 98th percentile val
 K4_FilteredHeatmap_mat[K4_FilteredHeatmap_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
 
 library(circlize)
-col_fun<- colorRamp2(c(-1, 0, quantile(K4_FilteredHeatmap_mat, 0.99)), c("white","white", "#f655f1"))
+col_fun<- colorRamp2(c(0, quantile(K4_FilteredHeatmap_mat, 0.99)), c("white", "#f655f1"))
 col_fun(seq(-1, quantile(K4_FilteredHeatmap_mat, 0.99), length = 20))
 
 K4_FilteredHeatmap_mat_sort = K4_FilteredHeatmap_mat[heatmap_sort_WT, ]
 
 library(ComplexHeatmap)
 K4_Filtered_hm <- Heatmap(K4_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = F, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K4_FilteredHeatmap_mat_sort)))) , heatmap_legend_param = list(title = "H3K4me2"))
-png("./Filtered_Heatmap_cacs_K4_K4_regions_K27sort.png", width = 800, height = 800)
+png("./K27_genes_K4_noc3.png", width = 800, height = 800)
 # Draw the heatmap
 draw(K4_Filtered_hm)
 # Close the device to save the file
