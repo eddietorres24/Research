@@ -106,12 +106,12 @@ module load deepTools
                         --sortUsing sum \
                         --sortRegions descend \
                         --missingDataColor 1 \
-                        --hclust 2 \
-                        --clusterUsingSamples 5 6 7 8 \
+                        --kmeans 3 \
+                        --clusterUsingSamples 1 2 3 \
                         --outFileSortedRegions heatmap.bed \
                         --colorList 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' \
                         --zMin 0 \
-                        --zMax 50 50 50 50 20 20 20 20
+                        --zMax 50 50 50 50 16 16 16 16
 
 #  --whatToShow "heatmap and colorbar" \
 
