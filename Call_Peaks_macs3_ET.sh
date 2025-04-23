@@ -244,18 +244,17 @@ module load MACS3
 #CAF-1
 # bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed \
-#                                ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed \
-#                                ${OUTDIR3}/2024_04_23_136_abcam_cac-3_peaks.bed \
-#                                ${OUTDIR3}/2024_04_23_24hr_peaks.bed > ${OUTDIR3}/merge_peaks.txt
-#
-#  cat WT_ATAC_No_CAF_merge.bed \
-#      CAF1_ATAC_NoWT.bed > CAF-1_ATAC_All_change.bed
+#                                ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed > ${OUTDIR3}/merge_peaks.txt
+
+ cat WT_CS_H3K27me3_Rep1_peaks.bed  \
+     cac-1_CS_H3K27me3_Rep1_peaks.bed \
+     cac-2_CS_H3K27me3_Rep1_peaks.bed > cac-1-2_K27.bed
 
 
-# sort -k1,1 -k2,2n K27_mraked_genes.bed > K27_1mraked_genes_sorted.bed
-# bedtools sort -i K27_1mraked_genes_sorted.bed > K27_narrow_genes_sorted.bed
-#
-# bedtools merge -i K27_mraked_genes_bed_sorted.bed -d 350 > CAF-1_ATAC_All_change_merge.bed
+sort -k1,1 -k2,2n cac-1-2_K27.bed > cac-1-2_K27_sorted.bed
+bedtools sort -i cac-1-2_K27_sorted.bed > cac-1-2_K27_bed_sorted.bed
+
+bedtools merge -i cac-1-2_K27_bed_sorted.bed -d 350 > cac-1-2_K27.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
