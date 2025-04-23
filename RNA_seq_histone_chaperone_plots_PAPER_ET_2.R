@@ -104,7 +104,7 @@ colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 
 
 #read in geneIDs of PRC2 target genes
-Prc2targets <- read.table("heatmapPRC2genesEdit.txt", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
+Prc2targets <- read.table("./text_files/K27_narrow_genes_sorted.txt", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
 
 ###SUBSET DATA FOR ALL KO SAMPLES
 Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,1])
@@ -114,7 +114,7 @@ AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Order
 
 
 ###Subset data to filter out non-PRC2 target regions that got through (cutting out any genes over 2 tpm in WT)
-AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 2))
+AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 9.5))
 AVERAGE_AlldataTPM <- subset(Averaged_Orderd_KO_data, (Averaged_Orderd_KO_data[,1] > -0.1))
 
 ###Add sudocount and log transform (if necessary)
@@ -151,20 +151,20 @@ meltedAverageAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
 
 altorder = rev(c( "WT","set-7","cac-1","cac-2","cac-3","naf-1","naf-2","asf-1","ATRX"))
 
-meltedAveragePRC2targetData$Sample <- factor(meltedAveragePRC2targetData$Sample, altorder)
+meltedAveragePRC2targetData$Sample <- factor(meltedAveragePRC2targetData$Sample)
 
-meltedAverageAllData$Sample <- factor(meltedAverageAllData$Sample, altorder)
+meltedAverageAllData$Sample <- factor(meltedAverageAllData$Sample)
 
 # Plot box & whisker chart
 library(ggplot2)
 xlabels = averageRowIDs
-colors = rev(c( "#4575b4","#fee090","#fee090", "#fee090", "#fee090", "#4575b4", "#4575b4", "#4575b4", "#4575b4"))
+colors = c( "#4575b4","#fee090","#fee090", "#fee090", "#fee090", "#4575b4", "#4575b4", "#4575b4", "#4575b4")
 
-box<-ggplot(meltedAverageAllData, aes(x=Sample, y=Count)) +
+box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
   labs(y="Expression Level (Transcripts per Million)", x="Strain") +
   stat_boxplot(geom = "errorbar", width = 0.2) + 
-  geom_boxplot(notch = TRUE, outlier.shape = NA, fill=colors, size=0.1, coef=1.5, lwd=0.25) +
-  coord_flip(ylim=c(-4,10))+
+  geom_boxplot(notch = TRUE, fill=colors, size=0.1, coef=1.5, lwd=0.25) +
+  ylim(0, 11.5) +
   theme_get() + 
   theme(axis.line.x = element_line(size = 0.5, colour = "black"),
         axis.line.y = element_line(size = 0.5, colour = "black"),
@@ -178,7 +178,48 @@ box<-ggplot(meltedAverageAllData, aes(x=Sample, y=Count)) +
 #device.on()
 box
 
-ggsave(filename = "histone_chaperone_boxplot_PAPER.pdf", plot = box, dpi=600, height= 3, width=4)
+ggsave(filename = "histone_chaperone_boxplot_PAPER_TEST.pdf", plot = box, dpi=600, height= 3, width=4)
+
+#######################
+
+#t-test for significance in difference of mean expression values of PRC2 targets b/w WT & mutants
+
+set7_t <- t.test(PRC2meancalc$set.7, mu = mean(PRC2meancalc$WT))
+cac1_t <- t.test(PRC2meancalc$cac.1, mu = mean(PRC2meancalc$WT))
+cac2_t <- t.test(PRC2meancalc$cac.2, mu = mean(PRC2meancalc$WT))
+cac3_t <- t.test(PRC2meancalc$cac.3, mu = mean(PRC2meancalc$WT))
+naf1_t <- t.test(PRC2meancalc$naf.1, mu = mean(PRC2meancalc$WT))
+naf2_t <- t.test(PRC2meancalc$naf.2, mu = mean(PRC2meancalc$WT))
+asf1_t <- t.test(PRC2meancalc$asf.1, mu = mean(PRC2meancalc$WT))
+atrx_t <- t.test(PRC2meancalc$ATRX, mu = mean(PRC2meancalc$WT))
+
+#I want to make a violin plot instead of boxplot. Going to adapt Abby's code
+library(grDevices)
+
+total2 <- meltedAveragePRC2targetData %>%
+  group_by(Sample)
+total_dist = meltedAveragePRC2targetData %>%
+  group_by(Sample) %>% summarise(num=n())
+
+#Setting distance between violins in plot
+dodge <- position_dodge(width = 1)
+###  plotting violin plot
+### this chunk is just for putting samples in the order that I want ###
+violin <- total2 %>%
+  left_join(total_dist) %>%
+  arrange(factor(Sample, levels = c("WT", "set-7", "cac-1", "cac-2", "cac-3", "naf-1", "naf-2", "asf-1", "ATRX"))) %>%
+  mutate(Sample = factor(Sample)) %>%
+  ### everything below is the actual violin plot ###
+  ggplot(aes(x=Sample, y=Count)) + 
+  geom_violin(position = dodge, scale="width", trim=FALSE) +
+  stat_summary(fun = "mean", geom = "crossbar", width = 0.25, colour = "black") +
+  stat_summary(fun.data = "mean_se", geom = "errorbar", width = 0.25) +
+  scale_fill_manual("",values = c("orchid1", "springgreen3")) +
+  labs(x = "Strain",y = expression("Expression Level (log "[2]~"(TPM+1)")) + 
+  theme_classic(base_size = 20)
+
+print(violin)
+ggsave("./Histone_Chape_PRC2_Gene_expression.pdf", plot=violin, width = 10, height = 8, unit="in",  dpi=400)
 
 
 ########################3
@@ -195,7 +236,7 @@ breaks1=seq(-4, 5, by=.09) #This is to set a custom heatmaps scale. Not used her
 ##strategy 1 - Plot the average TMP of all genes that change expression; row normalization; clustredRows
 
 ##Keep Only Genes that are expressed in at least one sample
-GenesWithChanges <- subset(AVERAGE_AlldataTPM, (rowSums(allDataTPM) > 0))
+GenesWithChanges <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0))
 GenesWithChanges_95 <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0))
 
 #plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above

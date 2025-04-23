@@ -49,7 +49,7 @@ samplesname <- colnames(cts2)
 write.table(samplesname, file="samplenames.txt", sep="\t")
 
 #after editing sample names in excel or text editor (new names are in column 3), read in the spreadsheet with hand annotated sample names that are short 
-rename <- read.table("./samplenames.txt", header=FALSE, skip=1, sep = "\t")
+rename <- read.table("./samplenames2.txt", header=FALSE, skip=1, sep = "\t")
 #assign short sample names to variable
 cnames <- rename$V2
 #replace column names
