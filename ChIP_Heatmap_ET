@@ -105,7 +105,7 @@ module load deepTools
                   			--endLabel "3'" \
                         --sortUsing sum \
                         --sortRegions descend \
-                        --clusterUsingSamples 1 2 3 4
+                        --clusterUsingSamples 1 2 3 4 \
                         --kmeans 3 \
                         --missingDataColor 1 \
                         --outFileSortedRegions heatmap.bed \
