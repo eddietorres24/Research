@@ -106,7 +106,6 @@ module load deepTools
                         --sortUsing sum \
                         --sortRegions descend \
                         --clusterUsingSamples 2 \
-                        --kmeans 2 \
                         --missingDataColor 1 \
                         --outFileSortedRegions heatmap.bed \
                         --colorList 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' \
