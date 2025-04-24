@@ -104,6 +104,7 @@ module load deepTools
                         --startLabel "5'" \
                   			--endLabel "3'" \
                         --sortUsing sum \
+                        --sortUsingSamples 1 \
                         --sortRegions descend \
                         --clusterUsingSamples 2 \
                         --missingDataColor 1 \
