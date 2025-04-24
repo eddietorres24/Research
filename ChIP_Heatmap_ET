@@ -88,30 +88,29 @@ module load deepTools
     #     $OUTDIR2/SRR10916163_log.bw \
     #     -R cac1_up.bed --skipZeros -o matrix_PRC2.gz
 
-    computeMatrix scale-regions \
-     -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-        $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
-        $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-        $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-        $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
+    computeMatrix scale-regions -b 1500 \
+     -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
         $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
         $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
         $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
-        -R $BEDDIR2/cac-1-2_K27.bed --skipZeros -o matrix_PRC2.gz
+        $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw \
+        $P141DIR/141-N12_ATAC_cac-1__Rep1_S101.bin_25.smooth_75Bulk.bw \
+        $P141DIR/141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw \
+        $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
+        -R $BEDDIR2/K27_narrow_genes_sorted.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_PRC2.gz -out CAF-1_ALLK27_K27_K4.pdf \
+        plotHeatmap -m matrix_PRC2.gz -out CAF-1_K27genes_K4_ATAC.pdf \
                         --samplesLabel WT cac-1 cac-2 set-7 WT cac-1 cac-2 set-7 \
                         --startLabel "5'" \
                   			--endLabel "3'" \
                         --sortUsing sum \
-                        --sortUsingSamples 1 \
                         --sortRegions descend \
-                        --clusterUsingSamples 2 \
+                        --kmeans 2 \
                         --missingDataColor 1 \
                         --outFileSortedRegions heatmap.bed \
-                        --colorList 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' \
+                        --colorList 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'mediumblue, cornflowerblue, white, salmon, red' 'mediumblue, cornflowerblue, white, salmon, red' 'mediumblue, cornflowerblue, white, salmon, red' 'mediumblue, cornflowerblue, white, salmon, red' \
                         --zMin 0 \
-                        --zMax 45 45 45 45 16 16 16 
+
 
 #  --whatToShow "heatmap and colorbar" \
 
