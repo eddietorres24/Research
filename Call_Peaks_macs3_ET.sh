@@ -246,15 +246,16 @@ module load MACS3
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 
- cat WT_CS_H3K27me3_Rep1_peaks.bed  \
-     cac-1_CS_H3K27me3_Rep1_peaks.bed \
-     cac-2_CS_H3K27me3_Rep1_peaks.bed > cac-1-2_K27.bed
-
-
-sort -k1,1 -k2,2n cac-1-2_K27.bed > cac-1-2_K27_sorted.bed
-bedtools sort -i cac-1-2_K27_sorted.bed > cac-1-2_K27_bed_sorted.bed
-
-bedtools merge -i cac-1-2_K27_bed_sorted.bed -d 350 > cac-1-2_K27.bed
+#  cat WT_H3K4me2_Rep1_peaks.bed \
+#      cac-1_H3K4me2_Rep1_peaks.bed \
+#      cac-2_H3K4me2_Rep1_peaks.bed \
+#      set-7_H3K4me2_Rep1_peaks.bed > cac-1-2_K4.bed
+#
+#
+# sort -k1,1 -k2,2n cac-1-2_K4.bed > cac-1-2_K4_sorted.bed
+# bedtools sort -i cac-1-2_K4_sorted.bed > cac-1-2_K4_bed_sorted.bed
+#
+# bedtools merge -i cac-1-2_K4_bed_sorted.bed -d 350 > cac_set7_K4.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt

@@ -85,8 +85,8 @@ filter=0, bin=TRUE, param=param)
 ```{r filter based on K9 and K27 peaks}
 
 #K27peaks <- read.table(file="./All_Peak_files/peakcalls/136-1_ChIP_WT_H3K27me3_abcam_Rep2_peaks.broadPeak")
-K27peaks_merged <- read.table(file="./bed_files/CAF-1_All_K27_merge_peaks.bed")
-K4peaks_merged <- read.table(file="./bed_files/CAF-1_All_K4_merge_peaks.bed")
+K27peaks_merged <- read.table(file="./bed_files/cac-1-2_K27.bed")
+K4peaks_merged <- read.table(file="./bed_files/cac_set7_K4.bed")
 ATACpeaks_merged <- read.table(file="./bed_files/CAF-1_All_ATAC_merge_peaks.bed")
 Regions <- read.table(file="./bed_files/CAF-1_All_peaks_K27_K4_ATAC_merge.bed")
 K4_27peaks_merged <- read.table(file="./bed_files/CAF-1_All_peaks_K27_K4_merge.bed")
@@ -626,15 +626,15 @@ K27_FilteredHeatmap_mat[K27_FilteredHeatmap_mat>max] = max    #replace any value
 
 library(circlize)
 col_fun<- colorRamp2(c(0, quantile(K27_FilteredHeatmap_mat, 0.99)), c("white", "darkgreen"))
-col_fun(seq(-1, quantile(K27_FilteredHeatmap_mat, 0.99), length = 20))
+col_fun(seq(0, quantile(K27_FilteredHeatmap_mat, 0.99), length = 20))
 
 heatmap_sort_WT <- order(K27_FilteredHeatmap_mat[, 1], decreasing = TRUE)
 
 K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat[heatmap_sort_WT, ]
 
 library(ComplexHeatmap)
-K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, clustering_method_rows = "single", show_column_dend = FALSE, show_row_dend = FALSE, km = 3, heatmap_legend_param = list(title = "K27me3"))
-png("./K27_gene_K27_heatmap_cluster_TEST.png", width = 800, height = 800)
+K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "K27me3"))
+pdf("./K27_gene_K27_heatmap_cac-1_2.pdf", height = 8)
 # Draw the heatmap
 draw(K27_Filtered_hm)
 # Close the device to save the file
@@ -890,9 +890,9 @@ K27.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K27.out.ranges),
    logFC_cac2vInput_K27me3 = cac2vI.K27.out.ranges$rep.logFC,
   PValue_cac2vInput_K27me3 = cac2vI.K27.out.ranges$PValue,
   FDR_cac2vInput_K27me3 = cac2vI.K27.out.ranges$FDR,
-   logFC_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$rep.logFC,
-  PValue_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$PValue,
-  FDR_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$FDR,
+   #logFC_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$rep.logFC,
+  #PValue_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$PValue,
+  #FDR_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$FDR,
   logFC_set7vInput_K27me3 = set7vInput.K27.out.ranges$rep.logFC,
   PValue_set7vInput_K27me3 = set7vInput.K27.out.ranges$PValue,
   FDR_set7vInput_K27me3 = set7vInput.K27.out.ranges$FDR)
@@ -905,11 +905,11 @@ K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logF
 
 K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac2vInput_K27me3[FDR_cac2vInput_K27me3 > 0.05] <- 0.1)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K27me3[FDR_cac3vInput_K27me3 > 0.05] <- 0.1)
+#K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K27me3[FDR_cac3vInput_K27me3 > 0.05] <- 0.1)
 
 K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_set7vInput_K27me3[FDR_set7vInput_K27me3 > 0.05] <- 0.1)
 
-K27_FilteredHeatmap_df <- dplyr::select(K27.chip.Filteredres.df_SigOnly,7,10,13,16,19)
+K27_FilteredHeatmap_df <- dplyr::select(K27.chip.Filteredres.df_SigOnly,7,10,13,16)
 
 rownames(K27_FilteredHeatmap_df) <- paste(K27.chip.Filteredres.df_SigOnly$seqnames, K27.chip.Filteredres.df_SigOnly$start, K27.chip.Filteredres.df_SigOnly$end, sep=".")
 
@@ -980,9 +980,9 @@ K4.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K4.out.ranges),
    logFC_cac2vInput_K4me2 = cac2vI.K4.out.ranges$rep.logFC,
   PValue_cac2vInput_K4me2 = cac2vI.K4.out.ranges$PValue,
   FDR_cac2vInput_K4me2 = cac2vI.K4.out.ranges$FDR,
-   logFC_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$rep.logFC,
-  PValue_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$PValue,
-  FDR_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$FDR,
+   #logFC_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$rep.logFC,
+  #PValue_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$PValue,
+  #FDR_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$FDR,
   logFC_set7vInput_K4me2 = set7vInput.K4.out.ranges$rep.logFC,
   PValue_set7vInput_K4me2 = set7vInput.K4.out.ranges$PValue,
   FDR_set7vInput_K4me2 = set7vInput.K4.out.ranges$FDR)
@@ -995,11 +995,11 @@ K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly, logFC_
 
 K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_cac2vInput_K4me2[FDR_cac2vInput_K4me2 > 0.05] <- 0.1)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K4me2[FDR_cac3vInput_K4me2 > 0.05] <- 0.1)
+#K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K4me2[FDR_cac3vInput_K4me2 > 0.05] <- 0.1)
 
 K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_set7vInput_K4me2[FDR_set7vInput_K4me2 > 0.05] <- 0.1)
 
-K4_FilteredHeatmap_df <- dplyr::select(K4.chip.Filteredres.df_SigOnly,7,10,13,16,19)
+K4_FilteredHeatmap_df <- dplyr::select(K4.chip.Filteredres.df_SigOnly,7,10,13,16)
 
 rownames(K4_FilteredHeatmap_df) <- paste(K4.chip.Filteredres.df_SigOnly$seqnames, K4.chip.Filteredres.df_SigOnly$start, K4.chip.Filteredres.df_SigOnly$end, sep=".")
 
@@ -1126,8 +1126,8 @@ max <- quantile(K4_FilteredHeatmap_mat, 0.98) # identify the 98th percentile val
 K4_FilteredHeatmap_mat[K4_FilteredHeatmap_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
 
 library(circlize)
-col_fun<- colorRamp2(c(-1, 0, quantile(K4_FilteredHeatmap_mat, 0.99)), c("white","white", "#f655f1"))
-col_fun(seq(-1, quantile(K4_FilteredHeatmap_mat, 0.99), length = 20))
+col_fun<- colorRamp2(c(0, quantile(K4_FilteredHeatmap_mat, 0.99)), c("white", "#f655f1"))
+col_fun(seq(0, quantile(K4_FilteredHeatmap_mat, 0.99), length = 20))
 
 heatmap_sort_WT <- order(K4_FilteredHeatmap_mat[, 1], decreasing = TRUE)
 
@@ -1135,7 +1135,7 @@ K4_FilteredHeatmap_mat_sort = K4_FilteredHeatmap_mat[heatmap_sort_WT, ]
 
 library(ComplexHeatmap)
 K4_Filtered_hm <- Heatmap(K4_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = F, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K4_FilteredHeatmap_mat_sort)))) , heatmap_legend_param = list(title = "H3K4me2"))
-png("./Filtered_Heatmap_cacs_K4_WT_K4_regions_K27sort.png", width = 800, height = 800)
+pdf("./K4_cac-1_2.pdf", height = 9)
 # Draw the heatmap
 draw(K4_Filtered_hm)
 # Close the device to save the file
