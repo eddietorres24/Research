@@ -111,7 +111,7 @@ module load deepTools
                         --outFileSortedRegions heatmap.bed \
                         --colorList 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, green, darkgreen' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' \
                         --zMin 0 \
-                        --zMax 45 45 45 45 16 16 16 16
+                        --zMax 45 45 45 45 16 16 16 
 
 #  --whatToShow "heatmap and colorbar" \
 
