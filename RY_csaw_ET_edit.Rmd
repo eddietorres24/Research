@@ -633,8 +633,8 @@ heatmap_sort_WT <- order(K27_FilteredHeatmap_mat[, 1], decreasing = TRUE)
 K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat[heatmap_sort_WT, ]
 
 library(ComplexHeatmap)
-K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "K27me3"))
-pdf("./K27_gene_K27_heatmap_cac-1_2.pdf", height = 8)
+K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "H3K27me3"))
+pdf("./K27_gene_K27_heatmap_cac-1_2.pdf", height = 9)
 # Draw the heatmap
 draw(K27_Filtered_hm)
 # Close the device to save the file
