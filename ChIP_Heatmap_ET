@@ -176,10 +176,10 @@ computeMatrix scale-regions \
                     --colorList 'white, blueviolet' 'white, blueviolet' 'white, blueviolet' \
                     --zMin 0 \
 
-                    #133-19_ChIP_WT_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
-                    #133-20_ChIP_cac-1_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
-                    #133-21_ChIP_cac-2_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
-                    #133-22_ChIP_set-7_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
+#133-19_ChIP_WT_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
+#133-20_ChIP_cac-1_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
+#133-21_ChIP_cac-2_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
+#133-22_ChIP_set-7_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
 
 #ATAC
 
