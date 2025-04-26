@@ -111,7 +111,7 @@ module load deepTools
 
 #H3K9me3
 
-computeMatrix scale-regions \
+computeMatrix reference-point --referencePoint center -a 2000 -b 2000 -bs 2 \
  -S $P133DIR/133-23_ChIP_WT_H3K9me3_Rep2_S21.bin_25.smooth_75Bulk.bw \
     $P133DIR/133-24_ChIP_cac-1_H3K9me3_Rep2_S22.bin_25.smooth_75Bulk.bw \
     $P133DIR/133-25_ChIP_cac-2_H3K9me3_Rep2_S23.bin_25.smooth_75Bulk.bw \
@@ -124,6 +124,7 @@ computeMatrix scale-regions \
                     --sortUsing sum \
                     --sortRegions descend \
                     --missingDataColor 1 \
+                    --whatToShow "heatmap and colorbar" \
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'white, mediumblue' 'white, mediumblue' 'white, mediumblue' \
                     --zMin 0 \
@@ -147,6 +148,7 @@ computeMatrix scale-regions \
                     --sortUsing sum \
                     --sortRegions descend \
                     --missingDataColor 1 \
+                    --whatToShow "heatmap and colorbar" \
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'white, darkgoldenrod' 'white, darkgoldenrod' 'white, darkgoldenrod' \
                     --zMin 0 \
@@ -160,9 +162,9 @@ computeMatrix scale-regions \
 #H4K20me3
 
 computeMatrix scale-regions \
- -S $P13DIR/133-19_ChIP_WT_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw \
-    $P13DIR/133-20_ChIP_cac-1_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw \
-    $P13DIR/133-21_ChIP_cac-2_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw \
+ -S $P133DIR/133-19_ChIP_WT_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw \
+    $P133DIR/133-20_ChIP_cac-1_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw \
+    $P133DIR/133-21_ChIP_cac-2_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/WT_CAF_H4K20me3_sorted.bed --skipZeros -o H4K20_matrix_PRC2.gz
 
     plotHeatmap -m H4K20_matrix_PRC2.gz -out CAF-1_H4K20me3_regions.pdf \
@@ -172,6 +174,7 @@ computeMatrix scale-regions \
                     --sortUsing sum \
                     --sortRegions descend \
                     --missingDataColor 1 \
+                    --whatToShow "heatmap and colorbar" \
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'white, blueviolet' 'white, blueviolet' 'white, blueviolet' \
                     --zMin 0 \
