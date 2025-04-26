@@ -3,7 +3,7 @@ THREADS=12
 
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 
-fastqPath="/scratch/evt82290/FastqFiles/2025_Run146_ET"
+fastqPath="/scratch/evt82290/FastqFiles/2024_Run141_ET"
 
 #Edit Code to add Q score option
 

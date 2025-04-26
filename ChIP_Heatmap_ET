@@ -116,7 +116,7 @@ computeMatrix scale-regions \
     $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/K27_narrow_genes_sorted.bed --skipZeros -o matrix_PRC2.gz
+    -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o matrix_PRC2.gz
 
     plotHeatmap -m matrix_PRC2.gz -out CAF-1_K9_regions.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \
@@ -127,7 +127,7 @@ computeMatrix scale-regions \
                     --kmeans 3 \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' \
+                    --colorList 'white, mediumblue' 'white, mediumblue' 'white, mediumblue' 'white, mediumblue'  \
                     --zMin 0 \
 
 #H3K36me3
@@ -148,7 +148,7 @@ computeMatrix scale-regions \
                     --kmeans 3 \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' \
+                    --colorList 'white, darkgoldenrod' 'white, darkgoldenrod' 'white, darkgoldenrod' 'white, darkgoldenrod' \
                     --zMin 0 \
 
 #H4K20me3
@@ -171,6 +171,11 @@ computeMatrix scale-regions \
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' \
                     --zMin 0 \
+
+                    #133-19_ChIP_WT_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
+                    #133-20_ChIP_cac-1_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
+                    #133-21_ChIP_cac-2_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
+                    #133-22_ChIP_set-7_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
 
 #ATAC
 
@@ -345,6 +350,8 @@ computeMatrix scale-regions -b 1750 -a 200 \
 #129-92_ChIP_cac-2_H3K36me3_Rep1_S73_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
 #129-93_ChIP_cac-3_H3K36me3_Rep1_S74_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
 #129-94_ChIP_set-7_H3K36me3_Rep1_S75_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw
+
+
 
 #124_1_ChIP_WT_K4me2_Rep1_4901.bin_25.smooth_50_BPM.bw
 #124_2_ChIP_cac_1_K4me2_Rep1_4901.bin_25.smooth_50_BPM.bw
