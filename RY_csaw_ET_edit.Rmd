@@ -643,8 +643,9 @@ sort_order <- order(sort_order, decreasing = TRUE)
 #K27_FilteredHeatmap_mat <- cbind(K27_FilteredHeatmap_mat, sort_order)
 
 #altering sort order to clean up heatmap
-no_cac1 <-
-no_WT <-
+no_cac1 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1 )
+no_WT <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_mat[, 2] <= 0.1)
+inWT_cac1 <- subset(K27_FilteredHeatmap_mat, ! K27_FilteredHeatmap_mat[, 1] < 0.101 & ! K27_FilteredHeatmap_mat[, 2] <= 0.101)
 
 #Applying order to new variable in order to sort heatmap
 K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat[sort_order, ]
