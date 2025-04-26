@@ -124,7 +124,7 @@ module load deepTools
                     --sortUsing sum \
                     --sortRegions descend \
                     --missingDataColor 1 \
-                    --heatmapHeight 6
+                    --heatmapHeight 20 \
                     --whatToShow "heatmap and colorbar" \
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'white, mediumblue' 'white, mediumblue' 'white, mediumblue' \
