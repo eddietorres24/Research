@@ -206,22 +206,12 @@ module load MACS3
 # cut -f 1-6 $OUTDIR1/qa-suz12_24hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_24hr_H3K27me3_Rep1_peaks.bed
 # cut -f 1-6 $OUTDIR1/WT_24hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/WT_24hr_H3K27me3_Rep1_peaks.bed
 #Rep 3
-# cut -f 1-6 WT_ATAC_Rep1_peaks.narrowPeak > WT_ATAC_peaks.bed
-# cut -f 1-6 cac-1_ATAC_Rep1_peaks.narrowPeak > cac-1_ATAC_peaks.bed
-# cut -f 1-6 cac-2_ATAC_Rep1_peaks.narrowPeak > cac-2_ATAC_peaks.bed
-# cut -f 1-6 cac-3_ATAC_Rep1_peaks.narrowPeak > cac-3_ATAC_peaks.bed
-# cut -f 1-6 set-7_ATAC_Rep1_peaks.narrowPeak > set-7_ATAC_peaks.bed
-# cut -f 1-6 WT_24hr_H3K27me3_Rep3_250_peaks.broadPeak > WT_24hr_H3K27me3_Rep3_peaks.bed
-
-# cut -f 1-6 cac-1_H3K9me3_Rep1_peaks.broadPeak > cac-1_H3K9me3_Rep1_peaks.bed
-
-
-
-
- # cut -f 1-6 WT_abc_H3K27me3_Rep2_peaks.narrowPeak > WT_K27_narrow_rep2.bed
-
-
-
+# cut -f 1-6 WT_H4K20me3_Rep2_peaks.broadPeak > WT_H4K20me3_peaks.bed
+# cut -f 1-6 cac-1_H4K20me3_Rep2_peaks.broadPeak > cac-1_H4K20me3_peaks.bed
+# cut -f 1-6 cac-2_H4K20me3_Rep2_peaks.broadPeak > cac-2_H4K20me3_peaks.bed
+# cut -f 1-6 WT_H3K36me3_Rep2_peaks.broadPeak > WT_H3K36me3_peaks.bed
+# cut -f 1-6 cac-1_H3K36me3_Rep2_peaks.broadPeak > cac-1_H3K36me3_peaks.bed
+# cut -f 1-6 cac-2_H3K36me3_Rep2_peaks.broadPeak > cac-2_H3K36me3_peaks.bed
 
 #bedtools
 # module load BEDTools
@@ -246,19 +236,19 @@ module load MACS3
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 
-#  cat WT_H3K4me2_Rep1_peaks.bed \
-#      cac-1_H3K4me2_Rep1_peaks.bed \
-#      cac-2_H3K4me2_Rep1_peaks.bed \
-#      set-7_H3K4me2_Rep1_peaks.bed > cac-1-2_K4.bed
+#   cat WT_H4K20me3_peaks.bed \
+#       cac-1_H4K20me3_peaks.bed \
+#       cac-2_H4K20me3_peaks.bed > WT_CAF_H4K20me3.bed
+#   cat WT_H3K36me3_peaks.bed \
+#       cac-1_H3K36me3_peaks.bed \
+#       cac-2_H3K36me3_peaks.bed > WT_CAF_H3K36me3.bed
 #
+# #
+# sort -k1,1 -k2,2n WT_CAF_H3K36me3.bed > WT_CAF_H3K36me3_sort.bed
+# bedtools sort -i WT_CAF_H3K36me3_sort.bed > WT_CAF_H3K36me3_bed_sort.bed
 #
-# sort -k1,1 -k2,2n cac-1-2_K4.bed > cac-1-2_K4_sorted.bed
-# bedtools sort -i cac-1-2_K4_sorted.bed > cac-1-2_K4_bed_sorted.bed
-#
-# bedtools merge -i cac-1-2_K4_bed_sorted.bed -d 350 > cac_set7_K4.bed
+# bedtools merge -i WT_CAF_H3K36me3_bed_sort.bed -d 350 > WT_CAF_H3K36me3_sorted.bed
 
-# bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
-# bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
 
 #qa-suz12
 #Rep1

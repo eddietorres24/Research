@@ -624,17 +624,30 @@ quantile(K27_FilteredHeatmap_mat, c(.01, .50, .75, .95, .98 , .995))
 max <- quantile(K27_FilteredHeatmap_mat, 0.98) # identify the 98th percentile value and assign this to max
 K27_FilteredHeatmap_mat[K27_FilteredHeatmap_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
 
+#I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0.1 in all 3 mutants
+K27_FilteredHeatmap_mat <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] >= 0.101 | K27_FilteredHeatmap_mat[, 2] >= 0.101 | K27_FilteredHeatmap_mat[, 3] >= 0.101)
+
+#throwing our regions that are > 0.1 in set-7
+K27_FilteredHeatmap_mat <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 4] <= 0.101)
+
 library(circlize)
-col_fun<- colorRamp2(c(0, quantile(K27_FilteredHeatmap_mat, 0.99)), c("white", "darkgreen"))
-col_fun(seq(0, quantile(K27_FilteredHeatmap_mat, 0.99), length = 20))
+col_fun<- colorRamp2(c(0, max), c("white", "darkgreen"))
+col_fun(seq(0, max, length = 20))
 
-heatmap_sort_WT <- order(K27_FilteredHeatmap_mat[, 1], decreasing = TRUE)
+#Sort Based on WT enrichment
+#heatmap_sort_WT <- order(K27_FilteredHeatmap_mat[, 1], decreasing = TRUE)
 
-K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat[heatmap_sort_WT, ]
+#Making new sort order based on enrichment in WT vs. cac-1 & sorting it high to low
+sort_order <- (K27_FilteredHeatmap_mat[, 1] - K27_FilteredHeatmap_mat[, 2])
+sort_order <- order(sort_order, decreasing = TRUE)
+#K27_FilteredHeatmap_mat <- cbind(K27_FilteredHeatmap_mat, sort_order)
+
+#Applying order to new variable in order to sort heatmap
+K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat[sort_order, ]
 
 library(ComplexHeatmap)
 K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "H3K27me3"))
-pdf("./K27_gene_K27_heatmap_cac-1_2.pdf", height = 9)
+pdf("./K27_region_WTvcac-1_sort.pdf", height = 9)
 # Draw the heatmap
 draw(K27_Filtered_hm)
 # Close the device to save the file
@@ -1107,6 +1120,7 @@ library(circlize)
 col_fun<- colorRamp2(c(-1, 0, quantile(K27_FilteredHeatmap_mat, 0.99)), c("white","white", "darkgreen"))
 col_fun(seq(-1, quantile(K27_FilteredHeatmap_mat, 0.995), length = 20))
 
+#sorting
 heatmap_sort_WT <- order(K4_FilteredHeatmap_mat[, 1], decreasing = TRUE)
 
 K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat[heatmap_sort_WT, ]
@@ -1125,17 +1139,28 @@ quantile(K4_FilteredHeatmap_mat, c(.01, .50, .75, .95, .98 , .995))
 max <- quantile(K4_FilteredHeatmap_mat, 0.98) # identify the 98th percentile value and assign this to max
 K4_FilteredHeatmap_mat[K4_FilteredHeatmap_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
 
+#get rid on non-K4 regions that got through
+K4_FilteredHeatmap_mat <- subset(K4_FilteredHeatmap_mat, K4_FilteredHeatmap_mat[, 1] >= 0.101 | K4_FilteredHeatmap_mat[, 2] >= 0.101 | K4_FilteredHeatmap_mat[, 3] >= 0.101 | K4_FilteredHeatmap_mat[, 4] >= 0.101)
+
 library(circlize)
-col_fun<- colorRamp2(c(0, quantile(K4_FilteredHeatmap_mat, 0.99)), c("white", "#f655f1"))
-col_fun(seq(0, quantile(K4_FilteredHeatmap_mat, 0.99), length = 20))
+col_fun<- colorRamp2(c(0, quantile(K4_FilteredHeatmap_mat, 0.98)), c("white", "#f655f1"))
+col_fun(seq(0, quantile(K4_FilteredHeatmap_mat, 0.98), length = 20))
 
-heatmap_sort_WT <- order(K4_FilteredHeatmap_mat[, 1], decreasing = TRUE)
+#Making new sort order based on enrichment in WT vs. cac-1 & sorting it high to low
+means <- rowMeans(K4_FilteredHeatmap_mat[, 2:4])
+K4sort_order <- (K4_FilteredHeatmap_mat[, 1] - rowMeans(K4_FilteredHeatmap_mat[, 2:4]))
+K4sort_order <- order(K4sort_order, decreasing = TRUE)
+K4_FilteredHeatmap_mat <- cbind(K4_FilteredHeatmap_mat, K4sort_order)
 
-K4_FilteredHeatmap_mat_sort = K4_FilteredHeatmap_mat[heatmap_sort_WT, ]
+#Applying order to new variable in order to sort heatmap
+K4_FilteredHeatmap_mat_sort = K4_FilteredHeatmap_mat[K4sort_order, ]
+
+#heatmap_sort_WT <- order(K4_FilteredHeatmap_mat[, 1], decreasing = TRUE)
+#K4_FilteredHeatmap_mat_sort = K4_FilteredHeatmap_mat[heatmap_sort_WT, ]
 
 library(ComplexHeatmap)
 K4_Filtered_hm <- Heatmap(K4_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = F, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K4_FilteredHeatmap_mat_sort)))) , heatmap_legend_param = list(title = "H3K4me2"))
-pdf("./K4_cac-1_2.pdf", height = 9)
+pdf("./K4_WTvcac1_sort.pdf", height = 9)
 # Draw the heatmap
 draw(K4_Filtered_hm)
 # Close the device to save the file
