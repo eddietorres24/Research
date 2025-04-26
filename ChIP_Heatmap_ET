@@ -162,9 +162,9 @@ computeMatrix scale-regions \
 #H4K20me3
 
 computeMatrix scale-regions \
- -S $P133DIR/133-19_ChIP_WT_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw \
-    $P133DIR/133-20_ChIP_cac-1_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw \
-    $P133DIR/133-21_ChIP_cac-2_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw \
+ -S $P133DIR/133-19_ChIP_WT_H4K20me3_Rep1_S17.bin_25.smooth_75Bulk.bw \
+    $P133DIR/133-20_ChIP_cac-1_H4K20me3_Rep1_S18.bin_25.smooth_75Bulk.bw \
+    $P133DIR/133-21_ChIP_cac-2_H4K20me3_Rep1_S19.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/WT_CAF_H4K20me3_sorted.bed --skipZeros -o H4K20_matrix_PRC2.gz
 
     plotHeatmap -m H4K20_matrix_PRC2.gz -out CAF-1_H4K20me3_regions.pdf \

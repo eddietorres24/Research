@@ -642,6 +642,10 @@ sort_order <- (K27_FilteredHeatmap_mat[, 1] - K27_FilteredHeatmap_mat[, 2])
 sort_order <- order(sort_order, decreasing = TRUE)
 #K27_FilteredHeatmap_mat <- cbind(K27_FilteredHeatmap_mat, sort_order)
 
+#altering sort order to clean up heatmap
+no_cac1 <-
+no_WT <-
+
 #Applying order to new variable in order to sort heatmap
 K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat[sort_order, ]
 
