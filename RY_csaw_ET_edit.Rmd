@@ -1147,10 +1147,9 @@ col_fun<- colorRamp2(c(0, quantile(K4_FilteredHeatmap_mat, 0.98)), c("white", "#
 col_fun(seq(0, quantile(K4_FilteredHeatmap_mat, 0.98), length = 20))
 
 #Making new sort order based on enrichment in WT vs. cac-1 & sorting it high to low
-means <- rowMeans(K4_FilteredHeatmap_mat[, 2:4])
-K4sort_order <- (K4_FilteredHeatmap_mat[, 1] - rowMeans(K4_FilteredHeatmap_mat[, 2:4]))
+K4sort_order <- (K4_FilteredHeatmap_mat[, 1] - rowMeans(K4_FilteredHeatmap_mat[, 2:3]))
 K4sort_order <- order(K4sort_order, decreasing = TRUE)
-K4_FilteredHeatmap_mat <- cbind(K4_FilteredHeatmap_mat, K4sort_order)
+#K4_FilteredHeatmap_mat <- cbind(K4_FilteredHeatmap_mat, K4sort_order)
 
 #Applying order to new variable in order to sort heatmap
 K4_FilteredHeatmap_mat_sort = K4_FilteredHeatmap_mat[K4sort_order, ]
