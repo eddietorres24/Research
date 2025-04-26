@@ -65,7 +65,7 @@ BiocManager::install("ComplexHeatmap")
 library(csaw) 
 getwd()
 #read in sample sheet
-samples <- read.csv("./csaw_samples_files/cac_csaw.csv")
+samples <- read.csv("../csaw_samples_files/cac_csaw.csv")
 
 #samples$bamReads <- paste("~/Desktop/COMPASS/SortedBamFiles/",samples$bamReads, sep="")
 

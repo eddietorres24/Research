@@ -106,12 +106,20 @@ colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 #read in geneIDs of PRC2 target genes
 Prc2targets <- read.table("./text_files/K27_narrow_genes_sorted.txt", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
 
+cac1up <- read.csv("./cac_DEseq/cac1_UP.csv", stringsAsFactors=FALSE, check.names=FALSE)
+cac2up <- read.csv("./cac_DEseq/cac2_UP.csv", stringsAsFactors=FALSE, check.names=FALSE)
+
+#reading in csvs w/ upregulated genes in CAF-1 mutants
+
 ###SUBSET DATA FOR ALL KO SAMPLES
 Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,1])
 
+#CAF-1 Upregulated mutants
+CAFUpTPM <- subset(allDataTPM, rownames(allDataTPM) %in% cac1up$NCU | rownames(allDataTPM) %in% cac2up$NCU)
+
 ###SUBSET DATA FOR AVERAGED KO SAMPLES
 AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,1])
-
+AVERAGE_CAFTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data) %in% cac1up$NCU | rownames(allDataTPM) %in% cac2up$NCU)
 
 ###Subset data to filter out non-PRC2 target regions that got through (cutting out any genes over 2 tpm in WT)
 AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 9.5))
@@ -120,6 +128,9 @@ AVERAGE_AlldataTPM <- subset(Averaged_Orderd_KO_data, (Averaged_Orderd_KO_data[,
 ###Add sudocount and log transform (if necessary)
 AVERAGE_Prc2targetTPM <- AVERAGE_Prc2targetTPM + 1
 AVERAGE_Prc2targetTPM <- log2(AVERAGE_Prc2targetTPM)
+
+AVERAGE_CAFTPM <- AVERAGE_CAFTPM + 1
+AVERAGE_CAFTPM <- log2(AVERAGE_CAFTPM)
 
 AVERAGE_AlldataTPM <- AVERAGE_AlldataTPM + 1
 AVERAGE_AlldataTPM <- log2(AVERAGE_AlldataTPM)
@@ -178,7 +189,7 @@ box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
 #device.on()
 box
 
-ggsave(filename = "histone_chaperone_boxplot_PAPER_TEST.pdf", plot = box, dpi=600, height= 3, width=4)
+ggsave(filename = "histone_chaperone_boxplot_PAPER_DELETE.pdf", plot = box, dpi=600, height= 3, width=4)
 
 #######################
 
@@ -237,16 +248,26 @@ breaks1=seq(-4, 5, by=.09) #This is to set a custom heatmaps scale. Not used her
 
 ##Keep Only Genes that are expressed in at least one sample
 GenesWithChanges <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0))
+CAFUpGenes <- subset(AVERAGE_CAFTPM, (rowSums(CAFUpTPM) > 0))
 GenesWithChanges_95 <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0))
 
 #plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above
 
-heatmap<- pheatmap(GenesWithChanges[,rev(altorder)], color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
+heatmap1 <- pheatmap(GenesWithChanges[,rev(altorder)], color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
                    cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
                    legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5)
 
-#to plot with ggplot, you need to extract [[4]] from the heatmap object
-heatmap_plot<-heatmap[[4]]
+heatmap2 <- pheatmap(CAFUpGenes[,rev(altorder)], color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
+                    cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
+                    legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5)
 
-ggsave(filename = "./histone_chaperone_heatmap_log2_prc2_gene_no_scale.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
+
+plot_list = c(heatmap1[[4]], heatmap2[[4]])
+  
+finalheat <- grid.arrange(arrangeGrob(grobs= heatmap1[[4]], heatmap2[[4]],nrow=2))
+
+#to plot with ggplot, you need to extract [[4]] from the heatmap object
+heatmap_plot <- finalheat[[4]]
+
+ggsave(filename = "./histone_chaperone_heatmap_log2_prc2_gene_no_scale_3.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
 #dev.off()
