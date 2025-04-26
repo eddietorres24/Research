@@ -112,22 +112,25 @@ module load deepTools
 #H3K9me3
 
 computeMatrix scale-regions \
- -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o matrix_PRC2.gz
+ -S $P133DIR/133-23_ChIP_WT_H3K9me3_Rep2_S21.bin_25.smooth_75Bulk.bw \
+    $P133DIR/133-24_ChIP_cac-1_H3K9me3_Rep2_S22.bin_25.smooth_75Bulk.bw  \
+    $P133DIR/133-25_ChIP_cac-2_H3K9me3_Rep2_S23.bin_25.smooth_75Bulk.bw \
+    -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o K9_matrix_PRC2.gz
 
-    plotHeatmap -m matrix_PRC2.gz -out CAF-1_K9_regions.pdf \
-                    --samplesLabel WT cac-1 cac-2 set-7 \
+    plotHeatmap -m K9_matrix_PRC2.gz -out CAF-1_K9_regions.pdf \
+                    --samplesLabel WT cac-1 cac-2 \
                     --startLabel "5'" \
                     --endLabel "3'" \
                     --sortUsing sum \
                     --sortRegions descend \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, mediumblue' 'white, mediumblue' 'white, mediumblue' 'white, mediumblue'  \
+                    --colorList 'white, mediumblue' 'white, mediumblue' 'white, mediumblue' \
                     --zMin 0 \
+
+                    # $P133DIR/133-23_ChIP_WT_H3K9me3_Rep2_S21.bin_25.smooth_75Bulk.bw \
+                    # $P133DIR/133-24_ChIP_cac-1_H3K9me3_Rep2_S22.bin_25.smooth_75Bulk.bw  \
+                    # $P133DIR/133-25_ChIP_cac-2_H3K9me3_Rep2_S23.bin_25.smooth_75Bulk.bw \
 
 #H3K36me3
 
@@ -135,18 +138,17 @@ computeMatrix scale-regions \
  -S $P138DIR/138-62_ChIP_WT_H3K36me3_Rep2_6252_S61.bin_25.smooth_75Bulk.bw \
     $P138DIR/138-63_ChIP_cac-1_H3K36me3_Rep2_6252_S62.bin_25.smooth_75Bulk.bw \
     $P138DIR/138-64_ChIP_cac-2_H3K36me3_Rep2_6252_S63.bin_25.smooth_75Bulk.bw \
-    $P138DIR/138-66_ChIP_set-7_H3K36me3_Rep2_6252_S65.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/WT_CAF_H3K36me3_sorted.bed --skipZeros -o matrix_PRC2.gz
+    -R $BEDDIR2/WT_CAF_H3K36me3_sorted.bed --skipZeros -o K36_matrix_PRC2.gz
 
-    plotHeatmap -m matrix_PRC2.gz -out CAF-1_H3K36me3_regions.pdf \
-                    --samplesLabel WT cac-1 cac-2 set-7 \
+    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_regions.pdf \
+                    --samplesLabel WT cac-1 cac-2 \
                     --startLabel "5'" \
                     --endLabel "3'" \
                     --sortUsing sum \
                     --sortRegions descend \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, darkgoldenrod' 'white, darkgoldenrod' 'white, darkgoldenrod' 'white, darkgoldenrod' \
+                    --colorList 'white, darkgoldenrod' 'white, darkgoldenrod' 'white, darkgoldenrod' \
                     --zMin 0 \
 
 #138-62_ChIP_WT_H3K36me3_Rep2_6252_S61.bin_25.smooth_75Bulk.bw
@@ -161,18 +163,17 @@ computeMatrix scale-regions \
  -S $P13DIR/133-19_ChIP_WT_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
     $P13DIR/133-20_ChIP_cac-1_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
     $P13DIR/133-21_ChIP_cac-2_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
-    $P13DIR/133-22_ChIP_set-7_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
-    -R $BEDDIR2/WT_CAF_H4K20me3_sorted.bed --skipZeros -o matrix_PRC2.gz
+    -R $BEDDIR2/WT_CAF_H4K20me3_sorted.bed --skipZeros -o H4K20_matrix_PRC2.gz
 
-    plotHeatmap -m matrix_PRC2.gz -out CAF-1_H4K20me3_regions.pdf \
-                    --samplesLabel WT cac-1 cac-2 set-7 \
+    plotHeatmap -m H4K20_matrix_PRC2.gz -out CAF-1_H4K20me3_regions.pdf \
+                    --samplesLabel WT cac-1 cac-2 \
                     --startLabel "5'" \
                     --endLabel "3'" \
                     --sortUsing sum \
                     --sortRegions descend \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, blueviolet' 'white, blueviolet' 'white, blueviolet' 'white, blueviolet' \
+                    --colorList 'white, blueviolet' 'white, blueviolet' 'white, blueviolet' \
                     --zMin 0 \
 
                     #133-19_ChIP_WT_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
