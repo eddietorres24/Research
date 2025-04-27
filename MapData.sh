@@ -15,9 +15,9 @@ source config.txt
 
 ###ADD a source file with path to FastqFiles
 #variables imported from submission script
-fastqPath="/scratch/evt82290/FastqFiles/2024_Run141_ET"
-#accession="148-60_ChIP_LGVI_3_H3K27me3_Rep1_S60"
-outdir="/scratch/evt82290/MappingOutputs/Run141"
+fastqPath="/scratch/evt82290/FastqFiles/misc_data"
+accession="hpo_H3K27me3"
+outdir="/scratch/evt82290/MappingOutputs/misc_data"
 
 # #if output directory doesn't exist, create it
 if [ ! -d $outdir ]
@@ -32,8 +32,11 @@ fi
 
 ###################################
 #input file variables
-read1="${fastqPath}/${accession}*_R1_001.fastq.gz"
-read2="${fastqPath}/${accession}*_R2_001.fastq.gz"
+# read1="${fastqPath}/${accession}*_R1_001.fastq.gz"
+# read2="${fastqPath}/${accession}*_R2_001.fastq.gz"
+
+read1="${fastqPath}/${accession}.fastq.gz"
+read2="${fastqPath}/${accession}.fastq.gz"
 
 #make output file folders
 trimmed="${outdir}/TrimmedFastQs/${accession}"
@@ -54,8 +57,8 @@ bam="${bamdir}/${accession}.bam"
 bigwig="${bwDir}/${accession}"
 peak="$PeakDir/${accession}"
 
-name=${bam/%_S[1-170]*_L001_R1_001_val_1.fq.gz/}
-
+# name=${bam/%_S[1-170]*_L001_R1_001_val_1.fq.gz/}
+name=${bam/*.fq.gz/}
 
 ############# Read Trimming ##############
 #remove adaptors, trim low quality reads (default = phred 20), length > 25
