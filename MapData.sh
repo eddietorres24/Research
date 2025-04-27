@@ -16,7 +16,7 @@ source config.txt
 ###ADD a source file with path to FastqFiles
 #variables imported from submission script
 fastqPath="/scratch/evt82290/FastqFiles/misc_data"
-accession="hpo_H3K27me3"
+accession="148-60_ChIP_LGVI_3_H3K27me3_Rep1_S60"
 outdir="/scratch/evt82290/MappingOutputs/misc_data"
 
 # #if output directory doesn't exist, create it
@@ -32,10 +32,10 @@ fi
 
 ###################################
 #input file variables
-# read1="${fastqPath}/${accession}*_R1_001.fastq.gz"
-# read2="${fastqPath}/${accession}*_R2_001.fastq.gz"
+read1="${fastqPath}/${accession}*_R1_001.fastq.gz"
+read2="${fastqPath}/${accession}*_R2_001.fastq.gz"
 
-read1="${fastqPath}/${accession}.fastq.gz"
+#read1="${fastqPath}/${accession}.fastq.gz"
 # read2="${fastqPath}/${accession}.fastq.gz"
 
 #make output file folders
@@ -71,11 +71,11 @@ name=${bam/*.fq.gz/}
 ##################
 #Trimming
 #################
-	  ml Trim_Galore/0.6.7-GCCcore-11.2.0
-
+	  # ml Trim_Galore/0.6.7-GCCcore-11.2.0
+    #
 	  # trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
 
-    trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $read1
+    # trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $read1
 
 	  wait
 
@@ -86,8 +86,8 @@ ml BWA
 
 #make directory to store temporary files written by samtools sort
 mkdir -p ${tmp}/${accession}
-# bwa mem -M -v 3 -t $THREADS $GENOME ${trimmed}/*val_1.fq.gz ${trimmed}/*val_2.fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T ${tmp}/${accession} -o "$bam" -
-bwa mem -M -v 3 -t $THREADS $GENOME ${trimmed}/*fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T ${tmp}/${accession} -o "$bam" -
+bwa mem -M -v 3 -t $THREADS $GENOME ${trimmed}/*val_1.fq.gz ${trimmed}/*val_2.fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T ${tmp}/${accession} -o "$bam" -
+# bwa mem -M -v 3 -t $THREADS $GENOME ${trimmed}/*fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T ${tmp}/${accession} -o "$bam" -
 samtools index "$bam"
 
 #delete directory written by samtools sort
