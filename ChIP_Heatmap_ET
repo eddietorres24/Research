@@ -168,12 +168,14 @@ computeMatrix scale-regions -b 1500 -a 200 \
     $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/K27_narrow_genes_sorted.bed --skipZeros -o matrix_PRC2_1.gz
 
-    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_genes.pdf \
+    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_genes_TEST.pdf \
                     --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                     --startLabel "5'" \
                     --endLabel "3'" \
                     --sortUsing sum \
                     --sortRegions descend \
+                    --hclust 2 \
+                    --clusterUsingSamples 1 \
                     --sortUsingSamples 1 \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
@@ -202,15 +204,15 @@ computeMatrix scale-regions -b 1000 -a 1000 \
     $P133DIR/133-8_ChIP_set-7_H3K27me2me3_8hr_Rep1_S8.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o matrix_PRC2_2.gz
 
-    plotHeatmap -m matrix_PRC2_2.gz -out K27me2me3_K9_edges.pdf \
+    plotHeatmap -m matrix_PRC2_2.gz -out K27me2me3_K9_edges_TEST.pdf \
                     --samplesLabel WT hpo cac-1 cac-2 set-7 \
                     --startLabel "5'" \
                     --endLabel "3'" \
                     --sortUsing sum \
                     --sortRegions descend \
-                    --sortUsingSamples 1 2 \
+                    --sortUsingSamples 1 \
                     --hclust 2 \
-                    --clusterUsingSamples 1 \
+                    --clusterUsingSamples 1 2 \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
                     --colorList "white, g, darkgreen" \
