@@ -209,7 +209,7 @@ computeMatrix scale-regions -b 1000 -a 1000 \
                     --sortUsing sum \
                     --sortRegions descend \
                     --sortUsingSamples 1 2 \
-                    --kmeans 2 \
+                    --hclust 2 \
                     --clusterUsingSamples 1 \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
