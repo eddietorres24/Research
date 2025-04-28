@@ -194,13 +194,13 @@ computeMatrix scale-regions -b 1500 -a 200 \
 
 #H3K27me3
 
-# computeMatrix scale-regions -b 1000 -a 1000 \
-#  -S $P133DIR/133-5_ChIP_WT_H3K27me2me3_8hr_Rep1_S5.bin_25.smooth_75Bulk.bw \
-#     $MISCDIR/hpo_H3K27me3.bin_25.smooth_75Bulk.bw \
-#     $P133DIR/133-6_ChIP_cac-1_H3K27me2me3_8hr_Rep1_S6.bin_25.smooth_75Bulk.bw \
-#     $P133DIR/133-7_ChIP_cac-2_H3K27me2me3_8hr_Rep1_S7.bin_25.smooth_75Bulk.bw \
-#     $P133DIR/133-8_ChIP_set-7_H3K27me2me3_8hr_Rep1_S8.bin_25.smooth_75Bulk.bw \
-#     -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o matrix_PRC2.gz
+computeMatrix scale-regions -b 1000 -a 1000 \
+ -S $P133DIR/133-5_ChIP_WT_H3K27me2me3_8hr_Rep1_S5.bin_25.smooth_75Bulk.bw \
+    $MISCDIR/hpo_H3K27me3.bin_25.smooth_75Bulk.bw \
+    $P133DIR/133-6_ChIP_cac-1_H3K27me2me3_8hr_Rep1_S6.bin_25.smooth_75Bulk.bw \
+    $P133DIR/133-7_ChIP_cac-2_H3K27me2me3_8hr_Rep1_S7.bin_25.smooth_75Bulk.bw \
+    $P133DIR/133-8_ChIP_set-7_H3K27me2me3_8hr_Rep1_S8.bin_25.smooth_75Bulk.bw \
+    -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o matrix_PRC2.gz
 
     plotHeatmap -m matrix_PRC2.gz -out K27me2me3_K9_edges.pdf \
                     --samplesLabel WT hpo cac-1 cac-2 set-7 \
