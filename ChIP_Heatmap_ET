@@ -160,24 +160,24 @@ module load deepTools
 
 #ATAC
 
-computeMatrix scale-regions -b 1500 -a 200 \
- -S $P146DIR/146-N1_ATAC_WT__Rep2_S97.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-N3_ATAC_cac-1__Rep2_S98.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-N4_ATAC_cac-2__Rep2_S99.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-N6_ATAC_cac-3__Rep2_S101.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-N5_ATAC_set-7__Rep2_S100.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/K27_narrow_genes_sorted.bed --skipZeros -o matrix_PRC2.gz
-
-    plotHeatmap -m matrix_PRC2.gz -out CAF-1_ATAC_K27_genes.pdf \
-                    --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
-                    --startLabel "5'" \
-                    --endLabel "3'" \
-                    --sortUsing sum \
-                    --sortRegions descend \
-                    --missingDataColor 1 \
-                    --outFileSortedRegions heatmap.bed \
-                    --colorMap "seismic" \
-                    --zMin 0 \
+# computeMatrix scale-regions -b 1500 -a 200 \
+#  -S $P146DIR/146-N1_ATAC_WT__Rep2_S97.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-N3_ATAC_cac-1__Rep2_S98.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-N4_ATAC_cac-2__Rep2_S99.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-N6_ATAC_cac-3__Rep2_S101.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-N5_ATAC_set-7__Rep2_S100.bin_25.smooth_75Bulk.bw \
+#     -R $BEDDIR2/K27_narrow_genes_sorted.bed --skipZeros -o matrix_PRC2.gz
+#
+#     plotHeatmap -m matrix_PRC2.gz -out CAF-1_ATAC_K27_genes.pdf \
+#                     --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
+#                     --startLabel "5'" \
+#                     --endLabel "3'" \
+#                     --sortUsing sum \
+#                     --sortRegions descend \
+#                     --missingDataColor 1 \
+#                     --outFileSortedRegions heatmap.bed \
+#                     --colorMap "seismic" \
+#                     --zMin 0 \
 
 # $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw \
 # $P141DIR/141-N12_ATAC_cac-1__Rep1_S101.bin_25.smooth_75Bulk.bw \
@@ -193,13 +193,13 @@ computeMatrix scale-regions -b 1500 -a 200 \
 
 #H3K27me3
 
-computeMatrix scale-regions -b 1000 -a 1000 \
- -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-    $MISCDIR/hpo_H3K27me3.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o matrix_PRC2.gz
+# computeMatrix scale-regions -b 1000 -a 1000 \
+#  -S $P133DIR/133-5_ChIP_WT_H3K27me2me3_8hr_Rep1_S5.bin_25.smooth_75Bulk.bw \
+#     $MISCDIR/hpo_H3K27me3.bin_25.smooth_75Bulk.bw \
+#     $P133DIR/133-6_ChIP_cac-1_H3K27me2me3_8hr_Rep1_S6.bin_25.smooth_75Bulk.bw \
+#     $P133DIR/133-7_ChIP_cac-2_H3K27me2me3_8hr_Rep1_S7.bin_25.smooth_75Bulk.bw \
+#     $P133DIR/133-8_ChIP_set-7_H3K27me2me3_8hr_Rep1_S8.bin_25.smooth_75Bulk.bw \
+#     -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o matrix_PRC2.gz
 
     plotHeatmap -m matrix_PRC2.gz -out K27_K9_edges.pdf \
                     --samplesLabel WT hpo cac-1 cac-2 set-7 \
@@ -212,6 +212,11 @@ computeMatrix scale-regions -b 1000 -a 1000 \
                     --outFileSortedRegions heatmap.bed \
                     --colorList "white, g, darkgreen" \
                     --zMin 0 \
+
+
+                    #133-6_ChIP_cac-1_H3K27me2me3_8hr_Rep1_S6.bin_25.smooth_75Bulk.bw
+                    #133-7_ChIP_cac-2_H3K27me2me3_8hr_Rep1_S7.bin_25.smooth_75Bulk.bw
+                    #133-8_ChIP_set-7_H3K27me2me3_8hr_Rep1_S8.bin_25.smooth_75Bulk.bw
 
 #  --whatToShow "heatmap and colorbar" \
 
@@ -371,6 +376,11 @@ computeMatrix scale-regions -b 1000 -a 1000 \
 #124_4_ChIP_cac_3_K4me2_Rep1_4901.bin_25.smooth_50_BPM.bw
 #124_5_ChIP_set_7_K4me2_Rep1_4901.bin_25.smooth_50_BPM.bw
 
+#Run133
+#133-5_ChIP_WT_H3K27me2me3_8hr_Rep1_S5.bin_25.smooth_75Bulk.bw
+#133-6_ChIP_cac-1_H3K27me2me3_8hr_Rep1_S6.bin_25.smooth_75Bulk.bw
+#133-7_ChIP_cac-2_H3K27me2me3_8hr_Rep1_S7.bin_25.smooth_75Bulk.bw
+#133-8_ChIP_set-7_H3K27me2me3_8hr_Rep1_S8.bin_25.smooth_75Bulk.bw
 #133-19_ChIP_WT_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
 #133-20_ChIP_cac-1_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
 #133-21_ChIP_cac-2_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
