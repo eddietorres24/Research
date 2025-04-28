@@ -26,7 +26,7 @@ P141DIR="/scratch/evt82290/MappingOutputs/Run141/bigWig"
 P144DIR="/scratch/evt82290/MappingOutputs/Run144/bigWig"
 P145DIR="/scratch/evt82290/MappingOutputs/Run145/bigWig"
 P146DIR="/scratch/evt82290/MappingOutputs/Run146/bigWig"
-MISCDIR="/scratch/evt82290/MappingOutputs/iswi_ash1/bigWig"
+MISCDIR="/scratch/evt82290/MappingOutputs/misc_data/bigWig"
 #bed file directories
 QABED="/home/evt82290/Research/bed_files/qa-suz12"
 BEDDIR="/scratch/evt82290/RNAseqIGV/bedgraph"
@@ -62,33 +62,6 @@ BEDDIR2="/home/evt82290/Research/bed_files"
 
 module load deepTools
 
-# computeMatrix scale-regions \
-#  --unscaled5prime 250 \
-#  --unscaled3prime 250 \
-#  -S $OUTDIR/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-#     $OUTDIR2/SRR8269825_log.bw \
-#     $OUTDIR2/SRR8444037_log.bw \
-#     $OUTDIR2/SRR7970629_log.bw \
-#     $OUTDIR2/SRR7970598_log.bw \
-#     $OUTDIR2/SRR10916163_log.bw \
-#     -R heatmapPRC2genesEdit.bed --skipZeros -o matrix_PRC2.gz
-
-    # computeMatrix scale-regions \
-    #  --unscaled5prime 250 \
-    #  --unscaled3prime 250 \
-    #  -S $OUTDIR/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
-    #     $OUTDIR/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2.bin_25.smooth_75Bulk.bw \
-    #     $OUTDIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw \
-    #     $OUTDIR2/SRR8269825_log.bw \
-    #     $OUTDIR2/SRR8444037_log.bw \
-    #     $OUTDIR2/SRR10916163_log.bw \
-    #     -R cac1_up.bed --skipZeros -o matrix_PRC2.gz
-
-
 #H3K4me2
     # computeMatrix scale-regions \
     #  -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
@@ -111,24 +84,24 @@ module load deepTools
 
 #H3K9me3
 
-computeMatrix scale-regions \
- -S $P133DIR/133-23_ChIP_WT_H3K9me3_Rep2_S21.bin_25.smooth_75Bulk.bw \
-    $P133DIR/133-24_ChIP_cac-1_H3K9me3_Rep2_S22.bin_25.smooth_75Bulk.bw \
-    $P133DIR/133-25_ChIP_cac-2_H3K9me3_Rep2_S23.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o K9_matrix_PRC2.gz
-
-    plotHeatmap -m K9_matrix_PRC2.gz -out CAF-1_K9_regions.pdf \
-                    --samplesLabel WT cac-1 cac-2 \
-                    --startLabel "5'" \
-                    --endLabel "3'" \
-                    --sortUsing sum \
-                    --sortRegions descend \
-                    --missingDataColor 1 \
-                    --heatmapHeight 20 \
-                    --whatToShow "heatmap and colorbar" \
-                    --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, mediumblue' 'white, mediumblue' 'white, mediumblue' \
-                    --zMin 0 \
+# computeMatrix scale-regions \
+#  -S $P133DIR/133-23_ChIP_WT_H3K9me3_Rep2_S21.bin_25.smooth_75Bulk.bw \
+#     $P133DIR/133-24_ChIP_cac-1_H3K9me3_Rep2_S22.bin_25.smooth_75Bulk.bw \
+#     $P133DIR/133-25_ChIP_cac-2_H3K9me3_Rep2_S23.bin_25.smooth_75Bulk.bw \
+#     -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o K9_matrix_PRC2.gz
+#
+#     plotHeatmap -m K9_matrix_PRC2.gz -out CAF-1_K9_regions.pdf \
+#                     --samplesLabel WT cac-1 cac-2 \
+#                     --startLabel "5'" \
+#                     --endLabel "3'" \
+#                     --sortUsing sum \
+#                     --sortRegions descend \
+#                     --missingDataColor 1 \
+#                     --heatmapHeight 20 \
+#                     --whatToShow "heatmap and colorbar" \
+#                     --outFileSortedRegions heatmap.bed \
+#                     --colorList 'white, mediumblue' 'white, mediumblue' 'white, mediumblue' \
+#                     --zMin 0 \
 
                     # $P133DIR/133-23_ChIP_WT_H3K9me3_Rep2_S21.bin_25.smooth_75Bulk.bw \
                     # $P133DIR/133-24_ChIP_cac-1_H3K9me3_Rep2_S22.bin_25.smooth_75Bulk.bw  \
@@ -211,9 +184,29 @@ computeMatrix scale-regions \
 # $P141DIR/141-N14_ATAC_cac-3__Rep1_S103.bin_25.smooth_75Bulk.bw \
 # $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
 
+#H3K27me3
+
+computeMatrix scale-regions -b 750 -a 750 \
+ -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+    $MISCDIR/hpo_H3K27me3.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
+    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
+    -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o matrix_PRC2.gz
+
+    plotHeatmap -m matrix_PRC2.gz -out K27_K9_edges.pdf \
+                    --samplesLabel WT hpo cac-1 cac-2 cac-3 set-7 \
+                    --startLabel "5'" \
+                    --endLabel "3'" \
+                    --sortUsing sum \
+                    --sortRegions descend \
+                    --missingDataColor 1 \
+                    --outFileSortedRegions heatmap.bed \
+                    --colorList "white, g, darkgreen"
+                    --zMin 0 \
+
 #  --whatToShow "heatmap and colorbar" \
-
-
 
 # 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue' 'white, deepskyblue'
 
