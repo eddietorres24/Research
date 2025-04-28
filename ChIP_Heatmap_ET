@@ -212,6 +212,7 @@ computeMatrix scale-regions \
                     --sortRegions descend \
                     --sortUsingSamples 1 \
                     --missingDataColor 1 \
+                    --whatToShow "heatmap and colorbar" \
                     --outFileSortedRegions heatmap.bed \
                     --colorList "white, g, darkgreen" \
                     --zMin 0 \
