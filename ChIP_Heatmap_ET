@@ -169,7 +169,7 @@ computeMatrix scale-regions -b 1500 -a 200 \
     -R $BEDDIR2/K27_narrow_genes_sorted.bed --skipZeros -o matrix_PRC2.gz
 
     plotHeatmap -m matrix_PRC2.gz -out CAF-1_ATAC_K27_genes.pdf \
-                    --samplesLabel WT cac-1 cac-2 set-7 \
+                    --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                     --startLabel "5'" \
                     --endLabel "3'" \
                     --sortUsing sum \
@@ -193,7 +193,7 @@ computeMatrix scale-regions -b 1500 -a 200 \
 
 #H3K27me3
 
-computeMatrix scale-regions -b 750 -a 750 \
+computeMatrix scale-regions -b 1000 -a 1000 \
  -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
     $MISCDIR/hpo_H3K27me3.bin_25.smooth_75Bulk.bw \
     $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
@@ -202,7 +202,7 @@ computeMatrix scale-regions -b 750 -a 750 \
     -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o matrix_PRC2.gz
 
     plotHeatmap -m matrix_PRC2.gz -out K27_K9_edges.pdf \
-                    --samplesLabel WT hpo cac-1 cac-2 cac-3 set-7 \
+                    --samplesLabel WT hpo cac-1 cac-2 set-7 \
                     --startLabel "5'" \
                     --endLabel "3'" \
                     --sortUsing sum \
