@@ -225,7 +225,7 @@ module load MACS3
 # bedtools intersect -a CAF-1_ATAC_Peaks_merge_2.bed -b WT_ATAC_peaks.bed -wa > CAF1_ATAC_WT.bed
 # bedtools intersect -a subtelomeric_K27_no_cac-3.bed -b WT_macs_0hr_rep2.bed -wa > subtelomeric_K27_normal.bed
 
-# bedtools intersect -a CAF-1_K27_Ectopic_sorted.bed -b WT_K27_narrow_rep2.bed -v > CAF-1_Ectopic_K27.bed
+# bedtools intersect -a CAF-1_K27_sorted.bed -b WT_CS_H3K27me3_Rep1_peaks.bed -v > CAF-1_Ectopic_K27.bed
 # bedtools intersect -a CAF1_ATAC_WT.bed -b cac-2_ATAC_peaks.bed -v > WT_ATAC_NoCAF2.bed
 # bedtools intersect -a CAF1_ATAC_WT.bed -b cac-3_ATAC_peaks.bed -v > WT_ATAC_NoCAF3.bed
 # bedtools intersect -a CAF1_ATAC_WT.bed -b set-7_ATAC_peaks.bed -v > WT_ATAC_NoCAF4.bed
