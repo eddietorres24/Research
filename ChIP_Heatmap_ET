@@ -168,19 +168,19 @@ module load deepTools
 #     $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
 #     -R $BEDDIR2/K27_narrow_genes_sorted.bed --skipZeros -o matrix_PRC2_1.gz
 #
-#     plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_genes_TEST.pdf \
-#                     --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
-#                     --startLabel "5'" \
-#                     --endLabel "3'" \
-#                     --sortUsing sum \
-#                     --sortRegions descend \
-#                     --hclust 2 \
-#                     --clusterUsingSamples 1 \
-#                     --sortUsingSamples 1 \
-#                     --missingDataColor 1 \
-#                     --outFileSortedRegions heatmap.bed \
-#                     --colorMap "seismic" \
-#                     --zMin 0 \
+    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_genes_TEST2.pdf \
+                    --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
+                    --startLabel "5'" \
+                    --endLabel "3'" \
+                    --sortUsing sum \
+                    --sortRegions descend \
+                    --hclust 2 \
+                    --clusterUsingSamples 1 2 3 4 \
+                    --sortUsingSamples 1 \
+                    --missingDataColor 1 \
+                    --outFileSortedRegions heatmap.bed \
+                    --colorMap "seismic" \
+                    --zMin 0 \
 
 # $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw \
 # $P141DIR/141-N12_ATAC_cac-1__Rep1_S101.bin_25.smooth_75Bulk.bw \
