@@ -90,7 +90,7 @@ computeMatrix scale-regions -a 1000 -b 1000 \
     $P133DIR/133-25_ChIP_cac-2_H3K9me3_Rep2_S23.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros -o K9_matrix_PRC2.gz
 
-    plotHeatmap -m K9_matrix_PRC2.gz -out CAF-1_K9_regions.pdf \
+    plotHeatmap -m K9_matrix_PRC2.gz -out CAF-1_K9_regions_2.pdf \
                     --samplesLabel WT cac-1 cac-2 \
                     --startLabel "5'" \
                     --endLabel "3'" \
@@ -115,7 +115,7 @@ computeMatrix scale-regions -a 500 -b 500 \
     $P138DIR/138-64_ChIP_cac-2_H3K36me3_Rep2_6252_S63.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/WT_CAF_H3K36me3_sorted.bed --skipZeros -o K36_matrix_PRC2.gz
 
-    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_regions.pdf \
+    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_regions_2.pdf \
                     --samplesLabel WT cac-1 cac-2 \
                     --startLabel "5'" \
                     --endLabel "3'" \
@@ -141,7 +141,7 @@ computeMatrix scale-regions -a 500 -b 500 \
     $P133DIR/133-21_ChIP_cac-2_H4K20me3_Rep1_S19.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/WT_CAF_H4K20me3_sorted.bed --skipZeros -o H4K20_matrix_PRC2.gz
 
-    plotHeatmap -m H4K20_matrix_PRC2.gz -out CAF-1_H4K20me3_regions.pdf \
+    plotHeatmap -m H4K20_matrix_PRC2.gz -out CAF-1_H4K20me3_regions_2.pdf \
                     --samplesLabel WT cac-1 cac-2 \
                     --startLabel "5'" \
                     --endLabel "3'" \
