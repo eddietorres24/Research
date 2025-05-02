@@ -109,7 +109,7 @@ computeMatrix scale-regions -a 1000 -b 1000 \
 
 #H3K36me3
 
-computeMatrix scale-regions -a 500 -b 500 \
+computeMatrix scale-regions -a 1000 -b 1000 \
  -S $P138DIR/138-62_ChIP_WT_H3K36me3_Rep2_6252_S61.bin_25.smooth_75Bulk.bw \
     $P138DIR/138-63_ChIP_cac-1_H3K36me3_Rep2_6252_S62.bin_25.smooth_75Bulk.bw \
     $P138DIR/138-64_ChIP_cac-2_H3K36me3_Rep2_6252_S63.bin_25.smooth_75Bulk.bw \
@@ -135,7 +135,7 @@ computeMatrix scale-regions -a 500 -b 500 \
 
 #H4K20me3
 
-computeMatrix scale-regions -a 500 -b 500 \
+computeMatrix scale-regions -a 1000 -b 1000 \
  -S $P133DIR/133-19_ChIP_WT_H4K20me3_Rep1_S17.bin_25.smooth_75Bulk.bw \
     $P133DIR/133-20_ChIP_cac-1_H4K20me3_Rep1_S18.bin_25.smooth_75Bulk.bw \
     $P133DIR/133-21_ChIP_cac-2_H4K20me3_Rep1_S19.bin_25.smooth_75Bulk.bw \
