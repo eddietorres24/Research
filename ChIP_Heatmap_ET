@@ -180,6 +180,7 @@ computeMatrix scale-regions \
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'white, lightskyblue, deepskyblue' \
                     --zMin 0 \
+                    --zMax 24 \
 
 # $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw \
 # $P141DIR/141-N12_ATAC_cac-1__Rep1_S101.bin_25.smooth_75Bulk.bw \
