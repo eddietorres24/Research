@@ -225,18 +225,22 @@ module load MACS3
 # bedtools intersect -a CAF-1_ATAC_Peaks_merge_2.bed -b WT_ATAC_peaks.bed -wa > CAF1_ATAC_WT.bed
 # bedtools intersect -a subtelomeric_K27_no_cac-3.bed -b WT_macs_0hr_rep2.bed -wa > subtelomeric_K27_normal.bed
 
+#ATAC
+# bedtools intersect -a CAF1_ATAC_WT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > WT_ATAC_K27_regions.bed
+# bedtools intersect -a CAF1_ATAC_NoWT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > CAF-1_only_ATAC_K27_regions.bed
+
 # bedtools intersect -a CAF-1_K27_sorted.bed -b WT_CS_H3K27me3_Rep1_peaks.bed -v > CAF-1_Ectopic_K27.bed
 # bedtools intersect -a CAF1_ATAC_WT.bed -b cac-2_ATAC_peaks.bed -v > WT_ATAC_NoCAF2.bed
 # bedtools intersect -a CAF1_ATAC_WT.bed -b cac-3_ATAC_peaks.bed -v > WT_ATAC_NoCAF3.bed
 # bedtools intersect -a CAF1_ATAC_WT.bed -b set-7_ATAC_peaks.bed -v > WT_ATAC_NoCAF4.bed
 
 #Combining all overlapping peaks & merging
-#CAF-1
+# CAF-1
 # bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed > ${OUTDIR3}/merge_peaks.txt
-
-
+#
+#
 #   cat cac-1_CS_H3K27me3_Rep1_peaks.bed \
 #       cac-1_CS_H3K27me3_Rep1_peaks.bed \
 #       cac-3_CS_H3K27me3_Rep1_peaks.bed > CAF-1_K27_Ectopic.bed
