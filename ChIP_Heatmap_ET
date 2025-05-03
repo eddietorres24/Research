@@ -166,7 +166,7 @@ computeMatrix scale-regions \
     $P141DIR/141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw \
     $P141DIR/141-N14_ATAC_cac-3__Rep1_S103.bin_25.smooth_75Bulk.bw \
     $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/WT_ATAC_K27_regions.bed $BEDDIR2/CAF-1_only_ATAC_K27_regions --skipZeros -o matrix_PRC2_1.gz
+    -R $BEDDIR2/WT_ATAC_K27_regions.bed $BEDDIR2/CAF-1_only_ATAC_K27_regions.bed --skipZeros -o matrix_PRC2_1.gz
 
     plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_regions.pdf \
                     --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
