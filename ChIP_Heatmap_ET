@@ -177,7 +177,7 @@ computeMatrix scale-regions \
                     --heatmapHeight 10 \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, deepskyblue' \
+                    --colorList 'white, lightskyblue, deepskyblue' \
                     --zMin 0 \
 
 # $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw \
