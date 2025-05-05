@@ -16,7 +16,7 @@ cd $SLURM_SUBMIT_DIR
 
 source config_bwt.txt
 
-OUTDIR=/path/to/directory/${OutputFolderName}
+OUTDIR=${OutputFolderName}
 mkdir ${OUTDIR}
 
 
