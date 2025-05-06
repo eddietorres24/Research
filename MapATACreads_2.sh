@@ -16,8 +16,8 @@ cd $SLURM_SUBMIT_DIR
 
 source config_bwt.txt
 
-OUTDIR=${OutputFolderName}
-mkdir ${OUTDIR}
+# OUTDIR=${OutputFolderName}
+# mkdir ${OUTDIR}
 
 
 # #process reads using trimGalore
@@ -27,14 +27,14 @@ mkdir ${OUTDIR}
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 #
 
- mkdir "${OUTDIR}/TrimmedReads"
- mkdir "${OUTDIR}/SortedBamFiles"
- mkdir "${OUTDIR}/ShiftedBamFiles"
- mkdir "${OUTDIR}/FilteredBamFiles"
-
- mkdir "${OUTDIR}/BigWigs"
- mkdir "${OUTDIR}/Peaks"
- mkdir "${OUTDIR}/logs"
+ # mkdir "${OUTDIR}/TrimmedReads"
+ # mkdir "${OUTDIR}/SortedBamFiles"
+ # mkdir "${OUTDIR}/ShiftedBamFiles"
+ # mkdir "${OUTDIR}/FilteredBamFiles"
+ #
+ # mkdir "${OUTDIR}/BigWigs"
+ # mkdir "${OUTDIR}/Peaks"
+ # mkdir "${OUTDIR}/logs"
 
 
 #mkdir "$OUTDIR/HomerTagDirectories"
