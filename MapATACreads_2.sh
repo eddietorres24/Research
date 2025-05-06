@@ -81,7 +81,7 @@ do
 ml SAMtools/1.16.1-GCC-11.3.0
 ml BWA/0.7.17-GCCcore-11.3.0
 
-#
+
 ### bowtie2 alignment -- works ###
 module load Bowtie2/2.5.2-GCC-11.3.0
 #
