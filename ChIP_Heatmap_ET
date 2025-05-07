@@ -162,13 +162,13 @@ module load deepTools
 #ATAC
 
 computeMatrix reference-point --referencePoint TSS -b 1000 -a 1000 \
- -S $P148DIR/148-N20_ATAC_WT__Rep4_S116.bin_25.smooth_75Bulk.bw
-    $P148DIR/148-N21_ATAC_cac-1__Rep4_S117.bin_25.smooth_75Bulk.bw
-    $P148DIR/148-N22_ATAC_cac-2__Rep4_S118.bin_25.smooth_75Bulk.bw
-    $P148DIR/148-N24_ATAC_set-7__Rep4_S120.bin_25.smooth_75Bulk.bw
+ -S $P148DIR/148-N20_ATAC_WT__Rep4_S116.bin_25.smooth_75Bulk.bw \
+    $P148DIR/148-N21_ATAC_cac-1__Rep4_S117.bin_25.smooth_75Bulk.bw \
+    $P148DIR/148-N22_ATAC_cac-2__Rep4_S118.bin_25.smooth_75Bulk.bw \
+    $P148DIR/148-N24_ATAC_set-7__Rep4_S120.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/K27_genes_gff.bed --skipZeros -o matrix_PRC2_1.gz
 
-    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_regions_TSS_TEST_3.pdf \
+    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_regions_TSS_TEST_4.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \
                     --startLabel "5'" \
                     --endLabel "3'" \
