@@ -178,11 +178,13 @@ computeMatrix reference-point --referencePoint TSS -a 1000 -b 1000 \
                     --endLabel "3'" \
                     --sortUsing sum \
                     --sortRegions descend \
-                    --sortUsingSamples 1 2 3 \
+                    --sortUsingSamples 5 6 7 \
+                    --kmeans 2 \
+                    --clusterUsingSamples 5 \
                     --whatToShow "heatmap and colorbar" \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
-                    --colorMap "bwr" \
+                    --colorMap "bwr" "bwr" "bwr" "bwr" "greens" "greens" "greens" "greens" \
                     --zMin 0 \
 
 #$P148DIR/148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw
