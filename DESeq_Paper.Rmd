@@ -155,14 +155,14 @@ ATRX_sig <- subset(ATRX, padj < 0.05)
 set7_sig <- subset(set7, padj < 0.05)
 #set3 <- subset(set3, padj < 0.05)
 
-write.csv(as.data.frame(cac1_sig), file = "cac1.csv")
-write.csv(as.data.frame(cac2_sig), file = "cac2.csv")
-write.csv(as.data.frame(cac3_sig), file = "cac3.csv")
-write.csv(as.data.frame(naf1_sig), file = "naf1.csv")
-write.csv(as.data.frame(naf2_sig), file = "naf2.csv")
-write.csv(as.data.frame(asf1_sig), file = "asf1.csv")
-write.csv(as.data.frame(ATRX_sig), file = "ATRX.csv")
-write.csv(as.data.frame(set7_sig), file = "set7.csv")
+write.csv(as.data.frame(cac1_sig), file = "cac1_1.csv")
+write.csv(as.data.frame(cac2_sig), file = "cac2_1.csv")
+write.csv(as.data.frame(cac3_sig), file = "cac3_1.csv")
+write.csv(as.data.frame(naf1_sig), file = "naf1_1.csv")
+write.csv(as.data.frame(naf2_sig), file = "naf2_1.csv")
+write.csv(as.data.frame(asf1_sig), file = "asf1_1.csv")
+write.csv(as.data.frame(ATRX_sig), file = "ATRX_1.csv")
+write.csv(as.data.frame(set7_sig), file = "set7_1.csv")
 #write.csv(as.data.frame(set3), file = "set3.csv")
 ```
 
@@ -261,17 +261,17 @@ input <- c(
 ngenes = read.csv("../csv_files/neurospora_genes.csv")
 
 combine <- transform(merge(ngenes, l2fc, by = "VALUE"))
-track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", "asf1.csv", "ATRX.csv", "cac1.csv", "cac2.csv", "cac3.csv", "naf1.csv", "naf2.csv", "set7.csv")
+track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", "asf1_1.csv", "ATRX_1.csv", "cac1_1.csv", "cac2_1.csv", "cac3_1.csv", "naf1_1.csv", "naf2_1.csv", "set7_1.csv")
 
-write.table(track, file="histchaps_TEST.igv", sep="\t", row.names = FALSE, quote = FALSE)
+write.table(track, file="histchaps_TEST_2.igv", sep="\t", row.names = FALSE, quote = FALSE)
 ```
 
 #Subsetting DEG by which strain they are up- or downregulated in CAF-1 mutants. Also extracting a list of ALL DEG for GO Analysis
 ```{r}
 #Reading in the csv's w/ DEGs back in
-cac1_DEG <- read.csv("./cac1.csv", header= TRUE, row.names = 1)
-cac2_DEG <- read.csv("./cac2.csv", header= TRUE, row.names = 1)
-cac3_DEG <- read.csv("./cac3.csv", header= TRUE, row.names = 1)
+cac1_DEG <- read.csv("./cac1_1.csv", header= TRUE, row.names = 1)
+cac2_DEG <- read.csv("./cac2_1.csv", header= TRUE, row.names = 1)
+cac3_DEG <- read.csv("./cac3_1.csv", header= TRUE, row.names = 1)
 
 #make a columns w/ gene names for easier subsetting
 cac1_DEG <- tibble::rownames_to_column(cac1_DEG, "NCU")
@@ -279,14 +279,26 @@ cac2_DEG <- tibble::rownames_to_column(cac2_DEG, "NCU")
 cac3_DEG <- tibble::rownames_to_column(cac3_DEG, "NCU")
 
 #Splitting Up & Down regulated genes
-cac1_UP <- subset(cac1_DEG, cac1_DEG$log2FoldChange > 0)
-cac1_DOWN <- subset(cac1_DEG, cac1_DEG$log2FoldChange < 0)
-cac2_UP <- subset(cac2_DEG, cac1_DEG$log2FoldChange > 0)
-cac2_DOWN <- subset(cac2_DEG, cac1_DEG$log2FoldChange < 0)
-cac3_UP <- subset(cac3_DEG, cac1_DEG$log2FoldChange > 0)
-cac3_DOWN <- subset(cac3_DEG, cac1_DEG$log2FoldChange < 0)
-#Write csv's
+cac1_UP <- subset(cac1_DEG, cac1_DEG$log2FoldChange > 1)
+cac1_DOWN <- subset(cac1_DEG, cac1_DEG$log2FoldChange < 1)
+cac2_UP <- subset(cac2_DEG, cac1_DEG$log2FoldChange > 1)
+cac2_DOWN <- subset(cac2_DEG, cac1_DEG$log2FoldChange < 1)
+cac3_UP <- subset(cac3_DEG, cac1_DEG$log2FoldChange > 1)
+cac3_DOWN <- subset(cac3_DEG, cac1_DEG$log2FoldChange < 1)
 
+#I want bed files of up/downregulated genes across samples
+neurospora = read.table("./bed_files/neurospora.bed")
+cac1_up <- subset(neurospora, neurospora$V4 %in% cac1_UP$NCU)
+cac2_up <- subset(neurospora, neurospora$V4 %in% cac2_UP$NCU)
+cac3_up <- subset(neurospora, neurospora$V4 %in% cac3_UP$NCU)
+
+write.csv(cac1_up, file = "cac1_up.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac2_up, file = "cac2_up.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac3_up, file = "cac3_up.csv", sep = "\t", col.names = F, row.names = F)
+
+#I will manipulate the csv in excel to make the bed file
+
+#Write csv's
 write.csv(as.data.frame(cac1_UP), file = "cac1_UP.csv")
 write.csv(as.data.frame(cac1_DOWN), file = "cac1_DOWN.csv")
 write.csv(as.data.frame(cac2_UP), file = "cac2_UP.csv")
