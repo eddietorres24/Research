@@ -232,7 +232,7 @@ module load MACS3
 # bedtools intersect -a K27_narrow_genes_sorted.bed -b cac1_up.bed -wa > cac1_up_K27_genes.bed
 # bedtools intersect -a K27_narrow_genes_sorted.bed -b cac2_up.bed -wa > cac2_up_K27_genes.bed
 #
-# bedtools intersect -a K27_narrow_genes_sorted.bed -b cac1_2_up_K27_genes_sorted.bed -v > cac1_2_not_up_K27_genes.bed
+# bedtools intersect -a all_genes_gff.bed -b K27_narrow_genes_sorted.bed -wa > K27_genes_gff.bed
 
 # bedtools intersect -a CAF1_ATAC_WT.bed -b cac-2_ATAC_peaks.bed -v > WT_ATAC_NoCAF2.bed
 # bedtools intersect -a CAF1_ATAC_WT.bed -b cac-3_ATAC_peaks.bed -v > WT_ATAC_NoCAF3.bed
