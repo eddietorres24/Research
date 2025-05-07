@@ -238,6 +238,10 @@ module load MACS3
 # bedtools intersect -a CAF1_ATAC_WT.bed -b cac-3_ATAC_peaks.bed -v > WT_ATAC_NoCAF3.bed
 # bedtools intersect -a CAF1_ATAC_WT.bed -b set-7_ATAC_peaks.bed -v > WT_ATAC_NoCAF4.bed
 
+#
+# bedtools intersect -a CAF1_ATAC_WT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > ATAC_WT_K27_regions.bed
+# bedtools intersect -a CAF1_ATAC_NoWT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > ATAC_NoWT_K27_regions.bed
+
 
 #Combining all overlapping peaks & merging
 # CAF-1
