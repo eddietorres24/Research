@@ -174,7 +174,6 @@ computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 \
                     --endLabel "3'" \
                     --sortUsing sum \
                     --sortRegions descend \
-                    --sortUsingSamples 1 \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
                     --colorMap "bwr" \
