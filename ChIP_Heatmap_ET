@@ -161,12 +161,12 @@ module load deepTools
 
 #ATAC
 
-computeMatrix scale-regions \
+computeMatrix --referencePoint center -a 1500 -b 1500 \
  -S $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw \
     $P141DIR/141-N12_ATAC_cac-1__Rep1_S101.bin_25.smooth_75Bulk.bw \
     $P141DIR/141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw \
     $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/ATAC_WT_K27_regions.bed $BEDDIR2/cac1_2_set7_ATAC_NoWT_K27_regions.bed --skipZeros -o matrix_PRC2_1.gz
+    -R $BEDDIR2/WT_ATAC_K27_regions.bed $BEDDIR2/cac1_2_set7_ATAC_NoWT_K27_regions.bed --skipZeros -o matrix_PRC2_1.gz
 
     plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_peaks_K27_regions_141_scale.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \

@@ -226,7 +226,7 @@ module load MACS3
 # bedtools intersect -a subtelomeric_K27_no_cac-3.bed -b WT_macs_0hr_rep2.bed -wa > subtelomeric_K27_normal.bed
 
 #ATAC
-# bedtools intersect -a CAF1_ATAC_WT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > WT_ATAC_K27_regions.bed
+# bedtools intersect -a CAF1_ATAC_WT_peaks.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > WT_ATAC_K27_regions.bed
 # bedtools intersect -a CAF1_ATAC_NoWT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > CAF-1_only_ATAC_K27_regions.bed
 
 # bedtools intersect -a K27_narrow_genes_sorted.bed -b cac1_up.bed -wa > cac1_up_K27_genes.bed
@@ -255,10 +255,10 @@ module load MACS3
 #       set-7_ATAC_peaks.bed > cac1_2_set_7_K27_genes.bed
 #
 # #
-# sort -k1,1 -k2,2n cac1_2_set_7_K27_genes.bed > cac1_2_set_7_K27_sort_genes.bed
-# bedtools sort -i cac1_2_set_7_K27_sort_genes.bed > cac1_2_set_7_K27_sort_bed_genes.bed
+# sort -k1,1 -k2,2n CAF1_ATAC_WT.bed > CAF1_ATAC_WT_fix.bed
+# bedtools sort -i CAF1_ATAC_WT_fix.bed > CAF1_ATAC_WT_fix2.bed
 # #
-# bedtools merge -i cac1_2_set_7_K27_sort_bed_genes.bed > cac_1_2_set7_ATAC_peaks.bed
+# bedtools merge -i CAF1_ATAC_WT_fix2.bed > CAF1_ATAC_WT_peaks.bed
 
 
 #qa-suz12
