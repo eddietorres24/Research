@@ -161,11 +161,11 @@ module load deepTools
 
 #ATAC
 
-computeMatrix scale-regions -b 1500 \
- -S $P148DIR/148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw \
-    $P148DIR/148-N15_ATAC_cac-1__Rep3_S111.bin_25.smooth_75Bulk.bw \
-    $P148DIR/148-N16_ATAC_cac-2__Rep3_S112.bin_25.smooth_75Bulk.bw \
-    $P148DIR/148-N19_ATAC_set-7__Rep3_S115.bin_25.smooth_75Bulk.bw \
+computeMatrix scale-regions -b 1750 -a 200 \
+ -S $P146DIR/146-N1_ATAC_WT__Rep2_S97.bin_25.smooth_75Bulk.bw
+    $P146DIR/146-N3_ATAC_cac-1__Rep2_S98.bin_25.smooth_75Bulk.bw
+    $P146DIR/146-N4_ATAC_cac-2__Rep2_S99.bin_25.smooth_75Bulk.bw
+    $P146DIR/146-N5_ATAC_set-7__Rep2_S100.bin_25.smooth_75Bulk.bw
     -R $BEDDIR2/K27_narrow_genes_sorted.bed --skipZeros -o matrix_PRC2_1.gz
 
     plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_regions.pdf \
@@ -178,7 +178,7 @@ computeMatrix scale-regions -b 1500 \
                     --whatToShow "heatmap and colorbar" \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, lightskyblue, deepskyblue' \
+                    --colorMap 'Blues' \
                     --zMin 0 \
 
 #148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw
