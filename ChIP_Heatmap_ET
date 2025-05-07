@@ -168,7 +168,7 @@ computeMatrix scale-regions -b 2000 --regionBodyLength 8000 \
     $P148DIR/148-N19_ATAC_set-7__Rep3_S115.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/K27_narrow_genes_sorted.bed --skipZeros -o matrix_PRC2_1.gz
 
-    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_regions_141_new.pdf \
+    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_regions_TEST.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \
                     --startLabel "5'" \
                     --endLabel "3'" \
