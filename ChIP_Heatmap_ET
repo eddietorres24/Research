@@ -166,10 +166,10 @@ computeMatrix reference-point --referencePoint TSS -a 1000 -b 1000 \
     $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
     $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
     $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-    $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw \
-    $P141DIR/141-N12_ATAC_cac-1__Rep1_S101.bin_25.smooth_75Bulk.bw \
-    $P141DIR/141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw \
-    $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
+    $P148DIR/148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw \
+    $P148DIR/148-N15_ATAC_cac-1__Rep3_S111.bin_25.smooth_75Bulk.bw \
+    $P148DIR/148-N16_ATAC_cac-2__Rep3_S112.bin_25.smooth_75Bulk.bw \
+    $P148DIR/148-N19_ATAC_set-7__Rep3_S115.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/K27_genes_gff.bed --skipZeros -o matrix_PRC2_1.gz
 
     plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_peaks_K27_regions_148.pdf \
@@ -184,7 +184,7 @@ computeMatrix reference-point --referencePoint TSS -a 1000 -b 1000 \
                     --whatToShow "heatmap and colorbar" \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
-                    --colorMap "bwr" "bwr" "bwr" "bwr" "greens" "greens" "greens" "greens" \
+                    --colorlist "white, g, darkgreen" "white, g, darkgreen" "white, g, darkgreen" "white, g, darkgreen" "w, ""b, w , r" "b, w , r" "b, w , r" "b, w , r" \
                     --zMin 0 \
 
 #$P148DIR/148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw
