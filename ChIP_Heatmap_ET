@@ -186,6 +186,7 @@ module load deepTools
                     --outFileSortedRegions heatmap.bed \
                     --colorList "white, g, darkgreen" "white, g, darkgreen" "white, g, darkgreen" "white, g, darkgreen" "b, w , r" "b, w , r" "b, w , r" "b, w , r" \
                     --zMin 0 \
+                    --zMax 50 50 50 50 10 10 10 10
 
 #$P148DIR/148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw
 #$P148DIR/148-N15_ATAC_cac-1__Rep3_S111.bin_25.smooth_75Bulk.bw
