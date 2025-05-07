@@ -229,10 +229,15 @@ module load MACS3
 # bedtools intersect -a CAF1_ATAC_WT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > WT_ATAC_K27_regions.bed
 # bedtools intersect -a CAF1_ATAC_NoWT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > CAF-1_only_ATAC_K27_regions.bed
 
-# bedtools intersect -a CAF-1_K27_sorted.bed -b WT_CS_H3K27me3_Rep1_peaks.bed -v > CAF-1_Ectopic_K27.bed
+# bedtools intersect -a K27_narrow_genes_sorted.bed -b cac1_up.bed -wa > cac1_up_K27_genes.bed
+# bedtools intersect -a K27_narrow_genes_sorted.bed -b cac2_up.bed -wa > cac2_up_K27_genes.bed
+#
+# bedtools intersect -a K27_narrow_genes_sorted.bed -b cac1_2_up_K27_genes_sorted.bed -v > cac1_2_not_up_K27_genes.bed
+
 # bedtools intersect -a CAF1_ATAC_WT.bed -b cac-2_ATAC_peaks.bed -v > WT_ATAC_NoCAF2.bed
 # bedtools intersect -a CAF1_ATAC_WT.bed -b cac-3_ATAC_peaks.bed -v > WT_ATAC_NoCAF3.bed
 # bedtools intersect -a CAF1_ATAC_WT.bed -b set-7_ATAC_peaks.bed -v > WT_ATAC_NoCAF4.bed
+
 
 #Combining all overlapping peaks & merging
 # CAF-1
@@ -241,15 +246,14 @@ module load MACS3
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 #
 #
-#   cat cac-1_CS_H3K27me3_Rep1_peaks.bed \
-#       cac-1_CS_H3K27me3_Rep1_peaks.bed \
-#       cac-3_CS_H3K27me3_Rep1_peaks.bed > CAF-1_K27_Ectopic.bed
+#   cat cac1_up_K27_genes.bed \
+#       cac2_up_K27_genes.bed > cac1_2_up_K27_genes.bed
 #
 # #
-# sort -k1,1 -k2,2n CAF-1_K27_Ectopic.bed > CAF-1_K27_Ectopic_sort.bed
-# bedtools sort -i CAF-1_K27_Ectopic_sort.bed > CAF-1_K27_Ectopic_bed_sort.bed
-#
-# bedtools merge -i CAF-1_K27_Ectopic_bed_sort.bed -d 350 > CAF-1_K27_Ectopic_sorted.bed
+# sort -k1,1 -k2,2n cac1_2_up_K27_genes.bed > cac1_2_up_K27_genes_sort.bed
+# bedtools sort -i cac1_2_up_K27_genes_sort.bed > cac1_2_up_K27_genes_bed_sort.bed
+# #
+# bedtools merge -i cac1_2_up_K27_genes_bed_sort.bed > cac1_2_up_K27_genes_sorted.bed
 
 
 #qa-suz12
