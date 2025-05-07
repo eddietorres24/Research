@@ -175,8 +175,6 @@ computeMatrix scale-regions -b 2000 --regionBodyLength 6000 \
                     --sortUsing sum \
                     --sortRegions descend \
                     --sortUsingSamples 1 \
-                    --kmeans 2 \
-                    --clusterUsingSamples 1 \
                     --heatmapHeight 16 \
                     --whatToShow "heatmap and colorbar" \
                     --missingDataColor 1 \
