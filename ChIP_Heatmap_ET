@@ -162,10 +162,10 @@ module load deepTools
 #ATAC
 
 computeMatrix reference-point --referencePoint TSS -b 1000 -a 1000 \
- -S $P146DIR/146-N1_ATAC_WT__Rep2_S97.bin_25.smooth_75Bulk.bw
-    $P146DIR/146-N3_ATAC_cac-1__Rep2_S98.bin_25.smooth_75Bulk.bw
-    $P146DIR/146-N4_ATAC_cac-2__Rep2_S99.bin_25.smooth_75Bulk.bw
-    $P146DIR/146-N5_ATAC_set-7__Rep2_S100.bin_25.smooth_75Bulk.bw
+ -S $P148DIR/148-N20_ATAC_WT__Rep4_S116.bin_25.smooth_75Bulk.bw
+    $P148DIR/148-N21_ATAC_cac-1__Rep4_S117.bin_25.smooth_75Bulk.bw
+    $P148DIR/148-N22_ATAC_cac-2__Rep4_S118.bin_25.smooth_75Bulk.bw
+    $P148DIR/148-N24_ATAC_set-7__Rep4_S120.bin_25.smooth_75Bulk.bw
     -R $BEDDIR2/K27_genes_gff.bed --skipZeros -o matrix_PRC2_1.gz
 
     plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_regions_TSS_TEST_3.pdf \
@@ -187,6 +187,12 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 1000 \
 #148-N16_ATAC_cac-2__Rep3_S112.bin_25.smooth_75Bulk.bw
 #148-N17_ATAC_cac-3__Rep3_S113.bin_25.smooth_75Bulk.bw
 #148-N19_ATAC_set-7__Rep3_S115.bin_25.smooth_75Bulk.bw
+
+#148-N20_ATAC_WT__Rep4_S116.bin_25.smooth_75Bulk.bw
+#148-N21_ATAC_cac-1__Rep4_S117.bin_25.smooth_75Bulk.bw
+#148-N22_ATAC_cac-2__Rep4_S118.bin_25.smooth_75Bulk.bw
+#148-N23_ATAC_cac-3__Rep4_S119.bin_25.smooth_75Bulk.bw
+#148-N24_ATAC_set-7__Rep4_S120.bin_25.smooth_75Bulk.bw
 
 
 # $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw \
