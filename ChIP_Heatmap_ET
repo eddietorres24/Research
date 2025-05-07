@@ -161,7 +161,7 @@ module load deepTools
 
 #ATAC
 
-computeMatrix --referencePoint center -a 1500 -b 1500 \
+computeMatrix referencePoint --referencePoint center -a 1500 -b 1500 \
  -S $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw \
     $P141DIR/141-N12_ATAC_cac-1__Rep1_S101.bin_25.smooth_75Bulk.bw \
     $P141DIR/141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw \
