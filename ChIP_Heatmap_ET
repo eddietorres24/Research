@@ -26,6 +26,7 @@ P141DIR="/scratch/evt82290/MappingOutputs/Run141/bigWig"
 P144DIR="/scratch/evt82290/MappingOutputs/Run144/bigWig"
 P145DIR="/scratch/evt82290/MappingOutputs/Run145/bigWig"
 P146DIR="/scratch/evt82290/MappingOutputs/Run146/bigWig"
+P148DIR="/scratch/evt82290/MappingOutputs/Run148/bigWig"
 MISCDIR="/scratch/evt82290/MappingOutputs/misc_data/bigWig"
 #bed file directories
 QABED="/home/evt82290/Research/bed_files/qa-suz12"
@@ -165,7 +166,7 @@ computeMatrix scale-regions -b 1500 \
     $P148DIR/148-N15_ATAC_cac-1__Rep3_S111.bin_25.smooth_75Bulk.bw \
     $P148DIR/148-N16_ATAC_cac-2__Rep3_S112.bin_25.smooth_75Bulk.bw \
     $P148DIR/148-N19_ATAC_set-7__Rep3_S115.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/K27_narrow_genes_sorted.bed  --skipZeros -o matrix_PRC2_1.gz
+    -R $BEDDIR2/K27_narrow_genes_sorted.bed --skipZeros -o matrix_PRC2_1.gz
 
     plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_regions.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \
