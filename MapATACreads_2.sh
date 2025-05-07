@@ -45,9 +45,9 @@ for f in $FILES
 do
 #
 # 	#Examples to Get Different parts of the file name
-# 		#See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
-		#${string//substring/replacement}
-# 		#dir=${f%/*}
+		# See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
+		# ${string//substring/replacement}
+		# dir=${f%/*}
 
 	file=${f##*/}
 	#remove ending from file name to create shorter names for bam files and other downstream output
@@ -65,7 +65,7 @@ do
   deduped1="${OUTDIR}/SortedBamFiles/${name}_deduped.bam"
   markeddupes="${OUTDIR}/SortedBamFiles/${name}_marked_dup_metrics.txt"
 
-	shifted="${OUTDIR}/ShiftedBamFiles/${name}.shifted.bam"
+	shifted="${OUTDIR}/ShiftedBamFiles/${name}_shifted.bam"
   deduped2="${OUTDIR}/FilteredBamFiles/${name}_shifted_deduped.bam"
 
     nfr="${OUTDIR}/SortedFilteredBamFiles/${name}_nfr.bam"
@@ -85,7 +85,7 @@ ml BWA/0.7.17-GCCcore-11.3.0
 ### bowtie2 alignment -- works ###
 module load Bowtie2/2.5.2-GCC-11.3.0
 #
-bowtie2 -p $THREADS -q --local --very-sensitive -x $BWT_GENOME -1 ${OUTDIR}/TrimmedReads/$file -2 ${OUTDIR}/TrimmedReads/$read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/Bowtie2/SortedBamFiles/tempReps -o "$bwt_bam" -
+bowtie2 -p $THREADS -q --local --very-sensitive -x $BWT_GENOME -1 ${OUTDIR}/TrimmedReads/$file -2 ${OUTDIR}/TrimmedReads/$read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/Bowtie2/SortedBamFiles/tempReps -o "$bwt_bam"
 samtools index "$bwt_bam"
 
 ##removing duplicates ##
@@ -102,10 +102,10 @@ samtools index "$deduped1"
 
 #deeptools
 module load deepTools/3.5.2-foss-2022a
-alignmentSieve -p $THREADS --ATACshift --bam $deduped1 -o ${OUTDIR}/ShiftedBamFiles/${name}.tmp.bam
+alignmentSieve -p $THREADS --ATACshift --bam $deduped1 -o ${OUTDIR}/ShiftedBamFiles/${name}_tmp.bam
 
 #the bam file needs to be sorted again
-samtools sort -@ $THREADS -O bam -o ${shifted} ${OUTDIR}/ShiftedBamFiles/${name}.tmp.bam
+samtools sort -@ $THREADS -O bam -o ${shifted} ${OUTDIR}/ShiftedBamFiles/${name}_tmp.bam
 samtools index -@ $THREADS ${shifted}
 
 #rm ${name}.tmp.bam
@@ -143,11 +143,11 @@ sambamba view --format \
 
 
 #Plot all reads
-bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b ${nfr} -o "${bwdir}/${name}.nfr.ATAC_bin_3.smooth_6_Bulk.bw"
-bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b ${mono} -o "${bwdir}/${name}.mono.ATAC_bin_3.smooth_6_Bulk.bw"
-bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b ${di} -o "${bwdir}/${name}.di.ATAC_bin_3.smooth_6_Bulk.bw"
-bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b ${tri} -o "${bwdir}/${name}.tri.ATAC_bin_3.smooth_6_Bulk.bw"
-bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b  ${deduped2} -o "${bwdir}/${name}.all.ATAC_bin_3.smooth_6_Bulk.bw"
+bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b ${nfr} -o "${bwdir}/${name}_nfr_ATAC_bin_3_smooth_6_Bulk.bw"
+bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b ${mono} -o "${bwdir}/${name}_mono_ATAC_bin_3_smooth_6_Bulk.bw"
+bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b ${di} -o "${bwdir}/${name}_di_ATAC_bin_3_smooth_6_Bulk.bw"
+bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b ${tri} -o "${bwdir}/${name}_tri_ATAC_bin_3_smooth_6_Bulk.bw"
+bamCoverage -p $THREADS --Offset 1 3 -bs 3 --smoothLength 6 --minMappingQuality 20 --normalizeUsing BPM  -of bigwig -b  ${deduped2} -o "${bwdir}/${name}_all_ATAC_bin_3_smooth_6_Bulk.bw"
 #
 
 module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
