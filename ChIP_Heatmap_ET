@@ -161,16 +161,16 @@ module load deepTools
 
 #ATAC
 
-computeMatrix reference-point --referencePoint TSS -a 1000 -b 1000 \
- -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-    $P148DIR/148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw \
-    $P148DIR/148-N15_ATAC_cac-1__Rep3_S111.bin_25.smooth_75Bulk.bw \
-    $P148DIR/148-N16_ATAC_cac-2__Rep3_S112.bin_25.smooth_75Bulk.bw \
-    $P148DIR/148-N19_ATAC_set-7__Rep3_S115.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/K27_genes_gff.bed --skipZeros -o matrix_PRC2_1.gz
+# computeMatrix reference-point --referencePoint TSS -a 1000 -b 1000 \
+#  -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+#     $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+#     $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+#     $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
+#     $P148DIR/148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw \
+#     $P148DIR/148-N15_ATAC_cac-1__Rep3_S111.bin_25.smooth_75Bulk.bw \
+#     $P148DIR/148-N16_ATAC_cac-2__Rep3_S112.bin_25.smooth_75Bulk.bw \
+#     $P148DIR/148-N19_ATAC_set-7__Rep3_S115.bin_25.smooth_75Bulk.bw \
+#     -R $BEDDIR2/K27_genes_gff.bed --skipZeros -o matrix_PRC2_1.gz
 
     plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_peaks_K27_regions_148.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 WT cac-1 cac-2 set-7 \
