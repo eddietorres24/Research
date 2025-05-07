@@ -255,10 +255,10 @@ module load MACS3
 #       set-7_ATAC_peaks.bed > cac1_2_set_7_K27_genes.bed
 #
 # #
-# sort -k1,1 -k2,2n CAF1_ATAC_WT.bed > CAF1_ATAC_WT_fix.bed
+# sort -k1,1 -k2,2n WT_ATAC_K27_regions.bed > CAF1_ATAC_WT_fix.bed
 # bedtools sort -i CAF1_ATAC_WT_fix.bed > CAF1_ATAC_WT_fix2.bed
 # #
-# bedtools merge -i CAF1_ATAC_WT_fix2.bed > CAF1_ATAC_WT_peaks.bed
+# bedtools merge -i CAF1_ATAC_WT_fix2.bed > WT_ATAC_K27_regions.bed
 
 
 #qa-suz12
