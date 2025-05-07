@@ -174,6 +174,7 @@ computeMatrix scale-regions -b 1750 -a 200 \
                     --endLabel "3'" \
                     --sortUsing sum \
                     --sortRegions descend \
+                    --sortUsingSamples 1 \
                     --heatmapHeight 16 \
                     --whatToShow "heatmap and colorbar" \
                     --missingDataColor 1 \
