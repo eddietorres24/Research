@@ -179,7 +179,7 @@ module load deepTools
                     --clusterUsingSamples 1 \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
-                    --colorMap 'bwr' \
+                    --colorList "white, deepskyblue" \
                     --zMin 0 \
 
 #148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw
