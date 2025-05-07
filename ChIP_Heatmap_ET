@@ -176,7 +176,7 @@ computeMatrix reference-point --referencePoint center -b 1000 -a 1000 \
                     --sortUsing sum \
                     --sortRegions descend \
                     --sortUsingSamples 1 2 3 4 \
-                    --heatmapHeight 15 \
+                    --heatmapHeight 20 \
                     --whatToShow "heatmap and colorbar" \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
