@@ -179,7 +179,7 @@ computeMatrix scale-regions -b 1750 -a 200 \
                     --whatToShow "heatmap and colorbar" \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
-                    --colorMap 'Blues' \
+                    --colorMap 'bwr' \
                     --zMin 0 \
 
 #148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw
