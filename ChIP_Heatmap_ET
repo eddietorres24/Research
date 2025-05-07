@@ -168,7 +168,7 @@ computeMatrix reference-point --referencePoint TSS -b 2500 -a 2500 \
     $P148DIR/148-N19_ATAC_set-7__Rep3_S115.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/K27_genes_gff.bed --skipZeros -o matrix_PRC2_1.gz
 
-    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_regions_TSS_141.pdf \
+    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_regions_TSS_1468_wide.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \
                     --startLabel "5'" \
                     --endLabel "3'" \
