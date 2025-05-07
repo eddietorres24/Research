@@ -161,14 +161,14 @@ module load deepTools
 
 #ATAC
 
-computeMatrix reference-point --referencePoint TSS -b 2500 -a 2500 \
- -S $P148DIR/148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw \
-    $P148DIR/148-N15_ATAC_cac-1__Rep3_S111.bin_25.smooth_75Bulk.bw \
-    $P148DIR/148-N16_ATAC_cac-2__Rep3_S112.bin_25.smooth_75Bulk.bw \
-    $P148DIR/148-N19_ATAC_set-7__Rep3_S115.bin_25.smooth_75Bulk.bw \
+computeMatrix reference-point --referencePoint TSS -b 2000 -a 2000 \
+ -S $P146DIR/146-N1_ATAC_WT__Rep2_S97.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-N3_ATAC_cac-1__Rep2_S98.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-N4_ATAC_cac-2__Rep2_S99.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-N5_ATAC_set-7__Rep2_S100.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/K27_genes_gff.bed --skipZeros -o matrix_PRC2_1.gz
 
-    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_regions_TSS_1468_wide.pdf \
+    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_regions_TSS_146_wide.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \
                     --startLabel "5'" \
                     --endLabel "3'" \
@@ -202,9 +202,9 @@ computeMatrix reference-point --referencePoint TSS -b 2500 -a 2500 \
 # $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
 
 # $P146DIR/146-N1_ATAC_WT__Rep2_S97.bin_25.smooth_75Bulk.bw
-# 146-N3_ATAC_cac-1__Rep2_S98.bin_25.smooth_75Bulk.bw
-# 146-N4_ATAC_cac-2__Rep2_S99.bin_25.smooth_75Bulk.bw
-# 146-N5_ATAC_set-7__Rep2_S100.bin_25.smooth_75Bulk.bw
+# $P146DIR/146-N3_ATAC_cac-1__Rep2_S98.bin_25.smooth_75Bulk.bw
+# $P146DIR/146-N4_ATAC_cac-2__Rep2_S99.bin_25.smooth_75Bulk.bw
+# $P146DIR/146-N5_ATAC_set-7__Rep2_S100.bin_25.smooth_75Bulk.bw
 # 146-N6_ATAC_cac-3__Rep2_S101.bin_25.smooth_75Bulk.bw
 
 #H3K27me3
