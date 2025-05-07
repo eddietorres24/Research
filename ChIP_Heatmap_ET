@@ -184,7 +184,7 @@ module load deepTools
                     --whatToShow "heatmap and colorbar" \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
-                    --colorlist "white, g, darkgreen" "white, g, darkgreen" "white, g, darkgreen" "white, g, darkgreen" "b, w , r" "b, w , r" "b, w , r" "b, w , r" \
+                    --colorList "white, g, darkgreen" "white, g, darkgreen" "white, g, darkgreen" "white, g, darkgreen" "b, w , r" "b, w , r" "b, w , r" "b, w , r" \
                     --zMin 0 \
 
 #$P148DIR/148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw
