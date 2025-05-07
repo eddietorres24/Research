@@ -112,7 +112,7 @@ dds<- DESeqDataSetFromMatrix(countData = round(cts_numeric_3),
 dds
 
 ##pre-filteringreads <2
-keep <- rowSums(counts(dds)) >= 2
+keep <- rowSums(counts(dds)) >= 29
 dds<- dds[keep,]
 
 #specify level of comparison
@@ -130,14 +130,14 @@ Export genes with statistically significant differential expression when compare
 ```{r coldata}
 alpha = 0.01
 
-cac1_sig <- results(dds2, alpha=alpha, contrast=c("condition", "cac1", "WT"))
-cac2_sig <- results(dds2, alpha=alpha, contrast=c("condition", "cac2", "WT"))
-cac3_sig <- results(dds2, alpha=alpha, contrast=c("condition", "cac3", "WT"))
-naf1_sig <- results(dds2, alpha=alpha, contrast=c("condition", "naf1", "WT"))
-naf2_sig <- results(dds2, alpha=alpha, contrast=c("condition", "naf2", "WT"))
-asf1_sig <- results(dds2, alpha=alpha, contrast=c("condition", "asf1", "WT"))
-ATRX_sig <- results(dds2, alpha=alpha, contrast=c("condition", "ATRX", "WT"))
-set7_sig <- results(dds2, alpha=alpha, contrast=c("condition", "set7", "WT"))
+cac1 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1", "WT"))
+cac2 <- results(dds2, alpha=alpha, contrast=c("condition", "cac2", "WT"))
+cac3<- results(dds2, alpha=alpha, contrast=c("condition", "cac3", "WT"))
+naf1 <- results(dds2, alpha=alpha, contrast=c("condition", "naf1", "WT"))
+naf2 <- results(dds2, alpha=alpha, contrast=c("condition", "naf2", "WT"))
+asf1 <- results(dds2, alpha=alpha, contrast=c("condition", "asf1", "WT"))
+ATRX <- results(dds2, alpha=alpha, contrast=c("condition", "ATRX", "WT"))
+set7 <- results(dds2, alpha=alpha, contrast=c("condition", "set7", "WT"))
 #set3 <- results(dds2, alpha=alpha, contrast=c("condition", "set3", "WT"))
 
 ```
