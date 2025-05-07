@@ -161,12 +161,12 @@ module load deepTools
 
 #ATAC
 
-computeMatrix scale-regions -b 2000 --regionBodyLength 6000 \
- -S $P148DIR/148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw \
-    $P148DIR/148-N15_ATAC_cac-1__Rep3_S111.bin_25.smooth_75Bulk.bw \
-    $P148DIR/148-N16_ATAC_cac-2__Rep3_S112.bin_25.smooth_75Bulk.bw \
-    $P148DIR/148-N19_ATAC_set-7__Rep3_S115.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/K27_narrow_genes_sorted.bed --skipZeros -o matrix_PRC2_1.gz
+# computeMatrix scale-regions -b 2000 --regionBodyLength 6000 \
+#  -S $P148DIR/148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw \
+#     $P148DIR/148-N15_ATAC_cac-1__Rep3_S111.bin_25.smooth_75Bulk.bw \
+#     $P148DIR/148-N16_ATAC_cac-2__Rep3_S112.bin_25.smooth_75Bulk.bw \
+#     $P148DIR/148-N19_ATAC_set-7__Rep3_S115.bin_25.smooth_75Bulk.bw \
+#     -R $BEDDIR2/K27_narrow_genes_sorted.bed --skipZeros -o matrix_PRC2_1.gz
 
     plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27_regions_TEST.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \
