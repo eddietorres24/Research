@@ -64,24 +64,24 @@ BEDDIR2="/home/evt82290/Research/bed_files"
 module load deepTools
 
 #H3K4me2
-    # computeMatrix scale-regions \
-    #  -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
-    #     $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
-    #     $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
-    #     $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
-    #     -R $BEDDIR2/K27_narrow_genes_sorted.bed --skipZeros -o matrix_PRC2.gz
-    #
-    #     plotHeatmap -m matrix_PRC2.gz -out CAF-1_K27genes_K4.pdf \
-    #                     --samplesLabel WT cac-1 cac-2 set-7 \
-    #                     --startLabel "5'" \
-    #               			--endLabel "3'" \
-    #                     --sortUsing sum \
-    #                     --sortRegions descend \
-    #                     --kmeans 3 \
-    #                     --missingDataColor 1 \
-    #                     --outFileSortedRegions heatmap.bed \
-    #                     --colorList 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' \
-    #                     --zMin 0 \
+    computeMatrix scale-regions \
+     -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
+        $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
+        $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
+        $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
+        $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
+        -R $BEDDIR2/all_genes_gff.bed  --skipZeros -o matrix_PRC2.gz
+
+        plotHeatmap -m matrix_PRC2.gz -out CAF-1_K27genes_K4.pdf \
+                        --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
+                        --startLabel "5'" \
+                  			--endLabel "3'" \
+                        --sortUsing sum \
+                        --sortRegions descend \s
+                        --missingDataColor 1 \
+                        --outFileSortedRegions heatmap.bed \
+                        --colorList 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' 'white, violet, magenta' \
+                        --zMin 0 \
 
 #H3K9me3
 
@@ -172,21 +172,21 @@ module load deepTools
 #     $P148DIR/148-N19_ATAC_set-7__Rep3_S115.bin_25.smooth_75Bulk.bw \
 #     -R $BEDDIR2/K27_genes_gff.bed --skipZeros -o matrix_PRC2_1.gz
 
-    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_peaks_K27_regions_148.pdf \
-                    --samplesLabel WT cac-1 cac-2 set-7 WT cac-1 cac-2 set-7 \
-                    --startLabel "5'" \
-                    --endLabel "3'" \
-                    --sortUsing sum \
-                    --sortRegions descend \
-                    --sortUsingSamples 5 6 7 \
-                    --kmeans 2 \
-                    --clusterUsingSamples 5 \
-                    --whatToShow "heatmap and colorbar" \
-                    --missingDataColor 1 \
-                    --outFileSortedRegions heatmap.bed \
-                    --colorList "white, g, darkgreen" "white, g, darkgreen" "white, g, darkgreen" "white, g, darkgreen" "b, w , r" "b, w , r" "b, w , r" "b, w , r" \
-                    --zMin 0 \
-                    --zMax 50 50 50 50 10 10 10 10
+    # plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_peaks_K27_regions_148.pdf \
+    #                 --samplesLabel WT cac-1 cac-2 set-7 WT cac-1 cac-2 set-7 \
+    #                 --startLabel "5'" \
+    #                 --endLabel "3'" \
+    #                 --sortUsing sum \
+    #                 --sortRegions descend \
+    #                 --sortUsingSamples 5 6 7 \
+    #                 --kmeans 2 \
+    #                 --clusterUsingSamples 5 \
+    #                 --whatToShow "heatmap and colorbar" \
+    #                 --missingDataColor 1 \
+    #                 --outFileSortedRegions heatmap.bed \
+    #                 --colorList "white, g, darkgreen" "white, g, darkgreen" "white, g, darkgreen" "white, g, darkgreen" "b, w , r" "b, w , r" "b, w , r" "b, w , r" \
+    #                 --zMin 0 \
+    #                 --zMax 50 50 50 50 10 10 10 10
 
 #$P148DIR/148-N14_ATAC_WT__Rep3_S110.bin_25.smooth_75Bulk.bw
 #$P148DIR/148-N15_ATAC_cac-1__Rep3_S111.bin_25.smooth_75Bulk.bw
