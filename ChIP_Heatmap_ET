@@ -70,9 +70,9 @@ module load deepTools
         $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
         $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
         $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
-        -R $BEDDIR2/CAF-1_All_K4_merge_peaks.bed --skipZeros -o matrix_PRC2.gz
+        -R $BEDDIR2/K4_genes_gff.bed --skipZeros -o matrix_PRC2.gz
 
-        plotHeatmap -m matrix_PRC2.gz -out CAF-1_Allpeaks_K4.pdf \
+        plotHeatmap -m matrix_PRC2.gz -out CAF-1_K4genes_K4.pdf \
                         --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                         --startLabel "5'" \
                   			--endLabel "3'" \
