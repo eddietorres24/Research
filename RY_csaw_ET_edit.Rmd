@@ -77,9 +77,33 @@ matLocus <- GRanges("CM002236.1", IRanges(1856288, 1862459)) # mat
 ##set parameters for windowCounts
 param <- readParam(discard = matLocus, pe="both", max.frag=1500, minq=20 )
 
+##Estimate Fragment length to determine window size setting (csaw book, 2.4)
+max.delay <- 1500
+x <- correlateReads(samples$bamReads, max.delay, param=param)
+plot(0:max.delay, x, type="l", ylab="CCF", xlab="Delay (bp)")
+
 #read counts from bam files
-data_csaw <- windowCounts(samples$bamReads, spacing=300, width=300, shift=0,
-filter=0, bin=TRUE, param=param)
+data_csaw <- windowCounts(samples$bamReads, spacing=300, width=300, shift=0, filter=0, bin=TRUE, param=param)
+```
+
+```{r pre-process data}
+##Filter by global background calculation (csaw book, 4.4)
+bin.size <- 2000L
+binned <- windowCounts(samples$bamReads, bin=TRUE, width=bin.size, param=param)
+filter.stat <- filterWindowsGlobal(data_csaw, background=binned)
+
+ keep <- filter.stat$filter > log2(2.2)
+ sum(keep)
+
+#filtered data keeping all regions > background
+     filtered.data <- data_csaw[keep,]
+
+hist(filter.stat$filter, xlab="Log-fold change from global background", 
+    breaks=100, main="", col="grey80", xlim=c(0, 5))
+abline(v=log2(2.2), col="red", lwd=2)
+
+
+##Filter by negative controls #Try this second
 ```
 
 ```{r filter based on K9 and K27 peaks}
@@ -140,28 +164,6 @@ K4_27.windows.df <- as.data.frame(granges(filtered.dataK4_27))
 K27_genes.Windows.df <- as.data.frame(granges(filtered.dataK27_genes))
 ```
 
-```{r pre-process data}
-
-##Filter by global background calculation
-# bin.size <- 2000L
-# binned <- windowCounts(samples$bamReads, bin=TRUE, width=bin.size, param=param)
-
-# filter.stat <- filterWindowsGlobal(data_csaw, background=binned)
-# keep <- filter.stat$filter > log2(2)
-# sum(keep)
-
-#filtered data keeping all regions > background
-    # filtered.data <- data_csaw[keep,]
-
-
-
-hist(filter.stat$filter, xlab="Log-fold change from global background", 
-    breaks=100, main="", col="grey80", xlim=c(0, 5))
-abline(v=log2(2.2), col="red", lwd=2)
-
-
-##Filter by negative controls #Try this second
-```
 
 ```{r prepare edgeR}
 ####################### Analyze differential binding events
