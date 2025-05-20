@@ -37,9 +37,9 @@ P146DIR="/scratch/evt82290/MappingOutputs/Run146/bamFiles"
 MISCDIR="/scratch/evt82290/MappingOutputs/iswi_ash1/bamFiles"
 
 #if output directory doesn't exist, create it
-if [ ! -d $OUTDIR3 ]
+if [ ! -d $OUTDIR1 ]
 then
-    mkdir -p $OUTDIR3
+    mkdir -p $OUTDIR1
 fi
 ###
 
