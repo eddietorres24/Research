@@ -19,8 +19,8 @@ source config.txt
 #Make Directories
 #Output
 OUTDIR1="/scratch/evt82290/Peaks/qa-suz12"
-OUTDIR12="/scratch/evt82290/Peaks/CAF-1/ATAC"
-OUTDIR13="/scratch/evt82290/Peaks/CAF-1/ChIP"
+OUTDIR2="/scratch/evt82290/Peaks/CAF-1/ATAC"
+OUTDIR3="/scratch/evt82290/Peaks/CAF-1/ChIP"
 #bams
 P126DIR="/scratch/evt82290/MappingOutputs/Run126/bamFiles"
 P129DIR="/scratch/evt82290/MappingOutputs/Run129/bamFiles"
@@ -37,9 +37,9 @@ P146DIR="/scratch/evt82290/MappingOutputs/Run146/bamFiles"
 MISCDIR="/scratch/evt82290/MappingOutputs/iswi_ash1/bamFiles"
 
 #if output directory doesn't exist, create it
-if [ ! -d $OUTDIR13 ]
+if [ ! -d $OUTDIR3 ]
 then
-    mkdir -p $OUTDIR13
+    mkdir -p $OUTDIR3
 fi
 ###
 
