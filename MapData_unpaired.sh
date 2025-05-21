@@ -16,8 +16,8 @@ source config.txt
 ###ADD a source file with path to FastqFiles
 #variables imported from submission script
 # accession=SRR7690284
-fastqPath="/scratch/evt82290/FastqFiles/iswi_ash1"
-outdir="/scratch/evt82290/MappingOutputs/iswi_ash1"
+fastqPath="/scratch/evt82290/FastqFiles/misc_data"
+outdir="/scratch/evt82290/MappingOutputs/misc_data"
 
 # #if output directory doesn't exist, create it
 if [ ! -d $outdir ]
