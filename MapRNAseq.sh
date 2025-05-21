@@ -17,8 +17,10 @@ THREADS=2
 ##ADD a source file with path to FastqFiles
 #variables imported from submission script
 #accession=SRR10916163
-fastqPath="/scratch/evt82290/SRA/FastqFiles"
-outdir="/scratch/evt82290/RNAseq/CAF-1_Heatmap"
+# fastqPath="/scratch/evt82290/SRA/FastqFiles"
+# outdir="/scratch/evt82290/RNAseq/CAF-1_Heatmap"
+fastqPath="/scratch/evt82290/FastqFiles/2025_Run149_ET"
+outdir="/scratch/evt82290/MappingOutputs/Run149/RNA"
 
 # #if output directory doesn't exist, create it
 if [ ! -d $outdir ]
