@@ -34,8 +34,8 @@ fi
 ####################################################
 
 #input file variables
-  read1=${fastqPath}/${accession}_1.fastq.gz
-  read2=${fastqPath}/${accession}_2.fastq.gz
+  read1=${fastqPath}/${accession}*_1.fastq.gz
+  read2=${fastqPath}/${accession}*_2.fastq.gz
   # unpaired=${fastqPath}/${accession}/${accession}.fastq.gz
 
 ###################################
