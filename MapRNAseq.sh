@@ -19,7 +19,7 @@ THREADS=2
 #accession=SRR10916163
 # fastqPath="/scratch/evt82290/SRA/FastqFiles"
 # outdir="/scratch/evt82290/RNAseq/CAF-1_Heatmap"
-fastqPath="/scratch/evt82290/FastqFiles/2025_Run149_ET"
+fastqPath="/scratch/evt82290/FastqFiles/2025_Run149_ET/RNA"
 outdir="/scratch/evt82290/MappingOutputs/Run149/RNA"
 
 # #if output directory doesn't exist, create it
