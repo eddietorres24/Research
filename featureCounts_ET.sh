@@ -18,7 +18,7 @@ THREADS=2
 
 #Make & Assign Directories
 BAMDIR="/scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles"
-149DIR="/scratch/evt82290/MappingOutputs/Run149/RNA/bamFiles"
+B149DIR="/scratch/evt82290/MappingOutputs/Run149/RNA/bamFiles"
 OUTDIR="/scratch/evt82290/RNAseq/CAF-1_Heatmap/counts"
 
 # #if output directory doesn't exist, create it
@@ -67,12 +67,12 @@ $BAMDIR/SRR8269810/SRR8269810_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR10916163/SRR10916163_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR10916164/SRR10916164_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR10916165/SRR10916165_Aligned.sortedByCoord.out.bam \
-$149DIR/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_Aligned.sortedByCoord.out.bam \
-$149DIR/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140_Aligned.sortedByCoord.out.bam \
-$149DIR/149-117_RNA_cac-1__Rep3_S141/149-117_RNA_cac-1__Rep3_S141_Aligned.sortedByCoord.out.bam \
-$149DIR/149-65_RNA_cac-1_cac-2___S65/149-65_RNA_cac-1_cac-2___S65_Aligned.sortedByCoord.out.bam \
-$149DIR/149-66_RNA_cac-1_cac-2___S66/149-66_RNA_cac-1_cac-2___S66_Aligned.sortedByCoord.out.bam \
-$149DIR/149-67_RNA_cac-1_cac-2___S67/149-67_RNA_cac-1_cac-2___S67_Aligned.sortedByCoord.out.bam \
-$149DIR/149-96_RNA_cac-1-suz-12__Rep1_S96/149-96_RNA_cac-1-suz-12__Rep1_S96_Aligned.sortedByCoord.out.bam \
-$149DIR/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121_Aligned.sortedByCoord.out.bam \
-$149DIR/149-98_RNA_cac-1-suz-12__Rep3_S122/149-98_RNA_cac-1-suz-12__Rep3_S122_Aligned.sortedByCoord.out.bam
+$B149DIR/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_Aligned.sortedByCoord.out.bam \
+$B149DIR/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140_Aligned.sortedByCoord.out.bam \
+$B149DIR/149-117_RNA_cac-1__Rep3_S141/149-117_RNA_cac-1__Rep3_S141_Aligned.sortedByCoord.out.bam \
+$B149DIR/149-65_RNA_cac-1_cac-2___S65/149-65_RNA_cac-1_cac-2___S65_Aligned.sortedByCoord.out.bam \
+$B149DIR/149-66_RNA_cac-1_cac-2___S66/149-66_RNA_cac-1_cac-2___S66_Aligned.sortedByCoord.out.bam \
+$B149DIR/149-67_RNA_cac-1_cac-2___S67/149-67_RNA_cac-1_cac-2___S67_Aligned.sortedByCoord.out.bam \
+$B149DIR/149-96_RNA_cac-1-suz-12__Rep1_S96/149-96_RNA_cac-1-suz-12__Rep1_S96_Aligned.sortedByCoord.out.bam \
+$B149DIR/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121_Aligned.sortedByCoord.out.bam \
+$B149DIR/149-98_RNA_cac-1-suz-12__Rep3_S122/149-98_RNA_cac-1-suz-12__Rep3_S122_Aligned.sortedByCoord.out.bam
