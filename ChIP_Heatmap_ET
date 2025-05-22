@@ -251,7 +251,7 @@ module load deepTools
                         $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
                         -R $BEDDIR2/WT_cac-1-2_K27_sort.bed $BEDDIR2/cac-1-2_K27_ectopic.bed --skipZeros -o matrix_PRC2_2.gz
 
-                        plotHeatmap -m matrix_PRC2_2.gz -out CAF-1_rtt106_K27_regions_TEST.pdf \
+                        plotHeatmap -m matrix_PRC2_2.gz -out CAF-1_rtt106_K27_regions_TEST_2.pdf \
                                         --samplesLabel WT rtt106 cac-1 cac-1_rtt106 cac-2 \
                                         --startLabel "5'" \
                                         --endLabel "3'" \
