@@ -234,6 +234,8 @@ macs3 callpeak -t "${P146DIR}/146-44_ChIP_WT_H3K27me3_Rep1_S44.bam" -c "${P146DI
 # bedtools intersect -a CAF-1_ATAC_Peaks_merge_2.bed -b WT_ATAC_peaks.bed -wa > CAF1_ATAC_WT.bed
 # bedtools intersect -a subtelomeric_K27_no_cac-3.bed -b WT_macs_0hr_rep2.bed -wa > subtelomeric_K27_normal.bed
 
+# bedtools intersect -a cac-1-2_K27.bed -b WT_CS_H3K27me3_Rep1_peaks.bed -wa > WT_cac-1-2_K27.bed
+
 #ATAC
 # bedtools intersect -a CAF1_ATAC_WT_peaks.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > WT_ATAC_K27_regions.bed
 # bedtools intersect -a CAF1_ATAC_NoWT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > CAF-1_only_ATAC_K27_regions.bed
