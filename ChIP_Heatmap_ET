@@ -244,10 +244,10 @@ module load deepTools
 
 #K27 w new rtt106 data
                     computeMatrix scale-regions \
-                     -S $P149DIR/149-55_ChIP_WT_H3K27me3__S55.bin_25.smooth_75Bulk.bw \
-                        $P149DIR/149-57_ChIP_rtt106_H3K27me3_Rep1_S57.bin_25.smooth_75Bulk.bw \
-                        $P149DIR/149-56_ChIP_cac-1_H3K27me3__S56.bin_25.smooth_75Bulk.bw \
-                        $P149DIR/149-58_ChIP_cac-1-rtt106_H3K27me3_Rep1_S58.bin_25.smooth_75Bulk.bw \
+                     -S $P149DIR/149-63_ChIP_WT_H3K27me3__S63.bin_25.smooth_75Bulk.bw \
+                        $P149DIR/149-68_ChIP_rtt106_H3K27me3_Rep2_S68.bin_25.smooth_75Bulk.bw \
+                        $P149DIR/149-64_ChIP_cac-1_H3K27me3__S64.bin_25.smooth_75Bulk.bw \
+                        $P149DIR/149-69_ChIP_cac-1-rtt106_H3K27me3_Rep2_S69.bin_25.smooth_75Bulk.bw \
                         $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
                         -R $BEDDIR2/WT_cac-1-2_K27_sort.bed $BEDDIR2/cac-1-2_K27_ectopic.bed --skipZeros -o matrix_PRC2_2.gz
 
@@ -267,6 +267,7 @@ module load deepTools
                                         # 149-64_ChIP_cac-1_H3K27me3__S64.bin_25.smooth_75Bulk.bw
                                         # 149-68_ChIP_rtt106_H3K27me3_Rep2_S68.bin_25.smooth_75Bulk.bw
                                         # 149-69_ChIP_cac-1-rtt106_H3K27me3_Rep2_S69.bin_25.smooth_75Bulk.bw
+
                                         # 149-55_ChIP_WT_H3K27me3__S55.bin_25.smooth_75Bulk.bw
                                         # 149-56_ChIP_cac-1_H3K27me3__S56.bin_25.smooth_75Bulk.bw
                                         # 149-57_ChIP_rtt106_H3K27me3_Rep1_S57.bin_25.smooth_75Bulk.bw
