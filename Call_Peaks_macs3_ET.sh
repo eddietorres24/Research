@@ -34,6 +34,8 @@ P141DIR="/scratch/evt82290/MappingOutputs/Run141/bamFiles"
 P144DIR="/scratch/evt82290/MappingOutputs/Run144/bamFiles"
 P145DIR="/scratch/evt82290/MappingOutputs/Run145/bamFiles"
 P146DIR="/scratch/evt82290/MappingOutputs/Run146/bamFiles"
+P148DIR="/scratch/evt82290/MappingOutputs/Run148/bamFiles"
+P149DIR="/scratch/evt82290/MappingOutputs/Run149/bamFiles"
 MISCDIR="/scratch/evt82290/MappingOutputs/iswi_ash1/bamFiles"
 
 #if output directory doesn't exist, create it
