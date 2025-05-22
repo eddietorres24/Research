@@ -262,6 +262,7 @@ module load deepTools
                                         --outFileSortedRegions heatmap.bed \
                                         --colorList "white, g, darkgreen" \
                                         --zMin 0 \
+                                        --zMax 45 \
 
                                         # 149-63_ChIP_WT_H3K27me3__S63.bin_25.smooth_75Bulk.bw
                                         # 149-64_ChIP_cac-1_H3K27me3__S64.bin_25.smooth_75Bulk.bw
