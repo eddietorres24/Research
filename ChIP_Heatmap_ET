@@ -244,12 +244,12 @@ module load deepTools
 
 #K27 w new rtt106 data
                     computeMatrix scale-regions \
-                     -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+                     -S $P149DIR/149-63_ChIP_WT_H3K27me3__S63.bin_25.smooth_75Bulk.bw \
                         $P149DIR/149-68_ChIP_rtt106_H3K27me3_Rep2_S68.bin_25.smooth_75Bulk.bw \
-                        $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+                        $P149DIR/149-64_ChIP_cac-1_H3K27me3__S64.bin_25.smooth_75Bulk.bw \
                         $P149DIR/149-69_ChIP_cac-1-rtt106_H3K27me3_Rep2_S69.bin_25.smooth_75Bulk.bw \
                         $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-                        -R $BEDDIR2/WT_K27_narrow_rep2.bed --skipZeros -o matrix_PRC2_2.gz
+                        -R $BEDDIR2/WT_K27_rep2.bed  $BEDDIR2/CAF-1_Ectopic_K27.bed --skipZeros -o matrix_PRC2_2.gz
 
                         plotHeatmap -m matrix_PRC2_2.gz -out CAF-1_rtt106_K27_regions_TEST.pdf \
                                         --samplesLabel WT rtt106 cac-1 cac-1_rtt106 cac-2 \
@@ -262,8 +262,10 @@ module load deepTools
                                         --outFileSortedRegions heatmap.bed \
                                         --colorList "white, g, darkgreen" \
                                         --zMin 0 \
-                                        --zMax 40 \
+                                        --zMax 50 \
 
+                                        # 149-63_ChIP_WT_H3K27me3__S63.bin_25.smooth_75Bulk.bw
+                                        # 149-64_ChIP_cac-1_H3K27me3__S64.bin_25.smooth_75Bulk.bw
                                         # 149-68_ChIP_rtt106_H3K27me3_Rep2_S68.bin_25.smooth_75Bulk.bw
                                         # 149-69_ChIP_cac-1-rtt106_H3K27me3_Rep2_S69.bin_25.smooth_75Bulk.bw
 
