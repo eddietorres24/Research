@@ -161,10 +161,10 @@ elif [ -f $read2 ]; then
   ##################
   #Trimming
   #################
-  	  # module load Trim_Galore/0.6.7-GCCcore-11.2.0
-      #
-  	  # trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
-  	  # wait
+  	  module load Trim_Galore/0.6.7-GCCcore-11.2.0
+
+  	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
+  	  wait
 
 
   ##map with STAR
@@ -173,7 +173,7 @@ elif [ -f $read2 ]; then
   	    --runThreadN $THREADS \
   	    --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
   	    --outFileNamePrefix ${bam} \
-  	    --readFilesIn $trimmed/${accession}_1_trimmed.fq.gz $trimmed/${accession}_2_trimmed.fq.gz \
+  	    --readFilesIn $trimmed/${accession}_val_1.fq.gz $trimmed/${accession}_val_2.fq.gz \
   	    --readFilesCommand zcat \
         --alignIntronMax 10000 \
   	    --outSAMtype BAM SortedByCoordinate \
