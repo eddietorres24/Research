@@ -166,6 +166,7 @@ elif [ -f $read2 ]; then
   	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
   	  wait
 
+trim_galore --illumina --fastqc --paired --length 25 --basename SRR9027658 --gzip -o /scratch/evt82290/RNAseq/qa-suz12/TrimmedFastQs/SRR9027658 /scratch/evt82290/SRA/FastqFiles/SRR9027658/SRR9027658_1.fastq.gz /scratch/evt82290/SRA/FastqFiles/SRR9027658/SRR9027658_1.fastq.gz
 
   ##map with STAR
   	  module load STAR/2.7.10b-GCC-11.3.0
