@@ -56,5 +56,5 @@ $B149DIR/149-90_RNA_qa-suz12__Rep1_S90/149-90_RNA_qa-suz12__Rep1_S90_Aligned.sor
 $B149DIR/149-91_RNA_qa-suz12__Rep2_S91/149-91_RNA_qa-suz12__Rep2_S91_Aligned.sortedByCoord.out.bam \
 $B149DIR/149-92_RNA_qa-suz12__Rep3_S92/149-92_RNA_qa-suz12__Rep3_S92_Aligned.sortedByCoord.out.bam \
 $B149DIR/149-93_RNA_qa-suz12_24hrqa__Rep1_S93/149-93_RNA_qa-suz12_24hrqa__Rep1_S93_Aligned.sortedByCoord.out.bam \
-$B149DIR/149-94_RNA_qa-suz12_24hrqa__Rep1_S94/149-94_RNA_qa-suz12_24hrqa__Rep1_S94_Aligned.sortedByCoord.out.bam \
-$B149DIR/149-95_RNA_qa-suz12_24hrqa__Rep1_S95/149-95_RNA_qa-suz12_24hrqa__Rep1_S95_Aligned.sortedByCoord.out.bam
+$B149DIR/149-94_RNA_qa-suz12_24hrqa__Rep2_S94/149-94_RNA_qa-suz12_24hrqa__Rep2_S94_Aligned.sortedByCoord.out.bam \
+$B149DIR/149-95_RNA_qa-suz12_24hrqa__Rep3_S95/149-95_RNA_qa-suz12_24hrqa__Rep3_S95_Aligned.sortedByCoord.out.bam
