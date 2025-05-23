@@ -161,10 +161,10 @@ elif [ -f $read2 ]; then
   ##################
   #Trimming
   #################
-  	  module load Trim_Galore/0.6.7-GCCcore-11.2.0
-
-  	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
-  	  wait
+  	  # module load Trim_Galore/0.6.7-GCCcore-11.2.0
+      #
+  	  # trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
+  	  # wait
 
 
   ##map with STAR
