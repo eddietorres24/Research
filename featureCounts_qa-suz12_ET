@@ -18,6 +18,7 @@ THREADS=2
 
 #Make & Assign Directories
 BAMDIR="/scratch/evt82290/RNAseq/qa-suz12/bamFiles"
+BAMDIR2="/scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles"
 B149DIR="/scratch/evt82290/MappingOutputs/Run149/RNA/bamFiles"
 OUTDIR="/scratch/evt82290/RNAseq/qa-suz12/counts"
 
@@ -42,10 +43,10 @@ featureCounts -T $THREADS \
 $BAMDIR/SRR8444037/SRR9027658_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR8444038/SRR9027689_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR8444043/SRR9027759_Aligned.sortedByCoord.out.bam \
-$BAMDIR/SRR8269825/SRR8269825_Aligned.sortedByCoord.out.bam \
-$BAMDIR/SRR8269775/SRR8269775_Aligned.sortedByCoord.out.bam \
-$BAMDIR/SRR8269782/SRR8269782_Aligned.sortedByCoord.out.bam \
-$BAMDIR/SRR8269810/SRR8269810_Aligned.sortedByCoord.out.bam \
+$BAMDIR2/SRR8269825/SRR8269825_Aligned.sortedByCoord.out.bam \
+$BAMDIR2/SRR8269775/SRR8269775_Aligned.sortedByCoord.out.bam \
+$BAMDIR2/SRR8269782/SRR8269782_Aligned.sortedByCoord.out.bam \
+$BAMDIR2/SRR8269810/SRR8269810_Aligned.sortedByCoord.out.bam \
 $B149DIR/149-89_RNA_WT_24hrqa__Rep3_S89/149-89_RNA_WT_24hrqa__Rep3_S89_Aligned.sortedByCoord.out.bam \
 $B149DIR/149-88_RNA_WT_24hrqa__Rep2_S88/149-88_RNA_WT_24hrqa__Rep2_S88_Aligned.sortedByCoord.out.bam \
 $B149DIR/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84_Aligned.sortedByCoord.out.bam \
