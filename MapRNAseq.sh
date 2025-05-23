@@ -17,10 +17,10 @@ THREADS=2
 ##ADD a source file with path to FastqFiles
 #variables imported from submission script
 #accession=SRR10916163
-# fastqPath="/scratch/evt82290/SRA/FastqFiles"
-# outdir="/scratch/evt82290/RNAseq/CAF-1_Heatmap"
-fastqPath="/scratch/evt82290/FastqFiles/2025_Run149_ET/RNA"
-outdir="/scratch/evt82290/MappingOutputs/Run149/RNA"
+fastqPath="/scratch/evt82290/SRA/FastqFiles"
+outdir="/scratch/evt82290/RNAseq/qa-suz12"
+# fastqPath="/scratch/evt82290/FastqFiles/2025_Run149_ET/RNA"
+# outdir="/scratch/evt82290/MappingOutputs/Run149/RNA"
 
 # #if output directory doesn't exist, create it
 if [ ! -d $outdir ]
@@ -34,8 +34,10 @@ fi
 ####################################################
 
 #input file variables
-  read1=${fastqPath}/${accession}*R1_001.fastq.gz
-  read2=${fastqPath}/${accession}*R2_001.fastq.gz
+  # read1=${fastqPath}/${accession}*R1_001.fastq.gz
+  # read2=${fastqPath}/${accession}*R2_001.fastq.gz
+  read1=${fastqPath}/${accession}*_1.fastq.gz
+  read2=${fastqPath}/${accession}*_2.fastq.gz
   # unpaired=${fastqPath}/${accession}/${accession}.fastq.gz
 
 ###################################

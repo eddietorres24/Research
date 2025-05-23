@@ -35,17 +35,18 @@ Read in the featurecounts output, convert to a matrix, and remove unneccesary co
 ```{r cts}
 setwd("C:\\Users\\eddie\\Desktop\\Research\\GitHub")
 cts2 <- as.matrix(read.table("./text_files/readcounts_FINAL.txt", sep="\t", row.names =1, header = TRUE))
-cts2 <- as.matrix(cts2[,-c(1:5)])
+ctstest <- as.matrix(read.table("./text_files/readcounts_newseq.txt", sep="\t", row.names =1, header = TRUE))
+ctstest <- as.matrix(ctstest[,-c(1:5)])
 ## change ncol to match number of columns
-cts_numeric <- matrix(as.numeric(cts2), ncol = 28)
-dimnames(cts_numeric) <- list(rownames(cts2), colnames(cts2))
+cts_numeric <- matrix(as.numeric(ctstest), ncol = 37)
+dimnames(cts_numeric) <- list(rownames(ctstest), colnames(ctstest))
 ```
 
 
 Export column names to a text file, open in a text editor and replace SRRs with short/identifiable names, save, and read in the file again to replace column titles with human readable names.
 
 ```{r titles}
-samplesname <- colnames(cts2)
+samplesname <- colnames(ctstest)
 write.table(samplesname, file="samplenames.txt", sep="\t")
 
 #after editing sample names in excel or text editor (new names are in column 3), read in the spreadsheet with hand annotated sample names that are short 
@@ -68,6 +69,9 @@ naf2 <- rowMeans(cts_numeric[, 16:18], na.rm = TRUE)
 ATRX <- rowMeans(cts_numeric[, 19:21], na.rm = TRUE)
 WT <- rowMeans(cts_numeric[, 22:25], na.rm = TRUE)
 set7 <- rowMeans(cts_numeric[, 26:28], na.rm = TRUE)
+cac1_new <- rowMeans(cts_numeric[, 29:31], na.rm = TRUE)
+cac1_cac2 <- rowMeans(cts_numeric[, 32:34], na.rm = TRUE)
+cac1_suz12 <- rowMeans(cts_numeric[, 35:37], na.rm = TRUE)
 #set3 <- rowMeans(cts_numeric[, 29:30], na.rm = TRUE)
 ```
 
@@ -112,7 +116,7 @@ dds<- DESeqDataSetFromMatrix(countData = round(cts_numeric_3),
 dds
 
 ##pre-filteringreads <2
-keep <- rowSums(counts(dds)) >= 29
+keep <- rowSums(counts(dds)) >= 38
 dds<- dds[keep,]
 
 #specify level of comparison
@@ -128,7 +132,7 @@ plotDispEsts(dds2)
 Export genes with statistically significant differential expression when compared against the wild type.
 
 ```{r coldata}
-alpha = 0.01
+alpha = 0.05
 
 cac1 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1", "WT"))
 cac2 <- results(dds2, alpha=alpha, contrast=c("condition", "cac2", "WT"))
@@ -138,6 +142,9 @@ naf2 <- results(dds2, alpha=alpha, contrast=c("condition", "naf2", "WT"))
 asf1 <- results(dds2, alpha=alpha, contrast=c("condition", "asf1", "WT"))
 ATRX <- results(dds2, alpha=alpha, contrast=c("condition", "ATRX", "WT"))
 set7 <- results(dds2, alpha=alpha, contrast=c("condition", "set7", "WT"))
+cac1_new <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_new", "WT"))
+cac1_cac2 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_cac2", "WT"))
+cac1_suz12 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_suz12", "WT"))
 #set3 <- results(dds2, alpha=alpha, contrast=c("condition", "set3", "WT"))
 
 ```
@@ -153,16 +160,22 @@ naf2_sig <- subset(naf2, padj < 0.05)
 asf1_sig <- subset(asf1, padj < 0.05)
 ATRX_sig <- subset(ATRX, padj < 0.05)
 set7_sig <- subset(set7, padj < 0.05)
+cac1_new_sig <- subset(cac1_new, padj < 0.05)
+cac1_cac2_sig <- subset(cac1_cac2, padj < 0.05)
+cac1_suz12_sig <- subset(cac1_suz12, padj < 0.05)
 #set3 <- subset(set3, padj < 0.05)
 
-write.csv(as.data.frame(cac1_sig), file = "cac1_1.csv")
-write.csv(as.data.frame(cac2_sig), file = "cac2_1.csv")
-write.csv(as.data.frame(cac3_sig), file = "cac3_1.csv")
-write.csv(as.data.frame(naf1_sig), file = "naf1_1.csv")
-write.csv(as.data.frame(naf2_sig), file = "naf2_1.csv")
-write.csv(as.data.frame(asf1_sig), file = "asf1_1.csv")
-write.csv(as.data.frame(ATRX_sig), file = "ATRX_1.csv")
-write.csv(as.data.frame(set7_sig), file = "set7_1.csv")
+write.csv(as.data.frame(cac1_sig), file = "cac1.csv")
+write.csv(as.data.frame(cac2_sig), file = "cac2.csv")
+write.csv(as.data.frame(cac3_sig), file = "cac3.csv")
+write.csv(as.data.frame(naf1_sig), file = "naf1.csv")
+write.csv(as.data.frame(naf2_sig), file = "naf2.csv")
+write.csv(as.data.frame(asf1_sig), file = "asf1.csv")
+write.csv(as.data.frame(ATRX_sig), file = "ATRX.csv")
+write.csv(as.data.frame(set7_sig), file = "set7.csv")
+write.csv(as.data.frame(cac1_new_sig), file = "cac1_new.csv")
+write.csv(as.data.frame(cac1_cac2_sig), file = "cac1_cac2.csv")
+write.csv(as.data.frame(cac1_suz12_sig), file = "cac1_suz12.csv")
 #write.csv(as.data.frame(set3), file = "set3.csv")
 ```
 
@@ -261,9 +274,9 @@ input <- c(
 ngenes = read.csv("../csv_files/neurospora_genes.csv")
 
 combine <- transform(merge(ngenes, l2fc, by = "VALUE"))
-track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", "asf1_1.csv", "ATRX_1.csv", "cac1_1.csv", "cac2_1.csv", "cac3_1.csv", "naf1_1.csv", "naf2_1.csv", "set7_1.csv")
+track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", "asf1.csv", "ATRX.csv", "cac1.csv", "cac2.csv", "cac3.csv", "naf1.csv", "naf2.csv", "set7.csv", "cac1_new.csv", "cac1_cac2.csv", "cac1_suz12.csv")
 
-write.table(track, file="histchaps_TEST_2.igv", sep="\t", row.names = FALSE, quote = FALSE)
+write.table(track, file="newseq.igv", sep="\t", row.names = FALSE, quote = FALSE)
 ```
 
 #Subsetting DEG by which strain they are up- or downregulated in CAF-1 mutants. Also extracting a list of ALL DEG for GO Analysis
@@ -323,7 +336,5 @@ CAF1_DEG <- rows_upsert(CAF1_DEG, cac3_DEG, by = "NCU")
 
 #Write csv to obtain NCU for all DEG across all 3 CAF-1 mutants
 write.csv(as.data.frame(CAF1_DEG), file = "CAF1_DEG.csv")
-
-
 
 ```

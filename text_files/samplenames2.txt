@@ -27,3 +27,12 @@ x
 26	set7_Rep1
 27	set7_Rep2
 28	set7_Rep3
+29	cac1_new_Rep1
+30	cac1_new_Rep2
+31	cac1_new_Rep3
+32	cac1_cac2_Rep1
+33	cac1_cac2_Rep2
+34	cac1_cac2_Rep3
+35	cac1_suz12_Rep1
+36	cac1_suz12_Rep2
+37	cac1_suz12_Rep3
