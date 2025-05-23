@@ -173,7 +173,7 @@ elif [ -f $read2 ]; then
   	    --runThreadN $THREADS \
   	    --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
   	    --outFileNamePrefix ${bam} \
-  	    --readFilesIn $trimmed/${accession}_val_1.fq.gz $trimmed/${accession}_val_2.fq.gz \
+  	    --readFilesIn $trimmed/${accession}_1_trimmed.fq.gz $trimmed/${accession}_2_trimmed.fq.gz \
   	    --readFilesCommand zcat \
         --alignIntronMax 10000 \
   	    --outSAMtype BAM SortedByCoordinate \
