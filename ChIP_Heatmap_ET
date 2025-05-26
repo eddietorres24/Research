@@ -131,7 +131,6 @@ computeMatrix reference-point --referencePoint TSS -a 2000 -b 1500 \
                     --sortUsing sum \
                     --sortRegions descend \
                     --missingDataColor 1 \
-                    --whatToShow "heatmap and colorbar" \
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'white, darkgoldenrod' \
                     --zMin 0 \
