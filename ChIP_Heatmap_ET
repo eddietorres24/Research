@@ -129,6 +129,7 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 3000 --scale 1.5 \
                     --startLabel "5'" \
                     --endLabel "3'" \
                     --sortUsing sum \
+                    --sortUsingSamples 1 \
                     --sortRegions descend \
                     --missingDataColor 1 \
                     --outFileSortedRegions heatmap.bed \
