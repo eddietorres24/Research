@@ -288,10 +288,10 @@ macs3 callpeak -t "${P146DIR}/146-44_ChIP_WT_H3K27me3_Rep1_S44.bam" -c "${P146DI
 #     qa-suz12_24hr_H3K27me3_Rep3_peaks.bed \
 #     qa-suz12_12hr_H3K27me3_Rep3_peaks.bed > qa-suz12_WT_K27.bed
 #
-# sort -k1,1 -k2,2n WT_cac-1-2_K27.bed > WT_cac-1-2_K27_sorted.bed
-# bedtools sort -i WT_cac-1-2_K27_sorted.bed > WT_cac-1-2_K27_bed_sorted.bed
+# sort -k1,1 -k2,2n K27_genes_gff_1.bed > K27_genes_gff_1_sorted.bed
+# bedtools sort -i K27_genes_gff_1_sorted.bed > K27_genes_gff_1_sorted_bed.bed
 #
-# bedtools merge -i WT_cac-1-2_K27_bed_sorted.bed > WT_cac-1-2_K27_sort.bed
+# bedtools merge -i K27_genes_gff_1_sorted_bed.bed > K27_genes_gff_sorted.bed
 
 # bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
 # bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
