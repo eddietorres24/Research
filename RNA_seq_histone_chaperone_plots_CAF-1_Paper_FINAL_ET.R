@@ -36,7 +36,7 @@ knitr::opts_knit$set(root.dir = "workingdir")
 
 #Bring in table with un-normalized transcription counts; check.names is important if you have dashes in the gene names 
 #row.names=1 command sets geneIDs as the row name
-countdataInteractors <- read.table("./text_files/readcounts_FINAL.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=TRUE, sep="\t")
+countdataInteractors <- read.table("./text_files/readcounts_FINAL.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
 
 #################################################
 #Section 1: calculate tpm using the scater package
@@ -83,7 +83,7 @@ Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,22:25], na.rm = TRUE),
                                  rowMeans(allDataTPM[,16:18], na.rm = TRUE),
                                  rowMeans(allDataTPM[,13:15], na.rm = TRUE),
                                  rowMeans(allDataTPM[,19:21], na.rm = TRUE))
-averageRowIDs=c("WT","set-7","cac-1","cac-2", "cac-1_cac-2","cac-3","naf-1","naf-2","asf-1","ATRX")
+averageRowIDs=c("WT","set-7","cac-1","cac-2","cac-1_cac-2","cac-3","naf-1","naf-2","asf-1","ATRX")
 colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 
 ####################################################################
@@ -149,7 +149,8 @@ meltedAveragePRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
 meltedAverageAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
                       varnames=c('GeneID', 'Sample'))
 
-altorder = rev(c( "WT","set-7","cac-1","cac-1_new","cac-2","cac-1_cac-2","cac-1_suz12","cac-3","naf-1","naf-2","asf-1","ATRX"))
+altorder = rev(c("WT","set7","cac1","cac2","cac1cac2","cac3","naf1","naf2","asf1","ATRX"))
+altorder1 = rev(c("WT","1"))
 
 meltedAveragePRC2targetData$Sample <- factor(meltedAveragePRC2targetData$Sample)
 
@@ -183,19 +184,16 @@ ggsave(filename = "histone_chaperone_boxplot_PAPER_FINAL.pdf", plot = box, dpi=6
 #######################
 
 #t-test for significance in difference of mean expression values of PRC2 targets b/w WT & mutants
-PRC2meancalc <- c (mean(AVERAGE_Prc2targetTPM[,1]),mean(AVERAGE_Prc2targetTPM[,2]),mean(AVERAGE_Prc2targetTPM[,3]),mean(AVERAGE_Prc2targetTPM[,4]),mean(AVERAGE_Prc2targetTPM[,5]),mean(AVERAGE_Prc2targetTPM[,6]),mean(AVERAGE_Prc2targetTPM[,7]),mean(AVERAGE_Prc2targetTPM[,8]),mean(AVERAGE_Prc2targetTPM[,9]),mean(AVERAGE_Prc2targetTPM[,10]))
-PRC2meancalc <- as.data.frame(PRC2meancalc)
-rownames(PRC2meancalc) <- colnames(AVERAGE_Prc2targetTPM)
 
-set7_t <- t.test(PRC2meancalc$set-7, mu = mean(PRC2meancalc$WT))
-cac1_t <- t.test(PRC2meancalc$cac-1, mu = mean(PRC2meancalc$WT))
-cac2_t <- t.test(PRC2meancalc$cac-2, mu = mean(PRC2meancalc$WT))
-cac1_2_t <- t.test(PRC2meancalc$cac.1, mu = mean(PRC2meancalc$WT))
-cac3_t <- t.test(PRC2meancalc$cac-3, mu = mean(PRC2meancalc$WT))
-naf1_t <- t.test(PRC2meancalc$naf.1, mu = mean(PRC2meancalc$WT))
-naf2_t <- t.test(PRC2meancalc$naf.2, mu = mean(PRC2meancalc$WT))
-asf1_t <- t.test(PRC2meancalc$asf.1, mu = mean(PRC2meancalc$WT))
-atrx_t <- t.test(PRC2meancalc$ATRX, mu = mean(PRC2meancalc$WT))
+set7_t <- t.test(AVERAGE_Prc2targetTPM[,2], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+cac1_t <- t.test(AVERAGE_Prc2targetTPM[,3], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+cac2_t <- t.test(AVERAGE_Prc2targetTPM[,4], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+cac1_2_t <- t.test(AVERAGE_Prc2targetTPM[,5], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+cac3_t <- t.test(AVERAGE_Prc2targetTPM[,6], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+naf1_t <- t.test(AVERAGE_Prc2targetTPM[,7], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+naf2_t <- t.test(AVERAGE_Prc2targetTPM[,8], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+asf1_t <- t.test(AVERAGE_Prc2targetTPM[,9], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+atrx_t <- t.test(AVERAGE_Prc2targetTPM[,10], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
 
 #I want to make a violin plot instead of boxplot. Going to adapt Abby's code
 library(grDevices)
@@ -222,7 +220,7 @@ violin <- total2 %>%
   theme_classic(base_size = 20)
 
 print(violin)
-ggsave("./Histone_Chape_PRC2_Gene_expression.pdf", plot=violin, width = 10, height = 8, unit="in",  dpi=400)
+ggsave("./Histone_Chap_PRC2_Gene_expression_FINAL.pdf", plot=violin, width = 10, height = 8, unit="in",  dpi=400)
 
 #stat_summary(fun.data = "mean_se", geom = "errorbar", width = 0.25, colour = "red") +
 
@@ -240,27 +238,18 @@ breaks1=seq(-4, 5, by=.09) #This is to set a custom heatmaps scale. Not used her
 ##strategy 1 - Plot the average TMP of all genes that change expression; row normalization; clustredRows
 
 ##Keep Only Genes that are expressed in at least one sample
-GenesWithChanges <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0))
-CAFUpGenes <- subset(AVERAGE_CAFTPM, (rowSums(CAFUpTPM) > 0))
-GenesWithChanges_95 <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0))
+GenesWithChanges <- subset(AVERAGE_Prc2targetTPM, (rowSums(AVERAGE_Prc2targetTPM) > 0))
+#CAFUpGenes <- subset(AVERAGE_CAFTPM, (rowSums(CAFUpTPM) > 0))
+#GenesWithChanges_95 <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0))
 
 #plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above
 
-heatmap1 <- pheatmap(GenesWithChanges[,rev(altorder)], color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
+heatmap <- pheatmap(GenesWithChanges, color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
                    cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
                    legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5)
 
-heatmap2 <- pheatmap(CAFUpGenes[,rev(altorder)], color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
-                    cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
-                    legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5)
-
-
-plot_list = c(heatmap1[[4]], heatmap2[[4]])
-  
-finalheat <- grid.arrange(arrangeGrob(grobs= heatmap1[[4]], heatmap2[[4]],nrow=2))
-
 #to plot with ggplot, you need to extract [[4]] from the heatmap object
-heatmap_plot <- finalheat[[4]]
+heatmap_plot <- heatmap[[4]]
 
-ggsave(filename = "./histone_chaperone_heatmap_log2_prc2_gene_no_scale_3.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
+ggsave(filename = "./histone_chaperone_heatmap_Paper_FINAL.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
 #dev.off()

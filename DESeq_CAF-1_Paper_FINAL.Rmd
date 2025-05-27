@@ -71,7 +71,6 @@ set7 <- rowMeans(cts_numeric[, 26:28], na.rm = TRUE)
 cac1_new <- rowMeans(cts_numeric[, 29:31], na.rm = TRUE)
 cac1_cac2 <- rowMeans(cts_numeric[, 32:34], na.rm = TRUE)
 cac1_suz12 <- rowMeans(cts_numeric[, 35:37], na.rm = TRUE)
-#set3 <- rowMeans(cts_numeric[, 29:30], na.rm = TRUE)
 ```
 
 ## Importing DEseq metadata
@@ -151,30 +150,30 @@ cac1_suz12 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_suz12", "
 Subset to only export significant differentially expressed genes
 
 ```{r}
-cac1_sig <- subset(cac1, padj < 0.05)
-cac2_sig <- subset(cac2, padj < 0.05)
-cac3_sig <- subset(cac3, padj < 0.05)
-naf1_sig <- subset(naf1, padj < 0.05)
-naf2_sig <- subset(naf2, padj < 0.05)
-asf1_sig <- subset(asf1, padj < 0.05)
-ATRX_sig <- subset(ATRX, padj < 0.05)
-set7_sig <- subset(set7, padj < 0.05)
-cac1_new_sig <- subset(cac1_new, padj < 0.05)
-cac1_cac2_sig <- subset(cac1_cac2, padj < 0.05)
-cac1_suz12_sig <- subset(cac1_suz12, padj < 0.05)
+cac1 <- subset(cac1, padj < 0.05)
+cac2 <- subset(cac2, padj < 0.05)
+cac3 <- subset(cac3, padj < 0.05)
+naf1 <- subset(naf1, padj < 0.05)
+naf2 <- subset(naf2, padj < 0.05)
+asf1 <- subset(asf1, padj < 0.05)
+ATRX <- subset(ATRX, padj < 0.05)
+set7 <- subset(set7, padj < 0.05)
+cac1_new <- subset(cac1_new, padj < 0.05)
+cac1_cac2 <- subset(cac1_cac2, padj < 0.05)
+cac1_suz12 <- subset(cac1_suz12, padj < 0.05)
 #set3 <- subset(set3, padj < 0.05)
 
-write.csv(as.data.frame(cac1_sig), file = "cac1.csv")
-write.csv(as.data.frame(cac2_sig), file = "cac2.csv")
-write.csv(as.data.frame(cac3_sig), file = "cac3.csv")
-write.csv(as.data.frame(naf1_sig), file = "naf1.csv")
-write.csv(as.data.frame(naf2_sig), file = "naf2.csv")
-write.csv(as.data.frame(asf1_sig), file = "asf1.csv")
-write.csv(as.data.frame(ATRX_sig), file = "ATRX.csv")
-write.csv(as.data.frame(set7_sig), file = "set7.csv")
-write.csv(as.data.frame(cac1_new_sig), file = "cac1_new.csv")
-write.csv(as.data.frame(cac1_cac2_sig), file = "cac1_cac2.csv")
-write.csv(as.data.frame(cac1_suz12_sig), file = "cac1_suz12.csv")
+write.csv(as.data.frame(cac1), file = "cac1.csv")
+write.csv(as.data.frame(cac2), file = "cac2.csv")
+write.csv(as.data.frame(cac3), file = "cac3.csv")
+write.csv(as.data.frame(naf1), file = "naf1.csv")
+write.csv(as.data.frame(naf2), file = "naf2.csv")
+write.csv(as.data.frame(asf1), file = "asf1.csv")
+write.csv(as.data.frame(ATRX), file = "ATRX.csv")
+write.csv(as.data.frame(set7), file = "set7.csv")
+write.csv(as.data.frame(cac1_new), file = "cac1_new.csv")
+write.csv(as.data.frame(cac1_cac2), file = "cac1_cac2.csv")
+write.csv(as.data.frame(cac1_suz12), file = "cac1_suz12.csv")
 #write.csv(as.data.frame(set3), file = "set3.csv")
 ```
 
@@ -204,19 +203,64 @@ library(tibble)
 l2fc <- tibble::rownames_to_column(l2fc_data, "VALUE")
 ```
 
-Find genes upregulated at any stage of perithecial development
-
+#Venn-diagram
 ```{r}
-#peri <- l2fc_data[,2:5]
-#peri_induced <- peri  %>% filter_at(vars(1:4), any_vars(. >4))
-#peri_3 <- peri %>% filter_at(vars(1), any_vars(. >4))
-#peri_4 <- peri %>% filter_at(vars(2), any_vars(. >4))
-#peri_5 <- peri %>% filter_at(vars(3), any_vars(. >4))
-#peri_6 <- peri %>% filter_at(vars(4), any_vars(. >4))
+library(VennDiagram)
+library(RColorBrewer)
+library(euler)
 
-#write.csv(as.data.frame(peri_induced), file = "peri_induced.csv")
+#Venn Diagram w/ CAF-1 mutants
+venn.diagram(
+  x = list(rownames(cac1), rownames(cac2), rownames(cac3)),
+  category.names = c("cac1" , "cac2 " , "cac3"),
+  filename = 'CAF-1_venn_diagramm.png',
+  col=c("#8da0cb", "#66c2a5", "#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+#purple: "#9e9ac8"
+#Venn Diagram w/ set-7
+venn.diagram(
+  x = list(rownames(cac1), rownames(cac2), rownames(cac3), rownames(set7)),
+  category.names = c("cac1" , "cac2 " , "cac3", "set7"),
+  filename = 'CAF-1_set7_venn_diagramm.png',
+  col=c("#8da0cb", "#66c2a5", "#fc8d62", "#9e9ac8"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25), alpha("#9e9ac8",0.25)),
+  output=TRUE)
+
+
+#Make euler plot inputing values gathered from venn.diagram(). This will provide a proportional venn-diagram
+fit = euler(c("A" = 351, "B" = 617, "C" = 1429, "A&B" = 1038, "A&C" = 646, "B&C" = 758, "A&B&C" = 3457))
+eulerplot <- plot(fit)
+
+#Save file
+ggsave(filename = "CAF-1_euler.png", plot = eulerplot, width = 4, height = 4, dpi = 600)
+
+###I also want to compare DE of only H3K27me3 genes b/w strains
+cac1_K27 <- subset(cac1, rownames(cac1) %in% Prc2targets[,1])
+cac2_K27 <- subset(cac2, rownames(cac2) %in% Prc2targets[,1])
+cac3_K27 <- subset(cac3, rownames(cac3) %in% Prc2targets[,1])
+set7_K27 <- subset(set7, rownames(set7) %in% Prc2targets[,1])
+
+#Making Venn
+venn.diagram(
+  x = list(rownames(cac1_K27), rownames(cac2_K27), rownames(cac3_K27)),
+  category.names = c("cac1" , "cac2 " , "cac3"),
+  filename = 'CAF-1_venn_diagramm_K27_genes.png',
+  col=c("#8da0cb", "#66c2a5", "#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+#plotting euler
+fit = euler(c("A" = 16, "B" = 35, "C" = 120, "A&B" = 72, "A&C" = 47, "B&C" = 52, "A&B&C" = 391))
+eulerplot <- plot(fit)
+
+#Save file
+ggsave(filename = "CAF-1_euler_K27.png", plot = eulerplot, width = 4, height = 4, dpi = 600)
 
 ```
+
+#Making Upset Plot
 Compare gene upregulation using UpSet plots. Data is entered by first listing the categories and the number of individuals in each category. After that, list intersections. I like to do this by calculating the number of overlaps directly in the input, but you can also do this separately. For example, if X has 10 samples, Y has 15 samples, and Z has 20 samples, you would enter like this:
 
 #input <- c(
@@ -228,34 +272,52 @@ Compare gene upregulation using UpSet plots. Data is entered by first listing th
 #  "X&Y&Z" = nrow(intersect(intersect(X, Y),Z)))
 #)
 
-
 To make the UpSet plot, run the code "upset(fromExpression(input)," and input parameters (read the documentation for full list of options). You MUST specify the number of categories (nsets) and number of intersections (nintersects), which INCLUDES the number of individual categories.
 
 ```{r}
 install.packages("UpSetR")
 library(UpSetR)
 
-#library(UpSetR)
+#processing data to subset
+##Put gene lists together
+combine <- rbind(cac1,cac2,cac3,set7)
+##subset l2fc data  to only have data i want
+caf <- l2fc_data[,c(5,7:8,11)]
+#subset to only DE genes
+caf <- subset(caf, rownames(caf) %in% rownames(combine))
+#subset caf for each strain
+cac1u = subset(caf, rownames(caf) %in% rownames(cac1))
+cac2u = subset(caf, rownames(caf) %in% rownames(cac2))
+cac3u = subset(caf, rownames(caf) %in% rownames(cac3))
+set7u = subset(caf, rownames(caf) %in% rownames(set7))
+
+#I'm just using values from venn diagram to do this. The way in was set up, genes would be present across multiple 
 
 # Dataset
 input <- c(
-  Day3 = 1233,
-  Day4 = 1407,
-  Day5 = 1457,
-  Day6 = 1489,
-  "Day3&Day4" = nrow(intersect(peri_3, peri_4)),
-  "Day3&Day5" = nrow(intersect(peri_3, peri_5)),
-  "Day3&Day6" = nrow(intersect(peri_3, peri_6)),
-  "Day4&Day5" = nrow(intersect(peri_4, peri_5)),
-  "Day4&Day6" = nrow(intersect(peri_4, peri_6)),
-  "Day5&Day6" = nrow(intersect(peri_5, peri_6)),
-  "Day3&Day4&Day5" = nrow(intersect(intersect(peri_3, peri_4), peri_5)),
-  "Day4&Day5&Day6" = nrow(intersect(intersect(peri_4, peri_5), peri_6)),
-  "Day3&Day5&Day6" = nrow(intersect(intersect(peri_3, peri_5), peri_6)),
-  "Day3&Day4&Day6" = nrow(intersect(intersect(peri_3, peri_4), peri_6)),
-  "Day3&Day4&Day5&Day6" = nrow(intersect(intersect(intersect(peri_3, peri_4), peri_6), peri_5)))
+  cac1u = 166,
+  cac2u = 284,
+  cac3u = 587,
+  set7u = 710,
+  cac1ucac2u = nrow(intersect(cac1u, cac2u)),
+  cac1ucac3u = nrow(intersect(cac1u, cac3u)),
+  cac1uset7u = nrow(intersect(cac1u, set7u)),
+  cac2ucac3u = nrow(intersect(cac2u, cac3u)),
+  cac2uset7u = nrow(intersect(cac2u, set7u)),
+  cac3uset7u = nrow(intersect(cac3u, set7u)),
+  cac1ucac2ucac3u = nrow(intersect(intersect(cac1u, cac2u), cac3u)),
+  cac2ucac3uset7u = nrow(intersect(intersect(cac2u, cac3u), set7u)),
+  cac1ucac3uset7u = nrow(intersect(intersect(cac1u, cac3u), set7u)),
+  cac1ucac2uset7u = nrow(intersect(intersect(cac1u, cac2u), set7u)),
+  cac1ucac2ucac3uset7u = nrow(intersect(intersect(intersect(cac1u, cac2u), set7u), cac3u)))
   
- upset(fromExpression(input), 
+input <- list(
+  cac1 = rownames(cac1),
+  cac2 = rownames(cac2),
+  cac3 = rownames(cac3),
+  set7 = rownames(set7))
+
+ upset(fromList(input), 
       nintersects = 15, 
       nsets = 4, 
       order.by = "freq", 
