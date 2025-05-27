@@ -116,7 +116,7 @@ module load deepTools
 
 #H3K36me3
 
-computeMatrix reference-point --referencePoint TSS -a 2000 -b 1500 --scale 2 \
+computeMatrix reference-point --referencePoint TSS -a 2500 -b 1000 --scale 2 \
  -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
