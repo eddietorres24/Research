@@ -261,9 +261,9 @@ module load deepTools
                         $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
                         $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
                         $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-                        -R $BEDDIR2/tRNA_genes.bed --skipZeros -o matrix_PRC2_2.gz
+                        -R $BEDDIR2/rRNA_genes.bed --skipZeros -o matrix_PRC2_2.gz
 
-                        plotHeatmap -m matrix_PRC2_2.gz -out CAF-1_K27_tRNA.pdf \
+                        plotHeatmap -m matrix_PRC2_2.gz -out CAF-1_K27_rRNA.pdf \
                                         --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                                         --startLabel "5'" \
                                         --endLabel "3'" \
