@@ -269,7 +269,6 @@ module load deepTools
                                         --endLabel "3'" \
                                         --sortUsing sum \
                                         --sortRegions descend \
-                                        --sortUsingSamples 1 \
                                         --missingDataColor 1 \
                                         --whatToShow "heatmap and colorbar" \
                                         --outFileSortedRegions heatmap.bed \
