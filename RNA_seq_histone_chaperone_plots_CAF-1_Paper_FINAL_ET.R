@@ -241,6 +241,7 @@ breaks1=seq(-4, 5, by=.09) #This is to set a custom heatmaps scale. Not used her
 GenesWithChanges <- subset(AVERAGE_Prc2targetTPM, (rowSums(AVERAGE_Prc2targetTPM) > 0))
 #CAFUpGenes <- subset(AVERAGE_CAFTPM, (rowSums(CAFUpTPM) > 0))
 #GenesWithChanges_95 <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0))
+tRNAmap <- subset(AVERAGE_AlldataTPM, rownames(AVERAGE_AlldataTPM) %in% tRNAgenes$Gene.ID)
 
 #plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above
 
