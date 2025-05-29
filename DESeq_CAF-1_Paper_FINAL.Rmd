@@ -33,7 +33,6 @@ library(dplyr)
 ## Importing featurecounts matrix
 Read in the featurecounts output, convert to a matrix, and remove unneccesary columns to include ONLY the count numbers, then convert columns to numeric.
 ```{r cts}
-setwd("C:\\Users\\eddie\\Desktop\\Research\\GitHub")
 cts2 <- as.matrix(read.table("./text_files/readcounts_FINAL.txt", sep="\t", row.names =1, header = TRUE))
 cts2 <- as.matrix(cts2[,-c(1:5)])
 ## change ncol to match number of columns
@@ -177,6 +176,172 @@ write.csv(as.data.frame(cac1_suz12), file = "cac1_suz12.csv")
 #write.csv(as.data.frame(set3), file = "set3.csv")
 ```
 
+#Subsetting DEG by which strain they are up- or downregulated in CAF-1 mutants. Also extracting a list of ALL DEG for GO Analysis
+```{r}
+library(tibble)
+#Reading in the csv's w/ DEGs back in
+cac1_DEG <- read.csv("./cac1.csv", header= TRUE, row.names = 1)
+cac2_DEG <- read.csv("./cac2.csv", header= TRUE, row.names = 1)
+cac3_DEG <- read.csv("./cac3.csv", header= TRUE, row.names = 1)
+set7_DEG <- read.csv("./set7.csv", header= TRUE, row.names = 1)
+
+#make a columns w/ gene names for easier subsetting
+cac1_DEG <- tibble::rownames_to_column(cac1_DEG, "NCU")
+cac2_DEG <- tibble::rownames_to_column(cac2_DEG, "NCU")
+cac3_DEG <- tibble::rownames_to_column(cac3_DEG, "NCU")
+set7_DEG <- tibble::rownames_to_column(set7_DEG, "NCU")
+
+#Making new subset for p < 0.01 for more strict analysis
+cac1_DEG_01 <- subset(cac1_DEG, cac1_DEG$padj <= 0.01)
+cac2_DEG_01 <- subset(cac2_DEG, cac2_DEG$padj <= 0.01)
+cac3_DEG_01 <- subset(cac3_DEG, cac3_DEG$padj <= 0.01)
+set7_DEG_01 <- subset(set7_DEG, set7_DEG$padj <= 0.01)
+
+#Splitting Up & Down regulated genes
+cac1_UP <- subset(cac1_DEG, cac1_DEG$log2FoldChange > 0)
+cac1_DOWN <- subset(cac1_DEG, cac1_DEG$log2FoldChange < 0)
+cac2_UP <- subset(cac2_DEG, cac1_DEG$log2FoldChange > 0)
+cac2_DOWN <- subset(cac2_DEG, cac1_DEG$log2FoldChange < 0)
+cac3_UP <- subset(cac3_DEG, cac1_DEG$log2FoldChange > 0)
+cac3_DOWN <- subset(cac3_DEG, cac1_DEG$log2FoldChange < 0)
+set7_UP <- subset(set7_DEG, cac1_DEG$log2FoldChange > 0)
+set7_DOWN <- subset(set7_DEG, cac1_DEG$log2FoldChange < 0)
+
+cac1_UP_01 <- subset(cac1_DEG_01, cac1_DEG_01$log2FoldChange > 0)
+cac1_DOWN_01 <- subset(cac1_DEG_01, cac1_DEG_01$log2FoldChange < 0)
+cac2_UP_01 <- subset(cac2_DEG_01, cac1_DEG_01$log2FoldChange > 0)
+cac2_DOWN_01 <- subset(cac2_DEG_01, cac1_DEG_01$log2FoldChange < 0)
+cac3_UP_01 <- subset(cac3_DEG_01, cac1_DEG_01$log2FoldChange > 0)
+cac3_DOWN_01 <- subset(cac3_DEG_01, cac1_DEG_01$log2FoldChange < 0)
+set7_UP_01 <- subset(set7_DEG_01, cac1_DEG_01$log2FoldChange > 0)
+set7_DOWN_01 <- subset(set7_DEG_01, cac1_DEG_01$log2FoldChange < 0)
+
+#I want bed files of up/downregulated genes across samples
+##p value of 0.05 first
+neurospora = read.table("../bed_files/neurospora_genes_edit.bed", sep = "\t", header= TRUE)
+cac1_up <- subset(neurospora, neurospora$Attributes %in% cac1_UP$NCU)
+cac2_up <- subset(neurospora, neurospora$Attributes %in% cac2_UP$NCU)
+cac3_up <- subset(neurospora, neurospora$Attributes %in% cac3_UP$NCU)
+set7_up <- subset(neurospora, neurospora$Attributes %in% set7_UP$NCU)
+cac1_down <- subset(neurospora, neurospora$Attributes %in% cac1_DOWN$NCU)
+cac2_down <- subset(neurospora, neurospora$Attributes %in% cac2_DOWN$NCU)
+cac3_down <- subset(neurospora, neurospora$Attributes %in% cac3_DOWN$NCU)
+set7_down <- subset(neurospora, neurospora$Attributes %in% set7_DOWN$NCU)
+
+##Write csv's
+write.csv(cac1_up, file = "cac1_up_05.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac2_up, file = "cac2_up_05.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac3_up, file = "cac3_up_05.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(set7_up, file = "set7_up_05.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac1_down, file = "cac1_down_05.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac2_down, file = "cac2_down_05.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac3_down, file = "cac3_down_05.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(set7_down, file = "set7_down_05.csv", sep = "\t", col.names = F, row.names = F)
+
+##now getting genes under p value of 0.01 for more strict analysis
+cac1_up_01 <- subset(neurospora, neurospora$Attributes %in% cac1_UP_01$NCU)
+cac2_up_01 <- subset(neurospora, neurospora$Attributes %in% cac2_UP_01$NCU)
+cac3_up_01 <- subset(neurospora, neurospora$Attributes %in% cac3_UP_01$NCU)
+set7_up_01 <- subset(neurospora, neurospora$Attributes %in% set7_UP_01$NCU)
+cac1_down_01 <- subset(neurospora, neurospora$Attributes %in% cac1_DOWN_01$NCU)
+cac2_down_01 <- subset(neurospora, neurospora$Attributes %in% cac2_DOWN_01$NCU)
+cac3_down_01 <- subset(neurospora, neurospora$Attributes %in% cac3_DOWN_01$NCU)
+set7_down_01 <- subset(neurospora, neurospora$Attributes %in% set7_DOWN_01$NCU)
+
+
+##Write csv's
+write.csv(cac1_up_01, file = "cac1_up_01.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac2_up_01, file = "cac2_up_01.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac3_up_01, file = "cac3_up_01.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(set7_up_01, file = "set7_up_01.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac1_down_01, file = "cac1_down_01.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac2_down_01, file = "cac2_down_01.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac3_down_01, file = "cac3_down_01.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(set7_down_01, file = "set7_down_01.csv", sep = "\t", col.names = F, row.names = F)
+
+#Combining all DEG's across CAF-1 mutants into one df
+##I want only cac-1 & cac-2 first, p < 0.05
+cac1and2_DEG_05 <- subset(neurospora, (neurospora$Attributes %in% cac1_DEG$NCU) & (neurospora$Attributes %in% cac2_DEG$NCU))
+write.csv(as.data.frame(cac1and2_DEG_05), file = "cac1_2_DEG_05.csv")  
+
+##p < 0.01
+cac1and2_DEG_01 <- subset(neurospora, (neurospora$Attributes %in% cac1_DEG_01$NCU) & (neurospora$Attributes %in% cac2_DEG_01$NCU))
+write.csv(as.data.frame(cac1and2_DEG_01), file = "cac1_2_DEG_01.csv") 
+
+##Upregulated in both cac-1 and cac-2
+cac1and2_UP <- subset(neurospora, (neurospora$Attributes %in% cac1_up$Attributes) & (neurospora$Attributes %in% cac2_up$Attributes))
+write.csv(as.data.frame(cac1and2_UP), file = "cac1and2_UP.csv")
+
+##downregulated in both cac-1 and cac-2
+cac1and2_DOWN <- subset(neurospora, (neurospora$Attributes %in% cac1_down$Attributes) & (neurospora$Attributes %in% cac2_down$Attributes))
+write.csv(as.data.frame(cac1and2_DOWN), file = "cac1and2_DOWN.csv")
+
+###Now including cac-3
+##p < 0.05
+cac1and2and3_DEG_05 <- subset(neurospora, neurospora$Attributes %in% cac1_DEG$NCU & neurospora$Attributes %in% cac2_DEG$NCU & neurospora$Attributes %in% cac3_DEG$NCU)
+write.csv(as.data.frame(cac1and2and3_DEG_05), file = "cac1and2and3_DEG_05.csv")  
+
+##p < 0.01
+cac1and2and3_DEG_01 <- subset(neurospora, neurospora$Attributes %in% cac1_DEG_01$NCU & neurospora$Attributes %in% cac2_DEG_01$NCU & neurospora$Attributes %in% cac3_DEG_01$NCU)
+write.csv(as.data.frame(cac1and2and3_DEG_01), file = "cac1and2and3_DEG_01.csv") 
+
+##Upregulated in All
+cac1and2and3_UP <- subset(neurospora, neurospora$Attributes %in% cac1_up$Attributes & neurospora$Attributes %in% cac2_up$Attributes & neurospora$Attributes %in% cac3_up$Attributes )
+write.csv(as.data.frame(cac1and2and3_UP), file = "cac1and2and3_UP.csv")
+
+##downregulated in All
+cac1and2and3_DOWN <- subset(neurospora, neurospora$Attributes %in% cac1_down$Attributes & neurospora$Attributes %in% cac2_down$Attributes& neurospora$Attributes %in% cac3_down$Attributes  )
+write.csv(as.data.frame(cac1and2and3_DOWN), file = "cac1and2and3_DOWN.csv")
+
+# I want a another set with all genes DEG in either cac1, cac2, OR cac3
+
+##Upregulated in either cac-1 or cac-2
+cac1or2_UP <- subset(neurospora, (neurospora$Attributes %in% cac1_up$Attributes) | (neurospora$Attributes %in% cac2_up$Attributes))
+write.csv(as.data.frame(cac1or2_UP), file = "cac1or2_UP.csv")
+
+##downregulated in either cac-1 or cac-2
+cac1or2_DOWN <- subset(neurospora, (neurospora$Attributes %in% cac1_down$Attributes) | (neurospora$Attributes %in% cac2_down$Attributes))
+write.csv(as.data.frame(cac1or2_DOWN), file = "cac1or2_DOWN.csv")
+
+##Upregulated in either cac-1 or cac-2
+cac1or2or3_UP <- subset(neurospora, (neurospora$Attributes %in% cac1_up$Attributes) | (neurospora$Attributes %in% cac2_up$Attributes) | (neurospora$Attributes %in% cac3_up$Attributes))
+write.csv(as.data.frame(cac1or2or3_UP), file = "cac1oror3_UP.csv")
+
+cac1or2or3_DOWN <- subset(neurospora, (neurospora$Attributes %in% cac1_down$Attributes) | (neurospora$Attributes %in% cac2_down$Attributes) | (neurospora$Attributes %in% cac3_down$Attributes))
+write.csv(as.data.frame(cac1or2or3_DOWN), file = "cac1oror3_DOWN.csv")
+
+###I also want to separate DE K27 genes from the rest of the genes. This is really only necessary for upregulated genes, as there are very few (if any) K27 marked genes that are actually downregulated ion these mutants. I will make bed files out of these csvs to use in plotheatmap
+Prc2targets <- read.table("./text_files/K27_narrow_genes_sorted.txt", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t")
+
+cac1_up_K27 <- subset(cac1_up, cac1_up$VALUE %in% Prc2targets$V1)
+cac2_up_K27 <- subset(cac2_up, cac2_up$VALUE %in% Prc2targets$V1)
+cac3_up_K27 <- subset(cac3_up, cac3_up$VALUE %in% Prc2targets$V1)
+set7_up_K27 <- subset(set7_up, set7_up$VALUE %in% Prc2targets$V1)
+cac1_up_nonK27 <- subset(cac1_up, ! (cac1_up$VALUE %in% Prc2targets$V1))
+cac2_up_nonK27 <- subset(cac2_up, ! (cac2_up$VALUE %in% Prc2targets$V1))
+cac3_up_nonK27 <- subset(cac3_up, ! (cac3_up$VALUE %in% Prc2targets$V1))
+set7_up_nonK27 <- subset(set7_up, ! (set7_up$VALUE %in% Prc2targets$V1))
+cac1and2_up_K27 <- subset(cac1and2_UP, cac1and2_UP$VALUE %in% Prc2targets$V1)
+cac1and2and3_up_K27 <- subset(cac1and2and3_UP, cac1and2and3_UP$VALUE %in% Prc2targets$V1)
+cac1and2_up_nonK27 <- subset(cac1and2_UP, ! (cac1and2_UP$VALUE %in% Prc2targets$V1))
+cac1and2and3_up_nonK27 <- subset(cac1and2and3_UP, ! (cac1and2and3_UP$VALUE %in% Prc2targets$V1))
+
+#Write csv's
+write.csv(cac1_up_K27, file = "cac1_up_K27.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac2_up_K27, file = "cac2_up_K27.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac3_up_K27, file = "cac3_up_K27.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac1_up_nonK27, file = "cac1_up_nonK27.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac2_up_nonK27, file = "cac2_up_nonK27.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac3_up_nonK27, file = "cac3_up_nonK27.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac1and2_up_K27, file = "cac1and2_up_K27.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac1and2and3_up_K27, file = "cac1and2and3_up_K27.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac1and2_up_nonK27, file = "cac1and2_up_nonK27.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac1and2and3_up_nonK27, file = "cac1and2and3_up_nonK27.csv", sep = "\t", col.names = F, row.names = F)
+
+#I will manipulate csvs in excel to make the bed files I desire
+
+```
+
 ### Analyzing DE Genes
 
 Read results files back into r as a single matrix
@@ -193,12 +358,13 @@ induced_genes <- readr::read_csv(list_of_files, id = "file_name")
 
 ##convert to wide format
 l2fc_data <- data.frame(pivot_wider(data = induced_genes, id_cols = "...1", names_from = "file_name", values_from = "log2FoldChange"))
+#assigning row names and deleting extra column
 rownames(l2fc_data) <- l2fc_data[,1]
 l2fc_data <- l2fc_data[,-1]
+#assigning NA values to 0
 l2fc_data[is.na(l2fc_data)] <- 0
-#rownames(l2fc_data) <- l2fc_data$gene
 
-
+#tibble NCU names back to first column
 library(tibble)
 l2fc <- tibble::rownames_to_column(l2fc_data, "VALUE")
 ```
@@ -275,42 +441,43 @@ Compare gene upregulation using UpSet plots. Data is entered by first listing th
 To make the UpSet plot, run the code "upset(fromExpression(input)," and input parameters (read the documentation for full list of options). You MUST specify the number of categories (nsets) and number of intersections (nintersects), which INCLUDES the number of individual categories.
 
 ```{r}
-install.packages("UpSetR")
+#install.packages("UpSetR")
 library(UpSetR)
 
 #processing data to subset
-##Put gene lists together
-combine <- rbind(cac1,cac2,cac3,set7)
-##subset l2fc data  to only have data i want
-caf <- l2fc_data[,c(5,7:8,11)]
-#subset to only DE genes
-caf <- subset(caf, rownames(caf) %in% rownames(combine))
-#subset caf for each strain
-cac1u = subset(caf, rownames(caf) %in% rownames(cac1))
-cac2u = subset(caf, rownames(caf) %in% rownames(cac2))
-cac3u = subset(caf, rownames(caf) %in% rownames(cac3))
-set7u = subset(caf, rownames(caf) %in% rownames(set7))
+# ##Put gene lists together
+# combine <- rbind(cac1,cac2,cac3,set7)
+# ##subset l2fc data  to only have data i want
+# caf <- l2fc_data[,c(5,7:8,11)]
+# #subset to only DE genes
+# caf <- subset(caf, rownames(caf) %in% rownames(combine))
+# #subset caf for each strain
+# cac1u = subset(caf, rownames(caf) %in% rownames(cac1))
+# cac2u = subset(caf, rownames(caf) %in% rownames(cac2))
+# cac3u = subset(caf, rownames(caf) %in% rownames(cac3))
+# set7u = subset(caf, rownames(caf) %in% rownames(set7))
 
 #I'm just using values from venn diagram to do this. The way in was set up, genes would be present across multiple 
 
 # Dataset
-input <- c(
-  cac1u = 166,
-  cac2u = 284,
-  cac3u = 587,
-  set7u = 710,
-  cac1ucac2u = nrow(intersect(cac1u, cac2u)),
-  cac1ucac3u = nrow(intersect(cac1u, cac3u)),
-  cac1uset7u = nrow(intersect(cac1u, set7u)),
-  cac2ucac3u = nrow(intersect(cac2u, cac3u)),
-  cac2uset7u = nrow(intersect(cac2u, set7u)),
-  cac3uset7u = nrow(intersect(cac3u, set7u)),
-  cac1ucac2ucac3u = nrow(intersect(intersect(cac1u, cac2u), cac3u)),
-  cac2ucac3uset7u = nrow(intersect(intersect(cac2u, cac3u), set7u)),
-  cac1ucac3uset7u = nrow(intersect(intersect(cac1u, cac3u), set7u)),
-  cac1ucac2uset7u = nrow(intersect(intersect(cac1u, cac2u), set7u)),
-  cac1ucac2ucac3uset7u = nrow(intersect(intersect(intersect(cac1u, cac2u), set7u), cac3u)))
-  
+# input <- c(
+#   cac1u = 166,
+#   cac2u = 284,
+#   cac3u = 587,
+#   set7u = 710,
+#   cac1ucac2u = nrow(intersect(cac1u, cac2u)),
+#   cac1ucac3u = nrow(intersect(cac1u, cac3u)),
+#   cac1uset7u = nrow(intersect(cac1u, set7u)),
+#   cac2ucac3u = nrow(intersect(cac2u, cac3u)),
+#   cac2uset7u = nrow(intersect(cac2u, set7u)),
+#   cac3uset7u = nrow(intersect(cac3u, set7u)),
+#   cac1ucac2ucac3u = nrow(intersect(intersect(cac1u, cac2u), cac3u)),
+#   cac2ucac3uset7u = nrow(intersect(intersect(cac2u, cac3u), set7u)),
+#   cac1ucac3uset7u = nrow(intersect(intersect(cac1u, cac3u), set7u)),
+#   cac1ucac2uset7u = nrow(intersect(intersect(cac1u, cac2u), set7u)),
+#   cac1ucac2ucac3uset7u = nrow(intersect(intersect(intersect(cac1u, cac2u), set7u), cac3u)))
+
+#All DE genes
 input <- list(
   cac1 = rownames(cac1),
   cac2 = rownames(cac2),
@@ -328,74 +495,97 @@ input <- list(
       point.size = 2.8, 
       line.size = 1
       )
+ 
+#All Upregulated Genes
+ 
+input <- list(
+  cac1 = cac1_up$Attributes,
+  cac2 = cac2_up$Attributes,
+  cac3 = cac3_up$Attributes,
+  set7 = set7_up$Attributes)
+
+ upset(fromList(input), 
+      nintersects = 15, 
+      nsets = 4, 
+      order.by = "freq", 
+      decreasing = T, 
+      mb.ratio = c(0.6, 0.4),
+      number.angles = 0, 
+      text.scale = 1.4, 
+      point.size = 2.8, 
+      line.size = 1
+      )
+
+#All Downregulated Genes
+
+input <- list(
+  cac1 = cac1_down$Attributes,
+  cac2 = cac2_down$Attributes,
+  cac3 = cac3_down$Attributes,
+  set7 = set7_down$Attributes)
+
+upset(fromList(input), 
+      nintersects = 15, 
+      nsets = 4, 
+      order.by = "freq", 
+      decreasing = T, 
+      mb.ratio = c(0.6, 0.4),
+      number.angles = 0, 
+      text.scale = 1.4, 
+      point.size = 2.8, 
+      line.size = 1
+      ) 
+ 
+#upregulated K27genes
+
+input <- list(
+  cac1 = cac1_up_K27$Attributes,
+  cac2 = cac2_up_K27$Attributes,
+  cac3 = cac3_up_K27$Attributes,
+  set7 = set7_up_K27$Attributes)
+
+ upset(fromList(input), 
+      nintersects = 15, 
+      nsets = 4, 
+      order.by = "freq", 
+      decreasing = T, 
+      mb.ratio = c(0.6, 0.4),
+      number.angles = 0, 
+      text.scale = 1.4, 
+      point.size = 2.8, 
+      line.size = 1
+      ) 
+
+#upregulated non-K27genes
+
+input <- list(
+  cac1 = cac1_up_nonK27$Attributes,
+  cac2 = cac2_up_nonK27$Attributes,
+  cac3 = cac3_up_nonK27$Attributes,
+  set7 = set7_up_nonK27$Attributes)
+
+ upset(fromList(input), 
+      nintersects = 15, 
+      nsets = 4, 
+      order.by = "degree", 
+      decreasing = T, 
+      mb.ratio = c(0.6, 0.4),
+      number.angles = 0, 
+      text.scale = 1.4, 
+      point.size = 2.8, 
+      line.size = 1
+      )  
+ 
 ```
 
 #IGV Track
 ```{r}
-ngenes = read.csv("../csv_files/neurospora_genes.csv")
+ngenes = read.csv("../csv_files/neurospora_genes_edit.csv")
 
 combine <- transform(merge(ngenes, l2fc, by = "VALUE"))
 track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", "asf1.csv", "ATRX.csv", "cac1.csv", "cac2.csv", "cac3.csv", "naf1.csv", "naf2.csv", "set7.csv", "cac1_new.csv", "cac1_cac2.csv", "cac1_suz12.csv")
 
 write.table(track, file="newseq.igv", sep="\t", row.names = FALSE, quote = FALSE)
 ```
-
-#Subsetting DEG by which strain they are up- or downregulated in CAF-1 mutants. Also extracting a list of ALL DEG for GO Analysis
-```{r}
-#Reading in the csv's w/ DEGs back in
-cac1_DEG <- read.csv("./cac1_1.csv", header= TRUE, row.names = 1)
-cac2_DEG <- read.csv("./cac2_1.csv", header= TRUE, row.names = 1)
-cac3_DEG <- read.csv("./cac3_1.csv", header= TRUE, row.names = 1)
-
-#make a columns w/ gene names for easier subsetting
-cac1_DEG <- tibble::rownames_to_column(cac1_DEG, "NCU")
-cac2_DEG <- tibble::rownames_to_column(cac2_DEG, "NCU")
-cac3_DEG <- tibble::rownames_to_column(cac3_DEG, "NCU")
-
-#Splitting Up & Down regulated genes
-cac1_UP <- subset(cac1_DEG, cac1_DEG$log2FoldChange > 1)
-cac1_DOWN <- subset(cac1_DEG, cac1_DEG$log2FoldChange < 1)
-cac2_UP <- subset(cac2_DEG, cac1_DEG$log2FoldChange > 1)
-cac2_DOWN <- subset(cac2_DEG, cac1_DEG$log2FoldChange < 1)
-cac3_UP <- subset(cac3_DEG, cac1_DEG$log2FoldChange > 1)
-cac3_DOWN <- subset(cac3_DEG, cac1_DEG$log2FoldChange < 1)
-
-#I want bed files of up/downregulated genes across samples
-neurospora = read.table("./bed_files/neurospora.bed")
-cac1_up <- subset(neurospora, neurospora$V4 %in% cac1_UP$NCU)
-cac2_up <- subset(neurospora, neurospora$V4 %in% cac2_UP$NCU)
-cac3_up <- subset(neurospora, neurospora$V4 %in% cac3_UP$NCU)
-
-write.csv(cac1_up, file = "cac1_up.csv", sep = "\t", col.names = F, row.names = F)
-write.csv(cac2_up, file = "cac2_up.csv", sep = "\t", col.names = F, row.names = F)
-write.csv(cac3_up, file = "cac3_up.csv", sep = "\t", col.names = F, row.names = F)
-
-#I will manipulate the csv in excel to make the bed file
-
-#Write csv's
-write.csv(as.data.frame(cac1_UP), file = "cac1_UP.csv")
-write.csv(as.data.frame(cac1_DOWN), file = "cac1_DOWN.csv")
-write.csv(as.data.frame(cac2_UP), file = "cac2_UP.csv")
-write.csv(as.data.frame(cac2_DOWN), file = "cac2_DOWN.csv")
-write.csv(as.data.frame(cac3_UP), file = "cac3_UP.csv")
-write.csv(as.data.frame(cac3_DOWN), file = "cac3_DOWN.csv")
-
-#Combining all DEG's across CAF-1 mutants into one df
-##I want only cac-1 & cac-2 first
-CAF1_DEG <- rows_upsert(cac1_DEG, cac2_DEG, by = "NCU")
-write.csv(as.data.frame(CAF1_DEG), file = "cac1_2_DEG.csv")  
-
-#I also wanted to see what genes are DE in BOTH cac-1/2 or All CAF mutants
-cac1and2_UP <- subset(CAF1_DEG, CAF1_DEG$NCU %in% cac1_UP$NCU & CAF1_DEG$NCU %in% cac2_UP$NCU)
-cac1and2_DOWN <- subset(CAF1_DEG, CAF1_DEG$NCU %in% cac1_DOWN$NCU & CAF1_DEG$NCU %in% cac2_DOWN$NCU)
-
-write.csv(as.data.frame(cac1and2_UP), file = "cac1and2_UP.csv")
-write.csv(as.data.frame(cac1and2_DOWN), file = "cac1and2_DOWN.csv")
-
-#Now including cac-3  
-CAF1_DEG <- rows_upsert(CAF1_DEG, cac3_DEG, by = "NCU")
-
-#Write csv to obtain NCU for all DEG across all 3 CAF-1 mutants
-write.csv(as.data.frame(CAF1_DEG), file = "CAF1_DEG.csv")
 
 ```
