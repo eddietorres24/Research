@@ -89,12 +89,12 @@ cac3DE <- read.csv("cac3.csv", sep = ",", header = TRUE, row.names = 1)
 
 ```{r}
 top_genes <- rownames(cac2DE)[order(cac2DE$pvalue)][1:15]
-prc2target <- subset(cac3DE, rownames(cac3DE)%in%Prc2targets$V1)
+prc2target <- subset(cac3, rownames(cac3)%in%Prc2targets$V1)
 prc2target <- rownames(prc2target)
 ```
 Define the volcano plot
 ```{r}
-volcano_plot <- ggplot(cac3DE, aes(x = log2FoldChange, y = -log10(pvalue), color = ifelse(log2FoldChange > 0 & pvalue < 0.05 & !(rownames(cac3DE)%in%Prc2targets$V1), "Upregulated", ifelse(log2FoldChange < 0 & pvalue < 0.05 & !(rownames(cac3DE)%in%Prc2targets$V1), "Downregulated", "PRC2")))) +
+volcano_plot <- ggplot(cac3, aes(x = log2FoldChange, y = -log10(padj), color = ifelse(log2FoldChange > 0 & padj < 0.05 & !(rownames(cac3)%in%Prc2targets$V1), "Upregulated", ifelse(log2FoldChange < 0 & padj < 0.05 & !(rownames(cac3)%in%Prc2targets$V1), "Downregulated", "PRC2")))) +
   geom_point(size = 1.5, alpha = 0.7) +
   scale_color_manual(values = c("Upregulated" = "red", "Downregulated" = "blue", "PRC2" = "chocolate2"),
                      labels = c("Downregulated", "PRC2", "Upregulated")) +
@@ -113,6 +113,7 @@ volcano_plot <- ggplot(cac3DE, aes(x = log2FoldChange, y = -log10(pvalue), color
 
 # Print the volcano plot
 print(volcano_plot)
+ggsave("./cac3DE_volcano_plot_FINAL.pdf", plot=volcano_plot, width = 10, height = 8, unit="in",  dpi=400)
 ```
 # Print the volcano plot with labels
 ```{r}

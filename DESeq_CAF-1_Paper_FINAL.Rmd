@@ -303,12 +303,12 @@ write.csv(as.data.frame(cac1or2_UP), file = "cac1or2_UP.csv")
 cac1or2_DOWN <- subset(neurospora, (neurospora$Attributes %in% cac1_down$Attributes) | (neurospora$Attributes %in% cac2_down$Attributes))
 write.csv(as.data.frame(cac1or2_DOWN), file = "cac1or2_DOWN.csv")
 
-##Upregulated in either cac-1 or cac-2
+##Upregulated in either cac-1, cac-2, or cac-3
 cac1or2or3_UP <- subset(neurospora, (neurospora$Attributes %in% cac1_up$Attributes) | (neurospora$Attributes %in% cac2_up$Attributes) | (neurospora$Attributes %in% cac3_up$Attributes))
-write.csv(as.data.frame(cac1or2or3_UP), file = "cac1oror3_UP.csv")
+write.csv(as.data.frame(cac1or2or3_UP), file = "cac1or2or3_UP.csv")
 
 cac1or2or3_DOWN <- subset(neurospora, (neurospora$Attributes %in% cac1_down$Attributes) | (neurospora$Attributes %in% cac2_down$Attributes) | (neurospora$Attributes %in% cac3_down$Attributes))
-write.csv(as.data.frame(cac1or2or3_DOWN), file = "cac1oror3_DOWN.csv")
+write.csv(as.data.frame(cac1or2or3_DOWN), file = "cac1or2or3_DOWN.csv")
 
 ###I also want to separate DE K27 genes from the rest of the genes. This is really only necessary for upregulated genes, as there are very few (if any) K27 marked genes that are actually downregulated ion these mutants. I will make bed files out of these csvs to use in plotheatmap
 Prc2targets <- read.table("./text_files/K27_narrow_genes_sorted.txt", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t")
@@ -325,6 +325,10 @@ cac1and2_up_K27 <- subset(cac1and2_UP, cac1and2_UP$VALUE %in% Prc2targets$V1)
 cac1and2and3_up_K27 <- subset(cac1and2and3_UP, cac1and2and3_UP$VALUE %in% Prc2targets$V1)
 cac1and2_up_nonK27 <- subset(cac1and2_UP, ! (cac1and2_UP$VALUE %in% Prc2targets$V1))
 cac1and2and3_up_nonK27 <- subset(cac1and2and3_UP, ! (cac1and2and3_UP$VALUE %in% Prc2targets$V1))
+cac1or2_up_K27 <- subset(cac1or2_UP, cac1and2_UP$VALUE %in% Prc2targets$V1)
+cac1or2or3_up_K27 <- subset(cac1or2or3_UP, cac1or2or3_UP$VALUE %in% Prc2targets$V1)
+cac1or2_up_nonK27 <- subset(cac1or2_UP, ! (cac1or2_UP$VALUE %in% Prc2targets$V1))
+cac1or2or3_up_nonK27 <- subset(cac1or2or3_UP, ! (cac1or2or3_UP$VALUE %in% Prc2targets$V1))
 
 #Write csv's
 write.csv(cac1_up_K27, file = "cac1_up_K27.csv", sep = "\t", col.names = F, row.names = F)
@@ -337,6 +341,10 @@ write.csv(cac1and2_up_K27, file = "cac1and2_up_K27.csv", sep = "\t", col.names =
 write.csv(cac1and2and3_up_K27, file = "cac1and2and3_up_K27.csv", sep = "\t", col.names = F, row.names = F)
 write.csv(cac1and2_up_nonK27, file = "cac1and2_up_nonK27.csv", sep = "\t", col.names = F, row.names = F)
 write.csv(cac1and2and3_up_nonK27, file = "cac1and2and3_up_nonK27.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac1or2_up_K27, file = "cac1or2_up_K27.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac1or2or3_up_K27, file = "cac1or2or3_up_K27.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac1or2_up_nonK27, file = "cac1or2_up_nonK27.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac1or2or3_up_nonK27, file = "cac1or2or3_up_nonK27.csv", sep = "\t", col.names = F, row.names = F)
 
 #I will manipulate csvs in excel to make the bed files I desire
 
@@ -373,7 +381,7 @@ l2fc <- tibble::rownames_to_column(l2fc_data, "VALUE")
 ```{r}
 library(VennDiagram)
 library(RColorBrewer)
-library(euler)
+library(eulerr)
 
 #Venn Diagram w/ CAF-1 mutants
 venn.diagram(
@@ -422,7 +430,7 @@ fit = euler(c("A" = 16, "B" = 35, "C" = 120, "A&B" = 72, "A&C" = 47, "B&C" = 52,
 eulerplot <- plot(fit)
 
 #Save file
-ggsave(filename = "CAF-1_euler_K27.png", plot = eulerplot, width = 4, height = 4, dpi = 600)
+ggsave(filename = "CAF-1_euler_K27.pdf", plot = eulerplot, width = 4, height = 4, dpi = 600)
 
 ```
 
@@ -444,77 +452,104 @@ To make the UpSet plot, run the code "upset(fromExpression(input)," and input pa
 #install.packages("UpSetR")
 library(UpSetR)
 
-#processing data to subset
-# ##Put gene lists together
-# combine <- rbind(cac1,cac2,cac3,set7)
-# ##subset l2fc data  to only have data i want
-# caf <- l2fc_data[,c(5,7:8,11)]
-# #subset to only DE genes
-# caf <- subset(caf, rownames(caf) %in% rownames(combine))
-# #subset caf for each strain
-# cac1u = subset(caf, rownames(caf) %in% rownames(cac1))
-# cac2u = subset(caf, rownames(caf) %in% rownames(cac2))
-# cac3u = subset(caf, rownames(caf) %in% rownames(cac3))
-# set7u = subset(caf, rownames(caf) %in% rownames(set7))
-
-#I'm just using values from venn diagram to do this. The way in was set up, genes would be present across multiple 
-
-# Dataset
-# input <- c(
-#   cac1u = 166,
-#   cac2u = 284,
-#   cac3u = 587,
-#   set7u = 710,
-#   cac1ucac2u = nrow(intersect(cac1u, cac2u)),
-#   cac1ucac3u = nrow(intersect(cac1u, cac3u)),
-#   cac1uset7u = nrow(intersect(cac1u, set7u)),
-#   cac2ucac3u = nrow(intersect(cac2u, cac3u)),
-#   cac2uset7u = nrow(intersect(cac2u, set7u)),
-#   cac3uset7u = nrow(intersect(cac3u, set7u)),
-#   cac1ucac2ucac3u = nrow(intersect(intersect(cac1u, cac2u), cac3u)),
-#   cac2ucac3uset7u = nrow(intersect(intersect(cac2u, cac3u), set7u)),
-#   cac1ucac3uset7u = nrow(intersect(intersect(cac1u, cac3u), set7u)),
-#   cac1ucac2uset7u = nrow(intersect(intersect(cac1u, cac2u), set7u)),
-#   cac1ucac2ucac3uset7u = nrow(intersect(intersect(intersect(cac1u, cac2u), set7u), cac3u)))
-
 #All DE genes
 input <- list(
-  cac1 = rownames(cac1),
-  cac2 = rownames(cac2),
-  cac3 = rownames(cac3),
-  set7 = rownames(set7))
+  cac1 = df2$cac1,
+  cac2 = df2$cac2,
+  cac3 = df2$cac3,
+  set7 = set7_both$Attributes)
 
- upset(fromList(input), 
+ upset(fromList(input),
       nintersects = 15, 
-      nsets = 4, 
-      order.by = "freq", 
-      decreasing = T, 
+      nsets = 4,
+      group.by = "sets",
+      cutoff = 4,
+      order.by = c("degree", "freq"),
       mb.ratio = c(0.6, 0.4),
       number.angles = 0, 
       text.scale = 1.4, 
       point.size = 2.8, 
       line.size = 1
       )
- 
+
+#make a list of all unique values in input list
+all_values <- unique(unlist(input))
+
+#make df3 conatining a row for each unique gene & rename rows
+df3 <- data.frame(Value = all_values)
+rownames(df3) = df3$Value
+
+#fill in new df3 with value of gene name if present in each condition individually, if not present, fill in df3 w/ NA
+for (i in seq_along(input)) { df3[[names(input)[i]]] <- ifelse(df3$Value %in% input[[i]], df3$Value, NA) }
+
+#remove uneeded Value column, save row names
+df3 <- df3[,-1]
+rows <- rownames(df3)
+
+#replace present values with 1 and NA's w/ 0
+df2 <- as.data.frame(lapply(df3, function(x) ifelse(x != "", 1, 0)))
+rownames(df2) <- rows
+df2[is.na(df2)] <- 0 
+
+#assign intersection values
+df2$pattern <- apply(df2, 1, function(row) paste(names(df2)[row == 1], collapse = "&"))
+
+#count genes per intersection
+intersection_counts <- df2 %>%
+  group_by(pattern) %>%
+  summarise(GeneCount = n()) %>%
+  ungroup()
+
+#Assign intersections to resepctive groups
+intersection_counts$Group <- case_when(
+  intersection_counts$pattern %in% c("cac1", "cac2", "cac1&cac2", "cac1&cac3", "cac2&cac3", "cac1&cac2&cac3") ~ "CAF-1 Regulated",
+  intersection_counts$pattern %in% c("set7", "cac3&set7") ~ "PRC2 Regulated",
+  intersection_counts$pattern %in%   c("cac1&set7", "cac2&set7", "cac1&cac2&set7", "cac1&cac3&set7", "cac2&cac3&set7", "cac1&cac2&cac3&set7") ~ "CAF-1 & PRC2 Regulated",
+  intersection_counts$pattern %in% "cac3" ~ "Other Complex",
+  TRUE ~ "Other"
+)
+
+#order by descending value
+intersection_counts <- intersection_counts %>%
+  group_by(Group) %>%
+  arrange(desc(GeneCount), .by_group = TRUE) %>%
+  ungroup()
+
+#Step 1: Set desired order
+group_order <- c("CAF-1 Regulated", "PRC2 Regulated", "CAF-1 & PRC2 Regulated", "Other Complex")
+
+# Step 2: Reorder entire dataframe by group order and gene count
+intersection_counts <- intersection_counts %>%
+  mutate(Group = factor(Group, levels = group_order)) %>%
+  arrange(Group, desc(GeneCount))
+
+# Step 3: Set the pattern factor to enforce this order in the plot
+intersection_counts$pattern <- factor(intersection_counts$pattern, levels = intersection_counts$pattern)
+
+#Plot
+ggplot(intersection_counts, aes(x = pattern, y = GeneCount, fill = Group)) +
+  geom_col() +
+  scale_fill_manual(values = c(
+    "CAF-1 Regulated" = "#E41A1C",
+    "PRC2 Regulated" = "#377EB8",
+    "CAF-1 & PRC2 Regulated" = "#4DAF4A",
+    "Other Complex" = "#984EA3"
+  )) +
+  theme_minimal() +
+  labs(x = "Intersection", y = "Number of Genes", title = "Custom UpSet Plot") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggsave("./CAF-1_AllDEGenes_upset.pdf", plot=plot, width = 10, height = 8, unit="in",  dpi=400)
+
+
 #All Upregulated Genes
- 
+#gather list of genes for each condition  
 input <- list(
   cac1 = cac1_up$Attributes,
   cac2 = cac2_up$Attributes,
   cac3 = cac3_up$Attributes,
   set7 = set7_up$Attributes)
 
- upset(fromList(input), 
-      nintersects = 15, 
-      nsets = 4, 
-      order.by = "freq", 
-      decreasing = T, 
-      mb.ratio = c(0.6, 0.4),
-      number.angles = 0, 
-      text.scale = 1.4, 
-      point.size = 2.8, 
-      line.size = 1
-      )
 
 #All Downregulated Genes
 
@@ -527,7 +562,8 @@ input <- list(
 upset(fromList(input), 
       nintersects = 15, 
       nsets = 4, 
-      order.by = "freq", 
+      order.by = "freq",
+      group.by = "sets",
       decreasing = T, 
       mb.ratio = c(0.6, 0.4),
       number.angles = 0, 
@@ -564,10 +600,10 @@ input <- list(
   cac3 = cac3_up_nonK27$Attributes,
   set7 = set7_up_nonK27$Attributes)
 
- upset(fromList(input), 
+  upset(fromList(input), 
       nintersects = 15, 
       nsets = 4, 
-      order.by = "degree", 
+      order.by = "freq", 
       decreasing = T, 
       mb.ratio = c(0.6, 0.4),
       number.angles = 0, 
@@ -588,4 +624,3 @@ track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", 
 write.table(track, file="newseq.igv", sep="\t", row.names = FALSE, quote = FALSE)
 ```
 
-```
