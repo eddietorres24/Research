@@ -132,7 +132,7 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
                     --sortUsingSamples 1 \
                     --sortRegions descend \
                     --missingDataColor 1 \
-                    --heatmapHeight 20 \
+                    --heatmapHeight 25 \
                     --outFileSortedRegions heatmap.bed \
                     --colorList 'white, darkgoldenrod' \
                     --zMin 0 \
