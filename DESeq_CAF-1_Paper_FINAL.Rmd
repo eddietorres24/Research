@@ -325,10 +325,13 @@ cac1and2_up_K27 <- subset(cac1and2_UP, cac1and2_UP$VALUE %in% Prc2targets$V1)
 cac1and2and3_up_K27 <- subset(cac1and2and3_UP, cac1and2and3_UP$VALUE %in% Prc2targets$V1)
 cac1and2_up_nonK27 <- subset(cac1and2_UP, ! (cac1and2_UP$VALUE %in% Prc2targets$V1))
 cac1and2and3_up_nonK27 <- subset(cac1and2and3_UP, ! (cac1and2and3_UP$VALUE %in% Prc2targets$V1))
-cac1or2_up_K27 <- subset(cac1or2_UP, cac1and2_UP$VALUE %in% Prc2targets$V1)
+cac1or2_up_K27 <- subset(cac1or2_UP, cac1or2_UP$VALUE %in% Prc2targets$V1)
 cac1or2or3_up_K27 <- subset(cac1or2or3_UP, cac1or2or3_UP$VALUE %in% Prc2targets$V1)
 cac1or2_up_nonK27 <- subset(cac1or2_UP, ! (cac1or2_UP$VALUE %in% Prc2targets$V1))
 cac1or2or3_up_nonK27 <- subset(cac1or2or3_UP, ! (cac1or2or3_UP$VALUE %in% Prc2targets$V1))
+
+cac1or2_down_K27 <- subset(cac1or2_DOWN, cac1or2_DOWN$VALUE %in% Prc2targets$V1)
+cac1or2_down_nonK27 <- subset(cac1or2_DOWN, ! cac1or2_DOWN$VALUE %in% Prc2targets$V1)
 
 #Write csv's
 write.csv(cac1_up_K27, file = "cac1_up_K27.csv", sep = "\t", col.names = F, row.names = F)
@@ -346,6 +349,8 @@ write.csv(cac1or2or3_up_K27, file = "cac1or2or3_up_K27.csv", sep = "\t", col.nam
 write.csv(cac1or2_up_nonK27, file = "cac1or2_up_nonK27.csv", sep = "\t", col.names = F, row.names = F)
 write.csv(cac1or2or3_up_nonK27, file = "cac1or2or3_up_nonK27.csv", sep = "\t", col.names = F, row.names = F)
 
+write.csv(cac1or2_down_K27, file = "cac1or2_down_K27.csv", sep = "\t", col.names = F, row.names = F)
+write.csv(cac1or2_down_nonK27, file = "cac1or2_down_nonK27.csv", sep = "\t", col.names = F, row.names = F)
 #I will manipulate csvs in excel to make the bed files I desire
 
 ```
