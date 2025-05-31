@@ -96,7 +96,7 @@ module load deepTools
             --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
             --startLabel "5'" \
             --endLabel "3'" \
-            --sortregions "keep" \
+            --sortRegions "keep" \
             --missingDataColor 1 \
             --heatmapHeight 25 \
             --colorList 'white, violet, magenta' \
@@ -286,7 +286,7 @@ module load deepTools
                                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                                 --startLabel "5'" \
                                 --endLabel "3'" \
-                                --sortregions "keep" \
+                                --sortRegions "keep" \
                                 --missingDataColor 1 \
                                 --heatmapHeight 25 \
                                 --colorList 'white, g, darkgreen' \
@@ -478,7 +478,7 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 3 \
             --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
             --startLabel "5'" \
             --endLabel "3'" \
-            --sortregions "keep" \
+            --sortRegions "keep" \
             --missingDataColor 1 \
             --heatmapHeight 25 \
             --outFileSortedRegions heatmap.bed \
