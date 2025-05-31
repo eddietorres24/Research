@@ -269,6 +269,10 @@ macs3 callpeak -t "${P149DIR}/149-108_ChIP_set-7_Input_Rep3_S132.bam" -c "${P149
 # bedtools intersect -a cac1_2_set7_ATAC_NoWT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > cac1_2_set7_ATAC_NoWT_K27_regions.bed
 
 
+# bedtools intersect -a K27genes_K27order.bed -b cac-1_CS_H3K27me3_Rep1_peaks.bed -wa > K27genes_in_cac1.bed
+# bedtools intersect -a K27genes_in_cac1.bed -b cac-2_CS_H3K27me3_Rep1_peaks.bed -wa > K27genes_in_cac1_2.bed
+# bedtools intersect -a K27genes_K27order.bed -b K27genes_in_cac1_2.bed -v > K27genes_NOT_in_cac1_2.bed
+
 #Combining all overlapping peaks & merging
 # CAF-1
 # bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \
