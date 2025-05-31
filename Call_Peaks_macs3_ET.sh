@@ -219,12 +219,6 @@ macs3 callpeak -t "${P149DIR}/149-106_ChIP_cac-2_H3K9me3_Rep3_S130.bam" -c "${P1
 macs3 callpeak -t "${P149DIR}/149-107_ChIP_cac-3_H3K9me3_Rep3_S131.bam" -c "${P149DIR}/149-137_ChIP_cac-3_input__S161.bam" -f BAMPE -n "cac-3_H3K9me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-3_H3K9" --min-length 650 --max-gap 375
 macs3 callpeak -t "${P149DIR}/149-108_ChIP_set-7_Input_Rep3_S132.bam" -c "${P149DIR}/149-138_ChIP_set-7_input__S162.bam" -f BAMPE -n "set-7_H3K9me3_Rep3" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/set-7_H3K9" --min-length 650 --max-gap 375
 
-149-104_ChIP_WT_H3K9me3_Rep3_S128.bam
-# 149-105_ChIP_cac-1_H3K9me3_Rep3_S129.bam
-# 149-106_ChIP_cac-2_H3K9me3_Rep3_S130.bam
-# 149-107_ChIP_cac-3_H3K9me3_Rep3_S131.bam
-# 149-108_ChIP_set-7_Input_Rep3_S132.bam
-
 #Convert Broadpeaks to bed format
 #Rep 1
 # cut -f 1-6 $OUTDIR1/WT_0hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/WT_0hr_H3K27me3_Rep1_peaks.bed
