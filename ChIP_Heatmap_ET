@@ -286,8 +286,8 @@ module load deepTools
                                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                                 --startLabel "5'" \
                                 --endLabel "3'" \
-                                --sortRegions "keep" \
                                 --missingDataColor 1 \
+                                --outFileSortedRegions heatmap.bed \
                                 --heatmapHeight 25 \
                                 --colorList 'white, g, darkgreen' \
                                 --zMin 0 \
