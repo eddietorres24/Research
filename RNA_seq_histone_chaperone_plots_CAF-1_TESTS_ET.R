@@ -146,6 +146,12 @@ meltedAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
 meltedAveragePRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
+meltedNotInCac <- melt(K27_lost, value.name = 'Count',
+                                    varnames=c('GeneID', 'Sample'))
+
+meltedInCac <- melt(K27_not_lost, value.name = 'Count',
+                                    varnames=c('GeneID', 'Sample'))
+
 meltedAverageAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
                       varnames=c('GeneID', 'Sample'))
 
@@ -198,9 +204,9 @@ atrx_t <- t.test(AVERAGE_Prc2targetTPM[,10], AVERAGE_Prc2targetTPM[,1], data = A
 #I want to make a violin plot instead of boxplot. Going to adapt Abby's code
 library(grDevices)
 
-total2 <- meltedAveragePRC2targetData %>%
+total2 <- meltedInCac %>%
   group_by(Sample)
-total_dist = meltedAveragePRC2targetData %>%
+total_dist = meltedInCac %>%
   group_by(Sample) %>% summarise(num=n())
 
 #Setting distance between violins in plot
@@ -220,7 +226,7 @@ violin <- total2 %>%
   theme_classic(base_size = 20)
 
 print(violin)
-ggsave("./Histone_Chap_PRC2_Gene_expression_FINAL.pdf", plot=violin, width = 10, height = 8, unit="in",  dpi=400)
+ggsave("./K27_genes_In_Cac.pdf", plot=violin, width = 10, height = 8, unit="in",  dpi=400)
 
 #stat_summary(fun.data = "mean_se", geom = "errorbar", width = 0.25, colour = "red") +
 
@@ -252,8 +258,8 @@ heatmap <- pheatmap(GenesWithChanges, color = colorRampPalette(rev(brewer.pal(n 
                    cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
                    legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5)
 
-heatmap <- pheatmap(K27_not_lost, color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
-                    cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
+heatmap <- pheatmap(combine, color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
+                    cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = F, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
                     legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5)
 
 #to plot with ggplot, you need to extract [[4]] from the heatmap object
