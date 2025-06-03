@@ -273,9 +273,10 @@ module load MACS3
 # bedtools intersect -a cac1_2_set7_ATAC_NoWT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > cac1_2_set7_ATAC_NoWT_K27_regions.bed
 
 
-# bedtools intersect -a K27genes_K27order.bed -b cac-1_CS_H3K27me3_Rep1_peaks.bed -wa > K27genes_in_cac1.bed
-# bedtools intersect -a K27genes_in_cac1.bed -b cac-2_CS_H3K27me3_Rep1_peaks.bed -wa > K27genes_in_cac1_2.bed
-# bedtools intersect -a K27genes_K27order.bed -b K27genes_in_cac1_2.bed -v > K27genes_NOT_in_cac1_2.bed
+bedtools intersect -a K27_genes_trimmed.bed -b cac-1_CS_H3K27me3_Rep1_peaks.bed -wa > K27genes_in_cac1.bed
+bedtools intersect -a K27_genes_trimmed.bed -b cac-2_CS_H3K27me3_Rep1_peaks.bed -wa > K27genes_in_cac2.bed
+bedtools intersect -a K27_genes_trimmed.bed -b K27genes_in_cac1_2.bed -v > K27genes_NOT_in_cac1_2.bed
+
 
 #Combining all overlapping peaks & merging
 # CAF-1
@@ -283,39 +284,34 @@ module load MACS3
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-1_peaks.bed \
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 #
-#
-#   cat cac-1_ATAC_peaks.bed \
-#       cac-2_ATAC_peaks.bed \
-#       set-7_ATAC_peaks.bed > cac1_2_set_7_K27_genes.bed
-#
-# #
-# sort -k1,1 -k2,2n WT_ATAC_K27_regions.bed > CAF1_ATAC_WT_fix.bed
-# bedtools sort -i CAF1_ATAC_WT_fix.bed > CAF1_ATAC_WT_fix2.bed
-# #
-# bedtools merge -i CAF1_ATAC_WT_fix2.bed > WT_ATAC_K27_regions.bed
 
+#merge bed files, remove duplicates
+cat K27genes_in_cac1.bed K27genes_in_cac2.bed | sort -k1,1 -k2,2n -k3,3n | uniq > K27genes_in_cac1_2.bed
+
+#test for Duplicates
+# sort K27genes_in_cac1_2.bed | uniq -d > test.bed
 
 ###BigWig Averages
-ml ucsc
-
-bigWigAverageOverBed ${BIG136DIR}/6147_136-6_ChIP_WT_H3K27me3_CS_Rep1_S6.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/WT_Rep1_K27signal_K27genes.tab
-bigWigAverageOverBed ${BIG136DIR}/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/WT_Rep2_K27signal_K27genes.tab
-bigWigAverageOverBed ${BIG138DIR}/138-57_ChIP_WT_H3K27me3_Rep3_6252_S56.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/WT_Rep3_K27signal_K27genes.tab
-
-bigWigAverageOverBed ${BIG136DIR}/6147_136-7_ChIP_cac-1_H3K27me3_CS_Rep1_S7.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac1_Rep1_K27signal_K27genes.tab
-bigWigAverageOverBed ${BIG136DIR}/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac1_Rep2_K27signal_K27genes.tab
-bigWigAverageOverBed ${BIG138DIR}/138-58_ChIP_cac-1_H3K27me3_Rep3_6252_S57.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac1_Rep3_K27signal_K27genes.tab
-
-bigWigAverageOverBed ${BIG136DIR}/6147_136-8_ChIP_cac-2_H3K27me3_CS_Rep1_S8.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac2_Rep1_K27signal_K27genes.tab
-bigWigAverageOverBed ${BIG136DIR}/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac2_Rep2_K27signal_K27genes.tab
-bigWigAverageOverBed ${BIG138DIR}/138-59_ChIP_cac-2_H3K27me3_Rep3_6252_S58.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac2_Rep3_K27signal_K27genes.tab
-
-bigWigAverageOverBed ${BIG136DIR}/6147_136-9_ChIP_cac-3_H3K27me3_CS_Rep1_S9.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac3_Rep1_K27signal_K27genes.tab
-bigWigAverageOverBed ${BIG136DIR}/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac3_Rep2_K27signal_K27genes.tab
-bigWigAverageOverBed ${BIG138DIR}/138-60_ChIP_cac-3_H3K27me3_Rep3_6252_S59.bin_25.smooth_75Bulk.bw  /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac3_Rep3_K27signal_K27genes.tab
-
-bigWigAverageOverBed ${BIG136DIR}/6147_136-10_ChIP_cac-1-2_H3K27me3_CS_Rep1_S10.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac1-2_Rep1_K27signal_K27genes.tab
-bigWigAverageOverBed ${BIG136DIR}/6147_136-82_ChIP_cac-1-2_H3K27me3_CS_Rep2_S81.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac1-2_Rep2_K27signal_K27genes.tab
+# ml ucsc
+#
+# bigWigAverageOverBed ${BIG136DIR}/6147_136-6_ChIP_WT_H3K27me3_CS_Rep1_S6.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/WT_Rep1_K27signal_K27genes.tab
+# bigWigAverageOverBed ${BIG136DIR}/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/WT_Rep2_K27signal_K27genes.tab
+# bigWigAverageOverBed ${BIG138DIR}/138-57_ChIP_WT_H3K27me3_Rep3_6252_S56.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/WT_Rep3_K27signal_K27genes.tab
+#
+# bigWigAverageOverBed ${BIG136DIR}/6147_136-7_ChIP_cac-1_H3K27me3_CS_Rep1_S7.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac1_Rep1_K27signal_K27genes.tab
+# bigWigAverageOverBed ${BIG136DIR}/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac1_Rep2_K27signal_K27genes.tab
+# bigWigAverageOverBed ${BIG138DIR}/138-58_ChIP_cac-1_H3K27me3_Rep3_6252_S57.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac1_Rep3_K27signal_K27genes.tab
+#
+# bigWigAverageOverBed ${BIG136DIR}/6147_136-8_ChIP_cac-2_H3K27me3_CS_Rep1_S8.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac2_Rep1_K27signal_K27genes.tab
+# bigWigAverageOverBed ${BIG136DIR}/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac2_Rep2_K27signal_K27genes.tab
+# bigWigAverageOverBed ${BIG138DIR}/138-59_ChIP_cac-2_H3K27me3_Rep3_6252_S58.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac2_Rep3_K27signal_K27genes.tab
+#
+# bigWigAverageOverBed ${BIG136DIR}/6147_136-9_ChIP_cac-3_H3K27me3_CS_Rep1_S9.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac3_Rep1_K27signal_K27genes.tab
+# bigWigAverageOverBed ${BIG136DIR}/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac3_Rep2_K27signal_K27genes.tab
+# bigWigAverageOverBed ${BIG138DIR}/138-60_ChIP_cac-3_H3K27me3_Rep3_6252_S59.bin_25.smooth_75Bulk.bw  /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac3_Rep3_K27signal_K27genes.tab
+#
+# bigWigAverageOverBed ${BIG136DIR}/6147_136-10_ChIP_cac-1-2_H3K27me3_CS_Rep1_S10.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac1-2_Rep1_K27signal_K27genes.tab
+# bigWigAverageOverBed ${BIG136DIR}/6147_136-82_ChIP_cac-1-2_H3K27me3_CS_Rep2_S81.bin_25.smooth_75Bulk.bw /home/evt82290/Research/bed_files/K27_genes_gff_sorted_bigwigs.bed ${OUTDIR4}/cac1-2_Rep2_K27signal_K27genes.tab
 
 
 #qa-suz12

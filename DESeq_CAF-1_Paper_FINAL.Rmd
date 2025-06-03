@@ -129,7 +129,7 @@ plotDispEsts(dds2)
 Export genes with statistically significant differential expression when compared against the wild type.
 
 ```{r coldata}
-alpha = 0.05
+alpha = 0.9999
 
 cac1 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1", "WT"))
 cac2 <- results(dds2, alpha=alpha, contrast=c("condition", "cac2", "WT"))
