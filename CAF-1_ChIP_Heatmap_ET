@@ -48,11 +48,11 @@ module load deepTools
         $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
         -R $BEDDIR2/K27genes_K27order_caf-1_clustered.bed --skipZeros -o matrix_PRC2_K4.gz
 
-    plotHeatmap -m matrix_PRC2_K4.gz -out CAF-1_K4_K27genes_K27ordered_clustered.pdf \
+    plotHeatmap -m matrix_PRC2_K4.gz -out CAF-1_K4_K27genes_CAF-1_clustered.pdf \
             --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
             --startLabel "5'" \
             --endLabel "3'" \
-            --sortRegions "keep" \
+            --sortRegions "sum" \
             --missingDataColor 1 \
             --heatmapHeight 25 \
             --colorList 'white, violet, magenta' \
@@ -100,11 +100,11 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
     $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/K27genes_K27order_caf-1_clustered.bed --skipZeros -o K36_matrix_PRC2.gz
 
-    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_K27genes_K27ordered_clustered.pdf \
+    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_K27genes_CAF-1_clustered.pdf \
                     --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                     --startLabel "5'" \
                     --endLabel "3'" \
-                    --sortRegions "keep" \
+                    --sortRegions "sum" \
                     --missingDataColor 1 \
                     --heatmapHeight 25 \
                     --colorList 'white, darkgoldenrod' \
@@ -131,11 +131,11 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
     $P133DIR/133-22_ChIP_set-7_H4K20me3_Rep1_S20.bin_25.smooth_75Bulk.bw  \
     -R $BEDDIR2/K27genes_K27order_caf-1_clustered.bed --skipZeros -o H4K20_matrix_PRC2.gz
 
-    plotHeatmap -m H4K20_matrix_PRC2.gz -out CAF-1_H4K20me3_K27genes_K27sort_clustered.pdf \
+    plotHeatmap -m H4K20_matrix_PRC2.gz -out CAF-1_H4K20me3_K27genes_CAF-1_clustered.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \
                     --startLabel "5'" \
                     --endLabel "3'" \
-                    --sortRegions "keep" \
+                    --sortRegions "sum" \
                     --missingDataColor 1 \
                     --colorList 'white, blueviolet' \
                     --zMin 0 \
@@ -150,11 +150,11 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
     $P141DIR/141-N15_ATAC_set-7__Rep1_S104.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/K27genes_K27order_caf-1_clustered.bed --skipZeros -o matrix_PRC2_1.gz
 
-    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27genes_K27order_clustered.pdf \
+    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27genes_CAF-1_clustered.pdf \
                     --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                     --startLabel "5'" \
                     --endLabel "3'" \
-                    --sortRegions "keep" \
+                    --sortRegions "sum" \
                     --missingDataColor 1 \
                     --colorMap "bwr" \
                     --zMin 0
@@ -217,7 +217,7 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
                                         --samplesLabel WT rtt106 cac-1 cac-1_rtt106 cac-2 set-7 \
                                         --startLabel "5'" \
                                         --endLabel "3'" \
-                                        --sortRegions "keep" \
+                                        --sortRegions "sum" \
                                         --missingDataColor 1 \
                                         --colorList "white, g, darkgreen" \
                                         --zMin 0 \
@@ -241,11 +241,11 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
                         $P149DIR/149-83_ChIP_set-7_H3K27ac_Rep2_S83.bin_25.smooth_75Bulk.bw \
                         -R $BEDDIR2/K27genes_K27order_caf-1_clustered.bed --skipZeros -o matrix_PRC2_K27ac.gz
 
-                        plotHeatmap -m matrix_PRC2_K27ac.gz -out CAF-1_K27ac_K27_genes_K27ordered_clustered.pdf \
+                        plotHeatmap -m matrix_PRC2_K27ac.gz -out CAF-1_K27ac_K27_genes_CAF-1_clustered.pdf \
                                         --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                                         --startLabel "5'" \
                                         --endLabel "3'" \
-                                        --sortRegions "keep" \
+                                        --sortRegions "sum" \
                                         --missingDataColor 1 \
                                         --colorList "white, lavender, mediumslateblue" \
                                         --zMin 0 \
@@ -260,11 +260,11 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 3 \
          $OUTDIR2/SRR10916163_log.bw \
          -R $BEDDIR2/K27genes_K27order_caf-1_clustered.bed --skipZeros -o matrix_PRC2_RNA.gz
 
-    plotHeatmap -m matrix_PRC2_RNA.gz -out CAF-1_RNA-seq_K27genes_K27ordered_clustered.pdf \
+    plotHeatmap -m matrix_PRC2_RNA.gz -out CAF-1_RNA-seq_K27genes_CAF-1_clustered.pdf \
             --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
             --startLabel "5'" \
             --endLabel "3'" \
-            --sortRegions "keep" \
+            --sortRegions "sum" \
             --missingDataColor 1 \
             --heatmapHeight 25 \
             --colorMap "bwr" \
