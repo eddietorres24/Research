@@ -93,7 +93,7 @@ colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 
 #read in geneIDs of PRC2 target genes
 #reading in csvs w/ upregulated genes in CAF-1 mutants
-Prc2targets <- read.table("./text_files/K27_narrow_genes_sorted.txt", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
+Prc2targets <- read.table("./bed_files/K27_genes_gff_sorted_names.bed", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
 cac1up <- read.csv("./cac_DEseq/cac1_UP.csv", stringsAsFactors=FALSE, check.names=FALSE)
 cac2up <- read.csv("./cac_DEseq/cac2_UP.csv", stringsAsFactors=FALSE, check.names=FALSE)
 
@@ -115,7 +115,7 @@ AVERAGE_AlldataTPM <- subset(Averaged_Orderd_KO_data, (Averaged_Orderd_KO_data[,
 Prc2targetTPM <- subset(Prc2targetTPM, rownames(Prc2targetTPM)%in%rownames(AVERAGE_Prc2targetTPM))
 
 ###Add sudocount and log transform (if necessary)
-AVERAGE_Prc2targetTPM <- AVERAGE_Prc2targetTPM + 1
+AVERAGE_Prc2targetTPM <- AVERAGE_Prc2targetTPM + 1.1
 AVERAGE_Prc2targetTPM <- log2(AVERAGE_Prc2targetTPM)
 
 AVERAGE_CAFTPM <- AVERAGE_CAFTPM + 1
