@@ -128,7 +128,7 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
  -S $P133DIR/133-19_ChIP_WT_H4K20me3_Rep1_S17.bin_25.smooth_75Bulk.bw \
     $P133DIR/133-20_ChIP_cac-1_H4K20me3_Rep1_S18.bin_25.smooth_75Bulk.bw \
     $P133DIR/133-21_ChIP_cac-2_H4K20me3_Rep1_S19.bin_25.smooth_75Bulk.bw \
-    $P133DIR/133-22_ChIP_set-7_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw \
+    $P133DIR/133-22_ChIP_set-7_H4K20me3_Rep1_S20.bin_25.smooth_75Bulk.bw  \
     -R $BEDDIR2/K27genes_K27order_caf-1_clustered.bed --skipZeros -o H4K20_matrix_PRC2.gz
 
     plotHeatmap -m H4K20_matrix_PRC2.gz -out CAF-1_H4K20me3_K27genes_K27sort_clustered.pdf \
@@ -139,11 +139,6 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
                     --missingDataColor 1 \
                     --colorList 'white, blueviolet' \
                     --zMin 0 \
-
-#133-19_ChIP_WT_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
-#133-20_ChIP_cac-1_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
-#133-21_ChIP_cac-2_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
-#133-22_ChIP_set-7_H4K20me3_Rep1.bin_25.smooth_75Bulk.bw
 
 #ATAC
 
@@ -210,10 +205,10 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
 
 #K27 w new rtt106 data
                     computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 \
-                     -S $P149DIR/149-63_ChIP_WT_H3K27me3__S63.bin_25.smooth_75Bulk.bw \
-                        $P149DIR/149-68_ChIP_rtt106_H3K27me3_Rep2_S68.bin_25.smooth_75Bulk.bw \
+                     -S $P149DIR/149-55_ChIP_WT_H3K27me3__S55.bin_25.smooth_75Bulk.bw \
                         $P149DIR/149-56_ChIP_cac-1_H3K27me3__S56.bin_25.smooth_75Bulk.bw \
-                        $P149DIR/149-69_ChIP_cac-1-rtt106_H3K27me3_Rep2_S69.bin_25.smooth_75Bulk.bw \
+                        $P149DIR/149-57_ChIP_rtt106_H3K27me3_Rep1_S57.bin_25.smooth_75Bulk.bw \
+                        $P149DIR/149-58_ChIP_cac-1-rtt106_H3K27me3_Rep1_S58.bin_25.smooth_75Bulk.bw \
                         $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
                         $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
                         -R $BEDDIR2/K27genes_K27order_caf-1_clustered.bed --skipZeros -o matrix_PRC2_rtt.gz
