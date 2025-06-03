@@ -40,7 +40,7 @@ P149DIR="/scratch/evt82290/MappingOutputs/Run149/bamFiles"
 MISCDIR="/scratch/evt82290/MappingOutputs/iswi_ash1/bamFiles"
 #bigWig
 BIG136DIR="/scratch/evt82290/MappingOutputs/Run136/bigWig"
-BIG138DIR="/scratch/evt82290/MappingOutputs/Run136/bigWig"
+BIG138DIR="/scratch/evt82290/MappingOutputs/Run138/bigWig"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR4 ]
