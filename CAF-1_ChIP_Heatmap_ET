@@ -261,6 +261,7 @@ computeMatrix scale-regions -a 500 -b 2500 --regionBodyLength 2500 --scale 1.5 \
 computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 3 \
       -S $OUTDIR2/SRR8269825_log.bw \
          $RNADIR/set2_RNAseq_ash1paper_1Rep_log.bw \
+         $RNADIR/SRR7690268_log.bw \
          /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_log.bw \
          $OUTDIR2/SRR7970629_log.bw \
          $OUTDIR2/SRR7970598_log.bw \
