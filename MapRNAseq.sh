@@ -18,7 +18,7 @@ THREADS=2
 #variables imported from submission script
 #accession=SRR10916163
 fastqPath="/scratch/evt82290/FastqFiles/misc_RNA"
-outdir="/scratch/evt82290/RNAseq"
+outdir="/scratch/evt82290/RNAseq/misc_mutants"
 # fastqPath="/scratch/evt82290/FastqFiles/2025_Run149_ET/RNA"
 # outdir="/scratch/evt82290/MappingOutputs/Run149/RNA"
 
@@ -38,7 +38,7 @@ fi
   # read2=${fastqPath}/${accession}*R2_001.fastq.gz
   read1=${fastqPath}/${accession}/${accession}*_1.fastq.gz
   read2=${fastqPath}/${accession}/${accession}*_2.fastq.gz
-  unpaired=${fastqPath}/${accession}/${accession}.fastq.gz
+  unpaired=${fastqPath}/${accession}.fastq.gz
 
 ###################################
 

@@ -30,7 +30,7 @@ fi
 # outdir="/scratch/evt82290/MappingOutputs/Run149/RNA"
 
 fastqPath="/scratch/evt82290/FastqFiles/misc_RNA"
-outdir="/scratch/evt82290/RNAseq"
+outdir="/scratch/evt82290/RNAseq/misc_mutants"
 
 mkdir ${outdir}
 mkdir ${outdir}/logs
