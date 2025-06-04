@@ -237,7 +237,7 @@ computeMatrix scale-regions -a 500 -b 2500 --regionBodyLength 2500 --scale 1.5 \
 #K27ac
                   computeMatrix scale-regions -a 500 -b 2500 --regionBodyLength 2500 --scale 1.5 \
                      -S $P149DIR/149-79_ChIP_WT_H3K27ac_Rep2_S79.bin_25.smooth_75Bulk.bw \
-                        $MISCDIR/ash-1_H3K27ac.bin_25.smooth_75Bulk.bw
+                        $MISCDIR/ash-1_H3K27ac.bin_25.smooth_75Bulk.bw \
                         $P149DIR/149-80_ChIP_cac-1_H3K27ac_Rep2_S80.bin_25.smooth_75Bulk.bw \
                         $P149DIR/149-81_ChIP_cac-2_H3K27ac_Rep2_S81.bin_25.smooth_75Bulk.bw \
                         $P149DIR/149-82_ChIP_cac-3_H3K27ac_Rep2_S82.bin_25.smooth_75Bulk.bw \
