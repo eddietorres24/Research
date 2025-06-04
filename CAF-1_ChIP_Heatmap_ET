@@ -103,7 +103,7 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
     -R $BEDDIR2/K27genes_CAF-1_clustered.bed --skipZeros -o K36_matrix_PRC2.gz
 
     plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_ash1_H3K36me3_K27genes_CAF-1_clustered.pdf \
-                    --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
+                    --samplesLabel WT ash-1 cac-1 cac-2 cac-3 set-7 \
                     --startLabel "5'" \
                     --endLabel "3'" \
                     --sortRegions descend \
