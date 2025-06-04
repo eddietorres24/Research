@@ -29,7 +29,7 @@ fi
 # fastqPath="/scratch/evt82290/FastqFiles/2025_Run149_ET/RNA"
 # outdir="/scratch/evt82290/MappingOutputs/Run149/RNA"
 
-fastqPath="/scratch/evt82290/FastqFiles/misc_RNA"
+fastqPath="/scratch/evt82290/SRA/FastqFiles"
 outdir="/scratch/evt82290/RNAseq/misc_mutants"
 
 mkdir ${outdir}
@@ -45,6 +45,6 @@ mkdir "${outdir}/bedGraph/"
 while read -r line
 
 	do
-	sleep 5
+	sleep 2
 	echo "$line mapping job submitted"
 	sbatch --export=ALL,accession="${line}",fastqPath="${fastqPath}",outdir="${outdir}" MapRNAseq.sh & done <"$1"
