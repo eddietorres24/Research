@@ -30,6 +30,7 @@ P146DIR="/scratch/evt82290/MappingOutputs/Run146/bigWig"
 P148DIR="/scratch/evt82290/MappingOutputs/Run148/bigWig"
 P149DIR="/scratch/evt82290/MappingOutputs/Run149/bigWig"
 MISCDIR="/scratch/evt82290/MappingOutputs/misc_data/bigWig"
+RNADIR="/scratch/evt82290/RNAseq/misc_mutants/bigWig"
 
 #bed file directories
 QABED="/home/evt82290/Research/bed_files/qa-suz12"
@@ -94,13 +95,14 @@ computeMatrix scale-regions -a 1000 -b 1000 \
 
 computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
  -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
+    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-102_ChIP_cac-3_H3K36me3_Rep3_S126.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/K27genes_CAF-1_clustered.bed --skipZeros -o K36_matrix_PRC2.gz
 
-    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_K27genes_CAF-1_clustered.pdf \
+    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_ash1_H3K36me3_K27genes_CAF-1_clustered.pdf \
                     --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                     --startLabel "5'" \
                     --endLabel "3'" \
@@ -237,6 +239,7 @@ computeMatrix scale-regions -a 500 -b 2500 --regionBodyLength 2500 --scale 1.5 \
 #K27ac
                   computeMatrix scale-regions -a 500 -b 2500 --regionBodyLength 2500 --scale 1.5 \
                      -S $P149DIR/149-79_ChIP_WT_H3K27ac_Rep2_S79.bin_25.smooth_75Bulk.bw \
+                        $MISCDIR/WT_H3K27ac.bin_25.smooth_75Bulk.bw \
                         $MISCDIR/ash-1_H3K27ac.bin_25.smooth_75Bulk.bw \
                         $P149DIR/149-80_ChIP_cac-1_H3K27ac_Rep2_S80.bin_25.smooth_75Bulk.bw \
                         $P149DIR/149-81_ChIP_cac-2_H3K27ac_Rep2_S81.bin_25.smooth_75Bulk.bw \
@@ -257,13 +260,14 @@ computeMatrix scale-regions -a 500 -b 2500 --regionBodyLength 2500 --scale 1.5 \
 
 computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 3 \
       -S $OUTDIR2/SRR8269825_log.bw \
+         $RNADIR/set2_RNAseq_ash1paper_1Rep_log.bw \
          /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_log.bw \
          $OUTDIR2/SRR7970629_log.bw \
          $OUTDIR2/SRR7970598_log.bw \
          $OUTDIR2/SRR10916163_log.bw \
          -R $BEDDIR2/K27genes_CAF-1_clustered.bed --skipZeros -o matrix_PRC2_RNA.gz
 
-    plotHeatmap -m matrix_PRC2_RNA.gz -out CAF-1_RNA-seq_K27genes_CAF-1_clustered.pdf \
+    plotHeatmap -m matrix_PRC2_RNA.gz -out CAF-1_ash1_RNA-seq_K27genes_CAF-1_clustered.pdf \
             --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
             --startLabel "5'" \
             --endLabel "3'" \
