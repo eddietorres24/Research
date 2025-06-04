@@ -237,7 +237,7 @@ computeMatrix scale-regions -a 500 -b 2500 --regionBodyLength 2500 --scale 1.5 \
 #K27ac
                   computeMatrix scale-regions -a 500 -b 2500 --regionBodyLength 2500 --scale 1.5 \
                      -S $P149DIR/149-79_ChIP_WT_H3K27ac_Rep2_S79.bin_25.smooth_75Bulk.bw \
-                        $MISCDIR/
+                        $MISCDIR/ash-1_H3K27ac.bin_25.smooth_75Bulk.bw
                         $P149DIR/149-80_ChIP_cac-1_H3K27ac_Rep2_S80.bin_25.smooth_75Bulk.bw \
                         $P149DIR/149-81_ChIP_cac-2_H3K27ac_Rep2_S81.bin_25.smooth_75Bulk.bw \
                         $P149DIR/149-82_ChIP_cac-3_H3K27ac_Rep2_S82.bin_25.smooth_75Bulk.bw \
@@ -245,7 +245,7 @@ computeMatrix scale-regions -a 500 -b 2500 --regionBodyLength 2500 --scale 1.5 \
                         -R $BEDDIR2/K27genes_CAF-1_clustered.bed --skipZeros -o matrix_PRC2_K27ac.gz
 
                         plotHeatmap -m matrix_PRC2_K27ac.gz -out CAF-1_ash1_K27ac_K27_genes_CAF-1_clustered.pdf \
-                                        --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
+                                        --samplesLabel WT ash-1 cac-1 cac-2 cac-3 set-7 \
                                         --startLabel "5'" \
                                         --endLabel "3'" \
                                         --sortRegions descend \
