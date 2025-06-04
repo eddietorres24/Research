@@ -29,8 +29,8 @@ fi
 # fastqPath="/scratch/evt82290/FastqFiles/2025_Run149_ET/RNA"
 # outdir="/scratch/evt82290/MappingOutputs/Run149/RNA"
 
-fastqPath="/scratch/evt82290/SRA/FastqFiles"
-outdir="/scratch/evt82290/RNAseq/qa-suz12"
+fastqPath="/scratch/evt82290/FastqFiles/misc_data"
+outdir="/scratch/evt82290/RNAseq/CAF-1"
 
 mkdir ${outdir}
 mkdir ${outdir}/logs
