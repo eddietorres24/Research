@@ -142,7 +142,7 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
 
 #ATAC
 
-computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
+computeMatrix scale-regions -a 500 -b 1500 --regionBodyLength 2000 --scale 1.5 \
  -S $P141DIR/141-N11_ATAC_WT__Rep1_S100.bin_25.smooth_75Bulk.bw \
     $P141DIR/141-N12_ATAC_cac-1__Rep1_S101.bin_25.smooth_75Bulk.bw \
     $P141DIR/141-N13_ATAC_cac-2__Rep1_S102.bin_25.smooth_75Bulk.bw \
@@ -205,10 +205,10 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
 
 #K27 w new rtt106 data
                     computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 \
-                     -S $P149DIR/149-55_ChIP_WT_H3K27me3__S55.bin_25.smooth_75Bulk.bw \
-                        $P149DIR/149-56_ChIP_cac-1_H3K27me3__S56.bin_25.smooth_75Bulk.bw \
-                        $P149DIR/149-57_ChIP_rtt106_H3K27me3_Rep1_S57.bin_25.smooth_75Bulk.bw \
-                        $P149DIR/149-58_ChIP_cac-1-rtt106_H3K27me3_Rep1_S58.bin_25.smooth_75Bulk.bw \
+                     -S $P149DIR/149-63_ChIP_WT_H3K27me3__S63.bin_25.smooth_75Bulk.bw \
+                        $P149DIR/149-68_ChIP_rtt106_H3K27me3_Rep2_S68.bin_25.smooth_75Bulk.bw \
+                        $P149DIR/149-64_ChIP_cac-1_H3K27me3__S64.bin_25.smooth_75Bulk.bw \
+                        $P149DIR/149-69_ChIP_cac-1-rtt106_H3K27me3_Rep2_S69.bin_25.smooth_75Bulk.bw \
                         $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
                         $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
                         -R $BEDDIR2/K27genes_CAF-1_clustered.bed --skipZeros -o matrix_PRC2_rtt.gz
@@ -233,7 +233,7 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
                                         # 149-58_ChIP_cac-1-rtt106_H3K27me3_Rep1_S58.bin_25.smooth_75Bulk.bw
 
 #K27ac
-                  computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
+                  computeMatrix scale-regions -a 500 -b 1500 --regionBodyLength 2000 --scale 1.5 \
                      -S $P149DIR/149-79_ChIP_WT_H3K27ac_Rep2_S79.bin_25.smooth_75Bulk.bw \
                         $P149DIR/149-80_ChIP_cac-1_H3K27ac_Rep2_S80.bin_25.smooth_75Bulk.bw \
                         $P149DIR/149-81_ChIP_cac-2_H3K27ac_Rep2_S81.bin_25.smooth_75Bulk.bw \
