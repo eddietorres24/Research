@@ -17,8 +17,8 @@ THREADS=2
 ##ADD a source file with path to FastqFiles
 #variables imported from submission script
 #accession=SRR10916163
-fastqPath="/scratch/evt82290/SRA/FastqFiles"
-outdir="/scratch/evt82290/RNAseq/qa-suz12"
+fastqPath="/scratch/evt82290/FastqFiles/misc_RNA"
+outdir="/scratch/evt82290/RNAseq"
 # fastqPath="/scratch/evt82290/FastqFiles/2025_Run149_ET/RNA"
 # outdir="/scratch/evt82290/MappingOutputs/Run149/RNA"
 
