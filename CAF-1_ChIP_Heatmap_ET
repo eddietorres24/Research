@@ -74,11 +74,11 @@ computeMatrix scale-regions -a 1000 -b 1000 \
                     --endLabel "3'" \
                     --sortUsing sum \
                     --sortRegions descend \
+                    --sortUsingSamples 1 \
                     --missingDataColor 1 \
-                    --heatmapHeight 20 \
-                    --whatToShow "heatmap and colorbar" \
+                    --heatmapHeight 15 \
                     --outFileSortedRegions heatmap.bed \
-                    --colorList 'white, mediumblue' 'white, mediumblue' 'white, mediumblue' \
+                    --colorList 'white, mediumblue' \
                     --zMin 0 \
 
                     # $P133DIR/133-23_ChIP_WT_H3K9me3_Rep2_S21.bin_25.smooth_75Bulk.bw \
@@ -185,23 +185,23 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
 
 #H3K27me3
 
-                    # computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 \
-                    #  -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-                    #     $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
-                    #     $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-                    #     $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
-                    #     $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-                    #     -R $BEDDIR2/K27genes_in_cac1_2.bed $BEDDIR2/K27genes_NOT_in_cac1_2.bed --skipZeros -o matrix_PRC2_2.gz
+                    computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 \
+                     -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+                        $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+                        $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+                        $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
+                        $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
+                        -R $BEDDIR2/K27genes_in_cac1_2_3.bed $BEDDIR2/K27genes_NOT_in_cac1_2.bed $BEDDIR2/K27genes_in_cac1_2_NOT_in_cac3.bed --skipZeros -o matrix_PRC2_2.gz
 
-                        # plotHeatmap -m matrix_PRC2_2.gz -out CAF-1_K27_K27genes_clustered.pdf \
-                        #         --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
-                        #         --startLabel "5'" \
-                        #         --endLabel "3'" \
-                        #         --missingDataColor 1 \
-                        #         --outFileSortedRegions heatmap.bed \
-                        #         --heatmapHeight 25 \
-                        #         --colorList 'white, g, darkgreen' \
-                        #         --zMin 0 \
+                        plotHeatmap -m matrix_PRC2_2.gz -out CAF-1_K27_K27genes_clustered.pdf \
+                                --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
+                                --startLabel "5'" \
+                                --endLabel "3'" \
+                                --missingDataColor 1 \
+                                --outFileSortedRegions heatmap.bed \
+                                --heatmapHeight 25 \
+                                --colorList 'white, g, darkgreen' \
+                                --zMin 0 \
 
 #K27 w new rtt106 data
                     computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 \
