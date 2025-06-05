@@ -258,7 +258,7 @@ computeMatrix scale-regions -a 500 -b 2500 --regionBodyLength 2500 --scale 1.5 \
 
 #RNA-seq
 
-computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 3 \
+computeMatrix scale-regions -a 200 -b 200 --regionBodyLength 2000 --scale 3 \
       -S $OUTDIR2/SRR8269825_log.bw \
          $RNADIR/set2_RNAseq_ash1paper_1Rep_log.bw \
          $RNADIR/SRR7690268_log.bw \
