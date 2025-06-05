@@ -26,8 +26,6 @@ if [ ! -d $outdir ]
 then
     mkdir -p $outdir
 fi
-# ###
-
 
 ###################
 #start
@@ -59,10 +57,13 @@ countsdir="${outdir}/counts/${accession}"
 mkdir "${countsdir}"
 
 countsdir2="${outdir}/counts2/${accession}"
-mkdir "${countsdir}"
+mkdir "${countsdir2}"
 
 bwDir="${outdir}/bigWig/${accession}"
 mkdir "${bwDir}"
+
+bedDir="${outdir}/beds/${accession}"
+mkdir "${bedDir}"
 
 #pipeaccession summary: trim reads, map with STAR, get Counts
 
@@ -147,86 +148,69 @@ if [ ! -f $read1 ]; then
     --limitBAMsortRAM 19990000000
     --quantMode TranscriptomeSAM GeneCounts
 
-#MAPPING READS BASED ON STRAND
-#Load samtools
-module load SAMtools/1.16.1-GCC-11.3.0
+    #ChatGPT helping me make bigwigs and count files with antisnese reads only
 
-# Forward strand.
-# 1. alignments of the second in pair if they map to the forward strand
-# 2. alignments of the first in pair if they map to the reverse  strand
-samtools view -b -f 128 -F 16 ${bam}Aligned.sortedByCoord.out.bam > ${bam}fow1.bam
-samtools index ${bam}fow1.bam
+    #load modules
+    ml BEDTools
+    module load SAMtools/1.16.1-GCC-11.3.0
+    module load StringTie
+    module load deepTools/3.5.2-foss-2022a
 
-samtools view -b -f 80 ${bam}Aligned.sortedByCoord.out.bam > ${bam}fow2.bam
-samtools index ${bam}fow2.bam
+          # Set input and output paths
+          BAM=${bam}Aligned.sortedByCoord.out.bam
+          ANNOT=/home/evt82290/Research/annotation.bed    # BED12 gene annotation file
+          GENOME="/home/ad45368/chrom_sizes.txt"   # Chromosome sizes
 
-# Combine alignments that originate on the forward strand.
-samtools merge -f ${bam}fwd.bam ${bam}fow1.bam ${bam}fow2.bam
-samtools index ${bam}fwd.bam
+          # 1. Convert BAM to BED (splice-aware)
+          bedtools bamtobed -split -i $BAM > $bedDir/${accession}_all_reads.bed
 
-# Reverse strand
-# 1. alignments of the second in pair if they map to the reverse strand
-# 2. alignments of the first in pair if they map to the forward strand
-samtools view -b -f 144 ${bam}Aligned.sortedByCoord.out.bam > ${bam}rev1.bam
-samtools index ${bam}rev1.bam
+          # 2. Extract antisense reads (opposite strand of gene annotation)
+          bedtools intersect -S -wa -a  $bedDir/${accession}_all_reads.bed -b $ANNOT >  $bedDir/${accession}_antisense_reads.bed
 
-samtools view -b -f 64 -F 16 ${bam}Aligned.sortedByCoord.out.bam > ${bam}rev2.bam
-samtools index ${bam}rev2.bam
+          # 3. Convert antisense BED to BAM
+          bedtools bedtobam -i  $bedDir/${accession}_antisense_reads.bed -g $GENOME > $bamdir/${accession}_antisense.bam
 
-# Combine alignments that originate on the reverse strand.
-#
-samtools merge -f ${bam}rev.bam ${bam}rev1.bam ${bam}rev2.bam
-samtools index ${bam}rev.bam
+          # 4. Sort and index the antisense BAM
+          samtools sort -o $bamdir/${accession}_antisense.sorted.bam $bamdir/${accession}_antisense.bam
+          samtools index $bamdir/${accession}_antisense.sorted.bam
 
-  #create index
-  # module load SAMtools/1.16.1-GCC-11.3.0
-  # samtools view -b -f 0x40 ${bam}Aligned.sortedByCoord.out.bam > ${bam}forward.bam
-  # samtools view -b -f 0x80 ${bam}Aligned.sortedByCoord.out.bam > ${bam}reverse.bam
-  # samtools index "${bam}forward.bam"
-  # samtools index "${bam}reverse.bam"
+          # 5. Generate strand-specific bigWigs for visualization
+          bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
+            -o $bwDir/${accession}_antisense_forward.bw \
+            --filterRNAstrand forward \
+            --normalizeUsing CPM \
+            --binSize 10 \
+            --numberOfProcessors 8
 
-  ##quantify with featureCounts
-  module load Subread/2.0.6-GCC-11.3.0
+          bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
+            -o $bwDir/${accession}_antisense_reverse.bw \
+            --filterRNAstrand reverse \
+            --normalizeUsing CPM \
+            --binSize 10 \
+            --numberOfProcessors 8
 
-  featureCounts -T $THREADS \
-  -p \
-  -t CDS \
-  -g gene_name \
-  -s 0 --primary \
-  -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
-  -o ${fowcounts} \
-  ${bam}fwd.bam
-
-  featureCounts -T $THREADS \
-  -p \
-  -t CDS \
-  -g gene_name \
-  -s 0 --primary \
-  -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
-  -o ${revcounts} \
-  ${bam}rev.bam
-
-
-
-  ##Plot reads to visualize tracks if needed
-       module load deepTools/3.5.2-foss-2022a
-       #Plot all reads
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}fwd.bam" -o "${fowbw}"
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}rev.bam" -o "${revbw}"
-
+#quantify w/ featureCounts
+  # featureCounts -T $THREADS \
+  # -p \
+  # -t CDS \
+  # -g gene_name \
+  # -s 0 --primary \
+  # -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
+  # -o ${fowcounts} \
+  # ${bam}fwd.bam
 
 #elseif read2 exists, do paired-end Trimming and PE mapping
 elif [ -f $read2 ]; then
   echo "${line} running as PE file only"
-
 
   ##################
   #Trimming
   #################
   	  module load Trim_Galore/0.6.7-GCCcore-11.2.0
 
-  	  # trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
-  	  # wait
+  	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
+
+      wait
 
 #Map with STAR
   module load STAR/2.7.10b-GCC-11.3.0
@@ -264,101 +248,46 @@ elif [ -f $read2 ]; then
       --limitBAMsortRAM 19990000000
       --quantMode TranscriptomeSAM GeneCounts
 
-  #MAPPING READS BASED ON STRAND
-  #Load samtools
-  module load SAMtools/1.16.1-GCC-11.3.0
-  module load StringTie
-  # Forward strand.
-  # 1. alignments of the second in pair if they map to the forward strand
-  # 2. alignments of the first in pair if they map to the reverse  strand
-  # samtools view -b -f 128 -F 16 ${bam}Aligned.sortedByCoord.out.bam > ${bam}fow1.bam
-  # samtools index ${bam}fow1.bam
-  #
-  # samtools view -b -f 80 ${bam}Aligned.sortedByCoord.out.bam > ${bam}fow2.bam
-  # samtools index ${bam}fow2.bam
-  #
-  # # Combine alignments that originate on the forward strand.
-  # samtools merge -f ${bam}fwd.bam ${bam}fow1.bam ${bam}fow2.bam
-  # samtools index ${bam}fwd.bam
-  #
-  # # Reverse strand
-  # # 1. alignments of the second in pair if they map to the reverse strand
-  # # 2. alignments of the first in pair if they map to the forward strand
-  # samtools view -b -f 144 ${bam}Aligned.sortedByCoord.out.bam > ${bam}rev1.bam
-  # samtools index ${bam}rev1.bam
-  #
-  # samtools view -b -f 64 -F 16 ${bam}Aligned.sortedByCoord.out.bam > ${bam}rev2.bam
-  # samtools index ${bam}rev2.bam
-  #
-  # # Combine alignments that originate on the reverse strand.
-  # #
-  # samtools merge -f ${bam}rev.bam ${bam}rev1.bam ${bam}rev2.bam
-  # samtools index ${bam}rev.bam
+#ChatGPT helping me make bigwigs and count files with antisnese reads only
 
-#MAP READS TO SENSE AND ANTISENSE
-# intersectBed -a genes.gff -b input.bam  -s  >  sense.bam
-# intersectBed -a genes.gff -b input.bam  -S  >  antisense.bam
+#load modules
+ml BEDTools
+module load SAMtools/1.16.1-GCC-11.3.0
+module load StringTie
+module load deepTools/3.5.2-foss-2022a
 
-# first read in pair maps to reverse strand, read is mapped in proper pair, read is paired
-samtools view -f 83 -b ${bam}Aligned.sortedByCoord.out.bam > ${bam}out.sorted.83.bam
-samtools view -f 163 -b ${bam}Aligned.sortedByCoord.out.bam > ${bam}out.sorted.163.bam
-# second read in pair maps to reverse strand, read is paired, read mapped to proper pair
-samtools view -f 99 -b ${bam}Aligned.sortedByCoord.out.bam > ${bam}out.sorted.99.bam
-samtools view -f 147 -b ${bam}Aligned.sortedByCoord.out.bam > ${bam}out.sorted.147.bam
-# merge files
-samtools merge ${bam}out.sorted.83.163.bam ${bam}out.sorted.83.bam ${bam}out.sorted.163.bam
-samtools merge ${bam}out.sorted.99.147.bam ${bam}out.sorted.99.bam ${bam}out.sorted.147.bam
-# stringtie to create a gtf reference - this is a non model organism
-# stringtie ${bam}out.sorted.99.147.bam -o out.99.147.stringtie.gtf -p 3 --rf -m 50
-# stringtie ${bam}out.sorted.83.163.bam -o out.83.163.stringtie.gtf -p 3 --rf -m 50
-# stringtie merge out.83.163.stringtie.gtf out.99.147.stringtie.gtf -o stringtie_merged.gtf
-# extract features that are on the + or - strand from stringtie
-# cat /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf | awk '$7 == "+" { print $0 }' > forward_cds.gff
-# cat /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf | awk '$7 == "-" { print $0 }' > reverse_cds.gff
-# separate out reads mapping to positive and negative features from the stranded read files to get sense and antisense transcription
-bedtools intersect -b forward_cds.gff -abam ${bam}out.sorted.83.163.bam > ${bam}out.sorted.83.163.sense.bam
-bedtools intersect -b reverse_cds.gff -abam ${bam}out.sorted.83.163.bam > ${bam}out.sorted.83.163.antisense.bam
-bedtools intersect -b forward_cds.gff -abam ${bam}out.sorted.99.147.bam > ${bam}out.sorted.99.147.antisense.bam
-bedtools intersect -b reverse_cds.gff -abam ${bam}out.sorted.99.147.bam > ${bam}out.sorted.99.147.sense.bam
-# merge the two sense and antisense files
-samtools merge ${bam}out_flags_sense.bam ${bam}out.sorted.83.163.sense.bam ${bam}out.sorted.99.147.sense.bam
-samtools merge ${bam}out_flags_antisense.bam ${bam}out.sorted.83.163.antisense.bam ${bam}out.99.147.antisense.bam
+      # Set input and output paths
+      BAM=${bam}Aligned.sortedByCoord.out.bam
+      ANNOT=/home/evt82290/Research/annotation.bed    # BED12 gene annotation file
+      GENOME="/home/ad45368/chrom_sizes.txt"   # Chromosome sizes
 
-  #create index
-  # module load SAMtools/1.16.1-GCC-11.3.0
-  # samtools view -b -f 0x40 ${bam}Aligned.sortedByCoord.out.bam > ${bam}forward.bam
-  # samtools view -b -f 0x80 ${bam}Aligned.sortedByCoord.out.bam > ${bam}reverse.bam
-  # samtools index "${bam}forward.bam"
-  # samtools index "${bam}reverse.bam"
+      # 1. Convert BAM to BED (splice-aware)
+      bedtools bamtobed -split -i $BAM > $bedDir/${accession}_all_reads.bed
 
-  ##quantify with featureCounts
-  module load Subread/2.0.6-GCC-11.3.0
+      # 2. Extract antisense reads (opposite strand of gene annotation)
+      bedtools intersect -S -wa -a  $bedDir/${accession}_all_reads.bed -b $ANNOT >  $bedDir/${accession}_antisense_reads.bed
 
-  # featureCounts -T $THREADS \
-  # -p \
-  # -t CDS \
-  # -g gene_name \
-  # -s 0 --primary \
-  # -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
-  # -o ${sencounts} \
-  # ${bam}out_flags_sense.bam
-  #
-  # featureCounts -T $THREADS \
-  # -p \
-  # -t CDS \
-  # -g gene_name \
-  # -s 0 --primary \
-  # -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
-  # -o ${antcounts} \
-  # ${bam}out_flags_antisense.bam
+      # 3. Convert antisense BED to BAM
+      bedtools bedtobam -i  $bedDir/${accession}_antisense_reads.bed -g $GENOME > $bamdir/${accession}_antisense.bam
 
+      # 4. Sort and index the antisense BAM
+      samtools sort -o $bamdir/${accession}_antisense.sorted.bam $bamdir/${accession}_antisense.bam
+      samtools index $bamdir/${accession}_antisense.sorted.bam
 
+      # 5. Generate strand-specific bigWigs for visualization
+      bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
+        -o $bwDir/${accession}_antisense_forward.bw \
+        --filterRNAstrand forward \
+        --normalizeUsing CPM \
+        --binSize 10 \
+        --numberOfProcessors 8
 
-  ##Plot reads to visualize tracks if needed
-       module load deepTools/3.5.2-foss-2022a
-       #Plot all reads
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}out_flags_sense.bam" -o "${senbw}"
-       bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}out_flags_antisense.bam" -o "${antbw}"
+      bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
+        -o $bwDir/${accession}_antisense_reverse.bw \
+        --filterRNAstrand reverse \
+        --normalizeUsing CPM \
+        --binSize 10 \
+        --numberOfProcessors 8
 
 #in rare cases there will only be a SRR##_1.fastq.gz format. Use this if nothing else exists.
 else
@@ -383,7 +312,6 @@ else
          --outSAMattributes Standard \
          --limitBAMsortRAM 19990000000
 
-
          #create index
          module load SAMtools/1.16.1-GCC-11.3.0
          samtools index "${bam}Aligned.sortedByCoord.out.bam"
@@ -400,14 +328,9 @@ else
          -o $counts \
          ${bam}Aligned.sortedByCoord.out.bam
 
-
          ##Plot reads to visualize tracks if needed
          	    module load deepTools/3.5.2-foss-2022a
          	    #Plot all reads
          	    bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}Aligned.sortedByCoord.out.bam" -o "${bw}"
-
-
-fi
-
 
 fi
