@@ -108,11 +108,11 @@ if [ ! -f $read1 ]; then
 #trim reads
   echo "${line} running as unpaired file only"
 
-  module load Trim_Galore/0.6.7-GCCcore-11.2.0
-
-  trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $unpaired
-
-  wait
+  # module load Trim_Galore/0.6.7-GCCcore-11.2.0
+  #
+  # trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $unpaired
+  #
+  # wait
 
 #map with STAR
   module load STAR/2.7.10b-GCC-11.3.0
@@ -145,7 +145,7 @@ if [ ! -f $read1 ]; then
     --outBAMsortingBinsN 100 \
     --outSAMunmapped Within \
     --outSAMattributes Standard \
-    --limitBAMsortRAM 19990000000
+    --limitBAMsortRAM 19990000000 \
     --quantMode TranscriptomeSAM GeneCounts
 
     #ChatGPT helping me make bigwigs and count files with antisnese reads only
@@ -206,11 +206,11 @@ elif [ -f $read2 ]; then
   ##################
   #Trimming
   #################
-  	  module load Trim_Galore/0.6.7-GCCcore-11.2.0
-
-  	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
-
-      wait
+  	  # module load Trim_Galore/0.6.7-GCCcore-11.2.0
+      #
+  	  # trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
+      #
+      # wait
 
 #Map with STAR
   module load STAR/2.7.10b-GCC-11.3.0
@@ -234,7 +234,7 @@ elif [ -f $read2 ]; then
     STAR --runMode alignReads \
       --runThreadN $THREADS \
       --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
-      --readFilesIn $trimmed/${accession}_trimmed.fq.gz \
+      --readFilesIn $trimmed/${accession}_val_1.fq.gz $trimmed/${accession}_val_2.fq.gz \
       --readFilesCommand zcat \
       --outFileNamePrefix ${bam} \
       --outSAMtype BAM SortedByCoordinate \
@@ -245,7 +245,7 @@ elif [ -f $read2 ]; then
       --outBAMsortingBinsN 100 \
       --outSAMunmapped Within \
       --outSAMattributes Standard \
-      --limitBAMsortRAM 19990000000
+      --limitBAMsortRAM 19990000000 \
       --quantMode TranscriptomeSAM GeneCounts
 
 #ChatGPT helping me make bigwigs and count files with antisnese reads only

@@ -144,7 +144,7 @@ if [ ! -f $read1 ]; then
     --outBAMsortingBinsN 100 \
     --outSAMunmapped Within \
     --outSAMattributes Standard \
-    --limitBAMsortRAM 19990000000
+    --limitBAMsortRAM 19990000000 \
     --quantMode TranscriptomeSAM GeneCounts
 
 #MAPPING READS BASED ON STRAND
@@ -250,7 +250,7 @@ elif [ -f $read2 ]; then
     STAR --runMode alignReads \
       --runThreadN $THREADS \
       --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
-      --readFilesIn $trimmed/${accession}_trimmed.fq.gz \
+      --readFilesIn $trimmed/${accession}_val_1.fq.gz $trimmed/${accession}_val_2.fq.gz \
       --readFilesCommand zcat \
       --outFileNamePrefix ${bam} \
       --outSAMtype BAM SortedByCoordinate \
@@ -261,7 +261,7 @@ elif [ -f $read2 ]; then
       --outBAMsortingBinsN 100 \
       --outSAMunmapped Within \
       --outSAMattributes Standard \
-      --limitBAMsortRAM 19990000000
+      --limitBAMsortRAM 19990000000 \
       --quantMode TranscriptomeSAM GeneCounts
 
   #MAPPING READS BASED ON STRAND
