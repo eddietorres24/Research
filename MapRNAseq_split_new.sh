@@ -132,21 +132,21 @@ if [ ! -f $read1 ]; then
   # --limitBAMsortRAM 19990000000
 
 #Altered STAR script for antisense mapping w/ help from ChatGPT
-  STAR --runMode alignReads \
-    --runThreadN $THREADS \
-    --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
-    --readFilesIn $trimmed/${accession}_trimmed.fq.gz \
-    --readFilesCommand zcat \
-    --outFileNamePrefix ${bam} \
-    --outSAMtype BAM SortedByCoordinate \
-    --twopassMode Basic \
-    --outSAMstrandField intronMotif \
-    --alignIntronMax 10000 \
-    --outBAMsortingBinsN 100 \
-    --outSAMunmapped Within \
-    --outSAMattributes Standard \
-    --limitBAMsortRAM 19990000000 \
-    --quantMode TranscriptomeSAM GeneCounts
+  # STAR --runMode alignReads \
+  #   --runThreadN $THREADS \
+  #   --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
+  #   --readFilesIn $trimmed/${accession}_trimmed.fq.gz \
+  #   --readFilesCommand zcat \
+  #   --outFileNamePrefix ${bam} \
+  #   --outSAMtype BAM SortedByCoordinate \
+  #   --twopassMode Basic \
+  #   --outSAMstrandField intronMotif \
+  #   --alignIntronMax 10000 \
+  #   --outBAMsortingBinsN 100 \
+  #   --outSAMunmapped Within \
+  #   --outSAMattributes Standard \
+  #   --limitBAMsortRAM 19990000000 \
+  #   --quantMode TranscriptomeSAM GeneCounts
 
     #ChatGPT helping me make bigwigs and count files with antisnese reads only
 
@@ -162,32 +162,58 @@ if [ ! -f $read1 ]; then
           GENOME="/home/ad45368/chrom_sizes.txt"   # Chromosome sizes
 
           # 1. Convert BAM to BED (splice-aware)
-          bedtools bamtobed -split -i $BAM > $bedDir/${accession}_all_reads.bed
+          # bedtools bamtobed -split -i $BAM > $bedDir/${accession}_all_reads.bed
 
           # 2. Extract antisense reads (opposite strand of gene annotation)
-          bedtools intersect -S -wa -a  $bedDir/${accession}_all_reads.bed -b $ANNOT >  $bedDir/${accession}_antisense_reads.bed
+          # bedtools intersect -S -wa -a $bedDir/${accession}_all_reads.bed -b $ANNOT >  $bedDir/${accession}_antisense_reads.bed
+          #
+          # # 3. Convert antisense BED to BAM
+          # bedtools bedtobam -i $bedDir/${accession}_antisense_reads.bed -g $GENOME > $bamdir/${accession}_antisense.bam
+
+          # 2. Extract antisense reads (opposite strand of gene annotation)
+          # We reverse the order of -a and -b, and use -s (same strand) so BEDTools checks if the read is on the *same strand* as the annotation.
+          # Since we're putting the annotation first, this effectively gives us reads on the *opposite strand* of the gene.
+          bedtools intersect -s -wa -a $ANNOT -b $bedDir/${accession}_all_reads.bed > $bedDir/${accession}_antisense_reads.bed
 
           # 3. Convert antisense BED to BAM
-          bedtools bedtobam -i  $bedDir/${accession}_antisense_reads.bed -g $GENOME > $bamdir/${accession}_antisense.bam
+          # Note: because the intersect output only has the read entries (not annotation), we can safely convert it back to BAM.
+          bedtools bedtobam -i $bedDir/${accession}_antisense_reads.bed -g $GENOME > $bamdir/${accession}_antisense.bam
 
           # 4. Sort and index the antisense BAM
           samtools sort -o $bamdir/${accession}_antisense.sorted.bam $bamdir/${accession}_antisense.bam
           samtools index $bamdir/${accession}_antisense.sorted.bam
 
           # 5. Generate strand-specific bigWigs for visualization
-          bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
-            -o $bwDir/${accession}_antisense_forward.bw \
-            --filterRNAstrand forward \
-            --normalizeUsing CPM \
-            --binSize 10 \
-            --numberOfProcessors 8
+          # bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
+          #   -o $bwDir/${accession}_antisense_forward.bw \
+          #   --filterRNAstrand forward \
+          #   --normalizeUsing CPM \
+          #   --binSize 10 \
+          #   --numberOfProcessors 8
+          #
+          # bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
+          #   -o $bwDir/${accession}_antisense_reverse.bw \
+          #   --filterRNAstrand reverse \
+          #   --normalizeUsing CPM \
+          #   --binSize 10 \
+          #   --numberOfProcessors 8
 
-          bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
-            -o $bwDir/${accession}_antisense_reverse.bw \
-            --filterRNAstrand reverse \
-            --normalizeUsing CPM \
-            --binSize 10 \
-            --numberOfProcessors 8
+            # Get only antisense reads moving in the forward direction (FLAG 16 = reverse strand read)
+  bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
+    -o $bwDir/${accession}_antisense_forward.bw \
+    --samFlagExclude 16 \
+    --normalizeUsing CPM \
+    --binSize 10 \
+    --numberOfProcessors 8
+
+  # Get only antisense reads moving in the reverse direction (FLAG 16 = reverse strand read)
+  bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
+    -o $bwDir/${accession}_antisense_reverse.bw \
+    --samFlagInclude 16 \
+    --normalizeUsing CPM \
+    --binSize 10 \
+    --numberOfProcessors 8
+
 
 #quantify w/ featureCounts
   # featureCounts -T $THREADS \
