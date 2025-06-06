@@ -170,18 +170,22 @@ if [ ! -f $read1 ]; then
           # # 3. Convert antisense BED to BAM
           # bedtools bedtobam -i $bedDir/${accession}_antisense_reads.bed -g $GENOME > $bamdir/${accession}_antisense.bam
 
-          # 2. Extract antisense reads (opposite strand of gene annotation)
-          # We reverse the order of -a and -b, and use -s (same strand) so BEDTools checks if the read is on the *same strand* as the annotation.
-          # Since we're putting the annotation first, this effectively gives us reads on the *opposite strand* of the gene.
-          bedtools intersect -s -wa -a $ANNOT -b $bedDir/${accession}_all_reads.bed > $bedDir/${accession}_antisense_reads.bed
+# 2. Extract reads antisense to genes on the + strand
+bedtools intersect -s -wa -abam $BAM -b <(awk '$6 == "+"' $ANNOT) \
+    | samtools view -f 16 -b - > $bamdir/${accession}_antisense_from_plus.bam
 
-          # 3. Convert antisense BED to BAM
-          # Note: because the intersect output only has the read entries (not annotation), we can safely convert it back to BAM.
-          bedtools bedtobam -i $bedDir/${accession}_antisense_reads.bed -g $GENOME > $bamdir/${accession}_antisense.bam
+# 3. Extract reads antisense to genes on the - strand
+bedtools intersect -s -wa -abam $BAM -b <(awk '$6 == "-"' $ANNOT) \
+    | samtools view -f 0 -b - > $bamdir/${accession}_antisense_from_minus.bam
 
-          # 4. Sort and index the antisense BAM
-          samtools sort -o $bamdir/${accession}_antisense.sorted.bam $bamdir/${accession}_antisense.bam
-          samtools index $bamdir/${accession}_antisense.sorted.bam
+# 4. Merge and sort
+samtools merge -f $bamdir/${accession}_antisense.bam \
+    $bamdir/${accession}_antisense_from_plus.bam \
+    $bamdir/${accession}_antisense_from_minus.bam
+
+samtools sort -o $bamdir/${accession}_antisense.sorted.bam $bamdir/${accession}_antisense.bam
+samtools index $bamdir/${accession}_antisense.sorted.bam
+
 
           # 5. Generate strand-specific bigWigs for visualization
           # bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
