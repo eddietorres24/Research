@@ -287,37 +287,105 @@ module load StringTie
 module load deepTools/3.5.2-foss-2022a
 
       # Set input and output paths
-      BAM=${bam}Aligned.sortedByCoord.out.bam
-      ANNOT=/home/evt82290/Research/annotation.bed    # BED12 gene annotation file
-      GENOME="/home/ad45368/chrom_sizes.txt"   # Chromosome sizes
+      # BAM=${bam}Aligned.sortedByCoord.out.bam
+      # ANNOT=/home/evt82290/Research/annotation.bed    # BED12 gene annotation file
+      # GENOME="/home/ad45368/chrom_sizes.txt"   # Chromosome sizes
+      #
+      # # 1. Convert BAM to BED (splice-aware)
+      # bedtools bamtobed -split -i $BAM > $bedDir/${accession}_all_reads.bed
+      #
+      # # 2. Extract antisense reads (opposite strand of gene annotation)
+      # bedtools intersect -S -wa -a  $bedDir/${accession}_all_reads.bed -b $ANNOT >  $bedDir/${accession}_antisense_reads.bed
+      #
+      # # 3. Convert antisense BED to BAM
+      # bedtools bedtobam -i  $bedDir/${accession}_antisense_reads.bed -g $GENOME > $bamdir/${accession}_antisense.bam
+      #
+      # # 4. Sort and index the antisense BAM
+      # samtools sort -o $bamdir/${accession}_antisense.sorted.bam $bamdir/${accession}_antisense.bam
+      # samtools index $bamdir/${accession}_antisense.sorted.bam
+      #
+      # # 5. Generate strand-specific bigWigs for visualization
+      # bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
+      #   -o $bwDir/${accession}_antisense_forward.bw \
+      #   --filterRNAstrand forward \
+      #   --normalizeUsing CPM \
+      #   --binSize 10 \
+      #   --numberOfProcessors 8
+      #
+      # bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
+      #   -o $bwDir/${accession}_antisense_reverse.bw \
+      #   --filterRNAstrand reverse \
+      #   --normalizeUsing CPM \
+      #   --binSize 10 \
+      #   --numberOfProcessors 8
 
-      # 1. Convert BAM to BED (splice-aware)
-      bedtools bamtobed -split -i $BAM > $bedDir/${accession}_all_reads.bed
+      ml BEDTools
+      module load SAMtools/1.16.1-GCC-11.3.0
+      module load StringTie
+      module load deepTools/3.5.2-foss-2022a
 
-      # 2. Extract antisense reads (opposite strand of gene annotation)
-      bedtools intersect -S -wa -a  $bedDir/${accession}_all_reads.bed -b $ANNOT >  $bedDir/${accession}_antisense_reads.bed
+            # Set input and output paths
+            BAM=${bam}Aligned.sortedByCoord.out.bam
+            ANNOT=/home/evt82290/Research/annotation.bed    # BED12 gene annotation file
+            GENOME="/home/ad45368/chrom_sizes.txt"   # Chromosome sizes
 
-      # 3. Convert antisense BED to BAM
-      bedtools bedtobam -i  $bedDir/${accession}_antisense_reads.bed -g $GENOME > $bamdir/${accession}_antisense.bam
+            # 1. Convert BAM to BED (splice-aware)
+            # bedtools bamtobed -split -i $BAM > $bedDir/${accession}_all_reads.bed
 
-      # 4. Sort and index the antisense BAM
-      samtools sort -o $bamdir/${accession}_antisense.sorted.bam $bamdir/${accession}_antisense.bam
-      samtools index $bamdir/${accession}_antisense.sorted.bam
+            # 2. Extract antisense reads (opposite strand of gene annotation)
+            # bedtools intersect -S -wa -a $bedDir/${accession}_all_reads.bed -b $ANNOT >  $bedDir/${accession}_antisense_reads.bed
+            #
+            # # 3. Convert antisense BED to BAM
+            # bedtools bedtobam -i $bedDir/${accession}_antisense_reads.bed -g $GENOME > $bamdir/${accession}_antisense.bam
 
-      # 5. Generate strand-specific bigWigs for visualization
-      bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
-        -o $bwDir/${accession}_antisense_forward.bw \
-        --filterRNAstrand forward \
-        --normalizeUsing CPM \
-        --binSize 10 \
-        --numberOfProcessors 8
+  # 2. Extract reads antisense to genes on the + strand
+  bedtools intersect -s -wa -abam $BAM -b <(awk '$6 == "+"' $ANNOT) \
+      | samtools view -f 16 -b - > $bamdir/${accession}_antisense_from_plus.bam
 
-      bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
-        -o $bwDir/${accession}_antisense_reverse.bw \
-        --filterRNAstrand reverse \
-        --normalizeUsing CPM \
-        --binSize 10 \
-        --numberOfProcessors 8
+  # 3. Extract reads antisense to genes on the - strand
+  bedtools intersect -s -wa -abam $BAM -b <(awk '$6 == "-"' $ANNOT) \
+      | samtools view -f 0 -b - > $bamdir/${accession}_antisense_from_minus.bam
+
+  # 4. Merge and sort
+  samtools merge -f $bamdir/${accession}_antisense.bam \
+      $bamdir/${accession}_antisense_from_plus.bam \
+      $bamdir/${accession}_antisense_from_minus.bam
+
+  samtools sort -o $bamdir/${accession}_antisense.sorted.bam $bamdir/${accession}_antisense.bam
+  samtools index $bamdir/${accession}_antisense.sorted.bam
+
+
+            # 5. Generate strand-specific bigWigs for visualization
+            # bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
+            #   -o $bwDir/${accession}_antisense_forward.bw \
+            #   --filterRNAstrand forward \
+            #   --normalizeUsing CPM \
+            #   --binSize 10 \
+            #   --numberOfProcessors 8
+            #
+            # bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
+            #   -o $bwDir/${accession}_antisense_reverse.bw \
+            #   --filterRNAstrand reverse \
+            #   --normalizeUsing CPM \
+            #   --binSize 10 \
+            #   --numberOfProcessors 8
+
+              # Get only antisense reads moving in the forward direction (FLAG 16 = reverse strand read)
+    bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
+      -o $bwDir/${accession}_antisense_forward.bw \
+      --samFlagExclude 16 \
+      --normalizeUsing CPM \
+      --binSize 10 \
+      --numberOfProcessors 8
+
+    # Get only antisense reads moving in the reverse direction (FLAG 16 = reverse strand read)
+    bamCoverage -b $bamdir/${accession}_antisense.sorted.bam \
+      -o $bwDir/${accession}_antisense_reverse.bw \
+      --samFlagInclude 16 \
+      --normalizeUsing CPM \
+      --binSize 10 \
+      --numberOfProcessors 8
+
 
 #in rare cases there will only be a SRR##_1.fastq.gz format. Use this if nothing else exists.
 else
