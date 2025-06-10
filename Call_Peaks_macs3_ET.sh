@@ -273,10 +273,10 @@ module load MACS3
 # bedtools intersect -a CAF1_ATAC_WT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > ATAC_WT_K27_regions.bed
 # bedtools intersect -a cac1_2_set7_ATAC_NoWT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > cac1_2_set7_ATAC_NoWT_K27_regions.bed
 
-bedtools intersect -a genes_and_promoters_overlap_100pct.bed -b cac1_H3K27me3_Rep2_peaks.bed -wa > K27genes_in_cac1_new.bed
-bedtools intersect -a genes_and_promoters_overlap_100pct.bed -b cac2_H3K27me3_Rep2_peaks.bed -wa > K27genes_in_cac2_new.bed
-bedtools intersect -a genes_and_promoters_overlap_100pct.bed -b cac3_H3K27me3_Rep2_peaks.bed -wa > K27genes_in_cac3_new.bed
-bedtools intersect -a genes_and_promoters_overlap_100pct.bed -b K27genes_in_cac1_2_new.bed -v > K27genes_NOT_in_cac1_2_new.bed
+bedtools intersect -a K27_genes_stringent.bed -b cac1_H3K27me3_Rep2_peaks.bed -wa > K27genes_in_cac1_new.bed
+bedtools intersect -a K27_genes_stringent.bed -b cac2_H3K27me3_Rep2_peaks.bed -wa > K27genes_in_cac2_new.bed
+bedtools intersect -a K27_genes_stringent.bed -b cac3_H3K27me3_Rep2_peaks.bed -wa > K27genes_in_cac3_new.bed
+bedtools intersect -a K27_genes_stringent.bed -b K27genes_in_cac1_2_new.bed -v > K27genes_NOT_in_cac1_2_new.bed
 bedtools intersect -a K27genes_in_cac1_2_new.bed -b cac3_H3K27me3_Rep2_peaks.bed -v > K27genes_in_cac1_2_NOT_in_cac3_new.bed
 bedtools intersect -a K27genes_in_cac1_2_new.bed -b K27genes_in_cac1_2_NOT_in_cac3_new.bed -v > K27genes_in_cac1_2_3_new.bed
 
