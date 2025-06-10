@@ -109,7 +109,7 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
                     --sortRegions descend \
                     --missingDataColor 1 \
                     --heatmapHeight 25 \
-                    --colorMap "bwr" \
+                    --colorMap "seismic" \
                     --zMin 0 \
 
 #138-62_ChIP_WT_H3K36me3_Rep2_6252_S61.bin_25.smooth_75Bulk.bw
