@@ -107,6 +107,7 @@ computeMatrix scale-regions -a 500 -b 800 --regionBodyLength 2000 --scale 1.5 \
                     --startLabel "5'" \
                     --endLabel "3'" \
                     --sortRegions descend \
+                    --sortUsingSamples 1 \
                     --missingDataColor 1 \
                     --heatmapHeight 25 \
                     --colorMap "seismic" \
