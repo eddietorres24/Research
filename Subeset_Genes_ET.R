@@ -4,55 +4,62 @@ library(GenomicRanges)
 library(rtracklayer)
 library(dplyr)
 
-# === Load Gene BED ===
-# gene_bed_path <- "./bed_files/K27_genes_trimmed_2.bed"
-# genes <- import(gene_bed_path, format = "BED")
-genes <- read.csv(file = "./csv_files/K27_genes_trimmed.csv")
-names(mcols(genes)) <- c("gene_id")
+# Load gene and peak data (assuming tab-delimited BED-like structure)
+genes_df <- read.table("./bed_files/K27_genes_trimmed.bed", header = FALSE, stringsAsFactors = FALSE)
+peaks_df <- read.table("./bed_files/WT_H3K27me3_Rep2_peaks.bed", header = FALSE, stringsAsFactors = FALSE)
 
-# === Load Peak File (BED or broadPeak format) ===
-peak_bed_path <- "peaks.bed"  # or peaks.broadPeak
-peaks <- import(peak_bed_path, format = "BED")
+# Create GRanges objects
+genes_gr <- GRanges(seqnames = genes_df$V1,
+                    ranges = IRanges(start = genes_df$V2 + 1, end = genes_df$V3),
+                    strand = "*",
+                    gene_id = genes_df$V11)
 
-# === Function to Calculate Percent Overlap ===
-calculate_overlap_fraction <- function(genes, peaks) {
-  overlaps <- findOverlaps(genes, peaks)
+peaks_gr <- GRanges(seqnames = peaks_df$V1,
+                    ranges = IRanges(start = peaks_df$V2 + 1, end = peaks_df$V3),
+                    strand = "*")
+
+# Find overlaps and calculate % of gene overlapped
+hits <- findOverlaps(genes_gr, peaks_gr)
+gene_hits <- genes_gr[queryHits(hits)]
+peak_hits <- peaks_gr[subjectHits(hits)]
+intersections <- pintersect(gene_hits, peak_hits)
+
+# Summarize total overlap per gene
+df_overlap <- data.frame(
+  gene_id = mcols(gene_hits)$gene_id,
+  gene_length = width(gene_hits),
+  intersect_length = width(intersections)
+) %>%
+  group_by(gene_id, gene_length) %>%
+  summarise(total_overlap = sum(intersect_length), .groups = "drop") %>%
+  mutate(overlap_percent = (total_overlap / gene_length) * 100)
+
+# Merge back with original gene info
+genes_df$gene_id <- genes_df$V11
+genes_annotated <- left_join(genes_df, df_overlap, by = "gene_id") %>%
+  mutate(overlap_percent = ifelse(is.na(overlap_percent), 0, overlap_percent))
+
+# Output BED files by tier
+tiers <- seq(50, 100, by = 10)
+for (tier in tiers) {
+  subset_df <- genes_annotated %>%
+    filter(overlap_percent >= tier) %>%
+    select(V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11)
   
-  gene_hits <- genes[queryHits(overlaps)]
-  peak_hits <- peaks[subjectHits(overlaps)]
-  
-  intersect_ranges <- pintersect(gene_hits, peak_hits)
-  intersect_df <- data.frame(
-    gene_id = mcols(gene_hits)$gene_id,
-    width = width(gene_hits),
-    intersect_width = width(intersect_ranges)
-  )
-  
-  # Sum overlaps per gene
-  overlap_summary <- intersect_df %>%
-    group_by(gene_id, width) %>%
-    summarise(total_overlap = sum(intersect_width), .groups = "drop") %>%
-    mutate(overlap_fraction = total_overlap / width)
-  
-  return(overlap_summary)
+  filename <- paste0("genes_overlap_", tier, "pct.bed")
+  write.table(subset_df, file = filename, quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
 }
 
-# === Run Overlap Calculation ===
-overlap_results <- calculate_overlap_fraction(genes, peaks)
+#Make bed file with promoters included
+genes_promoter <- genes_df
 
-# === Bin Genes by Overlap Tier (e.g. 50-59%, 60-69%, ..., 100%) ===
-tiers <- seq(0.5, 1.0, by = 0.1)
+# Subtract 1000 from V2 if strand is "+"
+genes_promoter$V2 <- ifelse(genes_promoter$V6 == "+", 
+                            pmax(0, genes_promoter$V2 - 1000),  # avoid negative coords
+                            genes_promoter$V2)
 
-overlap_tiers <- lapply(tiers, function(t) {
-  filtered <- overlap_results %>%
-    filter(overlap_fraction >= t & overlap_fraction < t + 0.1)
-  return(filtered$gene_id)
-})
-names(overlap_tiers) <- paste0(seq(50, 100, by = 10), "%")
-
-# === Output Tiered Gene Lists ===
-for (tier in names(overlap_tiers)) {
-  cat(sprintf("Genes with ≥%s overlap:\n", tier))
-  print(overlap_tiers[[tier]])
-  cat("\n")
-}
+# Add 1000 to V3 if strand is "-"
+genes_promoter$V3 <- ifelse(genes_promoter$V6 == "-", 
+                            genes_promoter$V3 + 1000,
+                            genes_promoter$V3)
+     

@@ -115,7 +115,7 @@ ATACpeaks_merged <- read.table(file="./bed_files/CAF-1_All_ATAC_merge_peaks.bed"
 Regions <- read.table(file="./bed_files/CAF-1_All_peaks_K27_K4_ATAC_merge.bed")
 K4_27peaks_merged <- read.table(file="./bed_files/CAF-1_All_peaks_K27_K4_merge.bed")
 
-K27_genes <- read.table(file="./bed_files/K27_genes_gff_sorted_NCU.bed")
+K27_genes <- read.table(file="./bed_files/K27_genes_gff_sorted.bed")
 
 #Regions.gr <- GRanges(Regions$V1, IRanges(Regions$V2, Regions$V3))
 
