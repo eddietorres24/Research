@@ -128,9 +128,9 @@ computeMatrix reference-point --referencePoint TSS -a 2500 -b 1000 --scale 1.75 
     $P149DIR/149-102_ChIP_cac-3_H3K36me3_Rep3_S126.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/K27_genes_stringent.bed --skipZeros -o K36_matrix_PRC2.gz
+    -R $BEDDIR2/nonK27_genes.bed --skipZeros -o K36_matrix_PRC2.gz
 
-    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_ash1_H3K36me3_K27genes.pdf \
+    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_ash1_H3K36me3_nonK27genes.pdf \
                     --samplesLabel WT cac-1 cac-2 cac-3 set-7 ash-1 \
                     --startLabel "TSS" \
                     --endLabel "TES" \
