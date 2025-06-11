@@ -72,18 +72,17 @@ write.table(samplesname, file="samplenames.txt", sep="\t")
 #move the subset of genes you want to plot into a new matrix
 sampleNames <- colnames(allDataTPM)
 write.table(sampleNames, file="names.txt")
-Ordered_KO_data <- cbind(allDataTPM[,22:25],allDataTPM[,26:28],allDataTPM[,29:31],allDataTPM[,4:6],allDataTPM[,32:34],allDataTPM[,7:9],allDataTPM[,10:12],allDataTPM[,16:18],allDataTPM[,13:15],allDataTPM[,19:21])
+Ordered_KO_data <- cbind(allDataTPM[,22:25],allDataTPM[,26:28],allDataTPM[,29:31],allDataTPM[,4:6],allDataTPM[,7:9],allDataTPM[,10:12],allDataTPM[,16:18],allDataTPM[,13:15],allDataTPM[,19:21])
 Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,22:25], na.rm = TRUE),
                                  rowMeans(allDataTPM[,26:28], na.rm = TRUE),
                                  rowMeans(allDataTPM[,29:31], na.rm = TRUE),
                                  rowMeans(allDataTPM[,4:6], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,32:34], na.rm = TRUE),
                                  rowMeans(allDataTPM[,7:9], na.rm = TRUE),
                                  rowMeans(allDataTPM[,10:12], na.rm = TRUE),
                                  rowMeans(allDataTPM[,16:18], na.rm = TRUE),
                                  rowMeans(allDataTPM[,13:15], na.rm = TRUE),
                                  rowMeans(allDataTPM[,19:21], na.rm = TRUE))
-averageRowIDs=c("WT","set-7","cac-1","cac-2","cac-1_cac-2","cac-3","naf-1","naf-2","asf-1","ATRX")
+averageRowIDs=c("WT","set-7","cac-1","cac-2","cac-3","naf-1","naf-2","asf-1","ATRX")
 colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 
 ####################################################################
@@ -93,18 +92,18 @@ colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 
 #read in geneIDs of PRC2 target genes
 #reading in csvs w/ upregulated genes in CAF-1 mutants
-Prc2targets <- read.table("./text_files/K27_narrow_genes_sorted.txt", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
+Prc2targets <- read.table("./bed_files/K27_genes_stringent.bed", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
 cac1up <- read.csv("./cac_DEseq/cac1_UP.csv", stringsAsFactors=FALSE, check.names=FALSE)
 cac2up <- read.csv("./cac_DEseq/cac2_UP.csv", stringsAsFactors=FALSE, check.names=FALSE)
 
 ###SUBSET DATA FOR ALL KO SAMPLES
-Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,1])
+Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,11])
 
 #CAF-1 Upregulated mutants
 CAFUpTPM <- subset(allDataTPM, rownames(allDataTPM) %in% cac1up$NCU | rownames(allDataTPM) %in% cac2up$NCU)
 
 ###SUBSET DATA FOR AVERAGED KO SAMPLES
-AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,1])
+AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,11])
 AVERAGE_CAFTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data) %in% cac1up$NCU | rownames(allDataTPM) %in% cac2up$NCU)
 
 ###Subset data to filter out non-PRC2 target regions that got through (cutting out any genes over 2 tpm in WT)
@@ -149,8 +148,7 @@ meltedAveragePRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
 meltedAverageAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
                       varnames=c('GeneID', 'Sample'))
 
-altorder = rev(c("WT","set7","cac1","cac2","cac1cac2","cac3","naf1","naf2","asf1","ATRX"))
-altorder1 = rev(c("WT","1"))
+altorder = rev(c("WT","set7","cac1","cac2","cac3","naf1","naf2","asf1","ATRX"))
 
 meltedAveragePRC2targetData$Sample <- factor(meltedAveragePRC2targetData$Sample)
 
@@ -159,7 +157,7 @@ meltedAverageAllData$Sample <- factor(meltedAverageAllData$Sample)
 # Plot box & whisker chart
 library(ggplot2)
 xlabels = averageRowIDs
-colors = c( "#4575b4","#fee090","#fee090", "#fee090", "#fee090", "#fee090","#4575b4", "#4575b4", "#4575b4", "#4575b4")
+colors = c( "#4575b4","#fee090","#fee090", "#fee090", "#fee090","#4575b4", "#4575b4", "#4575b4", "#4575b4")
 
 box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
   labs(y="Expression Level (Transcripts per Million)", x="Strain") +
@@ -188,7 +186,7 @@ ggsave(filename = "histone_chaperone_boxplot_PAPER_FINAL.pdf", plot = box, dpi=6
 set7_t <- t.test(AVERAGE_Prc2targetTPM[,2], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
 cac1_t <- t.test(AVERAGE_Prc2targetTPM[,3], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
 cac2_t <- t.test(AVERAGE_Prc2targetTPM[,4], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
-cac1_2_t <- t.test(AVERAGE_Prc2targetTPM[,5], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+# cac1_2_t <- t.test(AVERAGE_Prc2targetTPM[,5], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
 cac3_t <- t.test(AVERAGE_Prc2targetTPM[,6], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
 naf1_t <- t.test(AVERAGE_Prc2targetTPM[,7], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
 naf2_t <- t.test(AVERAGE_Prc2targetTPM[,8], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
@@ -209,7 +207,7 @@ dodge <- position_dodge(width = 1)
 ### this chunk is just for putting samples in the order that I want ###
 violin <- total2 %>%
   left_join(total_dist) %>%
-  arrange(factor(Sample, levels = c("WT", "set-7", "cac-1", "cac-1_new", "cac-2", "cac-1_cac-2", "cac-1_suz12", "cac-3", "naf-1", "naf-2", "asf-1", "ATRX"))) %>%
+  arrange(factor(Sample, levels = c("WT", "set-7", "cac-1", "cac-2", "cac-3", "naf-1", "naf-2", "asf-1", "ATRX"))) %>%
   mutate(Sample = factor(Sample)) %>%
   ### everything below is the actual violin plot ###
   ggplot(aes(x=Sample, y=Count)) + 
@@ -259,5 +257,5 @@ heatmap <- pheatmap(K27_not_lost, color = colorRampPalette(rev(brewer.pal(n = 7,
 #to plot with ggplot, you need to extract [[4]] from the heatmap object
 heatmap_plot <- heatmap[[4]]
 
-ggsave(filename = "./CAF-1_K27_lost.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
+ggsave(filename = "./CAF-1_K27_Paper_Final.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
 #dev.off()

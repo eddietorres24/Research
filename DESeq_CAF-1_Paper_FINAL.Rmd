@@ -129,7 +129,7 @@ plotDispEsts(dds2)
 Export genes with statistically significant differential expression when compared against the wild type.
 
 ```{r coldata}
-alpha = 0.9999
+alpha = 0.05
 
 cac1 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1", "WT"))
 cac2 <- results(dds2, alpha=alpha, contrast=c("condition", "cac2", "WT"))
@@ -180,7 +180,7 @@ write.csv(as.data.frame(cac1_suz12), file = "cac1_suz12.csv")
 ```{r}
 library(tibble)
 #Reading in the csv's w/ DEGs back in
-cac1_DEG <- read.csv("./cac1.csv", header= TRUE, row.names = 1)
+cac1_DEG <- read.csv("./cac1_new.csv", header= TRUE, row.names = 1)
 cac2_DEG <- read.csv("./cac2.csv", header= TRUE, row.names = 1)
 cac3_DEG <- read.csv("./cac3.csv", header= TRUE, row.names = 1)
 set7_DEG <- read.csv("./set7.csv", header= TRUE, row.names = 1)
@@ -200,21 +200,21 @@ set7_DEG_01 <- subset(set7_DEG, set7_DEG$padj <= 0.01)
 #Splitting Up & Down regulated genes
 cac1_UP <- subset(cac1_DEG, cac1_DEG$log2FoldChange > 0)
 cac1_DOWN <- subset(cac1_DEG, cac1_DEG$log2FoldChange < 0)
-cac2_UP <- subset(cac2_DEG, cac1_DEG$log2FoldChange > 0)
-cac2_DOWN <- subset(cac2_DEG, cac1_DEG$log2FoldChange < 0)
-cac3_UP <- subset(cac3_DEG, cac1_DEG$log2FoldChange > 0)
-cac3_DOWN <- subset(cac3_DEG, cac1_DEG$log2FoldChange < 0)
-set7_UP <- subset(set7_DEG, cac1_DEG$log2FoldChange > 0)
-set7_DOWN <- subset(set7_DEG, cac1_DEG$log2FoldChange < 0)
+cac2_UP <- subset(cac2_DEG, cac2_DEG$log2FoldChange > 0)
+cac2_DOWN <- subset(cac2_DEG, cac2_DEG$log2FoldChange < 0)
+cac3_UP <- subset(cac3_DEG, cac3_DEG$log2FoldChange > 0)
+cac3_DOWN <- subset(cac3_DEG, cac3_DEG$log2FoldChange < 0)
+set7_UP <- subset(set7_DEG, set7_DEG$log2FoldChange > 0)
+set7_DOWN <- subset(set7_DEG, set7_DEG$log2FoldChange < 0)
 
 cac1_UP_01 <- subset(cac1_DEG_01, cac1_DEG_01$log2FoldChange > 0)
 cac1_DOWN_01 <- subset(cac1_DEG_01, cac1_DEG_01$log2FoldChange < 0)
-cac2_UP_01 <- subset(cac2_DEG_01, cac1_DEG_01$log2FoldChange > 0)
-cac2_DOWN_01 <- subset(cac2_DEG_01, cac1_DEG_01$log2FoldChange < 0)
-cac3_UP_01 <- subset(cac3_DEG_01, cac1_DEG_01$log2FoldChange > 0)
-cac3_DOWN_01 <- subset(cac3_DEG_01, cac1_DEG_01$log2FoldChange < 0)
-set7_UP_01 <- subset(set7_DEG_01, cac1_DEG_01$log2FoldChange > 0)
-set7_DOWN_01 <- subset(set7_DEG_01, cac1_DEG_01$log2FoldChange < 0)
+cac2_UP_01 <- subset(cac2_DEG_01, cac2_DEG_01$log2FoldChange > 0)
+cac2_DOWN_01 <- subset(cac2_DEG_01, cac2_DEG_01$log2FoldChange < 0)
+cac3_UP_01 <- subset(cac3_DEG_01, cac3_DEG_01$log2FoldChange > 0)
+cac3_DOWN_01 <- subset(cac3_DEG_01, cac3_DEG_01$log2FoldChange < 0)
+set7_UP_01 <- subset(set7_DEG_01, set7_DEG_01$log2FoldChange > 0)
+set7_DOWN_01 <- subset(set7_DEG_01, set7_DEG_01$log2FoldChange < 0)
 
 #I want bed files of up/downregulated genes across samples
 ##p value of 0.05 first
@@ -311,27 +311,27 @@ cac1or2or3_DOWN <- subset(neurospora, (neurospora$Attributes %in% cac1_down$Attr
 write.csv(as.data.frame(cac1or2or3_DOWN), file = "cac1or2or3_DOWN.csv")
 
 ###I also want to separate DE K27 genes from the rest of the genes. This is really only necessary for upregulated genes, as there are very few (if any) K27 marked genes that are actually downregulated ion these mutants. I will make bed files out of these csvs to use in plotheatmap
-Prc2targets <- read.table("./text_files/K27_narrow_genes_sorted.txt", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t")
+Prc2targets <- read.table("../bed_files/K27_genes_stringent.bed", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t")
 
-cac1_up_K27 <- subset(cac1_up, cac1_up$VALUE %in% Prc2targets$V1)
-cac2_up_K27 <- subset(cac2_up, cac2_up$VALUE %in% Prc2targets$V1)
-cac3_up_K27 <- subset(cac3_up, cac3_up$VALUE %in% Prc2targets$V1)
-set7_up_K27 <- subset(set7_up, set7_up$VALUE %in% Prc2targets$V1)
-cac1_up_nonK27 <- subset(cac1_up, ! (cac1_up$VALUE %in% Prc2targets$V1))
-cac2_up_nonK27 <- subset(cac2_up, ! (cac2_up$VALUE %in% Prc2targets$V1))
-cac3_up_nonK27 <- subset(cac3_up, ! (cac3_up$VALUE %in% Prc2targets$V1))
-set7_up_nonK27 <- subset(set7_up, ! (set7_up$VALUE %in% Prc2targets$V1))
-cac1and2_up_K27 <- subset(cac1and2_UP, cac1and2_UP$VALUE %in% Prc2targets$V1)
-cac1and2and3_up_K27 <- subset(cac1and2and3_UP, cac1and2and3_UP$VALUE %in% Prc2targets$V1)
-cac1and2_up_nonK27 <- subset(cac1and2_UP, ! (cac1and2_UP$VALUE %in% Prc2targets$V1))
-cac1and2and3_up_nonK27 <- subset(cac1and2and3_UP, ! (cac1and2and3_UP$VALUE %in% Prc2targets$V1))
-cac1or2_up_K27 <- subset(cac1or2_UP, cac1or2_UP$VALUE %in% Prc2targets$V1)
-cac1or2or3_up_K27 <- subset(cac1or2or3_UP, cac1or2or3_UP$VALUE %in% Prc2targets$V1)
-cac1or2_up_nonK27 <- subset(cac1or2_UP, ! (cac1or2_UP$VALUE %in% Prc2targets$V1))
-cac1or2or3_up_nonK27 <- subset(cac1or2or3_UP, ! (cac1or2or3_UP$VALUE %in% Prc2targets$V1))
+cac1_up_K27 <- subset(cac1_up, cac1_up$VALUE %in% Prc2targets$V11)
+cac2_up_K27 <- subset(cac2_up, cac2_up$VALUE %in% Prc2targets$V11)
+cac3_up_K27 <- subset(cac3_up, cac3_up$VALUE %in% Prc2targets$V11)
+set7_up_K27 <- subset(set7_up, set7_up$VALUE %in% Prc2targets$V11)
+cac1_up_nonK27 <- subset(cac1_up, ! (cac1_up$VALUE %in% Prc2targets$V11))
+cac2_up_nonK27 <- subset(cac2_up, ! (cac2_up$VALUE %in% Prc2targets$V11))
+cac3_up_nonK27 <- subset(cac3_up, ! (cac3_up$VALUE %in% Prc2targets$V11))
+set7_up_nonK27 <- subset(set7_up, ! (set7_up$VALUE %in% Prc2targets$V11))
+cac1and2_up_K27 <- subset(cac1and2_UP, cac1and2_UP$VALUE %in% Prc2targets$V11)
+cac1and2and3_up_K27 <- subset(cac1and2and3_UP, cac1and2and3_UP$VALUE %in% Prc2targets$V11)
+cac1and2_up_nonK27 <- subset(cac1and2_UP, ! (cac1and2_UP$VALUE %in% Prc2targets$V11))
+cac1and2and3_up_nonK27 <- subset(cac1and2and3_UP, ! (cac1and2and3_UP$VALUE %in% Prc2targets$V11))
+cac1or2_up_K27 <- subset(cac1or2_UP, cac1or2_UP$VALUE %in% Prc2targets$V11)
+cac1or2or3_up_K27 <- subset(cac1or2or3_UP, cac1or2or3_UP$VALUE %in% Prc2targets$V11)
+cac1or2_up_nonK27 <- subset(cac1or2_UP, ! (cac1or2_UP$VALUE %in% Prc2targets$V11))
+cac1or2or3_up_nonK27 <- subset(cac1or2or3_UP, ! (cac1or2or3_UP$VALUE %in% Prc2targets$V11))
 
-cac1or2_down_K27 <- subset(cac1or2_DOWN, cac1or2_DOWN$VALUE %in% Prc2targets$V1)
-cac1or2_down_nonK27 <- subset(cac1or2_DOWN, ! cac1or2_DOWN$VALUE %in% Prc2targets$V1)
+cac1or2_down_K27 <- subset(cac1or2_DOWN, cac1or2_DOWN$VALUE %in% Prc2targets$V11)
+cac1or2_down_nonK27 <- subset(cac1or2_DOWN, ! cac1or2_DOWN$VALUE %in% Prc2targets$V11)
 
 #Write csv's
 write.csv(cac1_up_K27, file = "cac1_up_K27.csv", sep = "\t", col.names = F, row.names = F)
@@ -388,54 +388,79 @@ library(VennDiagram)
 library(RColorBrewer)
 library(eulerr)
 
-#Venn Diagram w/ CAF-1 mutants
+#Venn Diagram w/ All Upregulated genes in CAF-1 mutants
 venn.diagram(
-  x = list(rownames(cac1), rownames(cac2), rownames(cac3)),
-  category.names = c("cac1" , "cac2 " , "cac3"),
-  filename = 'CAF-1_venn_diagramm.png',
+  x = list(cac1_UP$NCU, cac2_UP$NCU, cac3_UP$NCU),
+  category.names = c("cac1", "cac2 ", "cac3"),
+  filename = 'CAF-1_UP_venn_diagramm.png',
   col=c("#8da0cb", "#66c2a5", "#fc8d62"),
   fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
   output=TRUE)
 
-#purple: "#9e9ac8"
-#Venn Diagram w/ set-7
+
+#Make euler plot inputing values gathered from venn.diagram(). This will provide a proportional venn-diagram
+fit = euler(c("A" = 1495, "B" = 364, "C" = 986, "A&B" = 631, "A&C" = 442, "B&C" = 499, "A&B&C" = 1288))
+eulerplot <- plot(fit)
+
+#Save file
+ggsave(filename = "CAF-1_All_UP_euler.pdf", plot = eulerplot, width = 4, height = 4, dpi = 600)
+
+
+#Venn Diagram w/ All Downregulated genes in CAF-1 mutants
 venn.diagram(
-  x = list(rownames(cac1), rownames(cac2), rownames(cac3), rownames(set7)),
-  category.names = c("cac1" , "cac2 " , "cac3", "set7"),
-  filename = 'CAF-1_set7_venn_diagramm.png',
-  col=c("#8da0cb", "#66c2a5", "#fc8d62", "#9e9ac8"),
-  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25), alpha("#9e9ac8",0.25)),
+  x = list(cac1_DOWN$NCU, cac2_DOWN$NCU, cac3_DOWN$NCU),
+  category.names = c("cac1", "cac2 ", "cac3"),
+  filename = 'CAF-1_DOWN_venn_diagramm.png',
+  col=c("#8da0cb", "#66c2a5", "#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
   output=TRUE)
 
 
 #Make euler plot inputing values gathered from venn.diagram(). This will provide a proportional venn-diagram
-fit = euler(c("A" = 351, "B" = 617, "C" = 1429, "A&B" = 1038, "A&C" = 646, "B&C" = 758, "A&B&C" = 3457))
+fit = euler(c("A" = 1370, "B" = 426, "C" = 730, "A&B" = 760, "A&C" = 443, "B&C" = 680, "A&B&C" = 1222))
 eulerplot <- plot(fit)
 
 #Save file
-ggsave(filename = "CAF-1_euler.png", plot = eulerplot, width = 4, height = 4, dpi = 600)
+ggsave(filename = "CAF-1_All_DOWN_euler.pdf", plot = eulerplot, width = 4, height = 4, dpi = 600)
+
 
 ###I also want to compare DE of only H3K27me3 genes b/w strains
-cac1_K27 <- subset(cac1, rownames(cac1) %in% Prc2targets[,1])
-cac2_K27 <- subset(cac2, rownames(cac2) %in% Prc2targets[,1])
-cac3_K27 <- subset(cac3, rownames(cac3) %in% Prc2targets[,1])
-set7_K27 <- subset(set7, rownames(set7) %in% Prc2targets[,1])
+cac1_K27 <- subset(cac1_UP, cac1_UP$NCU %in% Prc2targets[,11])
+cac2_K27 <- subset(cac2_UP, cac2_UP$NCU %in% Prc2targets[,11])
+cac3_K27 <- subset(cac3_UP, cac3_UP$NCU %in% Prc2targets[,11])
+set7_K27 <- subset(set7_UP, set7_UP$NCU %in% Prc2targets[,11])
 
-#Making Venn
+#Making Venn for All Upregulated K27 genes in CAF-1 mutants
 venn.diagram(
-  x = list(rownames(cac1_K27), rownames(cac2_K27), rownames(cac3_K27)),
-  category.names = c("cac1" , "cac2 " , "cac3"),
-  filename = 'CAF-1_venn_diagramm_K27_genes.png',
+  x = list(cac1_K27$NCU, cac2_K27$NCU, cac3_K27$NCU),
+  category.names = c("cac1", "cac2 ", "cac3"),
+  filename = 'CAF-1_venn_diagramm_UP_K27_genes.png',
   col=c("#8da0cb", "#66c2a5", "#fc8d62"),
   fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
   output=TRUE)
 
 #plotting euler
-fit = euler(c("A" = 16, "B" = 35, "C" = 120, "A&B" = 72, "A&C" = 47, "B&C" = 52, "A&B&C" = 391))
+fit = euler(c("A" = 98, "B" = 6, "C" = 55, "A&B" = 48, "A&C" = 59, "B&C" = 11, "A&B&C" = 261))
 eulerplot <- plot(fit)
 
 #Save file
-ggsave(filename = "CAF-1_euler_K27.pdf", plot = eulerplot, width = 4, height = 4, dpi = 600)
+ggsave(filename = "CAF-1_euler_K27_UP.pdf", plot = eulerplot, width = 4, height = 4, dpi = 600)
+
+#Making Venn for All Upregulated genes in cac-1/2 and set-7 mutants
+venn.diagram(
+  x = list(cac1_K27$NCU, cac2_K27$NCU, set7_K27$NCU),
+  category.names = c("cac1", "cac2 ", "set7"),
+  filename = 'cac1-2_set7_venn_diagramm_UP_K27_genes.png',
+  col=c("#8da0cb", "#66c2a5", "#756bb1"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#756bb1",0.25)),
+  output=TRUE)
+
+#plotting euler
+fit = euler(c("A" = 72, "B" = 2, "C" = 58, "A&B" = 67, "A&C" = 85, "B&C" = 15, "A&B&C" = 242))
+eulerplot <- plot(fit)
+
+#Save file
+ggsave(filename = "cac1-2_set7_euler_All_UP.pdf", plot = eulerplot, width = 4, height = 4, dpi = 600)
 
 ```
 
