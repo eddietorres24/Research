@@ -40,7 +40,7 @@ genes_annotated <- left_join(genes_promoter, df_overlap, by = "gene_id") %>%
   mutate(overlap_percent = ifelse(is.na(overlap_percent), 0, overlap_percent))
 
 # Output BED files by tier
-tiers <- seq(50, 100, by = 10)
+tiers <- seq(80, 100, by = 5)
 for (tier in tiers) {
   subset_df <- genes_annotated %>%
     filter(overlap_percent >= tier) %>%
