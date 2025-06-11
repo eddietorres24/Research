@@ -121,7 +121,7 @@ module load deepTools
 
 # computeMatrix scale-regions -a 250 -b 1000 --regionBodyLength 2000 --scale 1.5
 #unclustered
-computeMatrix reference-point --referencePoint TSS -a 2000 -b 1000 --scale 1.5 \
+computeMatrix reference-point --referencePoint TSS -a 2500 -b 1000 --scale 2 \
  -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
@@ -138,7 +138,7 @@ computeMatrix reference-point --referencePoint TSS -a 2000 -b 1000 --scale 1.5 \
                     --sortUsingSamples 1 \
                     --missingDataColor 1 \
                     --heatmapHeight 28 \
-                    --colorMap "winter" \
+                    --colorMap "YlOrBr" \
                     --zMin 0 \
 
 # #138-62_ChIP_WT_H3K36me3_Rep2_6252_S61.bin_25.smooth_75Bulk.bw
