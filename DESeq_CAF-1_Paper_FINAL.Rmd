@@ -198,23 +198,23 @@ cac3_DEG_01 <- subset(cac3_DEG, cac3_DEG$padj <= 0.01)
 set7_DEG_01 <- subset(set7_DEG, set7_DEG$padj <= 0.01)
 
 #Splitting Up & Down regulated genes
-cac1_UP <- subset(cac1_DEG, cac1_DEG$log2FoldChange > 0)
-cac1_DOWN <- subset(cac1_DEG, cac1_DEG$log2FoldChange < 0)
-cac2_UP <- subset(cac2_DEG, cac2_DEG$log2FoldChange > 0)
-cac2_DOWN <- subset(cac2_DEG, cac2_DEG$log2FoldChange < 0)
-cac3_UP <- subset(cac3_DEG, cac3_DEG$log2FoldChange > 0)
-cac3_DOWN <- subset(cac3_DEG, cac3_DEG$log2FoldChange < 0)
-set7_UP <- subset(set7_DEG, set7_DEG$log2FoldChange > 0)
-set7_DOWN <- subset(set7_DEG, set7_DEG$log2FoldChange < 0)
+cac1_UP <- subset(cac1_DEG, cac1_DEG$log2FoldChange > 1)
+cac1_DOWN <- subset(cac1_DEG, cac1_DEG$log2FoldChange < -1)
+cac2_UP <- subset(cac2_DEG, cac2_DEG$log2FoldChange > 1)
+cac2_DOWN <- subset(cac2_DEG, cac2_DEG$log2FoldChange < -1)
+cac3_UP <- subset(cac3_DEG, cac3_DEG$log2FoldChange > 1)
+cac3_DOWN <- subset(cac3_DEG, cac3_DEG$log2FoldChange < -1)
+set7_UP <- subset(set7_DEG, set7_DEG$log2FoldChange > 1)
+set7_DOWN <- subset(set7_DEG, set7_DEG$log2FoldChange < -1)
 
-cac1_UP_01 <- subset(cac1_DEG_01, cac1_DEG_01$log2FoldChange > 0)
-cac1_DOWN_01 <- subset(cac1_DEG_01, cac1_DEG_01$log2FoldChange < 0)
-cac2_UP_01 <- subset(cac2_DEG_01, cac2_DEG_01$log2FoldChange > 0)
-cac2_DOWN_01 <- subset(cac2_DEG_01, cac2_DEG_01$log2FoldChange < 0)
-cac3_UP_01 <- subset(cac3_DEG_01, cac3_DEG_01$log2FoldChange > 0)
-cac3_DOWN_01 <- subset(cac3_DEG_01, cac3_DEG_01$log2FoldChange < 0)
-set7_UP_01 <- subset(set7_DEG_01, set7_DEG_01$log2FoldChange > 0)
-set7_DOWN_01 <- subset(set7_DEG_01, set7_DEG_01$log2FoldChange < 0)
+cac1_UP_01 <- subset(cac1_DEG_01, cac1_DEG_01$log2FoldChange > 1)
+cac1_DOWN_01 <- subset(cac1_DEG_01, cac1_DEG_01$log2FoldChange < -1)
+cac2_UP_01 <- subset(cac2_DEG_01, cac2_DEG_01$log2FoldChange > 1)
+cac2_DOWN_01 <- subset(cac2_DEG_01, cac2_DEG_01$log2FoldChange < -1)
+cac3_UP_01 <- subset(cac3_DEG_01, cac3_DEG_01$log2FoldChange > 1)
+cac3_DOWN_01 <- subset(cac3_DEG_01, cac3_DEG_01$log2FoldChange < -1)
+set7_UP_01 <- subset(set7_DEG_01, set7_DEG_01$log2FoldChange > 1)
+set7_DOWN_01 <- subset(set7_DEG_01, set7_DEG_01$log2FoldChange < -1)
 
 #I want bed files of up/downregulated genes across samples
 ##p value of 0.05 first
@@ -399,7 +399,7 @@ venn.diagram(
 
 
 #Make euler plot inputing values gathered from venn.diagram(). This will provide a proportional venn-diagram
-fit = euler(c("A" = 1495, "B" = 364, "C" = 986, "A&B" = 631, "A&C" = 442, "B&C" = 499, "A&B&C" = 1288))
+fit = euler(c("A" = 1152, "B" = 140, "C" = 447, "A&B" = 382, "A&C" = 160, "B&C" = 93, "A&B&C" = 772))
 eulerplot <- plot(fit)
 
 #Save file
@@ -417,7 +417,7 @@ venn.diagram(
 
 
 #Make euler plot inputing values gathered from venn.diagram(). This will provide a proportional venn-diagram
-fit = euler(c("A" = 1370, "B" = 426, "C" = 730, "A&B" = 760, "A&C" = 443, "B&C" = 680, "A&B&C" = 1222))
+fit = euler(c("A" = 1365, "B" = 108, "C" = 447, "A&B" = 70, "A&C" = 104, "B&C" = 208, "A&B&C" = 131))
 eulerplot <- plot(fit)
 
 #Save file
@@ -440,7 +440,7 @@ venn.diagram(
   output=TRUE)
 
 #plotting euler
-fit = euler(c("A" = 98, "B" = 6, "C" = 55, "A&B" = 48, "A&C" = 59, "B&C" = 11, "A&B&C" = 261))
+fit = euler(c("A" = 107, "B" = 8, "C" = 53, "A&B" = 42, "A&C" = 50, "B&C" = 8, "A&B&C" = 245))
 eulerplot <- plot(fit)
 
 #Save file
@@ -456,7 +456,7 @@ venn.diagram(
   output=TRUE)
 
 #plotting euler
-fit = euler(c("A" = 72, "B" = 2, "C" = 58, "A&B" = 67, "A&C" = 85, "B&C" = 15, "A&B&C" = 242))
+fit = euler(c("A" = 81, "B" = 2, "C" = 66, "A&B" = 68, "A&C" = 76, "B&C" = 14, "A&B&C" = 219))
 eulerplot <- plot(fit)
 
 #Save file

@@ -179,7 +179,7 @@ box
 
 ggsave(filename = "histone_chaperone_boxplot_PAPER_FINAL.pdf", plot = box, dpi=600, height= 3, width=4)
 
-#######################
+############################################
 
 #t-test for significance in difference of mean expression values of PRC2 targets b/w WT & mutants
 
@@ -187,38 +187,95 @@ set7_t <- t.test(AVERAGE_Prc2targetTPM[,2], AVERAGE_Prc2targetTPM[,1], data = AV
 cac1_t <- t.test(AVERAGE_Prc2targetTPM[,3], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
 cac2_t <- t.test(AVERAGE_Prc2targetTPM[,4], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
 # cac1_2_t <- t.test(AVERAGE_Prc2targetTPM[,5], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
-cac3_t <- t.test(AVERAGE_Prc2targetTPM[,6], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
-naf1_t <- t.test(AVERAGE_Prc2targetTPM[,7], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
-naf2_t <- t.test(AVERAGE_Prc2targetTPM[,8], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
-asf1_t <- t.test(AVERAGE_Prc2targetTPM[,9], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
-atrx_t <- t.test(AVERAGE_Prc2targetTPM[,10], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+cac3_t <- t.test(AVERAGE_Prc2targetTPM[,5], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+naf1_t <- t.test(AVERAGE_Prc2targetTPM[,6], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+naf2_t <- t.test(AVERAGE_Prc2targetTPM[,7], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+asf1_t <- t.test(AVERAGE_Prc2targetTPM[,8], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+atrx_t <- t.test(AVERAGE_Prc2targetTPM[,9], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+
+###Make t-test dataframe
+
+#Make a list of t-test results objects
+t_test_list <- list(set7_t, cac1_t, cac2_t, cac3_t, naf1_t, naf2_t, asf1_t, atrx_t)
+names(t_test_list) <- c("set7", "cac1", "cac2", "cac3", "naf1", "naf2", "asf1", "atrx")
+
+# Function to extract relevant info from each t-test
+extract_t_test_info <- function(tobj) {
+  data.frame(
+    t_statistic = unname(tobj$statistic),
+    df = unname(tobj$parameter),
+    p_value = tobj$p.value,
+    conf_low = tobj$conf.int[1],
+    conf_high = tobj$conf.int[2],
+    mean_x = tobj$estimate[1],
+    mean_y = tobj$estimate[2],
+    stderr = tobj$stderr,
+    method = tobj$method,
+    alternative = tobj$alternative,
+    stringsAsFactors = FALSE
+  )
+}
+
+# Build the summary dataframe
+summary_df <- do.call(rbind, lapply(t_test_list, extract_t_test_info))
+rownames(summary_df) <- names(t_test_list)
+
+#write it to a csv
+write.csv(summary_df, "t_test_summary.csv", row.names = TRUE)
+
+################################################
 
 #I want to make a violin plot instead of boxplot. Going to adapt Abby's code
 library(grDevices)
 
+# Define factor order and formatted x-axis labels
+label_order <- c("WT", "set-7", "cac-1", "cac-2", "cac-3", "naf-1", "naf-2", "asf-1", "ATRX")
+formatted_labels <- c(
+  "WT",
+  expression(italic("\u0394set-7")),
+  expression(italic("\u0394cac-1")),
+  expression(italic("\u0394cac-2")),
+  expression(italic("\u0394cac-3")),
+  expression(italic("\u0394naf-1")),
+  expression(italic("\u0394naf-2")),
+  expression(italic("\u0394asf-1")),
+  expression(italic("\u0394ATRX"))
+)
+
+# Group and summarize
 total2 <- meltedAveragePRC2targetData %>%
   group_by(Sample)
-total_dist = meltedAveragePRC2targetData %>%
-  group_by(Sample) %>% summarise(num=n())
 
-#Setting distance between violins in plot
+total_dist <- meltedAveragePRC2targetData %>%
+  group_by(Sample) %>%
+  summarise(num = n())
+
+# Set dodge for violin spacing
 dodge <- position_dodge(width = 1)
-###  plotting violin plot
-### this chunk is just for putting samples in the order that I want ###
+
+# Build plot
 violin <- total2 %>%
   left_join(total_dist) %>%
-  arrange(factor(Sample, levels = c("WT", "set-7", "cac-1", "cac-2", "cac-3", "naf-1", "naf-2", "asf-1", "ATRX"))) %>%
-  mutate(Sample = factor(Sample)) %>%
-  ### everything below is the actual violin plot ###
-  ggplot(aes(x=Sample, y=Count)) + 
-  geom_violin(position = dodge, scale="width", trim=FALSE) +
+  arrange(factor(Sample, levels = label_order)) %>%
+  mutate(Sample = factor(Sample, levels = label_order)) %>%
+  ggplot(aes(x = Sample, y = Count)) +
+  geom_violin(position = dodge, scale = "width", trim = FALSE) +
   stat_summary(fun = "mean", geom = "crossbar", width = 0.25, colour = "red") +
-  scale_fill_manual("",values = c("orchid1", "springgreen3")) +
-  labs(x = "Strain",y = expression("Expression Level (log "[2]~"(TPM+1)")) + 
-  theme_classic(base_size = 20)
+  scale_x_discrete(labels = formatted_labels) +
+  labs(
+    x = "Strain",
+    y = expression("Expression Level (log"[2]~"(TPM+1))")) +
+  theme_classic(base_size = 20) +
+  theme(
+    axis.text.x = element_text(color = "black"),
+    axis.text.y = element_text(color = "black"),
+    axis.title.x = element_text(color = "black"),
+    axis.title.y = element_text(color = "black")
+  )
 
 print(violin)
-ggsave("./Histone_Chap_PRC2_Gene_expression_FINAL.pdf", plot=violin, width = 10, height = 8, unit="in",  dpi=400)
+
+ggsave("./Histone_Chap_PRC2_Gene_expression_FINAL_TEST.pdf", plot=violin, width = 10, height = 8, unit="in",  dpi=400)
 
 #stat_summary(fun.data = "mean_se", geom = "errorbar", width = 0.25, colour = "red") +
 

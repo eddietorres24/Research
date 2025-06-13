@@ -23,6 +23,7 @@ library(ggplot2)
 cac1DE <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1_new.csv", sep = ",", header = TRUE, row.names = 1)
 cac2DE <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac2.csv", sep = ",", header = TRUE, row.names = 1)
 cac3DE <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac3.csv", sep = ",", header = TRUE, row.names = 1)
+set7DE <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/set7.csv", sep = ",", header = TRUE, row.names = 1)
 ```
 
 #get rid of any genes that had p value = 0. Additionally, get rid of the KO'd gene (should be most "downregulated", but check)
@@ -31,33 +32,35 @@ cac3DE <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac3.csv", sep = ",", he
 cac1DE <- cac1DE[cac1DE$padj != 0, ]
 cac2DE <- cac2DE[cac2DE$padj != 0, ]
 cac3DE <- cac3DE[cac3DE$padj != 0, ]
+set7DE <- set7DE[set7DE$padj != 0, ]
 cac1DE <- cac1DE[-which.min(cac1DE$log2FoldChange), ]
 cac2DE <- cac2DE[-which.min(cac2DE$log2FoldChange), ]
 cac3DE <- cac3DE[-which.min(cac3DE$log2FoldChange), ]
+set7DE <- set7DE[-which.min(set7DE$log2FoldChange), ]
 ```
 
 #Define and print the volcano plot
 
 ```{r, Volcano Plot}
 # Assign categories with NS prioritized
-cac3DE$category <- case_when(
-  cac3DE$log2FoldChange > -1 & cac3DE$log2FoldChange < 1 ~ "NS",
-  rownames(cac3DE) %in% Prc2targets$V11 ~ "PRC2",
-  cac3DE$log2FoldChange > 1 & cac3DE$padj < 0.05 ~ "Upregulated",
-  cac3DE$log2FoldChange < -1 & cac3DE$padj < 0.05 ~ "Downregulated",
+cac2DE$category <- case_when(
+  cac2DE$log2FoldChange > -1 & cac2DE$log2FoldChange < 1 ~ "NS",
+  rownames(cac2DE) %in% Prc2targets$V11 ~ "PRC2",
+  cac2DE$log2FoldChange > 1 & cac2DE$padj < 0.05 ~ "Upregulated",
+  cac2DE$log2FoldChange < -1 & cac2DE$padj < 0.05 ~ "Downregulated",
   TRUE ~ "NS"
 )
 
 # Reorder so PRC2 is plotted last (on top)
-cac3DE <- cac3DE[order(cac3DE$category == "PRC2"), ]
+cac2DE <- cac2DE[order(cac2DE$category == "PRC2"), ]
 
 # Plot
-volcano_plot <- ggplot(cac3DE, aes(
+volcano_plot <- ggplot(cac2DE, aes(
   x = log2FoldChange,
   y = -log10(padj),
   color = category
 )) +
-  geom_point(size = 2, alpha = 0.85) +
+  geom_point(size = 3, alpha = 0.85) +
   scale_color_manual(
     values = c(
       "Upregulated" = "red",
@@ -69,16 +72,17 @@ volcano_plot <- ggplot(cac3DE, aes(
     labels = c("Upregulated", "Downregulated", "PRC2")
   ) +
   labs(
-    x = expression(paste("log"[2], "FoldChange(cac3/WT)")),
+    x = expression(paste("log"[2], "FoldChange(cac-2/WT)")),
     y = expression(paste("-log"[10], "(p-value)")),
-    title = "cac-3 vs WT"
+    title = "cac-2 vs WT"
   ) +
+  ylim(0, 300) +
   geom_vline(xintercept = c(-1, 1), color = "grey5", linetype = "dashed", alpha = 0.5) +
   geom_hline(yintercept = -log10(0.05), color = "grey5", linetype = "dashed", alpha = 0.5) +
   theme_classic(base_size = 20) +
   theme(
     axis.title.y = element_text(face = "bold", margin = margin(0, 20, 0, 0), size = rel(1.1), color = 'black'),
-    axis.title.x = element_text(face = "bold", margin = margin(20, 0, 0, 0), size = rel(1.1), color = 'black'),
+    axis.title.x = element_text(face = "bold", margin = margin(20, 0, 0, 0), size = rel(1.1), color = 'black',),
     axis.text = element_text(color = "black"),
     plot.title = element_text(hjust = 0.5, color = "black"),
     legend.position = "bottom",
@@ -90,5 +94,5 @@ volcano_plot <- ggplot(cac3DE, aes(
 # Print the plot
 print(volcano_plot)
 
-ggsave("./cac3DE_volcano_plot_FINAL.pdf", plot=volcano_plot, width = 12, height = 9, unit="in",  dpi=400)
+ggsave("./cac2DE_volcano_plot_FINAL.pdf", plot=volcano_plot, width = 12, height = 9, unit="in",  dpi=400)
 ```
