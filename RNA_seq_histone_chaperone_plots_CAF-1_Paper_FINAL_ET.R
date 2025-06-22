@@ -93,21 +93,24 @@ colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 #read in geneIDs of PRC2 target genes
 #reading in csvs w/ upregulated genes in CAF-1 mutants
 Prc2targets <- read.table("./bed_files/K27_genes_stringent.bed", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
-cac1up <- read.csv("./cac_DEseq/cac1_UP.csv", stringsAsFactors=FALSE, check.names=FALSE)
-cac2up <- read.csv("./cac_DEseq/cac2_UP.csv", stringsAsFactors=FALSE, check.names=FALSE)
 
 ###SUBSET DATA FOR ALL KO SAMPLES
-Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,11])
-
-#CAF-1 Upregulated mutants
-CAFUpTPM <- subset(allDataTPM, rownames(allDataTPM) %in% cac1up$NCU | rownames(allDataTPM) %in% cac2up$NCU)
+Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,10])
+#genes i had to rename in my bed file due to spaces
+hsp <- allDataTPM[rownames(allDataTPM) == "hsp30-like protein", ]
+lac <- allDataTPM[rownames(allDataTPM) == "laccase precursor", ]
+#add back missing genes
+Prc2targetTPM <- rbind(Prc2targetTPM, hsp, lac)
+#rename rows of added genes
+rownames(Prc2targetTPM)[rownames(Prc2targetTPM) == "hsp"] <- "hsp30-like protein"
+rownames(Prc2targetTPM)[rownames(Prc2targetTPM) == "lac"] <- "laccase precursor"
 
 ###SUBSET DATA FOR AVERAGED KO SAMPLES
-AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,11])
-AVERAGE_CAFTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data) %in% cac1up$NCU | rownames(allDataTPM) %in% cac2up$NCU)
+AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%rownames(Prc2targetTPM))
 
-###Subset data to filter out non-PRC2 target regions that got through (cutting out any genes over 2 tpm in WT)
-AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 12.5))
+###Subset data to filter out non-repressed PRC2 targets regions that got through (cutting out any genes over 10 tpm in WT).
+###These are likely genes whose promoter are not marked by H3K27me3, genes on the edge of K27 regions, and/or bivalent genes
+AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 10))
 AVERAGE_AlldataTPM <- subset(Averaged_Orderd_KO_data, (Averaged_Orderd_KO_data[,1] > -0.1))
 
 ###resubet PRC2 targets after filtering
@@ -117,20 +120,18 @@ Prc2targetTPM <- subset(Prc2targetTPM, rownames(Prc2targetTPM)%in%rownames(AVERA
 AVERAGE_Prc2targetTPM <- AVERAGE_Prc2targetTPM + 1
 AVERAGE_Prc2targetTPM <- log2(AVERAGE_Prc2targetTPM)
 
-AVERAGE_CAFTPM <- AVERAGE_CAFTPM + 1
-AVERAGE_CAFTPM <- log2(AVERAGE_CAFTPM)
-
 AVERAGE_AlldataTPM <- AVERAGE_AlldataTPM + 1
 AVERAGE_AlldataTPM <- log2(AVERAGE_AlldataTPM)
 #melt data to get it into a format ggplots can use (load library "reshape2")
 library(reshape2)
 
-meltedPRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
+meltedAveragePRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
 #Alldata
-meltedAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
-                             varnames=c('GeneID', 'Sample'))
+meltedAverageAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
+                      varnames=c('GeneID', 'Sample'))
+
 
 
 #################################################################################
@@ -141,12 +142,6 @@ meltedAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
 #melt the data and label value "Count" and the sample IDs GeneID and Sample
 #meltedData <- melt(tpm, value.name = "Count",
 #varnames=c('GeneID', 'Sample'))
-
-meltedAveragePRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
-                             varnames=c('GeneID', 'Sample'))
-
-meltedAverageAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
-                      varnames=c('GeneID', 'Sample'))
 
 altorder = rev(c("WT","set7","cac1","cac2","cac3","naf1","naf2","asf1","ATRX"))
 
@@ -181,47 +176,61 @@ ggsave(filename = "histone_chaperone_boxplot_PAPER_FINAL.pdf", plot = box, dpi=6
 
 ############################################
 
+###Make histogram to visualize distribution of data
+
+df <- as.data.frame(AVERAGE_Prc2targetTPM)
+
+long_df <- df %>%
+  select(WT, `cac-1`) %>%
+  pivot_longer(cols = everything(), names_to = "Strain", values_to = "TPM")
+
+# Plot overlapping histograms
+ggplot(long_df, aes(x = TPM, fill = Strain)) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 20, color = "black") +
+  theme_minimal() +
+  labs(title = "TPM Distribution in WT and cac-1",
+       x = "TPM",
+       y = "Frequency") +
+  scale_fill_manual(values = c("WT" = "steelblue", "cac-1" = "tomato"))
+
+#Histogram shows non-normal distribution, so proceed with wilcox test
 #t-test for significance in difference of mean expression values of PRC2 targets b/w WT & mutants
 
-set7_t <- t.test(AVERAGE_Prc2targetTPM[,2], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
-cac1_t <- t.test(AVERAGE_Prc2targetTPM[,3], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
-cac2_t <- t.test(AVERAGE_Prc2targetTPM[,4], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
-# cac1_2_t <- t.test(AVERAGE_Prc2targetTPM[,5], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
-cac3_t <- t.test(AVERAGE_Prc2targetTPM[,5], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
-naf1_t <- t.test(AVERAGE_Prc2targetTPM[,6], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
-naf2_t <- t.test(AVERAGE_Prc2targetTPM[,7], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
-asf1_t <- t.test(AVERAGE_Prc2targetTPM[,8], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
-atrx_t <- t.test(AVERAGE_Prc2targetTPM[,9], AVERAGE_Prc2targetTPM[,1], data = AVERAGE_Prc2targetTPM)
+set7_stat <- wilcox.test(df$`set-7`, df$WT, alternative = "greater")
+cac1_stat <- wilcox.test(df$`cac-1`, df$WT, alternative = "greater")
+cac2_stat <- wilcox.test(df$`cac-2`, df$WT, alternative = "greater")
+# cac1_2_tstat <- wilcox.test(df$`cac-1_2`, df$WT, alternative = "greater")
+cac3_stat <- wilcox.test(df$`cac-3`, df$WT, alternative = "greater")
+naf1_stat <- wilcox.test(df$`naf-1`, df$WT, alternative = "greater")
+naf2_stat <- wilcox.test(df$`naf-2`, df$WT, alternative = "greater")
+asf1_stat <- wilcox.test(df$`asf-1`, df$WT, alternative = "greater")
+atrx_stat <- wilcox.test(df$`ATRX`, df$WT, alternative = "greater")
 
 ###Make t-test dataframe
 
 #Make a list of t-test results objects
-t_test_list <- list(set7_t, cac1_t, cac2_t, cac3_t, naf1_t, naf2_t, asf1_t, atrx_t)
-names(t_test_list) <- c("set7", "cac1", "cac2", "cac3", "naf1", "naf2", "asf1", "atrx")
+wilcox_list <- list(set7_stat, cac1_stat, cac2_stat, cac3_stat, naf1_stat, naf2_stat, asf1_stat, atrx_stat)
+names(wilcox_list) <- c("set7", "cac1", "cac2", "cac3", "naf1", "naf2", "asf1", "atrx")
 
 # Function to extract relevant info from each t-test
-extract_t_test_info <- function(tobj) {
+# Name each element in the list according to the strain
+names(wilcox_list) <- c("set-7", "cac-1", "cac-2", "cac-3", "naf-1", "naf-2", "asf-1", "ATRX")
+
+# Extract relevant stats into a dataframe
+wilcox_df <- do.call(rbind, lapply(wilcox_list, function(res) {
   data.frame(
-    t_statistic = unname(tobj$statistic),
-    df = unname(tobj$parameter),
-    p_value = tobj$p.value,
-    conf_low = tobj$conf.int[1],
-    conf_high = tobj$conf.int[2],
-    mean_x = tobj$estimate[1],
-    mean_y = tobj$estimate[2],
-    stderr = tobj$stderr,
-    method = tobj$method,
-    alternative = tobj$alternative,
-    stringsAsFactors = FALSE
+    statistic = unname(res$statistic),
+    p_value = res$p.value,
+    alternative = res$alternative,
+    method = res$method
   )
-}
+}))
 
-# Build the summary dataframe
-summary_df <- do.call(rbind, lapply(t_test_list, extract_t_test_info))
-rownames(summary_df) <- names(t_test_list)
+# Set strain names as row names
+rownames(wilcox_df) <- names(wilcox_list)
 
-#write it to a csv
-write.csv(summary_df, "t_test_summary.csv", row.names = TRUE)
+# Save to CSV
+write.csv(wilcox_df, "Wilcoxon_summary_stats.csv", row.names = TRUE)
 
 ################################################
 

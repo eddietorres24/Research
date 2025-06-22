@@ -7,6 +7,12 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+# Set working environment
+workingdir="C:/Users/eddie/Research/GitHub"
+
+#set working directory to the correct location for working machine
+knitr::opts_knit$set(root.dir = "workingdir")
 ```
 
 ## R Markdown
@@ -20,8 +26,8 @@ library(ggplot2)
 #Read in Files
 
 ```{r, read in files}
-cac1DE <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1_new.csv", sep = ",", header = TRUE, row.names = 1)
-cac2DE <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac2.csv", sep = ",", header = TRUE, row.names = 1)
+cac1DE <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1_new_05.csv", sep = ",", header = TRUE, row.names = 1)
+cac2DE <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac2_05.csv", sep = ",", header = TRUE, row.names = 1)
 cac3DE <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac3.csv", sep = ",", header = TRUE, row.names = 1)
 set7DE <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/set7.csv", sep = ",", header = TRUE, row.names = 1)
 ```

@@ -127,11 +127,11 @@ module load MACS3
 #
 # H3K27me3
 # ##abcam Rep1
-# macs3 callpeak -t "${P129DIR}/129-38_ChIP_WT_K27me3_AbC_Rep_1_S37.bam" -c "${P129DIR}/129-43_ChIP_WT_input_S42.bam" -f BAMPE -n "WT_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/WT_abc_K27" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${P129DIR}/129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38.bam" -c "${P129DIR}/129-44_ChIP_cac-1_input_S43.bam" -f BAMPE -n "cac-1_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-1_abc_K27" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${P129DIR}/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39.bam" -c "${P129DIR}/129-45_ChIP_cac-2_input_S44.bam" -f BAMPE -n "cac-2_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-2_abc_K27" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${P129DIR}/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40.bam" -c "${P129DIR}/129-46_ChIP_cac-3_input_S45.bam" -f BAMPE -n "cac-3_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-3_abc_K27" --min-length 650 --max-gap 375
-# macs3 callpeak -t "${P129DIR}/129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41.bam" -c "${P129DIR}/129-47_ChIP_set-7_input_S46.bam" -f BAMPE -n "set-7_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/set-7_abc_K27" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P129DIR}/129-38_ChIP_WT_K27me3_AbC_Rep_1_S37.bam" -c "${P129DIR}/129-43_ChIP_WT_input_S42.bam" -f BAMPE -n "WT_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/WT_abc_K27" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P129DIR}/129-39_ChIP_cac-1_K27me3_AbC_Rep_1_S38.bam" -c "${P129DIR}/129-44_ChIP_cac-1_input_S43.bam" -f BAMPE -n "cac-1_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-1_abc_K27" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P129DIR}/129-40_ChIP_cac-2_K27me3_AbC_Rep_1_S39.bam" -c "${P129DIR}/129-45_ChIP_cac-2_input_S44.bam" -f BAMPE -n "cac-2_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-2_abc_K27" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P129DIR}/129-41_ChIP_cac-3_K27me3_AbC_Rep_1_S40.bam" -c "${P129DIR}/129-46_ChIP_cac-3_input_S45.bam" -f BAMPE -n "cac-3_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-3_abc_K27" --min-length 650 --max-gap 375
+macs3 callpeak -t "${P129DIR}/129-42_ChIP_set-7_K27me3_AbC_Rep_1_S41.bam" -c "${P129DIR}/129-47_ChIP_set-7_input_S46.bam" -f BAMPE -n "set-7_abc_H3K27me3_Rep1" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/set-7_abc_K27" --min-length 650 --max-gap 375
 # ##abcam Rep2
 # macs3 callpeak -t "${P136DIR}/6147_136-1_ChIP_WT_H3K27me3_abcam_Rep2_S1.bam" -c "${P136DIR}/6147_136-11_ChIP_WT_input_S11.bam" -f BAMPE -n "WT_abc_H3K27me3_Rep2" -g 41037538 -p 0.01 --outdir "${OUTDIR3}/WT_abc_K27" --min-length 650 --max-gap 360
 # macs3 callpeak -t "${P136DIR}/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2_S2.bam" -c "${P136DIR}/6147_136-12_ChIP_cac-1_input_S12.bam" -f BAMPE -n "cac-1_abc_H3K27me3_Rep2" --broad -g 41037538 --broad-cutoff 0.01 --outdir "${OUTDIR3}/cac-1_abc_K27" --min-length 650 --max-gap 375
@@ -275,14 +275,22 @@ module load MACS3
 
 bedtools intersect -a all_genes_gff_names.bed -b K27_genes_trimmed.bed -v > nonK27_genes.bed
 
-
-bedtools intersect -a K27_genes_stringent.bed -b cac1_H3K27me3_Rep2_peaks.bed -wa > K27genes_in_cac1_new.bed
-bedtools intersect -a K27_genes_stringent.bed -b cac2_H3K27me3_Rep2_peaks.bed -wa > K27genes_in_cac2_new.bed
+bedtools intersect -a K27_genes_stringent.bed -b cac1_H3K27me3_Rep2_peaks.bed -v > K27genes_not_in_cac1_new.bed
+bedtools intersect -a K27_genes_stringent.bed -b cac2_H3K27me3_Rep2_peaks.bed -v > K27genes_not_in_cac2_new.bed
 bedtools intersect -a K27_genes_stringent.bed -b cac3_H3K27me3_Rep2_peaks.bed -wa > K27genes_in_cac3_new.bed
 bedtools intersect -a K27_genes_stringent.bed -b K27genes_in_cac1_2_new.bed -v > K27genes_NOT_in_cac1_2_new.bed
 bedtools intersect -a K27genes_in_cac1_2_new.bed -b cac3_H3K27me3_Rep2_peaks.bed -v > K27genes_in_cac1_2_NOT_in_cac3_new.bed
 bedtools intersect -a K27genes_in_cac1_2_new.bed -b K27genes_in_cac1_2_NOT_in_cac3_new.bed -v > K27genes_in_cac1_2_3_new.bed
 
+bedtools intersect -a all_genes_gff_names.bed -b CAF-1_Ectopic_K27 -wa -f 0.8 > CAF-1_ectopic_K27_genes.bed
+
+bedtools intersect -a cac1_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-1_ectopic_K27_peaks.bed
+bedtools intersect -a cac2_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-2_ectopic_K27_peaks.bed
+bedtools intersect -a cac3_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-3_ectopic_K27_peaks.bed
+
+bedtools intersect -a all_genes_gff_names.bed -b cac-1_ectopic_K27_peaks.bed -wa -f 0.8 > cac-1_ectopic_K27_genes.bed
+bedtools intersect -a all_genes_gff_names.bed -b cac-2_ectopic_K27_peaks.bed -wa -f 0.8 > cac-2_ectopic_K27_genes.bed
+bedtools intersect -a all_genes_gff_names.bed -b cac-3_ectopic_K27_peaks.bed -wa -f 0.8 > cac-3_ectopic_K27_genes.bed
 #Combining all overlapping peaks & merging
 # CAF-1
 # bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \
@@ -291,7 +299,7 @@ bedtools intersect -a K27genes_in_cac1_2_new.bed -b K27genes_in_cac1_2_NOT_in_ca
 #
 
 #merge bed files, remove duplicates
-cat K27genes_in_cac1_new.bed K27genes_in_cac2_new.bed | sort -k1,1 -k2,2n -k3,3n | uniq > K27genes_in_cac1_2_new.bed
+cat cac-1_ectopic_K27_peaks.bed cac-2_ectopic_K27_peaks.bed cac-3_ectopic_K27_peaks.bed | sort -k1,1 -k2,2n -k3,3n | uniq > CAF-1_K27_ectopic_peaks.bed
 
 #test for Duplicates
 # sort K27genes_in_cac1_2.bed | uniq -d > test.bed

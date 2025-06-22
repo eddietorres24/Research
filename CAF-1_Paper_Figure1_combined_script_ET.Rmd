@@ -1,0 +1,947 @@
+---
+title: "CAF-1_Paper_Figure1_combined_script_ET"
+author: "Eddie Torres"
+date: "2025-06-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#Set working environment
+workingdir="C:/Users/eddie/Research/GitHub"
+
+#Set working directory to the correct location for working machine
+knitr::opts_knit$set(root.dir = "workingdir")
+```
+
+```{r load libraries, echo=FALSE}
+library("DESeq2")
+library("ggplot2")
+library("gplots")
+library("ggrepel")
+library("dplyr")
+library("pheatmap")
+library("grid")
+library("corrplot")
+library("RColorBrewer")
+library("scales")
+library("readr")
+library("tidyr")
+library("tidyverse")
+library("scater")
+library("reshape2")
+library("grDevices")
+library("tibble")
+library("VennDiagram")
+library("eulerr")
+library("gridExtra")
+```
+
+#Code for Violin plot & heatmap
+##DESeq not yet need because I am just averaging raw TPMs for these figures. Will need to run DESeq for volcano plots & Venn Diagrams
+
+```{r read in counts file from featureCounts, echo=FALSE}
+#Bring in table with un-normalized transcription counts; check.names is important if you have dashes in the gene names 
+##row.names=1 command sets geneIDs as the row name
+
+countdataInteractors <- read.table("./text_files/readcounts_FINAL.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
+
+#create matrix containing count data only; i.e. eliminate contig, start, stop, length fields
+##convert count file to matrix. Note:: I initially tried to use as.matrix, but this didn't work. <- data.matrix(countfile) worked fine.
+
+Interactors_countsOnly <- data.matrix(countdataInteractors[ ,6:ncol(countdataInteractors)])
+
+##Run calculateTPM function - must load "scater" library
+Interactors_tpm <- calculateTPM(Interactors_countsOnly, lengths = countdataInteractors[,5])
+
+##convert to matrix again
+allDataTPM  <- data.matrix(Interactors_tpm)
+
+#rename columns with human readable sample names
+##Note: THIS NEXT SECTION REQUIRED MANUAL INPUT INTO A SPREADSHEET OR TEXT EDITOR, this code only reads in the file that was already renamed
+
+names <- read.table(file="names.txt" , sep="", row.names = 1, header = TRUE)
+colnames(allDataTPM) <- names[,1]
+```
+
+```{r select data from mutants you want to plot and calculate mean TPM, echo=FALSE}
+#Make new matrix
+Ordered_KO_data <- cbind(allDataTPM[,22:25],allDataTPM[,26:28],allDataTPM[,29:31],allDataTPM[,4:6],allDataTPM[,7:9],allDataTPM[,10:12],allDataTPM[,16:18],allDataTPM[,13:15],allDataTPM[,19:21])
+Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,22:25], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,26:28], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,29:31], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,4:6], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,7:9], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,10:12], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,16:18], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,13:15], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,19:21], na.rm = TRUE))
+#Rename columns
+averageRowIDs=c("WT","set-7","cac-1","cac-2","cac-3","naf-1","naf-2","asf-1","ATRX")
+colnames(Averaged_Orderd_KO_data) <- averageRowIDs
+```
+
+```{r subseting data to include genes of interest, echo=FALSE} 
+#subset data to sample only PRC2-target genes
+##reading in geneIDs of PRC2 target genes (promoters and genes fully covered by K27)
+Prc2targets <- read.table("../bed_files/K27_genes_stringent.bed", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
+
+Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,10])
+
+#This gene gets left out becausei had to rename it in my bed file due to blanks. I need to add it back manually because the subsetting doesn't recognize the new name
+lac <- allDataTPM[rownames(allDataTPM) == "laccase precursor", ]
+Prc2targetTPM <- rbind(Prc2targetTPM, lac)
+
+#rename rows of added gene back to original name
+rownames(Prc2targetTPM)[rownames(Prc2targetTPM) == "lac"] <- "laccase precursor"
+
+#Subset Data (n = 575)
+AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%rownames(Prc2targetTPM))
+
+#Subset data to filter out non-repressed PRC2 targets regions that got through (cutting out any genes over 10 tpm in WT). Choice of 10 TPM cutoff was arbitrary
+##These are likely genes whose promoters are not marked by H3K27me3, genes on the edge of K27 regions, and/or bivalent genes
+AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 10))
+
+#resubet PRC2 targets after filtering
+Prc2targetTPM <- subset(Prc2targetTPM, rownames(Prc2targetTPM)%in%rownames(AVERAGE_Prc2targetTPM))
+
+#Add sudocount and log transform (if necessary)
+AVERAGE_Prc2targetTPM <- AVERAGE_Prc2targetTPM + 1
+AVERAGE_Prc2targetTPM <- log2(AVERAGE_Prc2targetTPM)
+
+#melt data to get it into a format ggplot can use (library "reshape2")
+meltedAveragePRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
+                             varnames=c('GeneID', 'Sample'))
+```
+
+```{r statistics, echo=FALSE}
+#I want to run statistical tests to determine the signifcance of the difference in expression b/w mutant strains and WT
+## First, I make histogram to visualize distribution of data. we'll use cac-1 as a comparison to WT
+
+hist <- as.data.frame(AVERAGE_Prc2targetTPM)
+
+long_hist <- hist %>%
+  select(WT, `cac-1`) %>%
+  pivot_longer(cols = everything(), names_to = "Strain", values_to = "TPM")
+
+# Plot overlapping histograms
+ggplot(long_hist, aes(x = TPM, fill = Strain)) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 20, color = "black") +
+  theme_minimal() +
+  labs(title = "TPM Distribution in WT and cac-1",
+       x = "TPM",
+       y = "Frequency") +
+  scale_fill_manual(values = c("WT" = "steelblue", "cac-1" = "tomato"))
+
+#Histogram shows non-normal distribution (skewed right), so proceed with wilcox test instead of t test
+##running tests
+set7_stat <- wilcox.test(hist$`set-7`, hist$WT, alternative = "greater")
+cac1_stat <- wilcox.test(hist$`cac-1`, hist$WT, alternative = "greater")
+cac2_stat <- wilcox.test(hist$`cac-2`, hist$WT, alternative = "greater")
+# cac1_2_tstat <- wilcox.test(hist$`cac-1_2`, hist$WT, alternative = "greater")
+cac3_stat <- wilcox.test(hist$`cac-3`, hist$WT, alternative = "greater")
+naf1_stat <- wilcox.test(hist$`naf-1`, hist$WT, alternative = "greater")
+naf2_stat <- wilcox.test(hist$`naf-2`, hist$WT, alternative = "greater")
+asf1_stat <- wilcox.test(hist$`asf-1`, hist$WT, alternative = "greater")
+atrx_stat <- wilcox.test(hist$`ATRX`, hist$WT, alternative = "greater")
+
+#Make a list of all wilcox results objects
+wilcox_list <- list(set7_stat, cac1_stat, cac2_stat, cac3_stat, naf1_stat, naf2_stat, asf1_stat, atrx_stat)
+
+#rename objects
+names(wilcox_list) <- c("set7", "cac1", "cac2", "cac3", "naf1", "naf2", "asf1", "atrx")
+
+#Extract relevant stats into a dataframe
+wilcox_df <- do.call(rbind, lapply(wilcox_list, function(res) {
+  data.frame(
+    statistic = unname(res$statistic),
+    p_value = res$p.value,
+    alternative = res$alternative,
+    method = res$method
+  )
+}))
+
+# Set strain names as row names
+rownames(wilcox_df) <- names(wilcox_list)
+
+# Save to CSV
+write.csv(wilcox_df, "Wilcoxon_summary_stats.csv", row.names = TRUE)
+```
+
+```{r Plotting data in Violin Plot, echo=FALSE}
+# Define factor order and formatted x-axis labels
+label_order <- c("WT", "set-7", "cac-1", "cac-2", "cac-3", "naf-1", "naf-2", "asf-1", "ATRX")
+formatted_labels <- c(
+  "WT",
+  expression(italic("\u0394set-7")),
+  expression(italic("\u0394cac-1")),
+  expression(italic("\u0394cac-2")),
+  expression(italic("\u0394cac-3")),
+  expression(italic("\u0394naf-1")),
+  expression(italic("\u0394naf-2")),
+  expression(italic("\u0394asf-1")),
+  expression(italic("\u0394atrx"))
+)
+
+#Group and summarize
+total2 <- meltedAveragePRC2targetData %>%
+  group_by(Sample)
+
+total_dist <- meltedAveragePRC2targetData %>%
+  group_by(Sample) %>%
+  summarise(num = n())
+
+#Set dodge for violin spacing
+dodge <- position_dodge(width = 1)
+
+#Build plot
+violin <- total2 %>%
+  left_join(total_dist) %>%
+  arrange(factor(Sample, levels = label_order)) %>%
+  mutate(Sample = factor(Sample, levels = label_order)) %>%
+  ggplot(aes(x = Sample, y = Count)) +
+  geom_violin(position = dodge, scale = "width", trim = FALSE) +
+  stat_summary(fun = "mean", geom = "crossbar", width = 0.25, colour = "red") +
+  scale_x_discrete(labels = formatted_labels) +
+  labs(
+    x = "Strain",
+    y = expression("Expression Level (log"[2]~"(TPM+1))")) +
+  theme_classic(base_size = 20) +
+  theme(
+    axis.text.x = element_text(color = "black"),
+    axis.text.y = element_text(color = "black"),
+    axis.title.x = element_text(color = "black"),
+    axis.title.y = element_text(color = "black")
+  )
+
+#check it
+print(violin)
+
+#save plot
+ggsave("./CAF-1_K27_Violin_Paper_Final.pdf", plot=violin, width = 10, height = 8, unit="in",  dpi=400)
+```
+
+```{r Plotting data on heatmap, echo=FALSE}
+##Keep Only Genes that are expressed in at least one sample (n = 564)
+GenesWithChanges <- subset(AVERAGE_Prc2targetTPM, (rowSums(AVERAGE_Prc2targetTPM) > 0))
+
+#plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above
+heatmap <- pheatmap(GenesWithChanges, color = colorRampPalette(rev(brewer.pal(n = 9, name ="RdBu")))(100), cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean", legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5)
+
+#plot
+heatmap_plot <- heatmap[[4]]
+
+#save plot
+ggsave(filename = "./CAF-1_K27_Heatmap_Paper_Final.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
+```
+
+#Moving on to DESeq2
+##We will use this to determine the genes significantly DE (p < 0.05 & < 0.01)
+##These lists will be used to make volcano plots, Venn Diagrams, and for GO Analysis
+
+```{r importing counts}
+#Note: file was already read in, using a different variable name for DESeq to avoid confusion this was already done
+## change ncol to match number of columns
+cts_numeric <- matrix(as.numeric(Interactors_countsOnly), ncol = 37)
+dimnames(cts_numeric) <- list(rownames(Interactors_countsOnly), colnames(Interactors_countsOnly))
+
+#Rename columns
+colnames(cts_numeric) <- names[,1]
+```
+
+```{r group samples, echo=FALSE}
+#grouping samples by strain for DESeq analysis
+##Note, I am leaving old cac-1 strain in analysis since the counts are in the file, but will not be utilizing the data for figures. I will be using the "cac-1_new" data instead
+cac1 <- rowMeans(cts_numeric[, 1:3], na.rm = TRUE)
+cac2 <- rowMeans(cts_numeric[, 4:6], na.rm = TRUE)
+cac3 <- rowMeans(cts_numeric[, 7:9], na.rm = TRUE)
+naf1 <- rowMeans(cts_numeric[, 10:12], na.rm = TRUE)
+asf1 <- rowMeans(cts_numeric[, 13:15], na.rm = TRUE)
+naf2 <- rowMeans(cts_numeric[, 16:18], na.rm = TRUE)
+ATRX <- rowMeans(cts_numeric[, 19:21], na.rm = TRUE)
+WT <- rowMeans(cts_numeric[, 22:25], na.rm = TRUE)
+set7 <- rowMeans(cts_numeric[, 26:28], na.rm = TRUE)
+cac1_new <- rowMeans(cts_numeric[, 29:31], na.rm = TRUE)
+cac1_cac2 <- rowMeans(cts_numeric[, 32:34], na.rm = TRUE)
+cac1_suz12 <- rowMeans(cts_numeric[, 35:37], na.rm = TRUE)
+```
+
+```{r load coldata, echo = FALSE}
+#Loading in column data file. This will be used to assign the counts samples to the correct strains in DESeq
+##Make sure you have the desired strain listed as a control in this sheet
+coldata <- read.csv("../coldata.csv", header= TRUE, row.names = 1)
+coldata$condition <- factor(coldata$condition)
+coldata$type <- factor(coldata$type)
+
+#Confirm that the number and order of samples are the same in each dataset before proceeding. Important, because this will throw off/fail DESeq otherwise
+all(rownames(coldata) %in% colnames(cts_numeric))
+all(rownames(coldata) == colnames(cts_numeric))
+
+```
+
+```{r create object for DESeq2 analysis, echo=FALSE}
+#add a pseudocount to avoid 0's
+cts_numeric_pseudo = cts_numeric + 1
+
+#create DEseq dataset
+dds<- DESeqDataSetFromMatrix(countData = round(cts_numeric_pseudo),
+                              colData = coldata,
+                              design = ~ condition)
+dds
+
+#pre-filtering reads that dont have at least 1 TPM
+##logic: there are 37 rows, any gene that isn't over 38 TPM is 1 TPM in every strain (or not expressed), and is not going to be Differentially expressed anyways. We don't want these genes in the background
+keep <- rowSums(counts(dds)) > 38
+dds<- dds[keep,]
+
+#specify level of comparison (Comparing to WT)
+dds$condition <- relevel(dds$condition, ref = "WT")
+```
+
+```{r run DESeq and plot dispersion, echo= FALSE}
+dds2 <- DESeq(dds)
+#plot dispersion to determine fit
+plotDispEsts(dds2)
+```
+
+```{r create csvs with DE genes for each strain, echo=FALSE}
+#Export genes with statistically significant differential expression when compared against the wild type
+##setting p-value cutoff, starting with 0.05
+alpha = 0.05
+
+#Subsetting results based on p-value
+cac1_05 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1", "WT"))
+cac2_05 <- results(dds2, alpha=alpha, contrast=c("condition", "cac2", "WT"))
+cac3_05 <- results(dds2, alpha=alpha, contrast=c("condition", "cac3", "WT"))
+naf1_05 <- results(dds2, alpha=alpha, contrast=c("condition", "naf1", "WT"))
+naf2_05 <- results(dds2, alpha=alpha, contrast=c("condition", "naf2", "WT"))
+asf1_05 <- results(dds2, alpha=alpha, contrast=c("condition", "asf1", "WT"))
+atrx_05 <- results(dds2, alpha=alpha, contrast=c("condition", "atrx", "WT"))
+set7_05 <- results(dds2, alpha=alpha, contrast=c("condition", "set7", "WT"))
+cac1_new_05 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_new", "WT"))
+cac1_cac2_05 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_cac2", "WT"))
+cac1_suz12_05 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_suz12", "WT"))
+
+#Taking into account adjusted p-value and log2FC cutoff of 1
+#(log2FoldChange > 1 | log2FoldChange < -1)
+cac1_05 <- subset(cac1_05, padj < 0.05)
+cac2_05 <- subset(cac2_05, padj < 0.05)
+cac3_05 <- subset(cac3_05, padj < 0.05)
+naf1_05 <- subset(naf1_05, padj < 0.05)
+naf2_05 <- subset(naf2_05, padj < 0.05)
+asf1_05 <- subset(asf1_05, padj < 0.05)
+atrx_05 <- subset(atrx_05, padj < 0.05)
+set7_05 <- subset(set7_05, padj < 0.05)
+cac1_new_05 <- subset(cac1_new_05, padj < 0.05)
+cac1_cac2_05 <- subset(cac1_cac2_05, padj < 0.05)
+cac1_suz12_05 <- subset(cac1_suz12_05, padj < 0.05)
+
+#writing csv files
+write.csv(as.data.frame(cac1_05), file = "cac1_05.csv")
+write.csv(as.data.frame(cac2_05), file = "cac2_05.csv")
+write.csv(as.data.frame(cac3_05), file = "cac3_05.csv")
+write.csv(as.data.frame(naf1_05), file = "naf1_05.csv")
+write.csv(as.data.frame(naf2_05), file = "naf2_05.csv")
+write.csv(as.data.frame(asf1_05), file = "asf1_05.csv")
+write.csv(as.data.frame(atrx_05), file = "atrx_05.csv")
+write.csv(as.data.frame(set7_05), file = "set7_05.csv")
+write.csv(as.data.frame(cac1_new_05), file = "cac1_new_05.csv")
+write.csv(as.data.frame(cac1_cac2_05), file = "cac1_cac2_05.csv")
+write.csv(as.data.frame(cac1_suz12_05), file = "cac1_suz12_05.csv")
+
+##I want a 0.01 cutoff as well to perform more stringent analysis, will make a new set of csv's
+alpha = 0.01
+
+#subsetting results based on p-value
+cac1_01 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1", "WT"))
+cac2_01 <- results(dds2, alpha=alpha, contrast=c("condition", "cac2", "WT"))
+cac3_01 <- results(dds2, alpha=alpha, contrast=c("condition", "cac3", "WT"))
+naf1_01 <- results(dds2, alpha=alpha, contrast=c("condition", "naf1", "WT"))
+naf2_01 <- results(dds2, alpha=alpha, contrast=c("condition", "naf2", "WT"))
+asf1_01 <- results(dds2, alpha=alpha, contrast=c("condition", "asf1", "WT"))
+atrx_01 <- results(dds2, alpha=alpha, contrast=c("condition", "atrx", "WT"))
+set7_01 <- results(dds2, alpha=alpha, contrast=c("condition", "set7", "WT"))
+cac1_new_01 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_new", "WT"))
+cac1_cac2_01 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_cac2", "WT"))
+cac1_suz12_01 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_suz12", "WT"))
+
+#Taking into account adjusted p-value
+cac1_01 <- subset(cac1_01, padj < 0.01)
+cac2_01 <- subset(cac2_01, padj < 0.01)
+cac3_01 <- subset(cac3_01, padj < 0.01)
+naf1_01 <- subset(naf1_01, padj < 0.01)
+naf2_01 <- subset(naf2_01, padj < 0.01)
+asf1_01 <- subset(asf1_01, padj < 0.01)
+atrx_01 <- subset(atrx_01, padj < 0.01)
+set7_01 <- subset(set7_01, padj < 0.01)
+cac1_new_01 <- subset(cac1_new_01, padj < 0.01)
+cac1_cac2_01 <- subset(cac1_cac2_01, padj < 0.01)
+cac1_suz12_01 <- subset(cac1_suz12_01, padj < 0.01)
+
+#writing csv files
+write.csv(as.data.frame(cac1_01), file = "cac1_01.csv")
+write.csv(as.data.frame(cac2_01), file = "cac2_01.csv")
+write.csv(as.data.frame(cac3_01), file = "cac3_01.csv")
+write.csv(as.data.frame(naf1_01), file = "naf1_01.csv")
+write.csv(as.data.frame(naf2_01), file = "naf2_01.csv")
+write.csv(as.data.frame(asf1_01), file = "asf1_01.csv")
+write.csv(as.data.frame(atrx_01), file = "atrx_01.csv")
+write.csv(as.data.frame(set7_01), file = "set7_01.csv")
+write.csv(as.data.frame(cac1_new_01), file = "cac1_new_01.csv")
+write.csv(as.data.frame(cac1_cac2_01), file = "cac1_cac2_01.csv")
+write.csv(as.data.frame(cac1_suz12_01), file = "cac1_suz12_01.csv")
+```
+
+#I now want to subset DEG's across strains based one which strain they are up- or downregulated in.
+##I will only focus on CAF-1 mutants & set-7 for paper to  make comparisons between the expression of All genes (CAF-1 mutants) & H3K27me3 marked genes (CAF-1 vs. set-7) specifically
+```{r making a bunch of csv files for further analysis, echo=FALSE}
+#Reading in the csv's w/ DEGs back in. This makes it easier to subset dfs later
+##Reading in both 0.05 and 0.01 cutoff csv's
+cac1_DEG_05 <- read.csv("./cac1_new_05.csv", header= TRUE, row.names = 1)
+cac2_DEG_05 <- read.csv("./cac2_05.csv", header= TRUE, row.names = 1)
+cac3_DEG_05 <- read.csv("./cac3_05.csv", header= TRUE, row.names = 1)
+set7_DEG_05 <- read.csv("./set7_05.csv", header= TRUE, row.names = 1)
+
+cac1_DEG_01 <- read.csv("./cac1_new_01.csv", header= TRUE, row.names = 1)
+cac2_DEG_01 <- read.csv("./cac2_01.csv", header= TRUE, row.names = 1)
+cac3_DEG_01 <- read.csv("./cac3_01.csv", header= TRUE, row.names = 1)
+set7_DEG_01 <- read.csv("./set7_01.csv", header= TRUE, row.names = 1)
+
+#make a columns w/ gene names for easier subsetting
+cac1_DEG_05 <- tibble::rownames_to_column(cac1_DEG_05, "NCU")
+cac2_DEG_05 <- tibble::rownames_to_column(cac2_DEG_05, "NCU")
+cac3_DEG_05 <- tibble::rownames_to_column(cac3_DEG_05, "NCU")
+set7_DEG_05 <- tibble::rownames_to_column(set7_DEG_05, "NCU")
+
+cac1_DEG_01 <- tibble::rownames_to_column(cac1_DEG_01, "NCU")
+cac2_DEG_01 <- tibble::rownames_to_column(cac2_DEG_01, "NCU")
+cac3_DEG_01 <- tibble::rownames_to_column(cac3_DEG_01, "NCU")
+set7_DEG_01 <- tibble::rownames_to_column(set7_DEG_01, "NCU")
+
+#Splitting Up & Down regulated genes
+cac1_UP <- subset(cac1_DEG_05, cac1_DEG_05$log2FoldChange > 1)
+cac1_DOWN <- subset(cac1_DEG_05, cac1_DEG_05$log2FoldChange < -1)
+cac2_UP <- subset(cac2_DEG_05, cac2_DEG_05$log2FoldChange > 1)
+cac2_DOWN <- subset(cac2_DEG_05, cac2_DEG_05$log2FoldChange < -1)
+cac3_UP <- subset(cac3_DEG_05, cac3_DEG_05$log2FoldChange > 1)
+cac3_DOWN <- subset(cac3_DEG_05, cac3_DEG_05$log2FoldChange < -1)
+set7_UP <- subset(set7_DEG_05, set7_DEG_05$log2FoldChange > 1)
+set7_DOWN <- subset(set7_DEG_05, set7_DEG_05$log2FoldChange < -1)
+
+cac1_UP_01 <- subset(cac1_DEG_01, cac1_DEG_01$log2FoldChange > 1)
+cac1_DOWN_01 <- subset(cac1_DEG_01, cac1_DEG_01$log2FoldChange < -1)
+cac2_UP_01 <- subset(cac2_DEG_01, cac2_DEG_01$log2FoldChange > 1)
+cac2_DOWN_01 <- subset(cac2_DEG_01, cac2_DEG_01$log2FoldChange < -1)
+cac3_UP_01 <- subset(cac3_DEG_01, cac3_DEG_01$log2FoldChange > 1)
+cac3_DOWN_01 <- subset(cac3_DEG_01, cac3_DEG_01$log2FoldChange < -1)
+set7_UP_01 <- subset(set7_DEG_01, set7_DEG_01$log2FoldChange > 1)
+set7_DOWN_01 <- subset(set7_DEG_01, set7_DEG_01$log2FoldChange < -1)
+
+#I want bed files of up/downregulated genes across samples
+##p value of 0.05 first
+neurospora = read.table("../bed_files/neurospora_genes_edit.bed", sep = "\t", header= TRUE)
+cac1_up_genes_05 <- subset(neurospora, neurospora$Attributes %in% cac1_UP$NCU)
+cac2_up_genes_05 <- subset(neurospora, neurospora$Attributes %in% cac2_UP$NCU)
+cac3_up_genes_05 <- subset(neurospora, neurospora$Attributes %in% cac3_UP$NCU)
+set7_up_genes_05 <- subset(neurospora, neurospora$Attributes %in% set7_UP$NCU)
+cac1_down_genes_05 <- subset(neurospora, neurospora$Attributes %in% cac1_DOWN$NCU)
+cac2_down_genes_05 <- subset(neurospora, neurospora$Attributes %in% cac2_DOWN$NCU)
+cac3_down_genes_05 <- subset(neurospora, neurospora$Attributes %in% cac3_DOWN$NCU)
+set7_down_genes_05 <- subset(neurospora, neurospora$Attributes %in% set7_DOWN$NCU)
+
+##Write csv's, i will make beds manually
+write.csv(cac1_up_genes_05, file = "cac1_up_genes_05.csv", row.names = F)
+write.csv(cac2_up_genes_05, file = "cac2_up_genes_05.csv", row.names = F)
+write.csv(cac3_up_genes_05, file = "cac3_up_genes_05.csv", row.names = F)
+write.csv(set7_up_genes_05, file = "set7_up_genes_05.csv", row.names = F)
+write.csv(cac1_down_genes_05, file = "cac1_down_genes_05.csv", row.names = F)
+write.csv(cac2_down_genes_05, file = "cac2_down_genes_05.csv", row.names = F)
+write.csv(cac3_down_genes_05, file = "cac3_down_genes_05.csv", row.names = F)
+write.csv(set7_down_genes_05, file = "set7_down_genes_05.csv", row.names = F)
+
+##now getting genes under p value of 0.01 for more strict analysis
+cac1_up_genes_01 <- subset(neurospora, neurospora$Attributes %in% cac1_UP_01$NCU)
+cac2_up_genes_01 <- subset(neurospora, neurospora$Attributes %in% cac2_UP_01$NCU)
+cac3_up_genes_01 <- subset(neurospora, neurospora$Attributes %in% cac3_UP_01$NCU)
+set7_up_genes_01 <- subset(neurospora, neurospora$Attributes %in% set7_UP_01$NCU)
+cac1_down_genes_01 <- subset(neurospora, neurospora$Attributes %in% cac1_DOWN_01$NCU)
+cac2_down_genes_01 <- subset(neurospora, neurospora$Attributes %in% cac2_DOWN_01$NCU)
+cac3_down_genes_01 <- subset(neurospora, neurospora$Attributes %in% cac3_DOWN_01$NCU)
+set7_down_genes_01 <- subset(neurospora, neurospora$Attributes %in% set7_DOWN_01$NCU)
+
+##Write csv's, i will make beds manually
+write.csv(cac1_up_genes_01, file = "cac1_up_genes_01.csv", row.names = F)
+write.csv(cac2_up_genes_01, file = "cac2_up_genes_01.csv", row.names = F)
+write.csv(cac3_up_genes_01, file = "cac3_up_genes_01.csv", row.names = F)
+write.csv(set7_up_genes_01, file = "set7_up_genes_01.csv", row.names = F)
+write.csv(cac1_down_genes_01, file = "cac1_down_genes_01.csv", row.names = F)
+write.csv(cac2_down_genes_01, file = "cac2_down_genes_01.csv", row.names = F)
+write.csv(cac3_down_genes_01, file = "cac3_down_genes_01.csv", row.names = F)
+write.csv(set7_down_genes_01, file = "set7_down_genes_01.csv", row.names = F)
+
+#Combining all DEG's across CAF-1 mutants into one df
+##I want only cac-1 & cac-2 first, p < 0.05
+cac1and2_DEG_05 <- subset(neurospora, (neurospora$Attributes %in% cac1_DEG_05$NCU) & (neurospora$Attributes %in% cac2_DEG_05$NCU))
+write.csv(as.data.frame(cac1and2_DEG_05), file = "cac1_2_DEG_05.csv")  
+
+##p < 0.01
+cac1and2_DEG_01 <- subset(neurospora, (neurospora$Attributes %in% cac1_DEG_01$NCU) & (neurospora$Attributes %in% cac2_DEG_01$NCU))
+write.csv(as.data.frame(cac1and2_DEG_01), file = "cac1_2_DEG_01.csv") 
+
+##Upregulated in both cac-1 and cac-2
+cac1and2_UP <- subset(neurospora, (neurospora$Attributes %in% cac1_up_genes_05$Attributes) & (neurospora$Attributes %in% cac2_up_genes_05$Attributes))
+write.csv(as.data.frame(cac1and2_UP), file = "cac1and2_UP_genes_05.csv")
+
+##downregulated in both cac-1 and cac-2
+cac1and2_DOWN <- subset(neurospora, (neurospora$Attributes %in% cac1_down_genes_01$Attributes) & (neurospora$Attributes %in% cac2_down_genes_01$Attributes))
+write.csv(as.data.frame(cac1and2_DOWN), file = "cac1and2_DOWN_genes_05.csv")
+
+###Now including cac-3
+##p < 0.05
+cac1and2and3_DEG_05 <- subset(neurospora, neurospora$Attributes %in% cac1_DEG_05$NCU & neurospora$Attributes %in% cac2_DEG_05$NCU & neurospora$Attributes %in% cac3_DEG_05$NCU)
+write.csv(as.data.frame(cac1and2and3_DEG_05), file = "cac1and2and3_DEG_05.csv")  
+
+##p < 0.01
+cac1and2and3_DEG_01 <- subset(neurospora, neurospora$Attributes %in% cac1_DEG_01$NCU & neurospora$Attributes %in% cac2_DEG_01$NCU & neurospora$Attributes %in% cac3_DEG_01$NCU)
+write.csv(as.data.frame(cac1and2and3_DEG_01), file = "cac1and2and3_DEG_01.csv") 
+
+##Upregulated in All
+cac1and2and3_UP <- subset(neurospora, neurospora$Attributes %in% cac1_up_genes_05$Attributes & neurospora$Attributes %in% cac2_up_genes_05$Attributes & neurospora$Attributes %in% cac3_up_genes_05$Attributes )
+write.csv(as.data.frame(cac1and2and3_UP), file = "cac1and2and3_UP_genes_05.csv")
+
+##downregulated in All
+cac1and2and3_DOWN <- subset(neurospora, neurospora$Attributes %in% cac1_down_genes_05$Attributes & neurospora$Attributes %in% cac2_down_genes_05$Attributes& neurospora$Attributes %in% cac3_down_genes_05$Attributes  )
+write.csv(as.data.frame(cac1and2and3_DOWN), file = "cac1and2and3_DOWN_genes_05.csv")
+
+#I want a another set with all genes DEG in either cac1, cac2, OR cac3
+
+##Upregulated in either cac-1 or cac-2
+cac1or2_UP <- subset(neurospora, (neurospora$Attributes %in% cac1_up_genes_05$Attributes) | (neurospora$Attributes %in% cac2_up_genes_05$Attributes))
+write.csv(as.data.frame(cac1or2_UP), file = "cac1or2_UP.csv")
+
+##downregulated in either cac-1 or cac-2
+cac1or2_DOWN <- subset(neurospora, (neurospora$Attributes %in% cac1_down_genes_05$Attributes) | (neurospora$Attributes %in% cac2_down_genes_05$Attributes))
+write.csv(as.data.frame(cac1or2_DOWN), file = "cac1or2_DOWN.csv")
+
+##Upregulated in either cac-1, cac-2, or cac-3
+cac1or2or3_UP <- subset(neurospora, (neurospora$Attributes %in% cac1_up_genes_05$Attributes) | (neurospora$Attributes %in% cac2_up_genes_05$Attributes) | (neurospora$Attributes %in% cac3_up_genes_05$Attributes))
+write.csv(as.data.frame(cac1or2or3_UP), file = "cac1or2or3_UP.csv")
+
+cac1or2or3_DOWN <- subset(neurospora, (neurospora$Attributes %in% cac1_down_genes_05$Attributes) | (neurospora$Attributes %in% cac2_down_genes_05$Attributes) | (neurospora$Attributes %in% cac3_down_genes_05$Attributes))
+write.csv(as.data.frame(cac1or2or3_DOWN), file = "cac1or2or3_DOWN.csv")
+
+#I also want to separate DE K27 genes from the rest of the genes. This is really only necessary for upregulated genes, as there are very few (if any) K27 marked genes that are actually downregulated in these mutants. I will make bed files out of these csvs to use in plotheatmap
+Prc2targets <- read.table("../bed_files/K27_genes_stringent.bed", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t")
+
+cac1_up_K27 <- subset(cac1_up_genes_05, cac1_up_genes_05$VALUE %in% Prc2targets$V11)
+cac2_up_K27 <- subset(cac2_up_genes_05, cac2_up_genes_05$VALUE %in% Prc2targets$V11)
+cac3_up_K27 <- subset(cac3_up_genes_05, cac3_up_genes_05$VALUE %in% Prc2targets$V11)
+set7_up_K27 <- subset(set7_up_genes_05, set7_up_genes_05$VALUE %in% Prc2targets$V11)
+cac1_up_nonK27 <- subset(cac1_up_genes_05, ! (cac1_up_genes_05$VALUE %in% Prc2targets$V11))
+cac2_up_nonK27 <- subset(cac2_up_genes_05, ! (cac2_up_genes_05$VALUE %in% Prc2targets$V11))
+cac3_up_nonK27 <- subset(cac3_up_genes_05, ! (cac3_up_genes_05$VALUE %in% Prc2targets$V11))
+set7_up_nonK27 <- subset(set7_up_genes_05, ! (set7_up_genes_05$VALUE %in% Prc2targets$V11))
+cac1and2_up_K27 <- subset(cac1and2_UP, cac1and2_UP$VALUE %in% Prc2targets$V11)
+cac1and2and3_up_K27 <- subset(cac1and2and3_UP, cac1and2and3_UP$VALUE %in% Prc2targets$V11)
+cac1and2_up_nonK27 <- subset(cac1and2_UP, ! (cac1and2_UP$VALUE %in% Prc2targets$V11))
+cac1and2and3_up_nonK27 <- subset(cac1and2and3_UP, ! (cac1and2and3_UP$VALUE %in% Prc2targets$V11))
+cac1or2_up_K27 <- subset(cac1or2_UP, cac1or2_UP$VALUE %in% Prc2targets$V11)
+cac1or2or3_up_K27 <- subset(cac1or2or3_UP, cac1or2or3_UP$VALUE %in% Prc2targets$V11)
+cac1or2_up_nonK27 <- subset(cac1or2_UP, ! (cac1or2_UP$VALUE %in% Prc2targets$V11))
+cac1or2or3_up_nonK27 <- subset(cac1or2or3_UP, ! (cac1or2or3_UP$VALUE %in% Prc2targets$V11))
+cac1or2_down_K27 <- subset(cac1or2_DOWN, cac1or2_DOWN$VALUE %in% Prc2targets$V11)
+cac1or2_down_nonK27 <- subset(cac1or2_DOWN, ! cac1or2_DOWN$VALUE %in% Prc2targets$V11)
+
+#Write csv's, I will manipulate csvs in excel to make the bed files I desire
+write.csv(cac1_up_K27, file = "cac1_up_K27_genes.csv", row.names = F)
+write.csv(cac2_up_K27, file = "cac2_up_K27_genes.csv", row.names = F)
+write.csv(cac3_up_K27, file = "cac3_up_K27_genes.csv", row.names = F)
+write.csv(cac1_up_nonK27, file = "cac1_up_nonK27_genes.csv", row.names = F)
+write.csv(cac2_up_nonK27, file = "cac2_up_nonK27_genes.csv", row.names = F)
+write.csv(cac3_up_nonK27, file = "cac3_up_nonK27_genes.csv", row.names = F)
+write.csv(cac1and2_up_K27, file = "cac1and2_up_K27_genes.csv", row.names = F)
+write.csv(cac1and2and3_up_K27, file = "cac1and2and3_up_K27_genes.csv", row.names = F)
+write.csv(cac1and2_up_nonK27, file = "cac1and2_up_nonK27_genes.csv", row.names = F)
+write.csv(cac1and2and3_up_nonK27, file = "cac1and2and3_up_nonK27_genes.csv", row.names = F)
+write.csv(cac1or2_up_K27, file = "cac1or2_up_K27_genes.csv", row.names = F)
+write.csv(cac1or2or3_up_K27, file = "cac1or2or3_up_K27_genes.csv", row.names = F)
+write.csv(cac1or2_up_nonK27, file = "cac1or2_up_nonK27_genes.csv", row.names = F)
+write.csv(cac1or2or3_up_nonK27, file = "cac1or2or3_up_nonK27_genes.csv", row.names = F)
+write.csv(cac1or2_down_K27, file = "cac1or2_down_K27_genes.csv", row.names = F)
+write.csv(cac1or2_down_nonK27, file = "cac1or2_down_nonK27_genes.csv", row.names = F)
+```
+
+#Next, make Volcano Plots displaying all DE genes
+```{r, Volcano Plots}
+#Make New variables for plot
+cac1_vol <- cac1_DEG_05
+cac2_vol <- cac2_DEG_05
+cac3_vol <- cac3_DEG_05
+set7_vol <- set7_DEG_05
+
+#I need to get rid of a few genes with a p-value of 0, as well as the knocked-out gene itself
+cac1_vol <- cac1_vol[cac1_vol$padj != 0, ]
+cac2_vol <- cac2_vol[cac2_vol$padj != 0, ]
+cac3_vol <- cac3_vol[cac3_vol$padj != 0, ]
+set7_vol <- set7_vol[set7_vol$padj != 0, ]
+cac1_vol <- cac1_vol[-which.min(cac1_vol$log2FoldChange), ]
+cac2_vol <- cac2_vol[-which.min(cac2_vol$log2FoldChange), ]
+cac3_vol <- cac3_vol[-which.min(cac3_vol$log2FoldChange), ]
+set7_vol <- set7_vol[-which.min(set7_vol$log2FoldChange), ]
+
+##cac-1
+#Assign categories with NS prioritized
+cac1_vol$category <- case_when(
+  cac1_vol$log2FoldChange > -1 & cac1_vol$log2FoldChange < 1 ~ "NS",
+  cac1_vol$NCU %in% Prc2targets$V11 ~ "PRC2",
+  cac1_vol$log2FoldChange > 1 & cac1_vol$padj < 0.05 ~ "Upregulated",
+  cac1_vol$log2FoldChange < -1 & cac1_vol$padj < 0.05 ~ "Downregulated",
+  TRUE ~ "NS"
+)
+
+#Reorder so PRC2 is plotted last (on top)
+cac1_vol <- cac1_vol[order(cac1_vol$category == "PRC2"), ]
+
+#Plot
+cac1_volcano_plot <- ggplot(cac1_vol, aes(
+  x = log2FoldChange,
+  y = -log10(padj),
+  color = category
+)) +
+  geom_point(size = 3, alpha = 0.85) +
+  scale_color_manual(
+    values = c(
+      "Upregulated" = "red",
+      "Downregulated" = "blue",
+      "PRC2" = "orange2",
+      "NS" = "grey"
+    ),
+    breaks = c("Upregulated", "Downregulated", "PRC2"), # only show these in legend
+    labels = c("Upregulated", "Downregulated", "PRC2")
+  ) +
+  labs(
+    x = expression(paste("log"[2], "FoldChange(cac-1/WT)")),
+    y = expression(paste("-log"[10], "(p-value)")),
+    title = "cac-1 vs WT"
+  ) +
+  ylim(0, 300) +
+  geom_vline(xintercept = c(-1, 1), color = "grey5", linetype = "dashed", alpha = 0.35) +
+  geom_hline(yintercept = -log10(0.05), color = "grey5", linetype = "dashed", alpha = 0.35) +
+  theme_classic(base_size = 20) +
+  theme(
+    axis.title.y = element_text(face = "bold", margin = margin(0, 20, 0, 0), size = rel(1.1), color = 'black'),
+    axis.title.x = element_text(face = "bold", margin = margin(20, 0, 0, 0), size = rel(1.1), color = 'black',),
+    axis.text = element_text(color = "black"),
+    plot.title = element_text(hjust = 0.5, color = "black"),
+    legend.position = "bottom",
+    legend.box = "horizontal",
+    legend.title = element_blank() 
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 5)))  # bigger legend dots
+
+#Print the plot
+print(cac1_volcano_plot)
+
+ggsave("./cac1_volcano_plot_FINAL.pdf", plot=cac1_volcano_plot, width = 12, height = 9, unit="in",  dpi=400)
+
+##cac-2
+#Assign categories with NS prioritized
+cac2_vol$category <- case_when(
+  cac2_vol$log2FoldChange > -1 & cac2_vol$log2FoldChange < 1 ~ "NS",
+  cac2_vol$NCU %in% Prc2targets$V11 ~ "PRC2",
+  cac2_vol$log2FoldChange > 1 & cac2_vol$padj < 0.05 ~ "Upregulated",
+  cac2_vol$log2FoldChange < -1 & cac2_vol$padj < 0.05 ~ "Downregulated",
+  TRUE ~ "NS"
+)
+
+#Reorder so PRC2 is plotted last (on top)
+cac2_vol <- cac2_vol[order(cac2_vol$category == "PRC2"), ]
+
+#Plot
+cac2_volcano_plot <- ggplot(cac2_vol, aes(
+  x = log2FoldChange,
+  y = -log10(padj),
+  color = category
+)) +
+  geom_point(size = 3, alpha = 0.85) +
+  scale_color_manual(
+    values = c(
+      "Upregulated" = "red",
+      "Downregulated" = "blue",
+      "PRC2" = "orange2",
+      "NS" = "grey"
+    ),
+    breaks = c("Upregulated", "Downregulated", "PRC2"), # only show these in legend
+    labels = c("Upregulated", "Downregulated", "PRC2")
+  ) +
+  labs(
+    x = expression(paste("log"[2], "FoldChange(cac-2/WT)")),
+    y = expression(paste("-log"[10], "(p-value)")),
+    title = "cac-2 vs WT"
+  ) +
+  ylim(0, 300) +
+  geom_vline(xintercept = c(-1, 1), color = "grey5", linetype = "dashed", alpha = 0.35) +
+  geom_hline(yintercept = -log10(0.05), color = "grey5", linetype = "dashed", alpha = 0.35) +
+  theme_classic(base_size = 20) +
+  theme(
+    axis.title.y = element_text(face = "bold", margin = margin(0, 20, 0, 0), size = rel(1.1), color = 'black'),
+    axis.title.x = element_text(face = "bold", margin = margin(20, 0, 0, 0), size = rel(1.1), color = 'black',),
+    axis.text = element_text(color = "black"),
+    plot.title = element_text(hjust = 0.5, color = "black"),
+    legend.position = "bottom",
+    legend.box = "horizontal",
+    legend.title = element_blank() 
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 5)))  # bigger legend dots
+
+#Print the plot
+print(cac2_volcano_plot)
+
+ggsave("./cac2_volcano_plot_FINAL.pdf", plot=cac2_volcano_plot, width = 12, height = 9, unit="in",  dpi=400)
+
+##cac-3
+#Assign categories with NS prioritized
+cac3_vol$category <- case_when(
+  cac3_vol$log2FoldChange > -1 & cac3_vol$log2FoldChange < 1 ~ "NS",
+  cac3_vol$NCU %in% Prc2targets$V11 ~ "PRC2",
+  cac3_vol$log2FoldChange > 1 & cac3_vol$padj < 0.05 ~ "Upregulated",
+  cac3_vol$log2FoldChange < -1 & cac3_vol$padj < 0.05 ~ "Downregulated",
+  TRUE ~ "NS"
+)
+
+#Reorder so PRC2 is plotted last (on top)
+cac3_vol <- cac3_vol[order(cac3_vol$category == "PRC2"), ]
+
+#Plot
+cac3_volcano_plot <- ggplot(cac3_vol, aes(
+  x = log2FoldChange,
+  y = -log10(padj),
+  color = category
+)) +
+  geom_point(size = 3, alpha = 0.85) +
+  scale_color_manual(
+    values = c(
+      "Upregulated" = "red",
+      "Downregulated" = "blue",
+      "PRC2" = "orange2",
+      "NS" = "grey"
+    ),
+    breaks = c("Upregulated", "Downregulated", "PRC2"), # only show these in legend
+    labels = c("Upregulated", "Downregulated", "PRC2")
+  ) +
+  labs(
+    x = expression(paste("log"[2], "FoldChange(cac-3/WT)")),
+    y = expression(paste("-log"[10], "(p-value)")),
+    title = "cac-3 vs WT"
+  ) +
+  ylim(0, 300) +
+  geom_vline(xintercept = c(-1, 1), color = "grey5", linetype = "dashed", alpha = 0.35) +
+  geom_hline(yintercept = -log10(0.05), color = "grey5", linetype = "dashed", alpha = 0.35) +
+  theme_classic(base_size = 20) +
+  theme(
+    axis.title.y = element_text(face = "bold", margin = margin(0, 20, 0, 0), size = rel(1.1), color = 'black'),
+    axis.title.x = element_text(face = "bold", margin = margin(20, 0, 0, 0), size = rel(1.1), color = 'black',),
+    axis.text = element_text(color = "black"),
+    plot.title = element_text(hjust = 0.5, color = "black"),
+    legend.position = "bottom",
+    legend.box = "horizontal",
+    legend.title = element_blank() 
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 5)))  # bigger legend dots
+
+#Print the plot
+print(cac3_volcano_plot)
+
+#Save Plot
+ggsave("./cac3_volcano_plot_FINAL.pdf", plot=cac3_volcano_plot, width = 12, height = 9, unit="in",  dpi=400)
+
+##set-7
+#Assign categories with NS prioritized
+set7_vol$category <- case_when(
+  set7_vol$log2FoldChange > -1 & set7_vol$log2FoldChange < 1 ~ "NS",
+  set7_vol$NCU %in% Prc2targets$V11 ~ "PRC2",
+  set7_vol$log2FoldChange > 1 & set7_vol$padj < 0.05 ~ "Upregulated",
+  set7_vol$log2FoldChange < -1 & set7_vol$padj < 0.05 ~ "Downregulated",
+  TRUE ~ "NS"
+)
+
+#Reorder so PRC2 is plotted last (on top)
+set7_vol <- set7_vol[order(set7_vol$category == "PRC2"), ]
+
+#Plot
+set7_volcano_plot <- ggplot(set7_vol, aes(
+  x = log2FoldChange,
+  y = -log10(padj),
+  color = category
+)) +
+  geom_point(size = 3, alpha = 0.85) +
+  scale_color_manual(
+    values = c(
+      "Upregulated" = "red",
+      "Downregulated" = "blue",
+      "PRC2" = "orange2",
+      "NS" = "grey"
+    ),
+    breaks = c("Upregulated", "Downregulated", "PRC2"), # only show these in legend
+    labels = c("Upregulated", "Downregulated", "PRC2")
+  ) +
+  labs(
+    x = expression(paste("log"[2], "FoldChange(set-7/WT)")),
+    y = expression(paste("-log"[10], "(p-value)")),
+    title = "set-7 vs WT"
+  ) +
+  ylim(0, 300) +
+  geom_vline(xintercept = c(-1, 1), color = "grey5", linetype = "dashed", alpha = 0.35) +
+  geom_hline(yintercept = -log10(0.05), color = "grey5", linetype = "dashed", alpha = 0.35) +
+  theme_classic(base_size = 20) +
+  theme(
+    axis.title.y = element_text(face = "bold", margin = margin(0, 20, 0, 0), size = rel(1.1), color = 'black'),
+    axis.title.x = element_text(face = "bold", margin = margin(20, 0, 0, 0), size = rel(1.1), color = 'black',),
+    axis.text = element_text(color = "black"),
+    plot.title = element_text(hjust = 0.5, color = "black"),
+    legend.position = "bottom",
+    legend.box = "horizontal",
+    legend.title = element_blank() 
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 5)))  # bigger legend dots
+
+#Print the plot
+print(set7_volcano_plot)
+
+#Save Plot
+ggsave("./set7_volcano_plot_FINAL.pdf", plot=set7_volcano_plot, width = 12, height = 9, unit="in",  dpi=400)
+```
+
+# Now, I want to make Venn-diagrams to compare the number of genes that are DE across all the CAF-1 mutants & set-7 for K27 genes
+
+```{r Make Venn Diagrams, echo=FALSE}
+#Venn Diagram w/ All Upregulated genes in CAF-1 mutants
+venn.diagram(
+  x = list(cac1_UP$NCU, cac2_UP$NCU, cac3_UP$NCU),
+  category.names = c("cac1", "cac2 ", "cac3"),
+  filename = 'CAF-1_UP_venn_diagramm.png',
+  col=c("#8da0cb", "#66c2a5", "#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+#Make euler plot inputing values gathered from venn.diagram(). This will provide a proportional venn-diagram
+CAF1_up_fit = euler(c("A" = 1152, "B" = 140, "C" = 447, "A&B" = 382, "A&C" = 160, "B&C" = 93, "A&B&C" = 772))
+CAF1_up_eulerplot <- plot(CAF1_up_fit)
+
+#Save file
+ggsave(filename = "CAF-1_All_UP_euler.pdf", plot = CAF1_up_eulerplot, width = 4, height = 4, dpi = 600)
+
+#Venn Diagram w/ All Downregulated genes in CAF-1 mutants
+venn.diagram(
+  x = list(cac1_DOWN$NCU, cac2_DOWN$NCU, cac3_DOWN$NCU),
+  category.names = c("cac1", "cac2 ", "cac3"),
+  filename = 'CAF-1_DOWN_venn_diagramm.png',
+  col=c("#8da0cb", "#66c2a5", "#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+#Make euler plot inputing values gathered from venn.diagram(). This will provide a proportional venn-diagram
+CAF1_down_fit = euler(c("A" = 1365, "B" = 108, "C" = 447, "A&B" = 70, "A&C" = 104, "B&C" = 208, "A&B&C" = 131))
+CAF1_down_eulerplot <- plot(CAF1_down_fit)
+
+#Save file
+ggsave(filename = "CAF-1_All_DOWN_euler.pdf", plot = CAF1_down_eulerplot, width = 4, height = 4, dpi = 600)
+
+###I also want to compare DE of only H3K27me3 genes b/w strains
+cac1_K27 <- subset(cac1_UP, cac1_UP$NCU %in% Prc2targets[,11])
+cac2_K27 <- subset(cac2_UP, cac2_UP$NCU %in% Prc2targets[,11])
+cac3_K27 <- subset(cac3_UP, cac3_UP$NCU %in% Prc2targets[,11])
+set7_K27 <- subset(set7_UP, set7_UP$NCU %in% Prc2targets[,11])
+
+#Making Venn for All Upregulated K27 genes in CAF-1 mutants
+venn.diagram(
+  x = list(cac1_K27$NCU, cac2_K27$NCU, cac3_K27$NCU),
+  category.names = c("cac1", "cac2 ", "cac3"),
+  filename = 'CAF-1_venn_diagramm_UP_K27_genes.png',
+  col=c("#8da0cb", "#66c2a5", "#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+#plotting euler
+CAF1_K27_up_fit = euler(c("A" = 107, "B" = 8, "C" = 53, "A&B" = 42, "A&C" = 50, "B&C" = 8, "A&B&C" = 245))
+CAF1_K27_up_eulerplot <- plot(CAF1_K27_up_fit)
+
+#Save file
+ggsave(filename = "CAF-1_euler_K27_UP.pdf", plot = CAF1_K27_up_eulerplot, width = 4, height = 4, dpi = 600)
+
+#Making Venn for All Upregulated genes in cac-1/2 and set-7 mutants
+venn.diagram(
+  x = list(cac1_K27$NCU, cac2_K27$NCU, set7_K27$NCU),
+  category.names = c("cac1", "cac2 ", "set7"),
+  filename = 'cac1-2_set7_venn_diagramm_UP_K27_genes.png',
+  col=c("#8da0cb", "#66c2a5", "#756bb1"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#756bb1",0.25)),
+  output=TRUE)
+
+#plotting euler
+cac1_2_set7_fit = euler(c("A" = 81, "B" = 2, "C" = 66, "A&B" = 68, "A&C" = 76, "B&C" = 14, "A&B&C" = 219))
+cac1_2_set7_eulerplot <- plot(cac1_2_set7_fit)
+
+#Save file
+ggsave(filename = "cac1-2_set7_euler_All_UP.pdf", plot = cac1_2_set7_eulerplot, width = 4, height = 4, dpi = 600)
+```
+
+#Lastly, I want to make an IGV track for visualizing DE data with ChIP data
+
+```{r Make IGV Track, echo=FALSE}
+#calling list of files
+##Note: this will only work if the ONLY csv's in this directory are the ones containing the Data you want on the track (i.e. you need to move any other csv's from this directory, or move the ones you want on the track to a new one and change the path)
+list_of_files <- list.files(path = "../Research",
+                            recursive = TRUE,
+                            pattern = ".csv$")
+
+induced_genes <- readr::read_csv(list_of_files, id = "file_name")
+
+##convert to wide format
+l2fc_data <- data.frame(pivot_wider(data = induced_genes, id_cols = "...1", names_from = "file_name", values_from = "log2FoldChange"))
+
+#assigning row names and deleting extra column
+rownames(l2fc_data) <- l2fc_data[,1]
+l2fc_data <- l2fc_data[,-1]
+
+#assigning NA values to 0
+l2fc_data[is.na(l2fc_data)] <- 0
+
+#tibble NCU names back to first column
+l2fc <- tibble::rownames_to_column(l2fc_data, "VALUE")
+
+#read in file w/ all genes
+ngenes = read.csv("../csv_files/neurospora_genes_edit.csv")
+
+#Make IGV Track
+##Note: only genes with DE in one or more strains will display data in the track
+combine <- transform(merge(ngenes, l2fc, by = "VALUE"))
+track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", "asf1_05.csv", "atrx_05.csv", "cac1_05.csv", "cac2_05.csv", "cac3_05.csv", "naf1_05.csv", "naf2_05.csv", "set7_05.csv", "cac1_new_05.csv", "cac1_cac2_05.csv", "cac1_suz12_05.csv")
+
+#write track to file
+write.table(track, file="newseq.igv", sep="\t", row.names = FALSE, quote = FALSE)
+```
+
+#For figure,  trying to use grid extra to get everything aligned
+```{r combining figures using grid extra}
+# Set theme for all ggplots to 8 pt font
+violin <- violin + theme(text = element_text(size = 8))
+cac1_volcano_plot <- cac1_volcano_plot + theme(text = element_text(size = 8))
+cac2_volcano_plot <- cac2_volcano_plot + theme(text = element_text(size = 8))
+cac3_volcano_plot <- cac3_volcano_plot + theme(text = element_text(size = 8))
+set7_volcano_plot <- set7_volcano_plot + theme(text = element_text(size = 8))
+
+# Arrange in 3x2 grid
+combined_plot <- grid.arrange(
+  violin, heatmap_plot,
+  cac1_volcano_plot, cac2_volcano_plot,
+  cac3_volcano_plot, set7_volcano_plot,
+  ncol = 2
+)
+
+# Save the combined figure
+ggsave("combined_figure.pdf", combined_plot, width = 7.5, height = 6.5, units = "in")
+```
+
+#END

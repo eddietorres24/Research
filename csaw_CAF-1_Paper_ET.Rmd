@@ -645,56 +645,99 @@ col_fun(seq(0, max, length = 20))
 #sort_order <- order(sort_order, decreasing = TRUE)
 #K27_FilteredHeatmap_mat <- cbind(K27_FilteredHeatmap_mat, sort_order)
 
-#altering the subsetting to clean up heatmap
-no_cac <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1 & K27_FilteredHeatmap_mat[, 3] <= 0.1 )
+#Manual Clustering to clean up heatmap
+no_caf <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1 & K27_FilteredHeatmap_mat[, 3] <= 0.1 & K27_FilteredHeatmap_mat[, 4] <= 0.1 )
 
-no_cac2 <- subset(K27_FilteredHeatmap_mat, ! K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1 & K27_FilteredHeatmap_mat[, 3] <= 0.1 )
+no_cac3 <- subset(K27_FilteredHeatmap_mat, ! K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_mat[, 3] <= 0.1 & K27_FilteredHeatmap_mat[, 4] <= 0.1)
 
-no_cac1 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_mat[, 3] <= 0.1 )
+no_cac2 <- subset(K27_FilteredHeatmap_mat, ! K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1 & K27_FilteredHeatmap_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_mat[, 4] <= 0.1)
 
-in_all <- subset(K27_FilteredHeatmap_mat, ! K27_FilteredHeatmap_mat[, 1] < 0.101 & ! K27_FilteredHeatmap_mat[, 2] < 0.101 & ! K27_FilteredHeatmap_mat[, 3] <= 0.1)
+no_cac1 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_mat[, 4] <= 0.1)
 
-no_WT <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 3] <= 0.1)
+no_cac2_3 <- subset(K27_FilteredHeatmap_mat, ! K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1 & K27_FilteredHeatmap_mat[, 3] <= 0.1 & K27_FilteredHeatmap_mat[, 4] <= 0.1)
 
-cac1only <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_mat[, 2] <= 0.1 & K27_FilteredHeatmap_mat[, 3] <= 0.101)
+no_cac1_3 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_mat[, 3] <= 0.1 & K27_FilteredHeatmap_mat[, 4] <= 0.1)
 
-cac2only <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] <= 0.1 & K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 3] <= 0.101)
+no_cac1_2 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1 & K27_FilteredHeatmap_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_mat[, 4] <= 0.1)
+
+in_all <- subset(K27_FilteredHeatmap_mat, ! K27_FilteredHeatmap_mat[, 1] < 0.101 & ! K27_FilteredHeatmap_mat[, 2] < 0.101 & ! K27_FilteredHeatmap_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_mat[, 4] <= 0.1)
+
+no_WT <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_mat[, 4] <= 0.1)
+
+no_WT_cac3 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 3] <= 0.101 & K27_FilteredHeatmap_mat[, 4] <= 0.1)
+
+no_WT_cac2 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_mat[, 2] <= 0.1 & K27_FilteredHeatmap_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_mat[, 4] <= 0.1)
+
+no_WT_cac1 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] <= 0.1 & K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_mat[, 4] <= 0.1)
+
+no_WT_cac2_3 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_mat[, 2] <= 0.1 & K27_FilteredHeatmap_mat[, 3] <= 0.1 & K27_FilteredHeatmap_mat[, 4] <= 0.1)
+
+no_WT_cac1_3 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] <= 0.1 & K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 3] <= 0.1 & K27_FilteredHeatmap_mat[, 4] <= 0.1)
+
+no_WT_cac1_2 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] <= 0.1 & K27_FilteredHeatmap_mat[, 2] <= 0.1 & K27_FilteredHeatmap_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_mat[, 4] <= 0.1)
 
 #ordering the subsets so that enrichment is ordered from highest to lowest in each one
-no_cac_order <-order(no_cac[, 1], decreasing = TRUE)
-no_cac2_order <-order(rowMeans(no_cac2[, 1:2]), decreasing = TRUE)
-no_cac1_order <- order(rowMeans(no_cac1[, 1&3]), decreasing = TRUE)
-in_all_order <- order(rowMeans(in_all[, 1:3]), decreasing = TRUE)
-no_WT_order <- order(rowMeans(no_WT[, 2:3]), decreasing = TRUE)
-cac1only_order <- order(cac1only[, 2], decreasing = TRUE)
-cac2only_order <- order(cac2only[, 3], decreasing = TRUE)
+no_caf_order <-order(no_caf[, 1], decreasing = TRUE)
+no_cac3_order <-order(rowMeans(no_cac3[, 1:3]), decreasing = TRUE)
+no_cac2_order <- order(rowMeans(no_cac2[, 1&2&4]), decreasing = TRUE)
+no_cac1_order <- order(rowMeans(no_cac1[, 1&3&4]), decreasing = TRUE)
+no_cac2_3_order <- order(rowMeans(no_cac2_3[, 1:2]), decreasing = TRUE)
+no_cac1_3_order <- order(rowMeans(no_cac1_3[, 1&3]), decreasing = TRUE)
+no_cac1_2_order <- order(rowMeans(no_cac1_2[, 1&4]), decreasing = TRUE)
+in_all_order <- order(rowMeans(in_all[, 1:4]), decreasing = TRUE)
+no_WT_order <- order(rowMeans(no_WT[, 2:4]), decreasing = TRUE)
+no_WT_cac3_order <- order(rowMeans(no_WT_cac3[, 2:3]), decreasing = TRUE)
+no_WT_cac2_order <- order(rowMeans(no_WT_cac2[, 2&4]), decreasing = TRUE)
+no_WT_cac1_order <- order(rowMeans(no_WT_cac1[, 3:4]), decreasing = TRUE)
+no_WT_cac2_3_order <- order(no_WT_cac2_3[, 2], decreasing = TRUE)
+no_WT_cac1_3_order <- order(no_WT_cac1_3[, 3], decreasing = TRUE)
+no_WT_cac1_2_order <- order(no_WT_cac1_2[, 4], decreasing = TRUE)
 
 #I now have to sort each new subset df separately based on enrichment in desired sample (WT or mutant), then I have to extract the original sorted # to properly sort them on the final heatmap. This is probably a backwards way to do this.
-no_cac_sort <- no_cac[no_cac_order, ]
+no_caf_sort <- no_caf[no_caf_order, ]
+no_cac3_sort <- no_cac3[no_cac3_order, ]
 no_cac2_sort <- no_cac2[no_cac2_order, ]
 no_cac1_sort <- no_cac1[no_cac1_order, ]
+no_cac2_3_sort <- no_cac2_3[no_cac2_3_order, ]
+no_cac1_3_sort <- no_cac1_3[no_cac1_3_order, ]
+no_cac1_2_sort <- no_cac1_2[no_cac1_2_order, ]
 in_all_sort <- in_all[in_all_order, ]
 no_WT_sort <- no_WT[no_WT_order, ]
-cac1only_sort <- cac1only[cac1only_order, ]
-cac2only_sort <- cac2only[cac2only_order, ]
+no_WT_cac3_sort <- no_WT_cac3[no_WT_cac3_order, ]
+no_WT_cac2_sort <- no_WT_cac2[no_WT_cac2_order, ]
+no_WT_cac1_sort <- no_WT_cac1[no_WT_cac1_order, ]
+no_WT_cac2_3_sort <- no_WT_cac2_3[no_WT_cac2_3_order, ]
+no_WT_cac1_3_sort <- no_WT_cac1_3[no_WT_cac1_3_order, ]
+no_WT_cac1_2_sort <- no_WT_cac1_2[no_WT_cac1_2_order, ]
 
 #need rownames of each subset in order
-forheat1 <- rownames(no_cac_sort)
-forheat2 <- rownames(no_cac2_sort)
-forheat3 <- rownames(no_cac1_sort)
-forheat4 <- rownames(in_all_sort)
-forheat5 <- rownames(no_WT_sort)
-forheat6 <- rownames(cac1only_sort)
-forheat7 <- rownames(cac2only_sort)
+forheat1 <- rownames(no_caf_sort)
+forheat2 <- rownames(no_cac3_sort)
+forheat3 <- rownames(no_cac2_sort)
+forheat4 <- rownames(no_cac1_sort)
+forheat5 <- rownames(no_cac2_3_sort)
+forheat6 <- rownames(no_cac1_3_sort)
+forheat7 <- rownames(no_cac1_2_sort)
+forheat8 <- rownames(in_all_sort)
+forheat9 <- rownames(no_WT_sort)
+forheat10 <- rownames(no_WT_cac3_sort)
+forheat11 <- rownames(no_WT_cac2_sort)
+forheat12 <- rownames(no_WT_cac1_sort)
+forheat13 <- rownames(no_WT_cac2_3_sort)
+forheat14 <- rownames(no_WT_cac1_3_sort)
+forheat15 <- rownames(no_WT_cac1_2_sort)
   
-finalorder <- c(forheat1, forheat2, forheat3, forheat4, forheat5, forheat6, forheat7)
+finalorder <- c(forheat1, forheat2, forheat3, forheat4, forheat5, forheat6, forheat7, forheat8, forheat9, forheat10, forheat11, forheat12, forheat13, forheat14, forheat15)
 
 #Applying order to new variable in order to sort heatmap
 K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat[finalorder, ]
 
+#testing making the 0.1 values 0
+K27_FilteredHeatmap_mat_sort[K27_FilteredHeatmap_mat_sort == 0.1] <- 0
+
 library(ComplexHeatmap)
 K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "H3K27me3"))
-pdf("./K27_region_WTvcac-1_sort_new_2.pdf", height = 9)
+pdf("./H3K27me3_peaks_WT_v_CAF-1_Paper.pdf", height = 9)
 # Draw the heatmap
 draw(K27_Filtered_hm)
 # Close the device to save the file
