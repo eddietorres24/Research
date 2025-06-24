@@ -150,13 +150,11 @@ computeMatrix scale-regions -a 250 -b 1000 --regionBodyLength 2000 --scale 2 \
     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/K27_genes_stringent.bed --skipZeros -o K36_matrix_PRC2.gz
 
-    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_ash1_H3K36me3_K27genes_scaled_Paper.pdf \
+    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_ash1_H3K36me3_K27genes_scaled_PLOT_Paper.pdf \
                     --samplesLabel WT cac-1 cac-2 cac-3 set-7 ash-1 \
                     --sortRegions descend \
                     --sortUsingSamples 2 \
                     --missingDataColor 1 \
-                    --heatmapHeight 20 \
-                    --heatmapWidth 3.5 \
                     --boxAroundHeatmaps no \
                     --whatToShow "plot" \
                     --colorMap "afmhot" \
