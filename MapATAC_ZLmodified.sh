@@ -77,29 +77,29 @@ samtools index "$bam"
 #
 
 #### Collect insert sizes using picardtools and plot histogram
-# module load picard/2.16.0-Java-1.8.0_144
+ module load picard
 
-# java -jar $EBROOTPICARD/picard.jar CollectInsertSizeMetrics \
-#      I=$bam \
-#      O=${OUTDIR}/Histograms/${name}.fraglen.stats \
-#      H=${OUTDIR}/Histograms/${name}.fraglen.pdf \
-#      M=0.5 \
-#     VALIDATION_STRINGENCY=LENIENT QUIET=TRUE VERBOSITY=ERROR
-#
+java -jar $EBROOTPICARD/picard.jar CollectInsertSizeMetrics \
+     I=$bam \
+     O=${OUTDIR}/Histograms/${name}.fraglen.stats \
+     H=${OUTDIR}/Histograms/${name}.fraglen.pdf \
+     M=0.5 \
+    VALIDATION_STRINGENCY=LENIENT QUIET=TRUE VERBOSITY=ERROR
+
 #### Mark duplicate sequences to remove from analysis and plot insert sizes before and after marking duplicates
 ### Install Picard in home directory (replace "/home/ad45368/apps/picard/3.4.0/picard.jar" with path to your Picard installation)
 ### For installation directions, see here: https://wiki.gacrc.uga.edu/wiki/Installing_Applications_Sapelo2
 
-module load Java/15.0.1
-module load R/4.4.2-gfbf-2024a
-ml SAMtools/1.16.1-GCC-11.3.0
+module load Java
+module load R
+ml SAMtools
 
 ## Reformat bam file to be compatible with Picard - this next step is optional; include if Picard throws out an error
 
 #samtools addreplacerg -r "@RG\tID:RG1\tSM:SampleName\tPL:Illumina\tLB:Library.fa" -o ${OUTDIR}/SortedBamFiles/${name}.tmp.bam $bam
 
 ### Plot size histogram BEFORE removing MarkDuplicates
-java -Xmx20g -classpath "/home/ad45368/apps/picard/3.4.0" -jar /home/ad45368/apps/picard/3.4.0/picard.jar CollectInsertSizeMetrics \
+java -Xmx20g -classpath "/home/evt82290/Research/picard/3.4.0" -jar /home/ad45368/apps/picard/3.4.0/picard.jar CollectInsertSizeMetrics \
     --Histogram_FILE ${OUTDIR}/Histograms/${name}.fraglen.pdf \
      --INPUT $bam \
      --OUTPUT ${OUTDIR}/Stats/${name}.fraglen.stats \
@@ -108,7 +108,7 @@ java -Xmx20g -classpath "/home/ad45368/apps/picard/3.4.0" -jar /home/ad45368/app
 
 
 ### Remove duplicates
-java -jar -Xmx20g -classpath "/home/ad45368/apps/picard/3.4.0" -jar /home/ad45368/apps/picard/3.4.0/picard.jar MarkDuplicates \
+java -jar -Xmx20g -classpath "/home/evt82290/Research/picard/3.4.0" -jar /home/ad45368/apps/picard/3.4.0/picard.jar MarkDuplicates \
      --INPUT ${OUTDIR}/SortedBamFiles/${name}.tmp.bam \
      --OUTPUT ${deduped} \
      -M ${OUTDIR}/Stats/${name}.marked_dup_metrics.txt \
@@ -119,7 +119,7 @@ java -jar -Xmx20g -classpath "/home/ad45368/apps/picard/3.4.0" -jar /home/ad4536
 
 ### Removes 50% of reads --- not using deduplicated files.
 ### Plot sizes again with duplicates removed
-java -Xmx20g -classpath "/home/ad45368/apps/picard/3.4.0" -jar /home/ad45368/apps/picard/3.4.0/picard.jar CollectInsertSizeMetrics \
+java -Xmx20g -classpath "/home/evt82290/Research/picard/3.4.0" -jar /home/ad45368/apps/picard/3.4.0/picard.jar CollectInsertSizeMetrics \
          --Histogram_FILE ${OUTDIR}/Histograms/${name}.deduped.fraglen.pdf \
           --INPUT $deduped \
           --OUTPUT ${OUTDIR}/Stats/${name}.deduped.fraglen.stats \

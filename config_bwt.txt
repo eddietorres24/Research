@@ -16,7 +16,7 @@ OutputFolderName="/scratch/evt82290/MappingOutputs/ATAC"
 
 #GENOME="path/to/IndexedGenomeFile"
 
-GENOME="/home/ad45368/NcGenome/bwt_Index/NC12_genomic" #bowtie2 genome index
+GENOME="/home/evt82290/Research/fasta_genome_files/Nc12_bowtie" #bowtie2 genome index
 
 BWA_GEOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic"
 
