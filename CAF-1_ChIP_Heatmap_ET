@@ -155,7 +155,8 @@ module load deepTools
                     --sortRegions descend \
                     --sortUsingSamples 2 \
                     --missingDataColor 1 \
-                    --heatmapHeight 21 \
+                    --heatmapHeight 20 \
+                    --heatmapWidth 3 \
                     --boxAroundHeatmaps no \
                     --whatToShow "heatmap and colorbar" \
                     --colorMap "magma_r" \
