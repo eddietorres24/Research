@@ -138,7 +138,7 @@ module load deepTools
                     --sortUsingSamples 1 \
                     --missingDataColor 1 \
                     --whatToShow "heatmap and colorbar" \
-                    --heatmapHeight 25 \
+                    --heatmapHeight 20 \
                     --colorMap "afmhot" \
                     --zMin 0 \
 
@@ -157,6 +157,7 @@ computeMatrix scale-regions -a 250 -b 1000 --regionBodyLength 2000 --scale 2 \
                     --sortUsingSamples 1 \
                     --missingDataColor 1 \
                     --boxAroundHeatmaps no \
+                    --heatmapHeight 20 \
                     --whatToShow "heatmap and colorbar" \
                     --colorMap "afmhot" \
                     --zMin 0 \
