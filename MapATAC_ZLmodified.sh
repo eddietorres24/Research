@@ -35,12 +35,9 @@ FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
  mkdir "${OUTDIR}/Histograms"
  mkdir "${OUTDIR}/Metaplots"
 
-
-
-
 #mkdir "$OUTDIR/HomerTagDirectories"
 #mkdir "$OUTDIR/TdfFiles"
-#
+
 #Iterate over the files
 for f in $FILES
 do
@@ -54,7 +51,6 @@ do
 	#remove ending from file name to create shorter names for bam files and other downstream output
 	name=${file/%_S[1-12]*_L003_R1_001_val_1.fq.gz/}
 
-#
 # 	# File Vars
 # 	#use sed to get the name of the second read matching the input file
 	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
@@ -68,10 +64,9 @@ do
   meta="${OUTDIR}/Metaplots/${name}"
 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 #
-
 ml SAMtools/1.16.1-GCC-11.3.0
 ml BWA/0.7.17-GCCcore-11.3.0
-# #
+
 bwa mem -M -v 3 -a -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
 #
@@ -151,8 +146,8 @@ bamCoverage -p $THREADS --Offset 1 3 -bs 1 --smoothLength 6 --normalizeUsing BPM
 
 module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 
-#macs3 hmmratac -b $shifted --outdir ${OUTDIR}/hmmr_Peaks -n $name
-#macs3 callpeak -t $shifted -c ${OUTDIR}/SortedBamFiles/148-N6_ATAC_CEA17_gDNA__Rep1_S102_L003_R1_001_val_1.fq.gz.shifted.bam --format BAMPE --outdir ${OUTDIR}/reg_Peaks -n $name
+macs3 hmmratac -b $shifted --outdir ${OUTDIR}/hmmr_Peaks -n $name
+macs3 callpeak -t $shifted -c ${OUTDIR}/SortedBamFiles/148-N6_ATAC_CEA17_gDNA__Rep1_S102_L003_R1_001_val_1.fq.gz.shifted.bam --format BAMPE --outdir ${OUTDIR}/reg_Peaks -n $name
 
 
 done
