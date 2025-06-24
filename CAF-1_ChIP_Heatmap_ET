@@ -153,7 +153,7 @@ computeMatrix reference-point --referencePoint TSS -a 3500 -b 1000 --scale 2 \
     plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_ash1_H3K36me3_K27genes_Paper.pdf \
                     --samplesLabel WT cac-1 cac-2 cac-3 set-7 ash-1 \
                     --sortRegions descend \
-                    --sortUsingSamples 2 3 \
+                    --sortUsingSamples 2 \
                     --missingDataColor 1 \
                     --heatmapHeight 21 \
                     --boxAroundHeatmaps no \
