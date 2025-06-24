@@ -159,7 +159,7 @@ module load deepTools
                     --heatmapWidth 3.5 \
                     --boxAroundHeatmaps no \
                     --whatToShow "heatmap and colorbar" \
-                    --colorMap "YlOrBr_r" \
+                    --colorMap "YlOrBr" \
                     --zMin 0 \
                     --zMax 20 \
 
