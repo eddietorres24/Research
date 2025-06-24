@@ -37,8 +37,8 @@ FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
  # mkdir "${OUTDIR}/logs"
 
 
-#mkdir "$OUTDIR/HomerTagDirectories"
-#mkdir "$OUTDIR/TdfFiles"
+mkdir "$OUTDIR/HomerTagDirectories"
+mkdir "$OUTDIR/TdfFiles"
 #
 #Iterate over the files
 for f in $FILES
