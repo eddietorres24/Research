@@ -159,9 +159,9 @@ module load deepTools
                     --heatmapWidth 3.5 \
                     --boxAroundHeatmaps no \
                     --whatToShow "heatmap and colorbar" \
-                    --colorMap "YlOrBr" \
+                    --colorMap "afmhot" \
                     --zMin 0 \
-                    --zMax 30 \
+                    --zMax 20 \
 
 # #138-62_ChIP_WT_H3K36me3_Rep2_6252_S61.bin_25.smooth_75Bulk.bw
 # #138-63_ChIP_cac-1_H3K36me3_Rep2_6252_S62.bin_25.smooth_75Bulk.bw
