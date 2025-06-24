@@ -153,7 +153,7 @@ computeMatrix scale-regions -a 500 -b 1000 --regionBodyLength 2500 --scale 1.75 
     plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_ash1_H3K36me3_K27genes_Paper.pdf \
                     --samplesLabel WT cac-1 cac-2 cac-3 set-7 ash-1 \
                     --sortRegions descend \
-                    --sortUsingSamples 1 2 \
+                    --sortUsingSamples 2 3 \
                     --missingDataColor 1 \
                     --heatmapHeight 22 \
                     --boxAroundHeatmaps no \
