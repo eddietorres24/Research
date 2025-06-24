@@ -141,7 +141,7 @@ module load deepTools
 #                     --colorMap "afmhot_r" \
 #                     --zMin 0 \
 
-computeMatrix reference-point --referencePoint TSS -a 3500 -b 1000 --scale 1.5 \
+computeMatrix reference-point --referencePoint TSS -a 3500 -b 1000 --scale 2 \
  -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
@@ -155,7 +155,7 @@ computeMatrix reference-point --referencePoint TSS -a 3500 -b 1000 --scale 1.5 \
                     --sortRegions descend \
                     --sortUsingSamples 2 3 \
                     --missingDataColor 1 \
-                    --heatmapHeight 22 \
+                    --heatmapHeight 21 \
                     --boxAroundHeatmaps no \
                     --whatToShow "heatmap and colorbar" \
                     --colorMap "afmhot_r" \
