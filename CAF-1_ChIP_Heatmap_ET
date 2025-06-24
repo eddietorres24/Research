@@ -156,10 +156,10 @@ module load deepTools
                     --sortUsingSamples 2 \
                     --missingDataColor 1 \
                     --heatmapHeight 20 \
-                    --heatmapWidth 3 \
+                    --heatmapWidth 3.5 \
                     --boxAroundHeatmaps no \
                     --whatToShow "heatmap and colorbar" \
-                    --colorMap "magma_r" \
+                    --colorMap "plasma_r" \
                     --zMin 0 \
                     --zMax 20 \
 
