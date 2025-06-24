@@ -156,7 +156,7 @@ computeMatrix scale-regions -a 500 -b 1000 --regionBodyLength 3000 --scale 1.75 
                     --sortUsingSamples 1 2 \
                     --missingDataColor 1 \
                     --heatmapHeight 7.62 \
-                    --heatmapWidth 5 \
+                    --heatmapWidth 2 \
                     --boxAroundHeatmaps no \
                     --whatToShow "heatmap and colorbar" \
                     --colorMap "afmhot_r" \
