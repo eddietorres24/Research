@@ -156,7 +156,7 @@ module load deepTools
                     --sortUsingSamples 1 2 \
                     --missingDataColor 1 \
                     --heatmapHeight 7.62 \
-                    --heatmapWidth 10 \
+                    --heatmapWidth 8.84 \
                     --boxAroundHeatmaps no \
                     --whatToShow "heatmap and colorbar" \
                     --colorMap "afmhot_r" \
