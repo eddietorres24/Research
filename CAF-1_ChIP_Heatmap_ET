@@ -139,7 +139,6 @@ module load deepTools
                     --missingDataColor 1 \
                     --whatToShow "heatmap and colorbar" \
                     --heatmapHeight 20 \
-                    --heatmapWidth 3.5 \
                     --colorMap "afmhot" \
                     --zMin 0 \
                     --zMax 10
@@ -160,7 +159,6 @@ module load deepTools
                     --missingDataColor 1 \
                     --boxAroundHeatmaps no \
                     --heatmapHeight 20 \
-                    --heatmapWidth 3.5 \
                     --whatToShow "heatmap and colorbar" \
                     --colorMap "afmhot" \
                     --zMin 0 \
