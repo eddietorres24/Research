@@ -20,6 +20,11 @@ OUTDIR=${OutputFolderName}
 # mkdir ${OUTDIR}
 
 
+if [ ! -e "${BWA_GENOME}.bwt" ]; then
+  echo "ERROR: BWA index not found for ${BWA_GENOME}"
+  exit 1
+fi
+
 # #process reads using trimGalore
 #
 # ml Trim_Galore/0.6.7-GCCcore-11.2.0
@@ -64,8 +69,8 @@ do
   meta="${OUTDIR}/Metaplots/${name}"
 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 #
-ml SAMtools/1.16.1-GCC-11.3.0
-ml BWA/0.7.17-GCCcore-11.3.0
+ml SAMtools
+ml BWA
 
 bwa mem -M -v 3 -a -t $THREADS $BWA_GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
