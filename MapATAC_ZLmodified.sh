@@ -67,7 +67,7 @@ do
 ml SAMtools/1.16.1-GCC-11.3.0
 ml BWA/0.7.17-GCCcore-11.3.0
 
-bwa mem -M -v 3 -a -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+bwa mem -M -v 3 -a -t $THREADS $BWA_GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
 #
 

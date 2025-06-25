@@ -1,5 +1,5 @@
 #number of CPUs
-THREADS=12
+THREADS=24
 
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 #do not end in "/"
