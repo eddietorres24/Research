@@ -62,4 +62,16 @@ genes_promoter$V2 <- ifelse(genes_promoter$V6 == "+",
 genes_promoter$V3 <- ifelse(genes_promoter$V6 == "-", 
                             genes_promoter$V3 + 1000,
                             genes_promoter$V3)
+
+###Make file w only promoters
+# K27_prom = genes_promoter
+# 
+# K27_prom$V3 <- ifelse(K27_prom$V6 == "+", 
+#                       pmax(0, K27_prom$V2 + 1000),  # avoid negative coords
+#                       K27_prom$V3)
+# 
+# # Add 1000 to V3 if strand is "-"
+# K27_prom$V2 <- ifelse(K27_prom$V6 == "-", 
+#                       pmax(0, K27_prom$V3 - 1000),
+#                       K27_prom$V2)
      

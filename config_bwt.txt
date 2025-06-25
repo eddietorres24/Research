@@ -18,7 +18,7 @@ OutputFolderName="/scratch/evt82290/MappingOutputs/ATAC"
 
 GENOME="/home/evt82290/Research/fasta_genome_files/Nc12_bowtie" #bowtie2 genome index
 
-BWA_GEOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic"
+BWA_GEOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna"
 
 #GENOME="/home/zlewis/Genomes/AfumagatisGenome/Af_CEA10/Afum_A1163_edit6.fasta"
 #GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO.fna" #Neurospora12 Genbank

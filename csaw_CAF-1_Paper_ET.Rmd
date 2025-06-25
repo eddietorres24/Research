@@ -27,43 +27,44 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 
-```{r echo = TRUE, eval = FALSE }
+```{r load libraries, echo = TRUE, eval = FALSE }
+# 
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager", type = "source")
+# 
+# BiocManager::install("csaw") #INSTALL from source (I had to download a gfortran installer from CRAN (https://cran.r-project.org/bin/macosx/tools/) )
+# 
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# 
+# BiocManager::install("DiffBind")
+# 
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# 
+# BiocManager::install("profileplyr")
+# 
+# #edgeR
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# 
+# BiocManager::install("edgeR")
+# 
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# 
+# BiocManager::install("ComplexHeatmap")
 
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager", type = "source")
-
-BiocManager::install("csaw") #INSTALL from source (I had to download a gfortran installer from CRAN (https://cran.r-project.org/bin/macosx/tools/) )
-
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install("DiffBind")
-
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install("profileplyr")
-
-#edgeR
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install("edgeR")
-
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install("ComplexHeatmap")
+library(csaw)
+library(edgeR)
+library(ComplexHeatmap)
+library(profileplyr)
+library(DiffBind)
 
 ```
 
-
 ```{r ReadBams and countWindows}
 #https://bioconductor.org/packages/release/bioc/manuals/csaw/man/csaw.pdf
-
-#MACS: Call peaks on K27me3, K4me2, and ATAC for CAF mutants &b WT + set-7 controls
-library(csaw) 
-getwd()
 #read in sample sheet
 samples <- read.csv("./csaw_samples_files/cac_csaw.csv")
 
@@ -80,7 +81,7 @@ param <- readParam(discard = matLocus, pe="both", max.frag=1500, minq=20 )
 ##Estimate Fragment length to determine window size setting (csaw book, 2.4)
 # max.delay <- 1500
 # x <- correlateReads(samples$bamReads, max.delay, param=param)
-plot(0:max.delay, x, type="l", ylab="CCF", xlab="Delay (bp)")
+# plot(0:max.delay, x, type="l", ylab="CCF", xlab="Delay (bp)")
 
 #read counts from bam files
 data_csaw <- windowCounts(samples$bamReads, spacing=300, width=300, shift=0, filter=0, bin=TRUE, param=param)
@@ -90,337 +91,130 @@ data_csaw <- windowCounts(samples$bamReads, spacing=300, width=300, shift=0, fil
 ##Filter by global background calculation (csaw book, 4.4)
 # bin.size <- 2000L
 # binned <- windowCounts(samples$bamReads, bin=TRUE, width=bin.size, param=param)
-filter.stat <- filterWindowsGlobal(data_csaw, background=binned)
-
- keep <- filter.stat$filter > log2(2.2)
- sum(keep)
-
-#filtered data keeping all regions > background
-     filtered.data <- data_csaw[keep,]
-
-hist(filter.stat$filter, xlab="Log-fold change from global background", 
-    breaks=100, main="", col="grey80", xlim=c(0, 5))
-abline(v=log2(2.2), col="red", lwd=2)
+# filter.stat <- filterWindowsGlobal(data_csaw, background=binned)
+# 
+#  keep <- filter.stat$filter > log2(2.2)
+#  sum(keep)
+# 
+# #filtered data keeping all regions > background
+#      filtered.data <- data_csaw[keep,]
+# 
+# hist(filter.stat$filter, xlab="Log-fold change from global background", 
+#     breaks=100, main="", col="grey80", xlim=c(0, 5))
+# abline(v=log2(2.2), col="red", lwd=2)
 
 
 ##Filter by negative controls #Try this second
 ```
 
-```{r filter based on K9 and K27 peaks}
-
-#K27peaks <- read.table(file="./All_Peak_files/peakcalls/136-1_ChIP_WT_H3K27me3_abcam_Rep2_peaks.broadPeak")
+```{r filter based on K27 peaks & genes}
+#Read in bed files
 K27peaks_merged <- read.table(file="./bed_files/CAF-1_All_K27_merge_peaks.bed")
-K4peaks_merged <- read.table(file="./bed_files/cac_set7_K4.bed")
-ATACpeaks_merged <- read.table(file="./bed_files/CAF-1_All_ATAC_merge_peaks.bed")
-Regions <- read.table(file="./bed_files/CAF-1_All_peaks_K27_K4_ATAC_merge.bed")
-K4_27peaks_merged <- read.table(file="./bed_files/CAF-1_All_peaks_K27_K4_merge.bed")
 
-K27_genes <- read.table(file="./bed_files/K27_genes_gff_sorted.bed")
+K27_genes <- read.table(file="./bed_files/K27_genes_stringent.bed")
 
-#Regions.gr <- GRanges(Regions$V1, IRanges(Regions$V2, Regions$V3))
+K27_genes_prom <- read.table(file="./bed_files/genes_and_promoters_overlap_100pct_edit.bed")
 
-#K27_Peaks.gr <- GRanges(K27peaks$V1, IRanges(K27peaks$V2, K27peaks$V3))
+K27_prom <- read.table(file="./bed_files/K27_gene_promoters.bed")
+
+#Get Genomic ranges from each bed files
 K27peaks_merged.gr <- GRanges(K27peaks_merged$V1, IRanges(K27peaks_merged$V2, K27peaks_merged$V3))
-K4peaks_merged.gr <- GRanges(K4peaks_merged$V1, IRanges(K4peaks_merged$V2, K4peaks_merged$V3))
-ATACpeaks_merged.gr <- GRanges(ATACpeaks_merged$V1, IRanges(ATACpeaks_merged$V2, ATACpeaks_merged$V3))
-Regions.gr <- GRanges(Regions$V1, IRanges(Regions$V2, Regions$V3))
-K4_27peaks_merged.gr <- GRanges(K4_27peaks_merged$V1, IRanges(K4_27peaks_merged$V2, K4_27peaks_merged$V3))
+
 K27_genes.gr <- GRanges(K27_genes$V1, IRanges(K27_genes$V2, K27_genes$V3))
+
+K27_genes_prom.gr <- GRanges(K27_genes_prom$V1, IRanges(K27_genes_prom$V2, K27_genes_prom$V3))
+
+K27_prom.gr <- GRanges(K27_prom$V1, IRanges(K27_prom$V2, K27_prom$V3))
 
 #Keep Regions within peaks
 suppressWarnings(keepK27 <- overlapsAny(rowRanges(data_csaw), K27peaks_merged.gr, type = "within"))
 summary(keepK27)
 
-suppressWarnings(keepK4 <- overlapsAny(rowRanges(data_csaw), K4peaks_merged.gr, type = "within"))
-summary(keepK4)
-
-suppressWarnings(keepATAC <- overlapsAny(rowRanges(data_csaw), ATACpeaks_merged.gr, type = "within"))
-summary(keepATAC)
-
-suppressWarnings(keep <- overlapsAny(rowRanges(data_csaw), Regions.gr, type = "within"))
-summary(keep)
-
-suppressWarnings(keepK4_27 <- overlapsAny(rowRanges(data_csaw), K4_27peaks_merged.gr, type = "within"))
-summary(keepK4_27)
-
 suppressWarnings(keepK27_genes <- overlapsAny(rowRanges(data_csaw), K27_genes.gr, type = "within"))
 summary(keepK27_genes)
+
+suppressWarnings(keepK27_genes_prom <- overlapsAny(rowRanges(data_csaw), K27_genes_prom.gr, type = "within"))
+summary(keepK27_genes_prom)
+
+suppressWarnings(keepK27_prom <- overlapsAny(rowRanges(data_csaw), K27_prom.gr, type = "within"))
+summary(keepK27_prom)
     
 #filter data keeping different regions for each modification
 filtered.dataK27 <- data_csaw[keepK27,]
-filtered.dataK4 <- data_csaw[keepK4,]
-filtered.dataATAC <- data_csaw[keepATAC,]
-filtered.dataK4_27 <- data_csaw[keepK4_27,]
+
 filtered.dataK27_genes <- data_csaw[keepK27_genes,]
-##For all regions in K27, K4, ATAC
-filtered.data <- data_csaw[keep,]
+
+filtered.dataK27_genes_prom <- data_csaw[keepK27_genes_prom,]
+
+filtered.dataK27_prom <- data_csaw[keepK27_prom,]
 
 #Make dataframe objects for each modification
 K27.Windows.df <- as.data.frame(granges(filtered.dataK27))
-K4.Windows.df <- as.data.frame(granges(filtered.dataK4))
-ATAC.Windows.df <- as.data.frame(granges(filtered.dataATAC))
-All.windows.df <- as.data.frame(granges(filtered.data))
-K4_27.windows.df <- as.data.frame(granges(filtered.dataK4_27))
+
 K27_genes.Windows.df <- as.data.frame(granges(filtered.dataK27_genes))
+
+K27_genes_prom.Windows.df <- as.data.frame(granges(filtered.dataK27_genes_prom))
+
+K27_prom.Windows.df <- as.data.frame(granges(filtered.dataK27_prom))
+
 ```
 
 
 ```{r prepare edgeR}
 ####################### Analyze differential binding events
 
-library(edgeR)
-
 #define groups for analysis (WT versus mutant timepoints)
-
 grouping <- factor(paste(samples$Strain, samples$Antibody, sep="."))
 
 #create a DGElistregions object, this creates an object with a counts DF and a samples DF
 DGElistK27 <- asDGEList(filtered.dataK27, group=factor(grouping)) 
-DGElistK4 <- asDGEList(filtered.dataK4, group=factor(grouping))
-DGElistATAC <- asDGEList(filtered.dataATAC, group=factor(grouping)) 
-DGElist <- asDGEList(filtered.data, group=factor(grouping)) 
-DGElistK4_27 <- asDGEList(filtered.dataK4_27, group=factor(grouping))
-DGElistK27_gene <- asDGEList(filtered.dataK27_genes, group=factor(grouping))
+DGElistK27_genes <- asDGEList(filtered.dataK27_genes, group=factor(grouping))
+DGElistK27_genes_prom <- asDGEList(filtered.dataK27_genes_prom, group=factor(grouping))
+DGElistK27_prom <- asDGEList(filtered.dataK27_prom, group=factor(grouping))
 
 #replace generic "Sample1, Sample2" names with actual names of samples. Do for all mods
+
 #K27
 colnames(DGElistK27$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
 rownames(DGElistK27$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
-#K4
-colnames(DGElistK4$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
-rownames(DGElistK4$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
-#ATAC
-colnames(DGElistATAC$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
-rownames(DGElistATAC$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
-#All
-colnames(DGElist$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
-rownames(DGElist$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
-#K4_27
-colnames(DGElistK4_27$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
-rownames(DGElistK4_27$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
-#K4_27
-colnames(DGElistK27_gene$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
-rownames(DGElistK27_gene$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
 
-```
+#K27_genes
+colnames(DGElistK27_genes$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+rownames(DGElistK27_genes$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
 
-```{r, Rochelle's Data Pre-Analysis}
-##make a correlation matrix based on counts, Rochelle's code to generate Correlation Plot
-#calculate normalization factors
+#K27_genes_promoters
+colnames(DGElistK27_genes_prom$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+rownames(DGElistK27_genes_prom$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
 
-# #calculate cpm
-logCPM <- cpm(DGElistK27, log = TRUE)
-sample_cor <- cor(logCPM, method="pearson")  # Transpose because dist() works on rows
-cor_matrix <- as.matrix(sample_cor)
-
-library(pheatmap)
-# Heatmap of the sample distances
-pheatmap(
-    cor_matrix,
-    cluster_rows = TRUE,
-    cluster_cols = TRUE,
-    main = "Sample Distance Matrix"
-)
-
-#################################################
-#use MDS to plot similarity between samples, Rochelle's code for a PCA plot
-MDSdata <- plotMDS(DGElist, top=500, col=as.numeric(DGElist$samples$group))
-    #plot shows replicates behave well.
-
-mds_df <- data.frame(
-  Dimension1 = MDSdata$x,
-  Dimension2 = MDSdata$y)
-
-LABELS <- rownames(MDSdata@.Data[[5]])
-rownames(mds_df) <- LABELS
-rename_samples <- c("WT CS H3K27me3 Rep 1",
-                    "WT CS H3K27me3 Rep 2",
-                    "WT CS H3K27me3 Rep 3",
-                    "cac1 CS H3K27me3 Rep 1",
-                    "cac1 CS H3K27me3 Rep 2",
-                    "cac1 CS H3K27me3 Rep 3",
-                    "cac2 CS H3K27me3 Rep 1",
-                    "cac2 CS H3K27me3 Rep 2",
-                    "cac2 CS H3K27me3 Rep 3",
-                    "cac3 CS H3K27me3 Rep 1",
-                    "cac3 CS H3K27me3 Rep 2",
-                    "cac3 CS H3K27me3 Rep 3",
-                    "set7 CS H3K27me3 Rep 1",
-                    "set7 CS H3K27me3 Rep 2",
-                    "set7 CS H3K27me3 Rep 3",
-                    "WT abc H3K27me3 Rep 1",
-                    "WT abc H3K27me3 Rep 2",
-                    "cac1 abc H3K27me3 Rep 1",
-                    "cac1 abc H3K27me3 Rep 2",
-                    "cac2 abc H3K27me3 Rep 1",
-                    "cac2 abc H3K27me3 Rep 2",
-                    "cac3 abc H3K27me3 Rep 1",
-                    "cac3 abc H3K27me3 Rep 2",
-                    "set7 abc H3K27me3 Rep 1",
-                    "set7 abc H3K27me3 Rep 2",
-                    "WT H3K4me2 Rep 1",
-                    "WT H3K4me2 Rep 2",
-                    "cac1 H3K4me2 Rep 1",
-                    "cac1 H3K4me2 Rep 2",
-                    "cac2 H3K4me2 Rep 1",
-                    "cac2 H3K4me2 Rep 2",
-                    "cac3 H3K4me2 Rep 1",
-                    "cac3 H3K4me2 Rep 2",
-                    "set7 H3K4me2 Rep 1",
-                    "set7 H3K4me2 Rep 2",
-                    "WT ATAC Rep 1",
-                    "WT ATAC Rep 2",
-                    "cac1 ATAC Rep 1",
-                    "cac1 ATAC Rep 2",
-                    "cac2 ATAC Rep 1",
-                    "cac2 ATAC Rep 2",
-                    "cac3 ATAC Rep 1",
-                    "cac3 ATAC Rep 2",
-                    "set7 ATAC Rep 1",
-                    "set7 ATAC Rep 2",
-                    "WT input Rep 1",
-                    "WT input Rep 2",
-                    "WT input Rep 3",
-                    "cac1 input Rep 1",
-                    "cac1 input Rep 2",
-                    "cac1 input Rep 3",
-                    "cac2 input Rep 1",
-                    "cac2 input Rep 2",
-                    "cac2 input Rep 3",
-                    "cac3 input Rep 1",
-                    "cac3 input Rep 2",
-                    "cac3 input Rep 3",
-                    "set7 input Rep 1",
-                    "set7 input Rep 2")
-
-mds_df$label <- rename_samples
-
-library(ggplot2)
-require("ggrepel")
-
-#make groups for differential coloring
-
-mds_df$group <- c("WT CS H3K27me3",
-                  "WT CS H3K27me3",
-                  "WT CS H3K27me3",
-                  "cac1 CS H3K27me3",
-                  "cac1 CS H3K27me3",
-                  "cac1 CS H3K27me3",
-                  "cac2 CS H3K27me3",
-                  "cac2 CS H3K27me3",
-                  "cac2 CS H3K27me3",
-                  "cac3 CS H3K27me3",
-                  "cac3 CS H3K27me3",
-                  "cac3 CS H3K27me3",
-                  "set7 CS H3K27me3",
-                  "set7 CS H3K27me3",
-                  "set7 CS H3K27me3",
-                  "WT abc H3K27me3",
-                  "WT abc H3K27me3",
-                  "cac1 abc H3K27me3",
-                  "cac1 abc H3K27me3",
-                  "cac2 abc H3K27me3",
-                  "cac2 abc H3K27me3",
-                  "cac3 abc H3K27me3",
-                  "cac3 abc H3K27me3",
-                  "set7 abc H3K27me3",
-                  "set7 abc H3K27me3",
-                  "WT H3K4me2",
-                  "WT H3K4me2",
-                  "cac1 H3K4me2",
-                  "cac1 H3K4me2",
-                  "cac2 H3K4me2",
-                  "cac2 H3K4me2",
-                  "cac3 H3K4me2",
-                  "cac3 H3K4me2",
-                  "set7 H3K4me2",
-                  "set7 H3K4me2",
-                  "WT ATAC",
-                  "WT ATAC",
-                  "cac1 ATAC",
-                  "cac1 ATAC",
-                  "cac2 ATAC",
-                  "cac2 ATAC",
-                  "cac3 ATAC",
-                  "cac3 ATAC",
-                  "set7 ATAC",
-                  "set7 ATAC",
-                  "WT input",
-                  "WT input",
-                  "WT input",
-                  "cac1 input",
-                  "cac1 input",
-                  "cac1 input",
-                  "cac2 input",
-                  "cac2 input",
-                  "cac2 input",
-                  "cac3 input",
-                  "cac3 input",
-                  "cac3 input",
-                  "set7 input",
-                  "set7 input")
-
-#library(ggplot2)
-#require("ggrepel")
-
-#make groups for differential coloring
-K27 <- subset(mds_df, group %in% c("WT H3K27me3", "cac-1 H3K27me3", "cac-2 H3K27me3", "cac-3 H3K27me3"))
-K4 <- subset(mds_df, group %in% c("WT H4Kme2", "cac-1 H4Kme2", "cac-2 H4Kme2", "cac-3 H4Kme2", "set-7 H4Kme2"))
-ATAC <- subset(mds_df, group %in% c("WT ATAC", "cac-1 ATAC", "cac-2 ATAC", "cac-3 ATAC", "set-7 ATAC"))
-input <- subset(mds_df, group %in% c("WT input", "cac-1 input", "cac-2 input", "cac-3 input", "set-7 input"))
-
-MDSplot_Formated <- ggplot(mds_df, aes(Dimension1, Dimension2)) + geom_point(colour="black", size= 1) +
-    geom_point(data=K27, colour="darkgreen", size=3) +
-     geom_point(data=K4, colour="pink", size=3)+
-     geom_point(data=ATAC, colour="grey", size=3)+
-      geom_point(data=input, colour="black", size=3)+
-       geom_text_repel(data=K27, direction="both",fontface="italic", nudge_x = -0.5,
-aes(K27$Dimension1, K27$Dimension2,label=K27$label), min.segment.length = .5, point.padding = .7, box.padding = .8, max.overlaps = Inf, size = 4, colour="darkgreen") +
-    geom_text_repel(data=K4, direction="both",fontface="italic",
-aes(K4$Dimension1, K4$Dimension2,label=K4$label), min.segment.length = .5, point.padding = .3, box.padding = .8, max.overlaps = Inf, size = 4, colour="pink") +
-     geom_text_repel(data=ATAC, direction="both",fontface="italic",
-aes(ATAC$Dimension1, ATAC$Dimension2,label=ATAC$label, sep=""), min.segment.length = .5, point.padding = .3, box.padding = .8, max.overlaps = Inf, size = 4, colour="grey") +
-  theme_minimal() +
-    theme(
-    axis.text = element_text(size = 14),   # Adjust tick label size
-    axis.title = element_text(size = 16), # Adjust axis title size
-    plot.title = element_text(size = 18)) + # Adjust plot title size) +
-    labs(
-    title = "MDS Plot",
-    x = "Dimension 1",
-    y = "Dimension 2" )
-
-ggsave(filename = "MDSplot.pdf", plot = MDSplot_Formated, dpi=600, height=10, width=10)
-#d1 <- estimateCommonDisp(DGElist, verbose=T)
+#K27_promoters
+colnames(DGElistK27_prom$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+rownames(DGElistK27_prom$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
 
 ```
 
 ```{r, Designing the matrix}
 #design a model matrix to compare groups, This Should be the same for all mods, as it depends on you sample sheet
-design.mat <- model.matrix(~0 + DGElist$samples$group)
+##In this case, I'm only looking at modifications within H3K27me3 regions, so i will use the H3K27me3 list to make the matrix
+design.mat <- model.matrix(~0 + DGElistK27$samples$group)
 #replace wonky column names with readable ones
-colnames(design.mat) <- levels(DGElist$samples$group)
+colnames(design.mat) <- levels(DGElistK27$samples$group)
 ```
 
 ```{r Estimate Dispersion}
 #We need to do this separately for each modification
 yK27 <- estimateDisp(DGElistK27, design.mat)
-yK4 <- estimateDisp(DGElistK4, design.mat)
-yATAC <- estimateDisp(DGElistATAC, design.mat)
-yAll <- estimateDisp(DGElist, design.mat)
-yK4_27 <- estimateDisp(DGElistK4_27, design.mat)
-yK27_gene <- estimateDisp(DGElistK27_gene, design.mat)
+yK27_gene <- estimateDisp(DGElistK27_genes, design.mat)
+yK27_gene_prom <- estimateDisp(DGElistK27_genes_prom, design.mat)
+yK27_prom <- estimateDisp(DGElistK27_prom, design.mat)
 
 #See summary if you want
 summary(yK27$trended.dispersion)
 
 #assign fit variable, THIS WILL BE USED FOR DOWNSTREAM ANALYSIS, need to do for each mod
 fitK27 <- glmQLFit(yK27, design.mat, robust=TRUE)
-fitK4 <- glmQLFit(yK4, design.mat, robust=TRUE)
-fitATAC <- glmQLFit(yATAC, design.mat, robust=TRUE)
-fitAll <- glmQLFit(yAll, design.mat, robust=TRUE)
-fitK4_27 <- glmQLFit(yK4_27, design.mat, robust=TRUE)
 fitK27_gene <- glmQLFit(yK27_gene, design.mat, robust=TRUE)
+fitK27_gene_prom <- glmQLFit(yK27_gene_prom, design.mat, robust=TRUE)
+fitK27_prom <- glmQLFit(yK27_prom, design.mat, robust=TRUE)
 
 #See summary & head of counts table
 summary(fitK27$var.post)
@@ -436,18 +230,24 @@ plotQLDisp(fitK27)
 ```
 
 
-```{r START OF CS K27 chips}
+```{r START OF CS K27 ChIP Analysis}
+###Analyzing K27 enrichment within K27 regions across samples
 #set up pairwise contrast
 FC_WTvInput.K27.contrast <- makeContrasts(K27vWT=WT.H3K27me3_CS-WT.input, levels=design.mat)
+
 #analyze data
 FC_WTvI.K27.res <- glmQLFTest(fitK27, contrast=FC_WTvInput.K27.contrast)
+
 #merge results to generate FDR; #calculates FRD on a per-region basis. This is not appropriate here since you have set the window size to 1000
 FC_WTvI.K27.merged <- mergeResults(filtered.dataK27, FC_WTvI.K27.res$table, tol=300, 
                             merge.args=list(max.width=300))
+
 #move FC data into a dataframe
 WTvI.K27.tabular <- FC_WTvI.K27.merged$combined
+
 #create an object of ranges
 WTvI.K27.out.ranges <- FC_WTvI.K27.merged$regions
+
 #add data to mcols of gRanges object
 mcols(WTvI.K27.out.ranges) <- DataFrame(WTvI.K27.tabular)
 
@@ -487,6 +287,60 @@ set7vInput.K27.tabular <- FC_set7vInput.K27.merged$combined
 set7vInput.K27.out.ranges <- FC_set7vInput.K27.merged$regions
 mcols(set7vInput.K27.out.ranges) <- DataFrame(set7vInput.K27.tabular)
 
+#cac-1_cac-2
+FC_cac1_cac2vInput.K27.contrast <- makeContrasts(K27vcac1_cac2=cac1_cac2.H3K27me3_CS-cac1_cac2.input,levels=design.mat)
+FC_cac1_cac2vInput.res <- glmQLFTest(fitK27, contrast=FC_cac1_cac2vInput.K27.contrast)
+FC_cac1_cac2vInput.merged <- mergeResults(filtered.dataK27, FC_cac1_cac2vInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_cac1_cac2vInput.K27.tabular <- FC_cac1_cac2vInput.merged$combined
+FC_cac1_cac2vInput.K27.out.ranges <- FC_cac1_cac2vInput.merged$regions
+mcols(FC_cac1_cac2vInput.K27.out.ranges) <- DataFrame(FC_cac1_cac2vInput.K27.tabular)
+
+#cac-2_comp
+FC_cac2_compvInput.K27.contrast <- makeContrasts(K27vcac2_comp=cac2_comp.H3K27me3_CS-cac2_comp.input,levels=design.mat)
+FC_cac2_compvInput.res <- glmQLFTest(fitK27, contrast=FC_cac2_compvInput.K27.contrast)
+FC_cac2_compvInput.merged <- mergeResults(filtered.dataK27, FC_cac2_compvInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_cac2_compvInput.K27.tabular <- FC_cac2_compvInput.merged$combined
+FC_cac2_compvInput.K27.out.ranges <- FC_cac2_compvInput.merged$regions
+mcols(FC_cac2_compvInput.K27.out.ranges) <- DataFrame(FC_cac2_compvInput.K27.tabular)
+
+#WT_new
+FC_WT_newvInput.K27.contrast <- makeContrasts(K27vWT_new=WT_new.H3K27me3_CS-WT_new.input,levels=design.mat)
+FC_WT_newvInput.res <- glmQLFTest(fitK27, contrast=FC_WT_newvInput.K27.contrast)
+FC_WT_newvInput.merged <- mergeResults(filtered.dataK27, FC_WT_newvInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_WT_newvInput.K27.tabular <- FC_WT_newvInput.merged$combined
+FC_WT_newvInput.K27.out.ranges <- FC_WT_newvInput.merged$regions
+mcols(FC_WT_newvInput.K27.out.ranges) <- DataFrame(FC_WT_newvInput.K27.tabular)
+
+#cac-1_new
+FC_cac1_newvInput.K27.contrast <- makeContrasts(K27vcac1_new=cac1_new.H3K27me3_CS-cac1_new.input,levels=design.mat)
+FC_cac1_newvInput.res <- glmQLFTest(fitK27, contrast=FC_cac1_newvInput.K27.contrast)
+FC_cac1_newvInput.merged <- mergeResults(filtered.dataK27, FC_cac1_newvInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_cac1_newvInput.K27.tabular <- FC_cac1_newvInput.merged$combined
+FC_cac1_newvInput.K27.out.ranges <- FC_cac1_newvInput.merged$regions
+mcols(FC_cac1_newvInput.K27.out.ranges) <- DataFrame(FC_cac1_newvInput.K27.tabular)
+
+#rtt106
+FC_rtt106vInput.K27.contrast <- makeContrasts(K27vrtt106=rtt106.H3K27me3_CS-rtt106.input,levels=design.mat)
+FC_rtt106vInput.res <- glmQLFTest(fitK27, contrast=FC_rtt106vInput.K27.contrast)
+FC_rtt106vInput.merged <- mergeResults(filtered.dataK27, FC_rtt106vInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_rtt106vInput.K27.tabular <- FC_rtt106vInput.merged$combined
+FC_rtt106vInput.K27.out.ranges <- FC_rtt106vInput.merged$regions
+mcols(FC_rtt106vInput.K27.out.ranges) <- DataFrame(FC_rtt106vInput.K27.tabular)
+
+#cac-1_rtt106
+FC_cac1_rtt106vInput.K27.contrast <- makeContrasts(K27vcac1_rtt106=cac1_rtt106.H3K27me3_CS-cac1_rtt106.input,levels=design.mat)
+FC_cac1_rtt106vInput.res <- glmQLFTest(fitK27, contrast=FC_cac1_rtt106vInput.K27.contrast)
+FC_cac1_rtt106vInput.merged <- mergeResults(filtered.dataK27, FC_cac1_rtt106vInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_cac1_rtt106vInput.K27.tabular <- FC_cac1_rtt106vInput.merged$combined
+FC_cac1_rtt106vInput.K27.out.ranges <- FC_cac1_rtt106vInput.merged$regions
+mcols(FC_cac1_rtt106vInput.K27.out.ranges) <- DataFrame(FC_cac1_rtt106vInput.K27.tabular)
+
 #combine
 K27.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K27.out.ranges),
   start=start(WTvI.K27.out.ranges),
@@ -508,26 +362,52 @@ K27.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K27.out.ranges),
   FDR_cac3vInput_K27me3 = cac3vInput.K27.out.ranges$FDR,
   logFC_set7vInput_K27me3 = set7vInput.K27.out.ranges$rep.logFC,
   PValue_set7vInput_K27me3 = set7vInput.K27.out.ranges$PValue,
-  FDR_set7vInput_K27me3 = set7vInput.K27.out.ranges$FDR)
+  FDR_set7vInput_K27me3 = set7vInput.K27.out.ranges$FDR,
+  logFC_cac1_cac2vInput_K27me3 = FC_cac1_cac2vInput.K27.out.ranges$rep.logFC,
+  PValue_cac1_cac2vInput_K27me3 = FC_cac1_cac2vInput.K27.out.ranges$PValue,
+  FDR_cac1_cac2vInput_K27me3 = FC_cac1_cac2vInput.K27.out.ranges$FDR,
+  logFC_cac2_compvInput_K27me3 = FC_cac2_compvInput.K27.out.ranges$rep.logFC,
+  PValue_cac2_compvInput_K27me3 = FC_cac2_compvInput.K27.out.ranges$PValue,
+  FDR_cac2_compvInput_K27me3 = FC_cac2_compvInput.K27.out.ranges$FDR,
+  # logFC_WT_newvInput_K27me3 = FC_WT_newvInput.K27.out.ranges$rep.logFC,
+  # PValue_WT_newvInput_K27me3 = FC_WT_newvInput.K27.out.ranges$PValue,
+  # FDR_WT_newvInput_K27me3 = FC_WT_newvInput.K27.out.ranges$FDR,
+  # logFC_cac1_newvInput_K27me3 = FC_cac1_newvInput.K27.out.ranges$rep.logFC,
+  # PValue_cac1_newvInput_K27me3 = FC_cac1_newvInput.K27.out.ranges$PValue,
+  # FDR_cac1_newvInput_K27me3 = FC_cac1_newvInput.K27.out.ranges$FDR,
+  logFC_rtt106vInput_K27me3 = FC_rtt106vInput.K27.out.ranges$rep.logFC,
+  PValue_rtt106vInput_K27me3 = FC_rtt106vInput.K27.out.ranges$PValue,
+  FDR_rtt106vInput_K27me3 = FC_rtt106vInput.K27.out.ranges$FDR,
+  logFC_cac1_rtt106vInput_K27me3 = FC_cac1_rtt106vInput.K27.out.ranges$rep.logFC,
+  PValue_cac1_rtt106vInput_K27me3 = FC_cac1_rtt106vInput.K27.out.ranges$PValue,
+  FDR_cac1_rtt106vInput_K27me3 = FC_cac1_rtt106vInput.K27.out.ranges$FDR)
 
 
 ##convert all non-sig values to 0
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df, logFC_WTvInput_K27me3[FDR_WTvInput_K27me3 > 0.05] <- 0.1)
+K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df, logFC_WTvInput_K27me3[FDR_WTvInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_cac1vInput_K27me3[FDR_cac1vInput_K27me3 > 0.05] <- 0.1)
+K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_cac1vInput_K27me3[FDR_cac1vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac2vInput_K27me3[FDR_cac2vInput_K27me3 > 0.05] <- 0.1)
+K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac2vInput_K27me3[FDR_cac2vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K27me3[FDR_cac3vInput_K27me3 > 0.05] <- 0.1)
+K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K27me3[FDR_cac3vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_set7vInput_K27me3[FDR_set7vInput_K27me3 > 0.05] <- 0.1)
+K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_set7vInput_K27me3[FDR_set7vInput_K27me3 > 0.05] <- 0)
 
-K27_FilteredHeatmap_df <- dplyr::select(K27.chip.Filteredres.df_SigOnly,7,10,13,16,19)
+K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_cac1_cac2vInput_K27me3[FDR_cac1_cac2vInput_K27me3 > 0.05] <- 0)
+
+K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_cac2_compvInput_K27me3[FDR_cac2_compvInput_K27me3 > 0.05] <- 0)
+
+K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_rtt106vInput_K27me3[FDR_rtt106vInput_K27me3 > 0.05] <- 0)
+
+K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_cac1_rtt106vInput_K27me3[FDR_cac1_rtt106vInput_K27me3 > 0.05] <- 0)
+
+K27_FilteredHeatmap_df <- dplyr::select(K27.chip.Filteredres.df_SigOnly,7,10,13,16,19,22,25,28,31)
 
 rownames(K27_FilteredHeatmap_df) <- paste(K27.chip.Filteredres.df_SigOnly$seqnames, K27.chip.Filteredres.df_SigOnly$start, K27.chip.Filteredres.df_SigOnly$end, sep=".")
 
-#K4 Analysis, K27 regions
-#K4
+#Now, I will look at H3K4me2 across K27 peaks
+
 #set up pairwise contrast
 FC_WTvInput.K4.contrast <- makeContrasts(K4vWT=WT.H3K4me2-WT.input, levels=design.mat)
 #analyze data
@@ -578,6 +458,33 @@ set7vInput.K4.tabular <- FC_set7vInput.K4.merged$combined
 set7vInput.K4.out.ranges <- FC_set7vInput.K4.merged$regions
 mcols(set7vInput.K4.out.ranges) <- DataFrame(set7vInput.K4.tabular)
 
+#cac-2_comp
+FC_cac2_compvInput.K4.contrast <- makeContrasts(K4vcac2_comp=cac2_comp.H3K4me2-cac2_comp.input,levels=design.mat)
+FC_cac2_compvInput.res <- glmQLFTest(fitK27, contrast=FC_cac2_compvInput.K4.contrast)
+FC_cac2_compvInput.merged <- mergeResults(filtered.dataK27, FC_cac2_compvInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_cac2_compvInput.K4.tabular <- FC_cac2_compvInput.merged$combined
+FC_cac2_compvInput.K4.out.ranges <- FC_cac2_compvInput.merged$regions
+mcols(FC_cac2_compvInput.K4.out.ranges) <- DataFrame(FC_cac2_compvInput.K4.tabular)
+
+#rtt106
+FC_rtt106vInput.K4.contrast <- makeContrasts(K4vrtt106=rtt106.H3K4me2-rtt106.input,levels=design.mat)
+FC_rtt106vInput.res <- glmQLFTest(fitK27, contrast=FC_rtt106vInput.K4.contrast)
+FC_rtt106vInput.merged <- mergeResults(filtered.dataK27, FC_rtt106vInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_rtt106vInput.K4.tabular <- FC_rtt106vInput.merged$combined
+FC_rtt106vInput.K4.out.ranges <- FC_rtt106vInput.merged$regions
+mcols(FC_rtt106vInput.K4.out.ranges) <- DataFrame(FC_rtt106vInput.K4.tabular)
+
+#cac-1_rtt106
+FC_cac1_rtt106vInput.K4.contrast <- makeContrasts(K4vcac1_rtt106=cac1_rtt106.H3K4me2-cac1_rtt106.input,levels=design.mat)
+FC_cac1_rtt106vInput.res <- glmQLFTest(fitK27, contrast=FC_cac1_rtt106vInput.K4.contrast)
+FC_cac1_rtt106vInput.merged <- mergeResults(filtered.dataK27, FC_cac1_rtt106vInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_cac1_rtt106vInput.K4.tabular <- FC_cac1_rtt106vInput.merged$combined
+FC_cac1_rtt106vInput.K4.out.ranges <- FC_cac1_rtt106vInput.merged$regions
+mcols(FC_cac1_rtt106vInput.K4.out.ranges) <- DataFrame(FC_cac1_rtt106vInput.K4.tabular)
+
 #combine
 K4.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K4.out.ranges),
   start=start(WTvI.K4.out.ranges),
@@ -594,12 +501,21 @@ K4.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K4.out.ranges),
    logFC_cac2vInput_K4me2 = cac2vI.K4.out.ranges$rep.logFC,
   PValue_cac2vInput_K4me2 = cac2vI.K4.out.ranges$PValue,
   FDR_cac2vInput_K4me2 = cac2vI.K4.out.ranges$FDR,
-   #logFC_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$rep.logFC,
-  #PValue_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$PValue,
-  #FDR_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$FDR,
+  logFC_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$rep.logFC,
+  PValue_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$PValue,
+  FDR_cac3vInput_K4me2 = cac3vInput.K4.out.ranges$FDR,
   logFC_set7vInput_K4me2 = set7vInput.K4.out.ranges$rep.logFC,
   PValue_set7vInput_K4me2 = set7vInput.K4.out.ranges$PValue,
-  FDR_set7vInput_K4me2 = set7vInput.K4.out.ranges$FDR)
+  FDR_set7vInput_K4me2 = set7vInput.K4.out.ranges$FDR,
+  logFC_cac2_compvInput_K4me2 = cac2_compvInput.K4.out.ranges$rep.logFC,
+  PValue_cac2_compvInput_K4me2 = cac2_compvInput.K4.out.ranges$PValue,
+  FDR_cac2_compvInput_K4me2 = cac2_compvInput.K4.out.ranges$FDR,
+  logFC_rtt106vInput_K4me2 = rtt106vInput.K4.out.ranges$rep.logFC,
+  PValue_rtt106vInput_K4me2 = rtt106vInput.K4.out.ranges$PValue,
+  FDR_rtt106vInput_K4me2 = rtt106vInput.K4.out.ranges$FDR,
+  logFC_cac1_rtt106vInput_K4me2 = cac1_rtt106vInput.K4.out.ranges$rep.logFC,
+  PValue_cac1_rtt106vInput_K4me2 = cac1_rtt106vInput.K4.out.ranges$PValue,
+  FDR_cac1_rtt106vInput_K4me2 = cac1_rtt106vInput.K4.out.ranges$FDR)
 
 
 ##convert all non-sig values to 0
