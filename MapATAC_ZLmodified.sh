@@ -27,8 +27,8 @@ fi
 
 # #process reads using trimGalore
 #
-# ml Trim_Galore/0.6.7-GCCcore-11.2.0
-# trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+ml Trim_Galore/0.6.7-GCCcore-11.2.0
+trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 #
@@ -39,6 +39,7 @@ FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
  # mkdir "${OUTDIR}/Beds"
  # mkdir "${OUTDIR}/Histograms"
  # mkdir "${OUTDIR}/Metaplots"
+mkdir "${OUTDIR}/Stats"
 
 #mkdir "$OUTDIR/HomerTagDirectories"
 #mkdir "$OUTDIR/TdfFiles"
@@ -130,7 +131,7 @@ java -Xmx20g -classpath "/home/evt82290/Research/picard/3.4.0" -jar /home/ad4536
 samtools index -@ $THREADS ${deduped}
 
 
-# #perl ./shiftTn5_BAM_2_BED.pl "${bam}" > "${name}.bed"
+perl ./shiftTn5_BAM_2_BED.pl "${bam}" > "${name}.bed"
 #
 # ############################
 # #deeptools
@@ -152,7 +153,7 @@ bamCoverage -p $THREADS --Offset 1 3 -bs 1 --smoothLength 6 --normalizeUsing BPM
 module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 
 macs3 hmmratac -b $shifted --outdir ${OUTDIR}/hmmr_Peaks -n $name
-macs3 callpeak -t $shifted -c ${OUTDIR}/SortedBamFiles/148-N6_ATAC_CEA17_gDNA__Rep1_S102_L003_R1_001_val_1.fq.gz.shifted.bam --format BAMPE --outdir ${OUTDIR}/reg_Peaks -n $name
+macs3 callpeak -t $shifted --format BAMPE --outdir ${OUTDIR}/reg_Peaks -n $name
 
 
 done
