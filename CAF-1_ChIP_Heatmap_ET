@@ -207,7 +207,7 @@ computeMatrix scale-regions -a 250 -b 1250 --regionBodyLength 2000 --scale 1.5 \
     $ATACDIR/141-N15_ATAC_set-7__Rep1_S104_L007_R1_001_val_1.fq.gz.ATAC_bin_3.smooth_6_Bulk.bw \
     -R $BEDDIR2/K27_genes_stringent.bed --skipZeros -o matrix_PRC2_1.gz
 
-    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27genes_CAF-1_clustered.pdf \
+    plotHeatmap -m matrix_PRC2_1.gz -out CAF-1_ATAC_K27genes.pdf \
                     --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                     --startLabel "TSS" \
                     --endLabel "TES" \
