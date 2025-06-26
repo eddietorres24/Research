@@ -1518,7 +1518,6 @@ dev.off()
 
 ```
 
-```
 
 ```{r, IGV Track}
 track = K4.chip.Filteredres.df_SigOnly %>% select("seqnames", "start", "end", "names", "logFC_WTvInput_K4me2", "logFC_cac1vInput_K4me2", "logFC_cac2vInput_K4me2", "logFC_cac3vInput_K4me2", "logFC_set7vInput_K4me2")
@@ -1640,7 +1639,7 @@ FC_cac1_rtt106vInput.K27_gene.out.ranges <- FC_cac1_rtt106vInput.merged$regions
 mcols(FC_cac1_rtt106vInput.K27_gene.out.ranges) <- DataFrame(FC_cac1_rtt106vInput.K27_gene.tabular)
 
 #combine
-K27.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K27_gene.out.ranges),
+K27.chip.Filteredres_gene.df <- data.frame(seqnames=seqnames(WTvI.K27_gene.out.ranges),
   start=start(WTvI.K27_gene.out.ranges),
   end=end(WTvI.K27_gene.out.ranges),
   names=c(rep(".", length(WTvI.K27_gene.out.ranges))),
@@ -1682,27 +1681,27 @@ K27.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K27_gene.out.ranges
 
 
 ##convert all non-sig values to 0
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df, logFC_WTvInput_K27me3[FDR_WTvInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_gene.df_SigOnly  <- within(K27.chip.Filteredres_gene.df, logFC_WTvInput_K27me3[FDR_WTvInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_cac1vInput_K27me3[FDR_cac1vInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_gene.df_SigOnly  <- within(K27.chip.Filteredres_gene.df_SigOnly, logFC_cac1vInput_K27me3[FDR_cac1vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac2vInput_K27me3[FDR_cac2vInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_gene.df_SigOnly  <- within(K27.chip.Filteredres_gene.df_SigOnly , logFC_cac2vInput_K27me3[FDR_cac2vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K27me3[FDR_cac3vInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_gene.df_SigOnly  <- within(K27.chip.Filteredres_gene.df_SigOnly , logFC_cac3vInput_K27me3[FDR_cac3vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_set7vInput_K27me3[FDR_set7vInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_gene.df_SigOnly  <- within(K27.chip.Filteredres_gene.df_SigOnly , logFC_set7vInput_K27me3[FDR_set7vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_cac1_cac2vInput_K27me3[FDR_cac1_cac2vInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_gene.df_SigOnly  <- within(K27.chip.Filteredres_gene.df_SigOnly, logFC_cac1_cac2vInput_K27me3[FDR_cac1_cac2vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_cac2_compvInput_K27me3[FDR_cac2_compvInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_gene.df_SigOnly  <- within(K27.chip.Filteredres_gene.df_SigOnly, logFC_cac2_compvInput_K27me3[FDR_cac2_compvInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_rtt106vInput_K27me3[FDR_rtt106vInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_gene.df_SigOnly  <- within(K27.chip.Filteredres_gene.df_SigOnly, logFC_rtt106vInput_K27me3[FDR_rtt106vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_cac1_rtt106vInput_K27me3[FDR_cac1_rtt106vInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_gene.df_SigOnly  <- within(K27.chip.Filteredres_gene.df_SigOnly, logFC_cac1_rtt106vInput_K27me3[FDR_cac1_rtt106vInput_K27me3 > 0.05] <- 0)
 
-K27_FilteredHeatmap_df <- dplyr::select(K27.chip.Filteredres.df_SigOnly,7,10,13,16,19,22,25,28,31)
+K27_FilteredHeatmap_gene_df <- dplyr::select(K27.chip.Filteredres_gene.df_SigOnly,7,10,13,16,19,22,25,28,31)
 
-rownames(K27_FilteredHeatmap_df) <- paste(K27.chip.Filteredres.df_SigOnly$seqnames, K27.chip.Filteredres.df_SigOnly$start, K27.chip.Filteredres.df_SigOnly$end, sep=".")
+rownames(K27_FilteredHeatmap_gene_df) <- paste(K27.chip.Filteredres_gene.df_SigOnly$seqnames, K27.chip.Filteredres_gene.df_SigOnly$start, K27.chip.Filteredres_gene.df_SigOnly$end, sep=".")
 
 #Now, I will look at H3K4me2 across K27 peaks
 
@@ -1784,7 +1783,7 @@ FC_cac1_rtt106vInput.K4.out.ranges <- FC_cac1_rtt106vInput.merged$regions
 mcols(FC_cac1_rtt106vInput.K4.out.ranges) <- DataFrame(FC_cac1_rtt106vInput.K4.tabular)
 
 #combine
-K4.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K4.out.ranges),
+K4.chip.Filteredres_gene.df <- data.frame(seqnames=seqnames(WTvI.K4.out.ranges),
   start=start(WTvI.K4.out.ranges),
   end=end(WTvI.K4.out.ranges),
   names=c(rep(".", length(WTvI.K4.out.ranges))),
@@ -1817,25 +1816,25 @@ K4.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K4.out.ranges),
 
 
 ##convert all non-sig values to 0
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df, logFC_WTvInput_K4me2[FDR_WTvInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_gene.df_SigOnly  <- within(K4.chip.Filteredres_gene.df, logFC_WTvInput_K4me2[FDR_WTvInput_K4me2 > 0.05] <- 0)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly, logFC_cac1vInput_K4me2[FDR_cac1vInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_gene.df_SigOnly  <- within(K4.chip.Filteredres_gene.df_SigOnly, logFC_cac1vInput_K4me2[FDR_cac1vInput_K4me2 > 0.05] <- 0)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_cac2vInput_K4me2[FDR_cac2vInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_gene.df_SigOnly  <- within(K4.chip.Filteredres_gene.df_SigOnly , logFC_cac2vInput_K4me2[FDR_cac2vInput_K4me2 > 0.05] <- 0)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K4me2[FDR_cac3vInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_gene.df_SigOnly  <- within(K4.chip.Filteredres_gene.df_SigOnly , logFC_cac3vInput_K4me2[FDR_cac3vInput_K4me2 > 0.05] <- 0)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_set7vInput_K4me2[FDR_set7vInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_gene.df_SigOnly  <- within(K4.chip.Filteredres_gene.df_SigOnly , logFC_set7vInput_K4me2[FDR_set7vInput_K4me2 > 0.05] <- 0)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_cac2_compvInput_K4me2[FDR_cac2_compvInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_gene.df_SigOnly  <- within(K4.chip.Filteredres_gene.df_SigOnly , logFC_cac2_compvInput_K4me2[FDR_cac2_compvInput_K4me2 > 0.05] <- 0)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_rtt106vInput_K4me2[FDR_rtt106vInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_gene.df_SigOnly  <- within(K4.chip.Filteredres_gene.df_SigOnly , logFC_rtt106vInput_K4me2[FDR_rtt106vInput_K4me2 > 0.05] <- 0)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_cac1_rtt106vInput_K4me2[FDR_cac1_rtt106vInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_gene.df_SigOnly  <- within(K4.chip.Filteredres_gene.df_SigOnly , logFC_cac1_rtt106vInput_K4me2[FDR_cac1_rtt106vInput_K4me2 > 0.05] <- 0)
 
-K4_FilteredHeatmap_df <- dplyr::select(K4.chip.Filteredres.df_SigOnly,7,10,13,16,19,22,25,28)
+K4_FilteredHeatmap_gene_df <- dplyr::select(K4.chip.Filteredres_gene.df_SigOnly,7,10,13,16,19,22,25,28)
 
-rownames(K4_FilteredHeatmap_df) <- paste(K4.chip.Filteredres.df_SigOnly$seqnames, K4.chip.Filteredres.df_SigOnly$start, K4.chip.Filteredres.df_SigOnly$end, sep=".")
+rownames(K4_FilteredHeatmap_gene_df) <- paste(K4.chip.Filteredres_gene.df_SigOnly$seqnames, K4.chip.Filteredres_gene.df_SigOnly$start, K4.chip.Filteredres_gene.df_SigOnly$end, sep=".")
 
 #Doing the same for H3K36me3
 
@@ -1890,7 +1889,7 @@ set7vInput.K36.out.ranges <- FC_set7vInput.K36.merged$regions
 mcols(set7vInput.K36.out.ranges) <- DataFrame(set7vInput.K36.tabular)
 
 #combine
-K36.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K36.out.ranges),
+K36.chip.Filteredres_gene.df <- data.frame(seqnames=seqnames(WTvI.K36.out.ranges),
   start=start(WTvI.K36.out.ranges),
   end=end(WTvI.K36.out.ranges),
   names=c(rep(".", length(WTvI.K36.out.ranges))),
@@ -1913,19 +1912,19 @@ K36.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K36.out.ranges),
   FDR_set7vInput_K36me2 = set7vInput.K36.out.ranges$FDR)
 
 ##convert all non-sig values to 0
-K36.chip.Filteredres.df_SigOnly  <- within(K36.chip.Filteredres.df, logFC_WTvInput_K36me2[FDR_WTvInput_K36me2 > 0.05] <- 0)
+K36.chip.Filteredres_gene.df_SigOnly  <- within(K36.chip.Filteredres_gene.df, logFC_WTvInput_K36me2[FDR_WTvInput_K36me2 > 0.05] <- 0)
 
-K36.chip.Filteredres.df_SigOnly  <- within(K36.chip.Filteredres.df_SigOnly, logFC_cac1vInput_K36me2[FDR_cac1vInput_K36me2 > 0.05] <- 0)
+K36.chip.Filteredres_gene.df_SigOnly  <- within(K36.chip.Filteredres_gene.df_SigOnly, logFC_cac1vInput_K36me2[FDR_cac1vInput_K36me2 > 0.05] <- 0)
 
-K36.chip.Filteredres.df_SigOnly  <- within(K36.chip.Filteredres.df_SigOnly , logFC_cac2vInput_K36me2[FDR_cac2vInput_K36me2 > 0.05] <- 0)
+K36.chip.Filteredres_gene.df_SigOnly  <- within(K36.chip.Filteredres_gene.df_SigOnly , logFC_cac2vInput_K36me2[FDR_cac2vInput_K36me2 > 0.05] <- 0)
 
-K36.chip.Filteredres.df_SigOnly  <- within(K36.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K36me2[FDR_cac3vInput_K36me2 > 0.05] <- 0)
+K36.chip.Filteredres_gene.df_SigOnly  <- within(K36.chip.Filteredres_gene.df_SigOnly , logFC_cac3vInput_K36me2[FDR_cac3vInput_K36me2 > 0.05] <- 0)
 
-K36.chip.Filteredres.df_SigOnly  <- within(K36.chip.Filteredres.df_SigOnly , logFC_set7vInput_K36me2[FDR_set7vInput_K36me2 > 0.05] <- 0)
+K36.chip.Filteredres_gene.df_SigOnly  <- within(K36.chip.Filteredres_gene.df_SigOnly , logFC_set7vInput_K36me2[FDR_set7vInput_K36me2 > 0.05] <- 0)
 
-K36_FilteredHeatmap_df <- dplyr::select(K36.chip.Filteredres.df_SigOnly,7,10,13,16,19)
+K36_FilteredHeatmap_gene_df <- dplyr::select(K36.chip.Filteredres_gene.df_SigOnly,7,10,13,16,19)
 
-rownames(K36_FilteredHeatmap_df) <- paste(K36.chip.Filteredres.df_SigOnly$seqnames, K36.chip.Filteredres.df_SigOnly$start, K36.chip.Filteredres.df_SigOnly$end, sep=".")
+rownames(K36_FilteredHeatmap_gene_df) <- paste(K36.chip.Filteredres_gene.df_SigOnly$seqnames, K36.chip.Filteredres_gene.df_SigOnly$start, K36.chip.Filteredres_gene.df_SigOnly$end, sep=".")
 
 #Doing the same for H3K27ac
 
@@ -1980,7 +1979,7 @@ set7vInput.K27_geneac.out.ranges <- FC_set7vInput.K27_geneac.merged$regions
 mcols(set7vInput.K27_geneac.out.ranges) <- DataFrame(set7vInput.K27_geneac.tabular)
 
 #combine
-K27ac.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K27_geneac.out.ranges),
+K27ac.chip.Filteredres_gene.df <- data.frame(seqnames=seqnames(WTvI.K27_geneac.out.ranges),
   start=start(WTvI.K27_geneac.out.ranges),
   end=end(WTvI.K27_geneac.out.ranges),
   names=c(rep(".", length(WTvI.K27_geneac.out.ranges))),
@@ -2003,19 +2002,19 @@ K27ac.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K27_geneac.out.ra
   FDR_set7vInput_K27acme2 = set7vInput.K27_geneac.out.ranges$FDR)
 
 ##convert all non-sig values to 0
-K27ac.chip.Filteredres.df_SigOnly  <- within(K27ac.chip.Filteredres.df, logFC_WTvInput_K27acme2[FDR_WTvInput_K27acme2 > 0.05] <- 0)
+K27ac.chip.Filteredres_gene.df_SigOnly  <- within(K27ac.chip.Filteredres_gene.df, logFC_WTvInput_K27acme2[FDR_WTvInput_K27acme2 > 0.05] <- 0)
 
-K27ac.chip.Filteredres.df_SigOnly  <- within(K27ac.chip.Filteredres.df_SigOnly, logFC_cac1vInput_K27acme2[FDR_cac1vInput_K27acme2 > 0.05] <- 0)
+K27ac.chip.Filteredres_gene.df_SigOnly  <- within(K27ac.chip.Filteredres_gene.df_SigOnly, logFC_cac1vInput_K27acme2[FDR_cac1vInput_K27acme2 > 0.05] <- 0)
 
-K27ac.chip.Filteredres.df_SigOnly  <- within(K27ac.chip.Filteredres.df_SigOnly , logFC_cac2vInput_K27acme2[FDR_cac2vInput_K27acme2 > 0.05] <- 0)
+K27ac.chip.Filteredres_gene.df_SigOnly  <- within(K27ac.chip.Filteredres_gene.df_SigOnly , logFC_cac2vInput_K27acme2[FDR_cac2vInput_K27acme2 > 0.05] <- 0)
 
-K27ac.chip.Filteredres.df_SigOnly  <- within(K27ac.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K27acme2[FDR_cac3vInput_K27acme2 > 0.05] <- 0)
+K27ac.chip.Filteredres_gene.df_SigOnly  <- within(K27ac.chip.Filteredres_gene.df_SigOnly , logFC_cac3vInput_K27acme2[FDR_cac3vInput_K27acme2 > 0.05] <- 0)
 
-K27ac.chip.Filteredres.df_SigOnly  <- within(K27ac.chip.Filteredres.df_SigOnly , logFC_set7vInput_K27acme2[FDR_set7vInput_K27acme2 > 0.05] <- 0)
+K27ac.chip.Filteredres_gene.df_SigOnly  <- within(K27ac.chip.Filteredres_gene.df_SigOnly , logFC_set7vInput_K27acme2[FDR_set7vInput_K27acme2 > 0.05] <- 0)
 
-K27ac_FilteredHeatmap_df <- dplyr::select(K27ac.chip.Filteredres.df_SigOnly,7,10,13,16,19)
+K27ac_FilteredHeatmap_gene_df <- dplyr::select(K27ac.chip.Filteredres_gene.df_SigOnly,7,10,13,16,19)
 
-rownames(K27ac_FilteredHeatmap_df) <- paste(K27ac.chip.Filteredres.df_SigOnly$seqnames, K27ac.chip.Filteredres.df_SigOnly$start, K27ac.chip.Filteredres.df_SigOnly$end, sep=".")
+rownames(K27ac_FilteredHeatmap_gene_df) <- paste(K27ac.chip.Filteredres_gene.df_SigOnly$seqnames, K27ac.chip.Filteredres_gene.df_SigOnly$start, K27ac.chip.Filteredres_gene.df_SigOnly$end, sep=".")
 
 #Doing the same for ATAC-seq data
 ```
@@ -2031,7 +2030,7 @@ FC_WTvInput.K27_prom.contrast <- makeContrasts(K27vWT=WT.H3K27me3_CS-WT.input, l
 FC_WTvI.K27_prom.res <- glmQLFTest(fitK27_prom, contrast=FC_WTvInput.K27_prom.contrast)
 
 #merge results to generate FDR; #calculates FRD on a per-region basis. This is not appropriate here since you have set the window size to 1000
-FC_WTvI.K27_prom.merged <- mergeResults(filtered.dataK27_proms, FC_WTvI.K27_prom.res$table, tol=300, 
+FC_WTvI.K27_prom.merged <- mergeResults(filtered.dataK27_prom, FC_WTvI.K27_prom.res$table, tol=300, 
                             merge.args=list(max.width=300))
 
 #move FC data into a dataframe
@@ -2046,7 +2045,7 @@ mcols(WTvI.K27_prom.out.ranges) <- DataFrame(WTvI.K27_prom.tabular)
 #cac-1
 FC_cac1vInput.K27_prom.contrast <- makeContrasts(K27vcac1=cac1.H3K27me3_CS-cac1.input,levels=design.mat)
 FC_cac1vInput.res <- glmQLFTest(fitK27_prom, contrast=FC_cac1vInput.K27_prom.contrast)
-FC_cac1vInput.merged <- mergeResults(filtered.dataK27_proms, FC_cac1vInput.res$table, tol=300, 
+FC_cac1vInput.merged <- mergeResults(filtered.dataK27_prom, FC_cac1vInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_cac1vInput.K27_prom.tabular <- FC_cac1vInput.merged$combined
 FC_cac1vInput.K27_prom.out.ranges <- FC_cac1vInput.merged$regions
@@ -2055,7 +2054,7 @@ mcols(FC_cac1vInput.K27_prom.out.ranges) <- DataFrame(FC_cac1vInput.K27_prom.tab
 #cac-2
 FC_cac2vInput.K27_prom.contrast <- makeContrasts(K27vcac2=cac2.H3K27me3_CS-cac2.input,levels=design.mat)
 FC_cac2vI.K27_prom.res <- glmQLFTest(fitK27_prom, contrast=FC_cac2vInput.K27_prom.contrast)
-FC_cac2vI.K27_prom.merged <- mergeResults(filtered.dataK27_proms, FC_cac2vI.K27_prom.res$table, tol=300, 
+FC_cac2vI.K27_prom.merged <- mergeResults(filtered.dataK27_prom, FC_cac2vI.K27_prom.res$table, tol=300, 
                             merge.args=list(max.width=300))
 cac2vI.K27_prom.tabular <- FC_cac2vI.K27_prom.merged$combined
 cac2vI.K27_prom.out.ranges <- FC_cac2vI.K27_prom.merged$regions
@@ -2064,7 +2063,7 @@ mcols(cac2vI.K27_prom.out.ranges) <- DataFrame(cac2vI.K27_prom.tabular)
 #cac-3
 FC_cac3vInput.K27_prom.contrast <- makeContrasts(K27vcac3=cac3.H3K27me3_CS-cac3.input,levels=design.mat)
 FC_cac3vInput.K27_prom.res <- glmQLFTest(fitK27_prom, contrast=FC_cac3vInput.K27_prom.contrast)
-FC_cac3vInput.K27_prom.merged <- mergeResults(filtered.dataK27_proms, FC_cac3vInput.K27_prom.res$table, tol=300, 
+FC_cac3vInput.K27_prom.merged <- mergeResults(filtered.dataK27_prom, FC_cac3vInput.K27_prom.res$table, tol=300, 
                             merge.args=list(max.width=300))
 cac3vInput.K27_prom.tabular <- FC_cac3vInput.K27_prom.merged$combined
 cac3vInput.K27_prom.out.ranges <- FC_cac3vInput.K27_prom.merged$regions
@@ -2073,7 +2072,7 @@ mcols(cac3vInput.K27_prom.out.ranges) <- DataFrame(cac3vInput.K27_prom.tabular)
 #set-7
 FC_set7vInput.K27_prom.contrast <- makeContrasts(K27vset7=set7.H3K27me3_CS-set7.input,levels=design.mat)
 FC_set7vInput.K27_prom.res <- glmQLFTest(fitK27_prom, contrast=FC_set7vInput.K27_prom.contrast)
-FC_set7vInput.K27_prom.merged <- mergeResults(filtered.dataK27_proms, FC_set7vInput.K27_prom.res$table, tol=300,
+FC_set7vInput.K27_prom.merged <- mergeResults(filtered.dataK27_prom, FC_set7vInput.K27_prom.res$table, tol=300,
                             merge.args=list(max.width=300))
 set7vInput.K27_prom.tabular <- FC_set7vInput.K27_prom.merged$combined
 set7vInput.K27_prom.out.ranges <- FC_set7vInput.K27_prom.merged$regions
@@ -2082,7 +2081,7 @@ mcols(set7vInput.K27_prom.out.ranges) <- DataFrame(set7vInput.K27_prom.tabular)
 #cac-1_cac-2
 FC_cac1_cac2vInput.K27_prom.contrast <- makeContrasts(K27vcac1_cac2=cac1_cac2.H3K27me3_CS-cac1_cac2.input,levels=design.mat)
 FC_cac1_cac2vInput.res <- glmQLFTest(fitK27_prom, contrast=FC_cac1_cac2vInput.K27_prom.contrast)
-FC_cac1_cac2vInput.merged <- mergeResults(filtered.dataK27_proms, FC_cac1_cac2vInput.res$table, tol=300, 
+FC_cac1_cac2vInput.merged <- mergeResults(filtered.dataK27_prom, FC_cac1_cac2vInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_cac1_cac2vInput.K27_prom.tabular <- FC_cac1_cac2vInput.merged$combined
 FC_cac1_cac2vInput.K27_prom.out.ranges <- FC_cac1_cac2vInput.merged$regions
@@ -2091,7 +2090,7 @@ mcols(FC_cac1_cac2vInput.K27_prom.out.ranges) <- DataFrame(FC_cac1_cac2vInput.K2
 #cac-2_comp
 FC_cac2_compvInput.K27_prom.contrast <- makeContrasts(K27vcac2_comp=cac2_comp.H3K27me3_CS-cac2_comp.input,levels=design.mat)
 FC_cac2_compvInput.res <- glmQLFTest(fitK27_prom, contrast=FC_cac2_compvInput.K27_prom.contrast)
-FC_cac2_compvInput.merged <- mergeResults(filtered.dataK27_proms, FC_cac2_compvInput.res$table, tol=300, 
+FC_cac2_compvInput.merged <- mergeResults(filtered.dataK27_prom, FC_cac2_compvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_cac2_compvInput.K27_prom.tabular <- FC_cac2_compvInput.merged$combined
 FC_cac2_compvInput.K27_prom.out.ranges <- FC_cac2_compvInput.merged$regions
@@ -2100,7 +2099,7 @@ mcols(FC_cac2_compvInput.K27_prom.out.ranges) <- DataFrame(FC_cac2_compvInput.K2
 #WT_new
 # FC_WT_newvInput.K27_prom.contrast <- makeContrasts(K27vWT_new=WT_new.H3K27me3_CS-WT_new.input,levels=design.mat)
 # FC_WT_newvInput.res <- glmQLFTest(fitK27_prom, contrast=FC_WT_newvInput.K27_prom.contrast)
-# FC_WT_newvInput.merged <- mergeResults(filtered.dataK27_proms, FC_WT_newvInput.res$table, tol=300, 
+# FC_WT_newvInput.merged <- mergeResults(filtered.dataK27_prom, FC_WT_newvInput.res$table, tol=300, 
 #                             merge.args=list(max.width=300))
 # FC_WT_newvInput.K27_prom.tabular <- FC_WT_newvInput.merged$combined
 # FC_WT_newvInput.K27_prom.out.ranges <- FC_WT_newvInput.merged$regions
@@ -2109,7 +2108,7 @@ mcols(FC_cac2_compvInput.K27_prom.out.ranges) <- DataFrame(FC_cac2_compvInput.K2
 # #cac-1_new
 # FC_cac1_newvInput.K27_prom.contrast <- makeContrasts(K27vcac1_new=cac1_new.H3K27me3_CS-cac1_new.input,levels=design.mat)
 # FC_cac1_newvInput.res <- glmQLFTest(fitK27_prom, contrast=FC_cac1_newvInput.K27_prom.contrast)
-# FC_cac1_newvInput.merged <- mergeResults(filtered.dataK27_proms, FC_cac1_newvInput.res$table, tol=300, 
+# FC_cac1_newvInput.merged <- mergeResults(filtered.dataK27_prom, FC_cac1_newvInput.res$table, tol=300, 
 #                             merge.args=list(max.width=300))
 # FC_cac1_newvInput.K27_prom.tabular <- FC_cac1_newvInput.merged$combined
 # FC_cac1_newvInput.K27_prom.out.ranges <- FC_cac1_newvInput.merged$regions
@@ -2118,7 +2117,7 @@ mcols(FC_cac2_compvInput.K27_prom.out.ranges) <- DataFrame(FC_cac2_compvInput.K2
 #rtt106
 FC_rtt106vInput.K27_prom.contrast <- makeContrasts(K27vrtt106=rtt106.H3K27me3_CS-rtt106.input,levels=design.mat)
 FC_rtt106vInput.res <- glmQLFTest(fitK27_prom, contrast=FC_rtt106vInput.K27_prom.contrast)
-FC_rtt106vInput.merged <- mergeResults(filtered.dataK27_proms, FC_rtt106vInput.res$table, tol=300, 
+FC_rtt106vInput.merged <- mergeResults(filtered.dataK27_prom, FC_rtt106vInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_rtt106vInput.K27_prom.tabular <- FC_rtt106vInput.merged$combined
 FC_rtt106vInput.K27_prom.out.ranges <- FC_rtt106vInput.merged$regions
@@ -2127,14 +2126,14 @@ mcols(FC_rtt106vInput.K27_prom.out.ranges) <- DataFrame(FC_rtt106vInput.K27_prom
 #cac-1_rtt106
 FC_cac1_rtt106vInput.K27_prom.contrast <- makeContrasts(K27vcac1_rtt106=cac1_rtt106.H3K27me3_CS-cac1_rtt106.input,levels=design.mat)
 FC_cac1_rtt106vInput.res <- glmQLFTest(fitK27_prom, contrast=FC_cac1_rtt106vInput.K27_prom.contrast)
-FC_cac1_rtt106vInput.merged <- mergeResults(filtered.dataK27_proms, FC_cac1_rtt106vInput.res$table, tol=300, 
+FC_cac1_rtt106vInput.merged <- mergeResults(filtered.dataK27_prom, FC_cac1_rtt106vInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_cac1_rtt106vInput.K27_prom.tabular <- FC_cac1_rtt106vInput.merged$combined
 FC_cac1_rtt106vInput.K27_prom.out.ranges <- FC_cac1_rtt106vInput.merged$regions
 mcols(FC_cac1_rtt106vInput.K27_prom.out.ranges) <- DataFrame(FC_cac1_rtt106vInput.K27_prom.tabular)
 
 #combine
-K27.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K27_prom.out.ranges),
+K27.chip.Filteredres_prom.df <- data.frame(seqnames=seqnames(WTvI.K27_prom.out.ranges),
   start=start(WTvI.K27_prom.out.ranges),
   end=end(WTvI.K27_prom.out.ranges),
   names=c(rep(".", length(WTvI.K27_prom.out.ranges))),
@@ -2176,27 +2175,27 @@ K27.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K27_prom.out.ranges
 
 
 ##convert all non-sig values to 0
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df, logFC_WTvInput_K27me3[FDR_WTvInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_prom.df_SigOnly  <- within(K27.chip.Filteredres_prom.df, logFC_WTvInput_K27me3[FDR_WTvInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_cac1vInput_K27me3[FDR_cac1vInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_prom.df_SigOnly  <- within(K27.chip.Filteredres_prom.df_SigOnly, logFC_cac1vInput_K27me3[FDR_cac1vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac2vInput_K27me3[FDR_cac2vInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_prom.df_SigOnly  <- within(K27.chip.Filteredres_prom.df_SigOnly , logFC_cac2vInput_K27me3[FDR_cac2vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K27me3[FDR_cac3vInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_prom.df_SigOnly  <- within(K27.chip.Filteredres_prom.df_SigOnly , logFC_cac3vInput_K27me3[FDR_cac3vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_set7vInput_K27me3[FDR_set7vInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_prom.df_SigOnly  <- within(K27.chip.Filteredres_prom.df_SigOnly , logFC_set7vInput_K27me3[FDR_set7vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_cac1_cac2vInput_K27me3[FDR_cac1_cac2vInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_prom.df_SigOnly  <- within(K27.chip.Filteredres_prom.df_SigOnly, logFC_cac1_cac2vInput_K27me3[FDR_cac1_cac2vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_cac2_compvInput_K27me3[FDR_cac2_compvInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_prom.df_SigOnly  <- within(K27.chip.Filteredres_prom.df_SigOnly, logFC_cac2_compvInput_K27me3[FDR_cac2_compvInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_rtt106vInput_K27me3[FDR_rtt106vInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_prom.df_SigOnly  <- within(K27.chip.Filteredres_prom.df_SigOnly, logFC_rtt106vInput_K27me3[FDR_rtt106vInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_cac1_rtt106vInput_K27me3[FDR_cac1_rtt106vInput_K27me3 > 0.05] <- 0)
+K27.chip.Filteredres_prom.df_SigOnly  <- within(K27.chip.Filteredres_prom.df_SigOnly, logFC_cac1_rtt106vInput_K27me3[FDR_cac1_rtt106vInput_K27me3 > 0.05] <- 0)
 
-K27_FilteredHeatmap_df <- dplyr::select(K27.chip.Filteredres.df_SigOnly,7,10,13,16,19,22,25,28,31)
+K27_FilteredHeatmap_prom_df <- dplyr::select(K27.chip.Filteredres_prom.df_SigOnly,7,10,13,16,19,22,25,28,31)
 
-rownames(K27_FilteredHeatmap_df) <- paste(K27.chip.Filteredres.df_SigOnly$seqnames, K27.chip.Filteredres.df_SigOnly$start, K27.chip.Filteredres.df_SigOnly$end, sep=".")
+rownames(K27_FilteredHeatmap_prom_df) <- paste(K27.chip.Filteredres_prom.df_SigOnly$seqnames, K27.chip.Filteredres_prom.df_SigOnly$start, K27.chip.Filteredres_prom.df_SigOnly$end, sep=".")
 
 #Now, I will look at H3K4me2 across K27 peaks
 
@@ -2205,7 +2204,7 @@ FC_WTvInput.K4.contrast <- makeContrasts(K4vWT=WT.H3K4me2-WT.input, levels=desig
 #analyze data
 FC_WTvI.K4.res <- glmQLFTest(fitK27_prom, contrast=FC_WTvInput.K4.contrast)
 #merge results to generate FDR; #calculates FRD on a per-region basis. This is not appropriate here since you have set the window size to 1000
-FC_WTvI.K4.merged <- mergeResults(filtered.dataK27_proms, FC_WTvI.K4.res$table, tol=300, 
+FC_WTvI.K4.merged <- mergeResults(filtered.dataK27_prom, FC_WTvI.K4.res$table, tol=300, 
                             merge.args=list(max.width=300))
 #move FC data into a dataframe
 WTvI.K4.tabular <- FC_WTvI.K4.merged$combined
@@ -2217,7 +2216,7 @@ mcols(WTvI.K4.out.ranges) <- DataFrame(WTvI.K4.tabular)
 #cac-1
 FC_cac1vInput.K4.contrast <- makeContrasts(K4vcac1=cac1.H3K4me2-cac1.input,levels=design.mat)
 FC_cac1vInput.res <- glmQLFTest(fitK27_prom, contrast=FC_cac1vInput.K4.contrast)
-FC_cac1vInput.merged <- mergeResults(filtered.dataK27_proms, FC_cac1vInput.res$table, tol=300, 
+FC_cac1vInput.merged <- mergeResults(filtered.dataK27_prom, FC_cac1vInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_cac1vInput.K4.tabular <- FC_cac1vInput.merged$combined
 FC_cac1vInput.K4.out.ranges <- FC_cac1vInput.merged$regions
@@ -2226,7 +2225,7 @@ mcols(FC_cac1vInput.K4.out.ranges) <- DataFrame(FC_cac1vInput.K4.tabular)
 #cac-2
 FC_cac2vInput.K4.contrast <- makeContrasts(K4vcac2=cac2.H3K4me2-cac2.input,levels=design.mat)
 FC_cac2vI.K4.res <- glmQLFTest(fitK27_prom, contrast=FC_cac2vInput.K4.contrast)
-FC_cac2vI.K4.merged <- mergeResults(filtered.dataK27_proms, FC_cac2vI.K4.res$table, tol=300, 
+FC_cac2vI.K4.merged <- mergeResults(filtered.dataK27_prom, FC_cac2vI.K4.res$table, tol=300, 
                             merge.args=list(max.width=300))
 cac2vI.K4.tabular <- FC_cac2vI.K4.merged$combined
 cac2vI.K4.out.ranges <- FC_cac2vI.K4.merged$regions
@@ -2235,7 +2234,7 @@ mcols(cac2vI.K4.out.ranges) <- DataFrame(cac2vI.K4.tabular)
 #cac-3
 FC_cac3vInput.K4.contrast <- makeContrasts(K4vcac3=cac3.H3K4me2-cac3.input,levels=design.mat)
 FC_cac3vInput.K4.res <- glmQLFTest(fitK27_prom, contrast=FC_cac3vInput.K4.contrast)
-FC_cac3vInput.K4.merged <- mergeResults(filtered.dataK27_proms, FC_cac3vInput.K4.res$table, tol=300, 
+FC_cac3vInput.K4.merged <- mergeResults(filtered.dataK27_prom, FC_cac3vInput.K4.res$table, tol=300, 
                             merge.args=list(max.width=300))
 cac3vInput.K4.tabular <- FC_cac3vInput.K4.merged$combined
 cac3vInput.K4.out.ranges <- FC_cac3vInput.K4.merged$regions
@@ -2244,7 +2243,7 @@ mcols(cac3vInput.K4.out.ranges) <- DataFrame(cac3vInput.K4.tabular)
 #set-7
 FC_set7vInput.K4.contrast <- makeContrasts(K4vset7=set7.H3K4me2-set7.input,levels=design.mat)
 FC_set7vInput.K4.res <- glmQLFTest(fitK27_prom, contrast=FC_set7vInput.K4.contrast)
-FC_set7vInput.K4.merged <- mergeResults(filtered.dataK27_proms, FC_set7vInput.K4.res$table, tol=300,
+FC_set7vInput.K4.merged <- mergeResults(filtered.dataK27_prom, FC_set7vInput.K4.res$table, tol=300,
                             merge.args=list(max.width=300))
 set7vInput.K4.tabular <- FC_set7vInput.K4.merged$combined
 set7vInput.K4.out.ranges <- FC_set7vInput.K4.merged$regions
@@ -2253,7 +2252,7 @@ mcols(set7vInput.K4.out.ranges) <- DataFrame(set7vInput.K4.tabular)
 #cac-2_comp
 FC_cac2_compvInput.K4.contrast <- makeContrasts(K4vcac2_comp=cac2_comp.H3K4me2-cac2_comp.input,levels=design.mat)
 FC_cac2_compvInput.res <- glmQLFTest(fitK27_prom, contrast=FC_cac2_compvInput.K4.contrast)
-FC_cac2_compvInput.merged <- mergeResults(filtered.dataK27_proms, FC_cac2_compvInput.res$table, tol=300, 
+FC_cac2_compvInput.merged <- mergeResults(filtered.dataK27_prom, FC_cac2_compvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_cac2_compvInput.K4.tabular <- FC_cac2_compvInput.merged$combined
 FC_cac2_compvInput.K4.out.ranges <- FC_cac2_compvInput.merged$regions
@@ -2262,7 +2261,7 @@ mcols(FC_cac2_compvInput.K4.out.ranges) <- DataFrame(FC_cac2_compvInput.K4.tabul
 #rtt106
 FC_rtt106vInput.K4.contrast <- makeContrasts(K4vrtt106=rtt106.H3K4me2-rtt106.input,levels=design.mat)
 FC_rtt106vInput.res <- glmQLFTest(fitK27_prom, contrast=FC_rtt106vInput.K4.contrast)
-FC_rtt106vInput.merged <- mergeResults(filtered.dataK27_proms, FC_rtt106vInput.res$table, tol=300, 
+FC_rtt106vInput.merged <- mergeResults(filtered.dataK27_prom, FC_rtt106vInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_rtt106vInput.K4.tabular <- FC_rtt106vInput.merged$combined
 FC_rtt106vInput.K4.out.ranges <- FC_rtt106vInput.merged$regions
@@ -2271,14 +2270,14 @@ mcols(FC_rtt106vInput.K4.out.ranges) <- DataFrame(FC_rtt106vInput.K4.tabular)
 #cac-1_rtt106
 FC_cac1_rtt106vInput.K4.contrast <- makeContrasts(K4vcac1_rtt106=cac1_rtt106.H3K4me2-cac1_rtt106.input,levels=design.mat)
 FC_cac1_rtt106vInput.res <- glmQLFTest(fitK27_prom, contrast=FC_cac1_rtt106vInput.K4.contrast)
-FC_cac1_rtt106vInput.merged <- mergeResults(filtered.dataK27_proms, FC_cac1_rtt106vInput.res$table, tol=300, 
+FC_cac1_rtt106vInput.merged <- mergeResults(filtered.dataK27_prom, FC_cac1_rtt106vInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_cac1_rtt106vInput.K4.tabular <- FC_cac1_rtt106vInput.merged$combined
 FC_cac1_rtt106vInput.K4.out.ranges <- FC_cac1_rtt106vInput.merged$regions
 mcols(FC_cac1_rtt106vInput.K4.out.ranges) <- DataFrame(FC_cac1_rtt106vInput.K4.tabular)
 
 #combine
-K4.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K4.out.ranges),
+K4.chip.Filteredres_prom.df <- data.frame(seqnames=seqnames(WTvI.K4.out.ranges),
   start=start(WTvI.K4.out.ranges),
   end=end(WTvI.K4.out.ranges),
   names=c(rep(".", length(WTvI.K4.out.ranges))),
@@ -2311,25 +2310,25 @@ K4.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K4.out.ranges),
 
 
 ##convert all non-sig values to 0
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df, logFC_WTvInput_K4me2[FDR_WTvInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_prom.df_SigOnly  <- within(K4.chip.Filteredres_prom.df, logFC_WTvInput_K4me2[FDR_WTvInput_K4me2 > 0.05] <- 0)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly, logFC_cac1vInput_K4me2[FDR_cac1vInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_prom.df_SigOnly  <- within(K4.chip.Filteredres_prom.df_SigOnly, logFC_cac1vInput_K4me2[FDR_cac1vInput_K4me2 > 0.05] <- 0)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_cac2vInput_K4me2[FDR_cac2vInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_prom.df_SigOnly  <- within(K4.chip.Filteredres_prom.df_SigOnly , logFC_cac2vInput_K4me2[FDR_cac2vInput_K4me2 > 0.05] <- 0)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K4me2[FDR_cac3vInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_prom.df_SigOnly  <- within(K4.chip.Filteredres_prom.df_SigOnly , logFC_cac3vInput_K4me2[FDR_cac3vInput_K4me2 > 0.05] <- 0)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_set7vInput_K4me2[FDR_set7vInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_prom.df_SigOnly  <- within(K4.chip.Filteredres_prom.df_SigOnly , logFC_set7vInput_K4me2[FDR_set7vInput_K4me2 > 0.05] <- 0)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_cac2_compvInput_K4me2[FDR_cac2_compvInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_prom.df_SigOnly  <- within(K4.chip.Filteredres_prom.df_SigOnly , logFC_cac2_compvInput_K4me2[FDR_cac2_compvInput_K4me2 > 0.05] <- 0)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_rtt106vInput_K4me2[FDR_rtt106vInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_prom.df_SigOnly  <- within(K4.chip.Filteredres_prom.df_SigOnly , logFC_rtt106vInput_K4me2[FDR_rtt106vInput_K4me2 > 0.05] <- 0)
 
-K4.chip.Filteredres.df_SigOnly  <- within(K4.chip.Filteredres.df_SigOnly , logFC_cac1_rtt106vInput_K4me2[FDR_cac1_rtt106vInput_K4me2 > 0.05] <- 0)
+K4.chip.Filteredres_prom.df_SigOnly  <- within(K4.chip.Filteredres_prom.df_SigOnly , logFC_cac1_rtt106vInput_K4me2[FDR_cac1_rtt106vInput_K4me2 > 0.05] <- 0)
 
-K4_FilteredHeatmap_df <- dplyr::select(K4.chip.Filteredres.df_SigOnly,7,10,13,16,19,22,25,28)
+K4_FilteredHeatmap_prom_df <- dplyr::select(K4.chip.Filteredres_prom.df_SigOnly,7,10,13,16,19,22,25,28)
 
-rownames(K4_FilteredHeatmap_df) <- paste(K4.chip.Filteredres.df_SigOnly$seqnames, K4.chip.Filteredres.df_SigOnly$start, K4.chip.Filteredres.df_SigOnly$end, sep=".")
+rownames(K4_FilteredHeatmap_prom_df) <- paste(K4.chip.Filteredres_prom.df_SigOnly$seqnames, K4.chip.Filteredres_prom.df_SigOnly$start, K4.chip.Filteredres_prom.df_SigOnly$end, sep=".")
 
 #Doing the same for H3K36me3
 
@@ -2338,7 +2337,7 @@ FC_WTvInput.K36.contrast <- makeContrasts(K36vWT=WT.H3K36me3-WT.input, levels=de
 #analyze data
 FC_WTvI.K36.res <- glmQLFTest(fitK27_prom, contrast=FC_WTvInput.K36.contrast)
 #merge results to generate FDR; #calculates FRD on a per-region basis. This is not appropriate here since you have set the window size to 1000
-FC_WTvI.K36.merged <- mergeResults(filtered.dataK27_proms, FC_WTvI.K36.res$table, tol=300, 
+FC_WTvI.K36.merged <- mergeResults(filtered.dataK27_prom, FC_WTvI.K36.res$table, tol=300, 
                             merge.args=list(max.width=300))
 #move FC data into a dataframe
 WTvI.K36.tabular <- FC_WTvI.K36.merged$combined
@@ -2350,7 +2349,7 @@ mcols(WTvI.K36.out.ranges) <- DataFrame(WTvI.K36.tabular)
 #cac-1
 FC_cac1vInput.K36.contrast <- makeContrasts(K36vcac1=cac1.H3K36me3-cac1.input,levels=design.mat)
 FC_cac1vInput.res <- glmQLFTest(fitK27_prom, contrast=FC_cac1vInput.K36.contrast)
-FC_cac1vInput.merged <- mergeResults(filtered.dataK27_proms, FC_cac1vInput.res$table, tol=300, 
+FC_cac1vInput.merged <- mergeResults(filtered.dataK27_prom, FC_cac1vInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_cac1vInput.K36.tabular <- FC_cac1vInput.merged$combined
 FC_cac1vInput.K36.out.ranges <- FC_cac1vInput.merged$regions
@@ -2359,7 +2358,7 @@ mcols(FC_cac1vInput.K36.out.ranges) <- DataFrame(FC_cac1vInput.K36.tabular)
 #cac-2
 FC_cac2vInput.K36.contrast <- makeContrasts(K36vcac2=cac2.H3K36me3-cac2.input,levels=design.mat)
 FC_cac2vI.K36.res <- glmQLFTest(fitK27_prom, contrast=FC_cac2vInput.K36.contrast)
-FC_cac2vI.K36.merged <- mergeResults(filtered.dataK27_proms, FC_cac2vI.K36.res$table, tol=300, 
+FC_cac2vI.K36.merged <- mergeResults(filtered.dataK27_prom, FC_cac2vI.K36.res$table, tol=300, 
                             merge.args=list(max.width=300))
 cac2vI.K36.tabular <- FC_cac2vI.K36.merged$combined
 cac2vI.K36.out.ranges <- FC_cac2vI.K36.merged$regions
@@ -2368,7 +2367,7 @@ mcols(cac2vI.K36.out.ranges) <- DataFrame(cac2vI.K36.tabular)
 #cac-3
 FC_cac3vInput.K36.contrast <- makeContrasts(K36vcac3=cac3.H3K36me3-cac3.input,levels=design.mat)
 FC_cac3vInput.K36.res <- glmQLFTest(fitK27_prom, contrast=FC_cac3vInput.K36.contrast)
-FC_cac3vInput.K36.merged <- mergeResults(filtered.dataK27_proms, FC_cac3vInput.K36.res$table, tol=300, 
+FC_cac3vInput.K36.merged <- mergeResults(filtered.dataK27_prom, FC_cac3vInput.K36.res$table, tol=300, 
                             merge.args=list(max.width=300))
 cac3vInput.K36.tabular <- FC_cac3vInput.K36.merged$combined
 cac3vInput.K36.out.ranges <- FC_cac3vInput.K36.merged$regions
@@ -2377,14 +2376,14 @@ mcols(cac3vInput.K36.out.ranges) <- DataFrame(cac3vInput.K36.tabular)
 #set-7
 FC_set7vInput.K36.contrast <- makeContrasts(K36vset7=set7.H3K36me3-set7.input,levels=design.mat)
 FC_set7vInput.K36.res <- glmQLFTest(fitK27_prom, contrast=FC_set7vInput.K36.contrast)
-FC_set7vInput.K36.merged <- mergeResults(filtered.dataK27_proms, FC_set7vInput.K36.res$table, tol=300,
+FC_set7vInput.K36.merged <- mergeResults(filtered.dataK27_prom, FC_set7vInput.K36.res$table, tol=300,
                             merge.args=list(max.width=300))
 set7vInput.K36.tabular <- FC_set7vInput.K36.merged$combined
 set7vInput.K36.out.ranges <- FC_set7vInput.K36.merged$regions
 mcols(set7vInput.K36.out.ranges) <- DataFrame(set7vInput.K36.tabular)
 
 #combine
-K36.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K36.out.ranges),
+K36.chip.Filteredres_prom.df <- data.frame(seqnames=seqnames(WTvI.K36.out.ranges),
   start=start(WTvI.K36.out.ranges),
   end=end(WTvI.K36.out.ranges),
   names=c(rep(".", length(WTvI.K36.out.ranges))),
@@ -2407,19 +2406,19 @@ K36.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K36.out.ranges),
   FDR_set7vInput_K36me2 = set7vInput.K36.out.ranges$FDR)
 
 ##convert all non-sig values to 0
-K36.chip.Filteredres.df_SigOnly  <- within(K36.chip.Filteredres.df, logFC_WTvInput_K36me2[FDR_WTvInput_K36me2 > 0.05] <- 0)
+K36.chip.Filteredres_prom.df_SigOnly  <- within(K36.chip.Filteredres_prom.df, logFC_WTvInput_K36me2[FDR_WTvInput_K36me2 > 0.05] <- 0)
 
-K36.chip.Filteredres.df_SigOnly  <- within(K36.chip.Filteredres.df_SigOnly, logFC_cac1vInput_K36me2[FDR_cac1vInput_K36me2 > 0.05] <- 0)
+K36.chip.Filteredres_prom.df_SigOnly  <- within(K36.chip.Filteredres_prom.df_SigOnly, logFC_cac1vInput_K36me2[FDR_cac1vInput_K36me2 > 0.05] <- 0)
 
-K36.chip.Filteredres.df_SigOnly  <- within(K36.chip.Filteredres.df_SigOnly , logFC_cac2vInput_K36me2[FDR_cac2vInput_K36me2 > 0.05] <- 0)
+K36.chip.Filteredres_prom.df_SigOnly  <- within(K36.chip.Filteredres_prom.df_SigOnly , logFC_cac2vInput_K36me2[FDR_cac2vInput_K36me2 > 0.05] <- 0)
 
-K36.chip.Filteredres.df_SigOnly  <- within(K36.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K36me2[FDR_cac3vInput_K36me2 > 0.05] <- 0)
+K36.chip.Filteredres_prom.df_SigOnly  <- within(K36.chip.Filteredres_prom.df_SigOnly , logFC_cac3vInput_K36me2[FDR_cac3vInput_K36me2 > 0.05] <- 0)
 
-K36.chip.Filteredres.df_SigOnly  <- within(K36.chip.Filteredres.df_SigOnly , logFC_set7vInput_K36me2[FDR_set7vInput_K36me2 > 0.05] <- 0)
+K36.chip.Filteredres_prom.df_SigOnly  <- within(K36.chip.Filteredres_prom.df_SigOnly , logFC_set7vInput_K36me2[FDR_set7vInput_K36me2 > 0.05] <- 0)
 
-K36_FilteredHeatmap_df <- dplyr::select(K36.chip.Filteredres.df_SigOnly,7,10,13,16,19)
+K36_FilteredHeatmap_prom_df <- dplyr::select(K36.chip.Filteredres_prom.df_SigOnly,7,10,13,16,19)
 
-rownames(K36_FilteredHeatmap_df) <- paste(K36.chip.Filteredres.df_SigOnly$seqnames, K36.chip.Filteredres.df_SigOnly$start, K36.chip.Filteredres.df_SigOnly$end, sep=".")
+rownames(K36_FilteredHeatmap_prom_df) <- paste(K36.chip.Filteredres_prom.df_SigOnly$seqnames, K36.chip.Filteredres_prom.df_SigOnly$start, K36.chip.Filteredres_prom.df_SigOnly$end, sep=".")
 
 #Doing the same for H3K27ac
 
@@ -2428,7 +2427,7 @@ FC_WTvInput.K27_promac.contrast <- makeContrasts(K27acvWT=WT.H3K27ac-WT.input, l
 #analyze data
 FC_WTvI.K27_promac.res <- glmQLFTest(fitK27_prom, contrast=FC_WTvInput.K27_promac.contrast)
 #merge results to generate FDR; #calculates FRD on a per-region basis. This is not appropriate here since you have set the window size to 1000
-FC_WTvI.K27_promac.merged <- mergeResults(filtered.dataK27_proms, FC_WTvI.K27_promac.res$table, tol=300, 
+FC_WTvI.K27_promac.merged <- mergeResults(filtered.dataK27_prom, FC_WTvI.K27_promac.res$table, tol=300, 
                             merge.args=list(max.width=300))
 #move FC data into a dataframe
 WTvI.K27_promac.tabular <- FC_WTvI.K27_promac.merged$combined
@@ -2440,7 +2439,7 @@ mcols(WTvI.K27_promac.out.ranges) <- DataFrame(WTvI.K27_promac.tabular)
 #cac-1
 FC_cac1vInput.K27_promac.contrast <- makeContrasts(K27acvcac1=cac1.H3K27ac-cac1.input,levels=design.mat)
 FC_cac1vInput.res <- glmQLFTest(fitK27_prom, contrast=FC_cac1vInput.K27_promac.contrast)
-FC_cac1vInput.merged <- mergeResults(filtered.dataK27_proms, FC_cac1vInput.res$table, tol=300, 
+FC_cac1vInput.merged <- mergeResults(filtered.dataK27_prom, FC_cac1vInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_cac1vInput.K27_promac.tabular <- FC_cac1vInput.merged$combined
 FC_cac1vInput.K27_promac.out.ranges <- FC_cac1vInput.merged$regions
@@ -2449,7 +2448,7 @@ mcols(FC_cac1vInput.K27_promac.out.ranges) <- DataFrame(FC_cac1vInput.K27_promac
 #cac-2
 FC_cac2vInput.K27_promac.contrast <- makeContrasts(K27acvcac2=cac2.H3K27ac-cac2.input,levels=design.mat)
 FC_cac2vI.K27_promac.res <- glmQLFTest(fitK27_prom, contrast=FC_cac2vInput.K27_promac.contrast)
-FC_cac2vI.K27_promac.merged <- mergeResults(filtered.dataK27_proms, FC_cac2vI.K27_promac.res$table, tol=300, 
+FC_cac2vI.K27_promac.merged <- mergeResults(filtered.dataK27_prom, FC_cac2vI.K27_promac.res$table, tol=300, 
                             merge.args=list(max.width=300))
 cac2vI.K27_promac.tabular <- FC_cac2vI.K27_promac.merged$combined
 cac2vI.K27_promac.out.ranges <- FC_cac2vI.K27_promac.merged$regions
@@ -2458,7 +2457,7 @@ mcols(cac2vI.K27_promac.out.ranges) <- DataFrame(cac2vI.K27_promac.tabular)
 #cac-3
 FC_cac3vInput.K27_promac.contrast <- makeContrasts(K27acvcac3=cac3.H3K27ac-cac3.input,levels=design.mat)
 FC_cac3vInput.K27_promac.res <- glmQLFTest(fitK27_prom, contrast=FC_cac3vInput.K27_promac.contrast)
-FC_cac3vInput.K27_promac.merged <- mergeResults(filtered.dataK27_proms, FC_cac3vInput.K27_promac.res$table, tol=300, 
+FC_cac3vInput.K27_promac.merged <- mergeResults(filtered.dataK27_prom, FC_cac3vInput.K27_promac.res$table, tol=300, 
                             merge.args=list(max.width=300))
 cac3vInput.K27_promac.tabular <- FC_cac3vInput.K27_promac.merged$combined
 cac3vInput.K27_promac.out.ranges <- FC_cac3vInput.K27_promac.merged$regions
@@ -2467,14 +2466,14 @@ mcols(cac3vInput.K27_promac.out.ranges) <- DataFrame(cac3vInput.K27_promac.tabul
 #set-7
 FC_set7vInput.K27_promac.contrast <- makeContrasts(K27acvset7=set7.H3K27ac-set7.input,levels=design.mat)
 FC_set7vInput.K27_promac.res <- glmQLFTest(fitK27_prom, contrast=FC_set7vInput.K27_promac.contrast)
-FC_set7vInput.K27_promac.merged <- mergeResults(filtered.dataK27_proms, FC_set7vInput.K27_promac.res$table, tol=300,
+FC_set7vInput.K27_promac.merged <- mergeResults(filtered.dataK27_prom, FC_set7vInput.K27_promac.res$table, tol=300,
                             merge.args=list(max.width=300))
 set7vInput.K27_promac.tabular <- FC_set7vInput.K27_promac.merged$combined
 set7vInput.K27_promac.out.ranges <- FC_set7vInput.K27_promac.merged$regions
 mcols(set7vInput.K27_promac.out.ranges) <- DataFrame(set7vInput.K27_promac.tabular)
 
 #combine
-K27ac.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K27_promac.out.ranges),
+K27ac.chip.Filteredres_prom.df <- data.frame(seqnames=seqnames(WTvI.K27_promac.out.ranges),
   start=start(WTvI.K27_promac.out.ranges),
   end=end(WTvI.K27_promac.out.ranges),
   names=c(rep(".", length(WTvI.K27_promac.out.ranges))),
@@ -2497,21 +2496,563 @@ K27ac.chip.Filteredres.df <- data.frame(seqnames=seqnames(WTvI.K27_promac.out.ra
   FDR_set7vInput_K27acme2 = set7vInput.K27_promac.out.ranges$FDR)
 
 ##convert all non-sig values to 0
-K27ac.chip.Filteredres.df_SigOnly  <- within(K27ac.chip.Filteredres.df, logFC_WTvInput_K27acme2[FDR_WTvInput_K27acme2 > 0.05] <- 0)
+K27ac.chip.Filteredres_prom.df_SigOnly  <- within(K27ac.chip.Filteredres_prom.df, logFC_WTvInput_K27acme2[FDR_WTvInput_K27acme2 > 0.05] <- 0)
 
-K27ac.chip.Filteredres.df_SigOnly  <- within(K27ac.chip.Filteredres.df_SigOnly, logFC_cac1vInput_K27acme2[FDR_cac1vInput_K27acme2 > 0.05] <- 0)
+K27ac.chip.Filteredres_prom.df_SigOnly  <- within(K27ac.chip.Filteredres_prom.df_SigOnly, logFC_cac1vInput_K27acme2[FDR_cac1vInput_K27acme2 > 0.05] <- 0)
 
-K27ac.chip.Filteredres.df_SigOnly  <- within(K27ac.chip.Filteredres.df_SigOnly , logFC_cac2vInput_K27acme2[FDR_cac2vInput_K27acme2 > 0.05] <- 0)
+K27ac.chip.Filteredres_prom.df_SigOnly  <- within(K27ac.chip.Filteredres_prom.df_SigOnly , logFC_cac2vInput_K27acme2[FDR_cac2vInput_K27acme2 > 0.05] <- 0)
 
-K27ac.chip.Filteredres.df_SigOnly  <- within(K27ac.chip.Filteredres.df_SigOnly , logFC_cac3vInput_K27acme2[FDR_cac3vInput_K27acme2 > 0.05] <- 0)
+K27ac.chip.Filteredres_prom.df_SigOnly  <- within(K27ac.chip.Filteredres_prom.df_SigOnly , logFC_cac3vInput_K27acme2[FDR_cac3vInput_K27acme2 > 0.05] <- 0)
 
-K27ac.chip.Filteredres.df_SigOnly  <- within(K27ac.chip.Filteredres.df_SigOnly , logFC_set7vInput_K27acme2[FDR_set7vInput_K27acme2 > 0.05] <- 0)
+K27ac.chip.Filteredres_prom.df_SigOnly  <- within(K27ac.chip.Filteredres_prom.df_SigOnly , logFC_set7vInput_K27acme2[FDR_set7vInput_K27acme2 > 0.05] <- 0)
 
-K27ac_FilteredHeatmap_df <- dplyr::select(K27ac.chip.Filteredres.df_SigOnly,7,10,13,16,19)
+K27ac_FilteredHeatmap_prom_df <- dplyr::select(K27ac.chip.Filteredres_prom.df_SigOnly,7,10,13,16,19)
 
-rownames(K27ac_FilteredHeatmap_df) <- paste(K27ac.chip.Filteredres.df_SigOnly$seqnames, K27ac.chip.Filteredres.df_SigOnly$start, K27ac.chip.Filteredres.df_SigOnly$end, sep=".")
+rownames(K27ac_FilteredHeatmap_prom_df) <- paste(K27ac.chip.Filteredres_prom.df_SigOnly$seqnames, K27ac.chip.Filteredres_prom.df_SigOnly$start, K27ac.chip.Filteredres_prom.df_SigOnly$end, sep=".")
 
 #Doing the same for ATAC-seq data
-
 ```
 
+
+```{r, Heatmaps with separate promoters and genes}
+#K27 Heatmap
+#genesmatrix
+K27_FilteredHeatmap_gene_mat <- as.matrix(K27_FilteredHeatmap_gene_df)
+quantile(K27_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K27_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27_FilteredHeatmap_gene_mat[K27_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 99.5th percentile value with the 99.5th
+
+#I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0.1 in all 3 CAF-1 mutants and WT
+K27_FilteredHeatmap_gene_mat <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 1] >= 0.101 | K27_FilteredHeatmap_gene_mat[, 2] >= 0.101 | K27_FilteredHeatmap_gene_mat[, 3] >= 0.101 | K27_FilteredHeatmap_gene_mat[, 4] >= 0.101)
+
+#Get rid of anything 0 or lower in WT
+K27_FilteredHeatmap_gene_mat <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 1] > 0)
+
+#Lets Look at CAF-1 mutants only
+K27_FilteredHeatmap_gene_mat <- K27_FilteredHeatmap_gene_mat[,c(1:5)]
+
+#Manual Clustering to clean up heatmap
+no_caf <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 4] <= 0.1 )
+
+no_cac3 <- subset(K27_FilteredHeatmap_gene_mat, ! K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 4] <= 0.1)
+
+no_cac2 <- subset(K27_FilteredHeatmap_gene_mat, ! K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 4] <= 0.1)
+
+no_cac1 <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 4] <= 0.1)
+
+no_cac2_3 <- subset(K27_FilteredHeatmap_gene_mat, ! K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 4] <= 0.1)
+
+no_cac1_3 <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 4] <= 0.1)
+
+no_cac1_2 <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 4] <= 0.1)
+
+in_all <- subset(K27_FilteredHeatmap_gene_mat, ! K27_FilteredHeatmap_gene_mat[, 1] < 0.101 & ! K27_FilteredHeatmap_gene_mat[, 2] < 0.101 & ! K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 4] <= 0.1)
+
+#ordering the subsets so that enrichment is ordered from highest to lowest in each one
+no_caf_order <-order(no_caf[, 1], decreasing = TRUE)
+no_cac3_order <-order(rowMeans(no_cac3[, 1:3]), decreasing = TRUE)
+no_cac2_order <- order(rowMeans(no_cac2[, 1&2&4]), decreasing = TRUE)
+no_cac1_order <- order(rowMeans(no_cac1[, 1&3&4]), decreasing = TRUE)
+no_cac2_3_order <- order(rowMeans(no_cac2_3[, 1:2]), decreasing = TRUE)
+no_cac1_3_order <- order(rowMeans(no_cac1_3[, 1&3]), decreasing = TRUE)
+no_cac1_2_order <- order(rowMeans(no_cac1_2[, 1&4]), decreasing = TRUE)
+in_all_order <- order(rowMeans(in_all[, 1:4]), decreasing = TRUE)
+
+#I now have to sort each new subset df separately based on enrichment in desired sample (WT or mutant), then I have to extract the original sorted # to properly sort them on the final heatmap. This is probably a backwards way to do this.
+no_caf_sort <- no_caf[no_caf_order, ]
+no_cac3_sort <- no_cac3[no_cac3_order, ]
+no_cac2_sort <- no_cac2[no_cac2_order, ]
+no_cac1_sort <- no_cac1[no_cac1_order, ]
+no_cac2_3_sort <- no_cac2_3[no_cac2_3_order, ]
+no_cac1_3_sort <- no_cac1_3[no_cac1_3_order, ]
+no_cac1_2_sort <- no_cac1_2[no_cac1_2_order, ]
+in_all_sort <- in_all[in_all_order, ]
+
+#need rownames of each subset in order
+forheat1 <- rownames(no_caf_sort)
+forheat2 <- rownames(no_cac3_sort)
+forheat3 <- rownames(no_cac2_sort)
+forheat4 <- rownames(no_cac1_sort)
+forheat5 <- rownames(no_cac2_3_sort)
+forheat6 <- rownames(no_cac1_3_sort)
+forheat7 <- rownames(no_cac1_2_sort)
+forheat8 <- rownames(in_all_sort)
+  
+finalorder <- c(forheat1, forheat2, forheat3, forheat4, forheat5, forheat6, forheat7, forheat8)
+
+#Applying order to new variable in order to sort heatmap
+K27_FilteredHeatmap_gene_mat_sort = K27_FilteredHeatmap_gene_mat[finalorder, ]
+
+
+#Doing same for promoter matrix
+K27_FilteredHeatmap_prom_mat <- as.matrix(K27_FilteredHeatmap_prom_df)
+quantile(K27_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K27_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27_FilteredHeatmap_prom_mat[K27_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 99.5th percentile value with the 99.5th
+
+#I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0.1 in all 3 CAF-1 mutants and WT
+K27_FilteredHeatmap_prom_mat <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 1] >= 0.101 | K27_FilteredHeatmap_prom_mat[, 2] >= 0.101 | K27_FilteredHeatmap_prom_mat[, 3] >= 0.101 | K27_FilteredHeatmap_prom_mat[, 4] >= 0.101)
+
+#Get rid of anything 0 or lower in WT
+K27_FilteredHeatmap_prom_mat <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 1] > 0)
+
+#Lets Look at CAF-1 mutants only
+K27_FilteredHeatmap_prom_mat <- K27_FilteredHeatmap_prom_mat[,c(1:5)]
+
+
+#Manual Clustering to clean up heatmap
+no_prom_caf <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 4] <= 0.1 )
+
+no_prom_cac3 <- subset(K27_FilteredHeatmap_prom_mat, ! K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 4] <= 0.1)
+
+no_prom_cac2 <- subset(K27_FilteredHeatmap_prom_mat, ! K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 4] <= 0.1)
+
+no_prom_cac1 <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 4] <= 0.1)
+
+no_prom_cac2_3 <- subset(K27_FilteredHeatmap_prom_mat, ! K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 4] <= 0.1)
+
+no_prom_cac1_3 <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 4] <= 0.1)
+
+no_prom_cac1_2 <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 4] <= 0.1)
+
+in_all_prom <- subset(K27_FilteredHeatmap_prom_mat, ! K27_FilteredHeatmap_prom_mat[, 1] < 0.101 & ! K27_FilteredHeatmap_prom_mat[, 2] < 0.101 & ! K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 4] <= 0.1)
+
+#ordering the subsets so that enrichment is ordered from highest to lowest in each one
+no_prom_caf_order <-order(no_prom_caf[, 1], decreasing = TRUE)
+no_prom_cac3_order <-order(rowMeans(no_prom_cac3[, 1:3]), decreasing = TRUE)
+no_prom_cac2_order <- order(rowMeans(no_prom_cac2[, 1&2&4]), decreasing = TRUE)
+no_prom_cac1_order <- order(rowMeans(no_prom_cac1[, 1&3&4]), decreasing = TRUE)
+no_prom_cac2_3_order <- order(rowMeans(no_prom_cac2_3[, 1:2]), decreasing = TRUE)
+no_prom_cac1_3_order <- order(rowMeans(no_prom_cac1_3[, 1&3]), decreasing = TRUE)
+no_prom_cac1_2_order <- order(rowMeans(no_prom_cac1_2[, 1&4]), decreasing = TRUE)
+in_all_prom_order <- order(rowMeans(in_all_prom[, 1:4]), decreasing = TRUE)
+
+#I now have to sort each new subset df separately based on enrichment in desired sample (WT or mutant), then I have to extract the original sorted # to properly sort them on the final heatmap. This is probably a backwards way to do this.
+no_prom_caf_sort <- no_prom_caf[no_prom_caf_order, ]
+no_prom_cac3_sort <- no_prom_cac3[no_prom_cac3_order, ]
+no_prom_cac2_sort <- no_prom_cac2[no_prom_cac2_order, ]
+no_prom_cac1_sort <- no_prom_cac1[no_prom_cac1_order, ]
+no_prom_cac2_3_sort <- no_prom_cac2_3[no_prom_cac2_3_order, ]
+no_prom_cac1_3_sort <- no_prom_cac1_3[no_prom_cac1_3_order, ]
+no_prom_cac1_2_sort <- no_prom_cac1_2[no_prom_cac1_2_order, ]
+in_all_prom_sort <- in_all_prom[in_all_prom_order, ]
+
+#need rownames of each subset in order
+forheat_prom1 <- rownames(no_prom_caf_sort)
+forheat_prom2 <- rownames(no_prom_cac3_sort)
+forheat_prom3 <- rownames(no_prom_cac2_sort)
+forheat_prom4 <- rownames(no_prom_cac1_sort)
+forheat_prom5 <- rownames(no_prom_cac2_3_sort)
+forheat_prom6 <- rownames(no_prom_cac1_3_sort)
+forheat_prom7 <- rownames(no_prom_cac1_2_sort)
+forheat_prom8 <- rownames(in_all_prom_sort)
+  
+finalorder_prom <- c(forheat_prom1, forheat_prom2, forheat_prom3, forheat_prom4, forheat_prom5, forheat_prom6, forheat_prom7, forheat_prom8)
+
+#Applying order to new variable in order to sort heatmap
+K27_FilteredHeatmap_prom_mat_sort = K27_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#Color
+col_fun<- colorRamp2(c(0, quantile(K27_FilteredHeatmap_gene_mat, 0.995)), c("white", "darkgreen"))
+col_fun(seq(0, quantile(K27_FilteredHeatmap_gene_mat, 0.995), length = 20))
+
+# Create the heatmap objects for each matrix
+gene_hm <- Heatmap(K27_FilteredHeatmap_gene_mat_sort, name = "K27me3_gene", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_gene_mat_sort)))), heatmap_legend_param = list(title = "K27me3")
+)
+
+promoter_hm <- Heatmap(K27_FilteredHeatmap_prom_mat_sort, name = "K27me3_prom", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_prom_mat_sort))))
+)
+
+# Combine them vertically
+combined_hm <- gene_hm %v% promoter_hm 
+
+# Draw to PDF
+pdf("./H3K27me3_K27_genes_promoters_CAF.pdf", height = 9.5)
+draw(combined_hm)
+dev.off()
+
+#############################
+
+#K4 Heatmap
+#genes
+K4_FilteredHeatmap_gene_mat <- as.matrix(K4_FilteredHeatmap_gene_df)
+quantile(K4_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K4_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K4_FilteredHeatmap_gene_mat[K4_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#CAF-1 mutants
+K4_FilteredHeatmap_gene_mat <- K4_FilteredHeatmap_gene_mat[,1:5]
+
+#Applying order to new variable in order to sort heatmap
+K4_FilteredHeatmap_gene_mat_sort = K4_FilteredHeatmap_gene_mat[finalorder, ]
+
+#promoters
+K4_FilteredHeatmap_prom_mat <- as.matrix(K4_FilteredHeatmap_prom_df)
+quantile(K4_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K4_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K4_FilteredHeatmap_prom_mat[K4_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+K4_FilteredHeatmap_prom_mat <- K4_FilteredHeatmap_prom_mat[,1:5]
+
+#Applying order to new variable in order to sort heatmap
+K4_FilteredHeatmap_prom_mat_sort = K4_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#color
+col_fun<- colorRamp2(c(-1, 0, quantile(K4_FilteredHeatmap_mat, 0.995)), c("white","white", "magenta"))
+col_fun(seq(-1, quantile(K4_FilteredHeatmap_mat, 0.995), length = 20))
+
+# Create the heatmap objects for each matrix
+gene_hm <- Heatmap(K4_FilteredHeatmap_gene_mat_sort, name = "K4me2_gene", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K4_FilteredHeatmap_gene_mat_sort)))), heatmap_legend_param = list(title = "K4me2")
+)
+
+promoter_hm <- Heatmap(K4_FilteredHeatmap_prom_mat_sort, name = "K4me2_prom", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K4_FilteredHeatmap_prom_mat_sort))))
+)
+
+# Combine them vertically
+combined_hm <- gene_hm %v% promoter_hm 
+
+# Draw to PDF
+pdf("./H3K4me2_K27_genes_promoters_CAF.pdf", height = 9.5)
+draw(combined_hm)
+dev.off()
+
+##################
+
+#K27ac Heatmap
+#genes
+K27ac_FilteredHeatmap_gene_mat <- as.matrix(K27ac_FilteredHeatmap_gene_df)
+quantile(K27ac_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K27ac_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27ac_FilteredHeatmap_gene_mat[K27ac_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#CAF-1 mutants
+K27ac_FilteredHeatmap_gene_mat <- K27ac_FilteredHeatmap_gene_mat[,1:5]
+
+#Applying order to new variable in order to sort heatmap
+K27ac_FilteredHeatmap_gene_mat_sort = K27ac_FilteredHeatmap_gene_mat[finalorder, ]
+
+#promoters
+K27ac_FilteredHeatmap_prom_mat <- as.matrix(K27ac_FilteredHeatmap_prom_df)
+quantile(K27ac_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K27ac_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27ac_FilteredHeatmap_prom_mat[K27ac_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+K27ac_FilteredHeatmap_prom_mat <- K27ac_FilteredHeatmap_prom_mat[,1:5]
+
+#Applying order to new variable in order to sort heatmap
+K27ac_FilteredHeatmap_prom_mat_sort = K27ac_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#color
+col_fun<- colorRamp2(c(-1, 0, quantile(K27ac_FilteredHeatmap_mat, 0.995)), c("white","white", "#A89CF6"))
+col_fun(seq(-1, quantile(K27ac_FilteredHeatmap_mat, 0.995), length = 20))
+
+# Create the heatmap objects for each matrix
+gene_hm <- Heatmap(K27ac_FilteredHeatmap_gene_mat_sort, name = "K27ac_gene", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27ac_FilteredHeatmap_gene_mat_sort)))), heatmap_legend_param = list(title = "K27ac")
+)
+
+promoter_hm <- Heatmap(K27ac_FilteredHeatmap_prom_mat_sort, name = "K27ac_prom", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27ac_FilteredHeatmap_prom_mat_sort))))
+)
+
+# Combine them vertically
+combined_hm <- gene_hm %v% promoter_hm 
+
+# Draw to PDF
+pdf("./H3K27ac_K27_genes_promoters_CAF.pdf", height = 9.5)
+draw(combined_hm)
+dev.off()
+
+###############################
+
+#K36 Heatmap
+#genes
+K36_FilteredHeatmap_gene_mat <- as.matrix(K36_FilteredHeatmap_gene_df)
+quantile(K36_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K36_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K36_FilteredHeatmap_gene_mat[K36_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#CAF-1 mutants
+K36_FilteredHeatmap_gene_mat <- K36_FilteredHeatmap_gene_mat[,1:5]
+
+#Applying order to new variable in order to sort heatmap
+K36_FilteredHeatmap_gene_mat_sort = K36_FilteredHeatmap_gene_mat[finalorder, ]
+
+#promoters
+K36_FilteredHeatmap_prom_mat <- as.matrix(K36_FilteredHeatmap_prom_df)
+quantile(K36_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K36_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K36_FilteredHeatmap_prom_mat[K36_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+K36_FilteredHeatmap_prom_mat <- K36_FilteredHeatmap_prom_mat[,1:5]
+
+#Applying order to new variable in order to sort heatmap
+K36_FilteredHeatmap_prom_mat_sort = K36_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#color
+col_fun<- colorRamp2(c(-1, 0, quantile(K36_FilteredHeatmap_mat, 0.995)), c("white","white", "#A59D00"))
+col_fun(seq(-1, quantile(K36_FilteredHeatmap_mat, 0.995), length = 20))
+
+# Create the heatmap objects for each matrix
+gene_hm <- Heatmap(K36_FilteredHeatmap_gene_mat_sort, name = "K36me3_gene", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K36_FilteredHeatmap_gene_mat_sort)))), heatmap_legend_param = list(title = "K36me3")
+)
+
+promoter_hm <- Heatmap(K36_FilteredHeatmap_prom_mat_sort, name = "K36me3_prom", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K36_FilteredHeatmap_prom_mat_sort))))
+)
+
+# Combine them vertically
+combined_hm <- gene_hm %v% promoter_hm 
+
+# Draw to PDF
+pdf("./H3K36me3_K27_genes_promoters_CAF.pdf", height = 9.5)
+draw(combined_hm)
+dev.off()
+```
+
+```{r, Heatmaps for individual strains}
+#K27 Heatmap
+#genesmatrix
+K27_FilteredHeatmap_gene_mat <- as.matrix(K27_FilteredHeatmap_gene_df)
+quantile(K27_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K27_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27_FilteredHeatmap_gene_mat[K27_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 99.5th percentile value with the 99.5th
+
+#I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0.1 in all 3 CAF-1 mutants and WT
+K27_FilteredHeatmap_gene_mat <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 1] >= 0.101 | K27_FilteredHeatmap_gene_mat[, 2] >= 0.101 | K27_FilteredHeatmap_gene_mat[, 3] >= 0.101 | K27_FilteredHeatmap_gene_mat[, 4] >= 0.101)
+
+#Get rid of anything 0 or lower in WT
+K27_FilteredHeatmap_gene_mat <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 1] > 0)
+
+#Now, I only want to look at cac-1
+K27_FilteredHeatmap_gene_mat <- K27_FilteredHeatmap_gene_mat[,c(1:2)]
+
+#Manual Clustering to clean up heatmap
+
+no_cac1 <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1)
+
+in_both <- subset(K27_FilteredHeatmap_gene_mat, ! rownames(K27_FilteredHeatmap_gene_mat) %in% rownames(no_cac1))
+
+#ordering the subsets so that enrichment is ordered from highest to lowest in each one
+no_cac1_order <- order(no_cac1[, 1], decreasing = TRUE)
+in_both_order <- order(rowMeans(in_both[, 1&2]), decreasing = TRUE)
+
+#I now have to sort each new subset df separately based on enrichment in desired sample (WT or mutant), then I have to extract the original sorted # to properly sort them on the final heatmap. This is probably a backwards way to do this.
+no_cac1_sort <- no_cac1[no_cac1_order, ]
+in_both_sort <- in_both[in_both_order, ]
+
+#need rownames of each subset in order
+forheat1 <- rownames(no_cac1_sort)
+forheat2 <- rownames(in_both_sort)
+  
+finalorder <- c(forheat1, forheat2)
+
+#Applying order to new variable in order to sort heatmap
+K27_FilteredHeatmap_gene_mat_sort = K27_FilteredHeatmap_gene_mat[finalorder, ]
+
+#Doing same for promoter matrix
+K27_FilteredHeatmap_prom_mat <- as.matrix(K27_FilteredHeatmap_prom_df)
+quantile(K27_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K27_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27_FilteredHeatmap_prom_mat[K27_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 99.5th percentile value with the 99.5th
+
+#I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0.1 in all 3 CAF-1 mutants and WT
+K27_FilteredHeatmap_prom_mat <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 1] >= 0.101 | K27_FilteredHeatmap_prom_mat[, 2] >= 0.101 | K27_FilteredHeatmap_prom_mat[, 3] >= 0.101 | K27_FilteredHeatmap_prom_mat[, 4] >= 0.101)
+
+#Get rid of anything 0 or lower in WT
+K27_FilteredHeatmap_prom_mat <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 1] > 0)
+
+#Lets Look at CAF-1 mutants only
+K27_FilteredHeatmap_prom_mat <- K27_FilteredHeatmap_prom_mat[,c(1:2)]
+
+#Manual Clustering to clean up heatmap
+no_prom_cac1 <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1)
+
+in_both_prom <- subset(K27_FilteredHeatmap_prom_mat, ! rownames(K27_FilteredHeatmap_prom_mat) %in% rownames(no_cac1_prom))
+
+#ordering the subsets so that enrichment is ordered from highest to lowest in each one
+no_prom_cac1_order <- order(no_prom_cac1[, 1], decreasing = TRUE)
+in_both_prom_order <- order(rowMeans(in_both_prom[, 1&2]), decreasing = TRUE)
+
+#I now have to sort each new subset df separately based on enrichment in desired sample (WT or mutant), then I have to extract the original sorted # to properly sort them on the final heatmap. This is probably a backwards way to do this.
+no_prom_cac1_sort <- no_prom_cac1[no_prom_cac1_order, ]
+in_both_prom_sort <- in_both_prom[in_both_prom_order, ]
+
+#need rownames of each subset in order
+forheat1_prom <- rownames(no_prom_cac1_sort)
+forheat2_prom <- rownames(in_both_prom_sort)
+  
+finalorder_prom <- c(forheat1_prom, forheat2_prom)
+
+#Applying order to new variable in order to sort heatmap
+K27_FilteredHeatmap_prom_mat_sort = K27_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#combined matrix for K27 enrichment
+K27_combined_mat <- rbind(K27_FilteredHeatmap_gene_mat_sort, K27_FilteredHeatmap_prom_mat_sort)
+
+#Color
+col_fun<- colorRamp2(c(0, quantile(K27_FilteredHeatmap_gene_mat, 0.995)), c("white", "darkgreen"))
+col_fun(seq(0, quantile(K27_FilteredHeatmap_gene_mat, 0.995), length = 20))
+
+# Plot the heatmap
+htK27 <- Heatmap(
+  K27_combined_mat,
+  name = "K27me3",
+  col = col_fun,
+  cluster_columns = FALSE,
+  cluster_rows = FALSE,
+  show_row_names = FALSE,
+  show_column_dend = FALSE,
+  show_row_dend = FALSE,
+)
+
+# Save to PDF
+pdf("K27_gene_promoter_combined.pdf", height = 12)
+draw(ht)
+dev.off()
+
+#############################
+
+#K4 Heatmap
+#genes
+K4_FilteredHeatmap_gene_mat <- as.matrix(K4_FilteredHeatmap_gene_df)
+quantile(K4_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K4_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K4_FilteredHeatmap_gene_mat[K4_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#cac-1 only mutants
+K4_FilteredHeatmap_gene_mat <- K4_FilteredHeatmap_gene_mat[,1:2]
+
+#Applying order to new variable in order to sort heatmap
+K4_FilteredHeatmap_gene_mat_sort = K4_FilteredHeatmap_gene_mat[finalorder, ]
+
+#promoters
+K4_FilteredHeatmap_prom_mat <- as.matrix(K4_FilteredHeatmap_prom_df)
+quantile(K4_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K4_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K4_FilteredHeatmap_prom_mat[K4_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#cac-1 only
+K4_FilteredHeatmap_prom_mat <- K4_FilteredHeatmap_prom_mat[,1:2]
+
+#Applying order to new variable in order to sort heatmap
+K4_FilteredHeatmap_prom_mat_sort = K4_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#combined matrix for K4 enrichment
+K4_combined_mat <- rbind(K4_FilteredHeatmap_gene_mat_sort, K4_FilteredHeatmap_prom_mat_sort)
+
+#color
+col_fun<- colorRamp2(c(-1, 0, quantile(K4_FilteredHeatmap_mat, 0.995)), c("white","white", "magenta"))
+col_fun(seq(-1, quantile(K4_FilteredHeatmap_mat, 0.995), length = 20))
+
+# Plot the heatmap
+htK4 <- Heatmap(
+  K4_combined_mat,
+  name = "K4me2",
+  col = col_fun,
+  cluster_columns = FALSE,
+  cluster_rows = FALSE,
+  show_row_names = FALSE,
+  show_column_dend = FALSE,
+  show_row_dend = FALSE,
+)
+
+##################
+
+#K27ac Heatmap
+#genes
+K27ac_FilteredHeatmap_gene_mat <- as.matrix(K27ac_FilteredHeatmap_gene_df)
+quantile(K27ac_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K27ac_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27ac_FilteredHeatmap_gene_mat[K27ac_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#CAF-1 mutants
+K27ac_FilteredHeatmap_gene_mat <- K27ac_FilteredHeatmap_gene_mat[,1:2]
+
+#Applying order to new variable in order to sort heatmap
+K27ac_FilteredHeatmap_gene_mat_sort = K27ac_FilteredHeatmap_gene_mat[finalorder, ]
+
+#promoters
+K27ac_FilteredHeatmap_prom_mat <- as.matrix(K27ac_FilteredHeatmap_prom_df)
+quantile(K27ac_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K27ac_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27ac_FilteredHeatmap_prom_mat[K27ac_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#cac-1 only
+K27ac_FilteredHeatmap_prom_mat <- K27ac_FilteredHeatmap_prom_mat[,1:2]
+
+#Applying order to new variable in order to sort heatmap
+K27ac_FilteredHeatmap_prom_mat_sort = K27ac_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#combined matrix for K4 enrichment
+K27ac_combined_mat <- rbind(K27ac_FilteredHeatmap_gene_mat_sort, K27ac_FilteredHeatmap_prom_mat_sort)
+
+#color
+col_fun<- colorRamp2(c(-1, 0, quantile(K27ac_FilteredHeatmap_mat, 0.995)), c("white","white", "#A89CF6"))
+col_fun(seq(-1, quantile(K27ac_FilteredHeatmap_mat, 0.995), length = 20))
+
+# Plot the heatmap
+htK27ac <- Heatmap(
+  K27ac_combined_mat,
+  name = "K27ac",
+  col = col_fun,
+  cluster_columns = FALSE,
+  cluster_rows = FALSE,
+  show_row_names = FALSE,
+  show_column_dend = FALSE,
+  show_row_dend = FALSE,
+)
+
+###############################
+
+#K36 Heatmap
+#genes
+K36_FilteredHeatmap_gene_mat <- as.matrix(K36_FilteredHeatmap_gene_df)
+quantile(K36_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K36_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K36_FilteredHeatmap_gene_mat[K36_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#CAF-1 mutants
+K36_FilteredHeatmap_gene_mat <- K36_FilteredHeatmap_gene_mat[,1:2]
+
+#Applying order to new variable in order to sort heatmap
+K36_FilteredHeatmap_gene_mat_sort = K36_FilteredHeatmap_gene_mat[finalorder, ]
+
+#promoters
+K36_FilteredHeatmap_prom_mat <- as.matrix(K36_FilteredHeatmap_prom_df)
+quantile(K36_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K36_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K36_FilteredHeatmap_prom_mat[K36_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#cac-1 only
+K36_FilteredHeatmap_prom_mat <- K36_FilteredHeatmap_prom_mat[,1:2]
+
+#Applying order to new variable in order to sort heatmap
+K36_FilteredHeatmap_prom_mat_sort = K36_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#combined matrix for K4 enrichment
+K36_combined_mat <- rbind(K36_FilteredHeatmap_gene_mat_sort, K36_FilteredHeatmap_prom_mat_sort)
+
+#color
+col_fun<- colorRamp2(c(-1, 0, quantile(K36_FilteredHeatmap_mat, 0.995)), c("white","white", "#A59D00"))
+col_fun(seq(-1, quantile(K36_FilteredHeatmap_mat, 0.995), length = 20))
+
+# Plot the heatmap
+htK36 <- Heatmap(
+  K36_combined_mat,
+  name = "K36me3",
+  col = col_fun,
+  cluster_columns = FALSE,
+  cluster_rows = FALSE,
+  show_row_names = FALSE,
+  show_column_dend = FALSE,
+  show_row_dend = FALSE,
+)
+
+#plot combined heatmap
+final_hm <- htK27 + htK4 + htK27ac + htK36
+
+# Step 4: Plot
+pdf("final_combined_heatmap_grid.pdf", width = 16, height = 12)
+draw(final_hm)
+dev.off()
+
+
+```
