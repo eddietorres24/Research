@@ -35,4 +35,4 @@ samtools view -b /scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles/SRR7970598/SRR7
 samtools index subregion.bam
 
 #Run BRAKER
-braker.pl --genome subregion_genome.fasta --bam subregion.bam --softmasking --gff3 --species Neurospora_crassa_cac3 --cpus 8 --workingdir /scratch/evt82290/BRAKER
+braker.pl --genome subregion_genome.fasta --bam subregion.bam --softmasking --gff3 --species Neurospora_crassa_cac3 --workingdir /scratch/evt82290/BRAKER
