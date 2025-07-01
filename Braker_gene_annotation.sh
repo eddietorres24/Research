@@ -22,11 +22,11 @@ module load GeneMark-ET/4.72-GCCcore-12.3.0
 module load AUGUSTUS
 module load SAMtools
 
-extract unannotated gene regions from genome
-samtools faidx "$GENOME" CM002241.1:1931560-1965456 > subregion_genome.fasta
-
-#index bam
-samtools index /scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles/SRR7970598/SRR7970598_Aligned.sortedByCoord.out.bam
+# #extract unannotated gene regions from genome
+# samtools faidx "$GENOME" CM002241.1:1931560-1965456 > subregion_genome.fasta
+#
+# #index bam
+# samtools index /scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles/SRR7970598/SRR7970598_Aligned.sortedByCoord.out.bam
 
 #set AUGUSTUS directory w/ write permissions
 export AUGUSTUS_CONFIG_PATH=/scratch/evt82290/BRAKER/augustus_config
