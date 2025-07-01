@@ -22,5 +22,14 @@ module load GeneMark-ET/4.72-GCCcore-12.3.0
 module load AUGUSTUS
 module load SAMtools
 
+#extract unannotated gene regions from genome
+samtools faidx "$GENOME" CM002241.1:1931560-1965456 > subregion_genome.fasta
+
+#extract unannotated gene regions from RNA-seq
+samtools view -b /scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles/SRR7970598/SRR7970598_Aligned.sortedByCoord.out.bam CM002241.1:1931560-1965456 > subregion.bam
+
+# Index it
+samtools index subregion.bam
+
 #Run BRAKER
-braker.pl --genome ${GENOME} --bam /scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles/SRR7970598/SRR7970598_Aligned.sortedByCoord.out.bam --softmasking --gff3 --species Neurospora_crassa_cac3 --cores 8 --workingdir /scratch/evt82290/BRAKER
+braker.pl --genome subregion_genome.fasta --bam subregion.bam --softmasking --gff3 --species Neurospora_crassa_cac3 --cores 8 --workingdir /scratch/evt82290/BRAKER
