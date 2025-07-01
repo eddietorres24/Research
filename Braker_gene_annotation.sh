@@ -32,4 +32,4 @@ samtools index /scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles/SRR7970598/SRR797
 export AUGUSTUS_CONFIG_PATH=/scratch/evt82290/BRAKER/augustus_config
 
 #Run BRAKER
-braker.pl --genome $GENOME --bam /scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles/SRR7970598/SRR7970598_Aligned.sortedByCoord.out.bam --softmasking --gff3 --species Neurospora_crassa_cac3 --workingdir /scratch/evt82290/BRAKER
+braker.pl --genome /home/evt82290/Research/GCA_000182925.2_NC12_clean.fna --bam /scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles/SRR7970598/SRR7970598_Aligned.sortedByCoord.out.bam --softmasking --gff3 --species Neurospora_crassa_cac3 --workingdir /scratch/evt82290/BRAKER
