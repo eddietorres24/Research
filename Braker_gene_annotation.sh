@@ -34,5 +34,8 @@ module load SAMtools
 # # Index new bam
 # samtools index subregion.bam
 
+#set AUGUSTUS directory w/ write permissions
+export AUGUSTUS_CONFIG_PATH=/scratch/evt82290/BRAKER/augustus_config
+
 #Run BRAKER
 braker.pl --genome subregion_genome.fasta --bam subregion.bam --softmasking --gff3 --species Neurospora_crassa_cac3 --workingdir /scratch/evt82290/BRAKER
