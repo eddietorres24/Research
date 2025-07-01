@@ -23,16 +23,16 @@ module load AUGUSTUS
 module load SAMtools
 
 #extract unannotated gene regions from genome
-samtools faidx "$GENOME" CM002241.1:1931560-1965456 > subregion_genome.fasta
-
-#index original bam
-samtools index /scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles/SRR7970598/SRR7970598_Aligned.sortedByCoord.out.bam
-
-#extract unannotated gene regions from RNA-seq
-samtools view -b /scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles/SRR7970598/SRR7970598_Aligned.sortedByCoord.out.bam CM002241.1:1931560-1965456 > subregion.bam
-
-# Index new bam
-samtools index subregion.bam
+# samtools faidx "$GENOME" CM002241.1:1931560-1965456 > subregion_genome.fasta
+#
+# #index original bam
+# samtools index /scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles/SRR7970598/SRR7970598_Aligned.sortedByCoord.out.bam
+#
+# #extract unannotated gene regions from RNA-seq
+# samtools view -b /scratch/evt82290/RNAseq/CAF-1_Heatmap/bamFiles/SRR7970598/SRR7970598_Aligned.sortedByCoord.out.bam CM002241.1:1931560-1965456 > subregion.bam
+#
+# # Index new bam
+# samtools index subregion.bam
 
 #Run BRAKER
 braker.pl --genome subregion_genome.fasta --bam subregion.bam --softmasking --gff3 --species Neurospora_crassa_cac3 --workingdir /scratch/evt82290/BRAKER
