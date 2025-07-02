@@ -290,10 +290,6 @@ bedtools intersect -a K27genes_in_cac1_2_new.bed -b K27genes_in_cac1_2_NOT_in_ca
 
 bedtools intersect -a all_genes_gff_names.bed -b CAF-1_Ectopic_K27 -wa -f 0.8 > CAF-1_ectopic_K27_genes.bed
 
-bedtools intersect -a cac1_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-1_ectopic_K27_peaks.bed
-bedtools intersect -a cac2_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-2_ectopic_K27_peaks.bed
-bedtools intersect -a cac3_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-3_ectopic_K27_peaks.bed
-
 bedtools intersect -a all_genes_gff_names.bed -b cac-1_ectopic_K27_peaks.bed -wa -f 0.8 > cac-1_ectopic_K27_genes.bed
 bedtools intersect -a all_genes_gff_names.bed -b cac-2_ectopic_K27_peaks.bed -wa -f 0.8 > cac-2_ectopic_K27_genes.bed
 bedtools intersect -a all_genes_gff_names.bed -b cac-3_ectopic_K27_peaks.bed -wa -f 0.8 > cac-3_ectopic_K27_genes.bed
@@ -301,37 +297,40 @@ bedtools intersect -a all_genes_gff_names.bed -b cac-3_ectopic_K27_peaks.bed -wa
 #K27 peaks
 bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac2_H3K27me3_Rep2_peaks.bed -v > WT_K27_peaks_NO_cac2.bed
 bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac2_H3K27me3_Rep2_peaks.bed -wa > WT_K27_peaks_IN_cac2.bed
+bedtools intersect -a cac2_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-2_ectopic_K27_peaks.bed
 bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac1_H3K27me3_Rep2_peaks.bed -v > WT_K27_peaks_NO_cac1.bed
 bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac1_H3K27me3_Rep2_peaks.bed -wa > WT_K27_peaks_IN_cac1.bed
+bedtools intersect -a cac1_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-1_ectopic_K27_peaks.bed
 bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac3_H3K27me3_Rep2_peaks.bed -v > WT_K27_peaks_NO_cac3.bed
 bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac3_H3K27me3_Rep2_peaks.bed -wa > WT_K27_peaks_IN_cac3.bed
+bedtools intersect -a cac3_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-3_ectopic_K27_peaks.bed
 
 #K4 marked genes
-bedtools intersect -a all_genes_gff.bed -b WT_H3K4me2_Rep1_peaks.bed -wa > WT_K4_genes.bed
-bedtools intersect -a all_genes_gff.bed -b cac-1_H3K4me2_Rep1_peaks.bed -wa > cac-1_K4_genes.bed
-bedtools intersect -a all_genes_gff.bed -b cac-2_H3K4me2_Rep1_peaks.bed -wa > cac-2_K4_genes.bed
-bedtools intersect -a all_genes_gff.bed -b cac-3_H3K4me2_Rep1_peaks.bed -wa > cac-3_K4_genes.bed
-bedtools intersect -a all_genes_gff.bed -b set-7_H3K4me2_Rep1_peaks.bed -wa > set-7_K4_genes.bed
-#retained
-bedtools intersect -a WT_K4_genes.bed -b cac-1_K4_genes.bed -wa > WT_K4_genes_IN_cac-1.bed
-bedtools intersect -a WT_K4_genes.bed -b cac-2_K4_genes.bed -wa > WT_K4_genes_IN_cac-2.bed
-bedtools intersect -a WT_K4_genes.bed -b cac-3_K4_genes.bed -wa > WT_K4_genes_IN_cac-3.bed
-bedtools intersect -a WT_K4_genes.bed -b set-7_K4_genes.bed -wa > WT_K4_genes_IN_set-7.bed
-#lost
-bedtools intersect -a WT_K4_genes.bed -b cac-1_K4_genes.bed -v > WT_K4_genes_NO_cac-1.bed
-bedtools intersect -a WT_K4_genes.bed -b cac-2_K4_genes.bed -v > WT_K4_genes_NO_cac-2.bed
-bedtools intersect -a WT_K4_genes.bed -b cac-3_K4_genes.bed -v > WT_K4_genes_NO_cac-3.bed
-bedtools intersect -a WT_K4_genes.bed -b set-7_K4_genes.bed -v > WT_K4_genes_NO_set-7.bed
-#ectopic
-bedtools intersect -a cac-1_K4_genes.bed -b WT_K4_genes.bed -v > cac-1_ectopic_K4_genes.bed
-bedtools intersect -a cac-2_K4_genes.bed -b WT_K4_genes.bed -v > cac-2_ectopic_K4_genes.bed
-bedtools intersect -a cac-3_K4_genes.bed -b WT_K4_genes.bed -v > cac-3_ectopic_K4_genes.bed
-bedtools intersect -a set-7_K4_genes.bed -b WT_K4_genes.bed -v > set-7_ectopic_K4_genes.bed
-#ectopic K4 @ K27
-bedtools intersect -a cac-1_ectopic_K4_genes.bed -b K27_genes_stringent.bed -wa > cac-1_ectopic_K4_genes_K27_regions.bed
-bedtools intersect -a cac-2_ectopic_K4_genes.bed -b K27_genes_stringent.bed -wa > cac-2_ectopic_K4_genes_K27_regions.bed
-bedtools intersect -a cac-3_ectopic_K4_genes.bed -b K27_genes_stringent.bed -wa > cac-3_ectopic_K4_genes_K27_regions.bed
-bedtools intersect -a set-7_ectopic_K4_genes.bed -b K27_genes_stringent.bed -wa > set-7_ectopic_K4_genes_K27_regions.bed
+# bedtools intersect -a all_genes_gff.bed -b WT_H3K4me2_Rep1_peaks.bed -wa > WT_K4_genes.bed
+# bedtools intersect -a all_genes_gff.bed -b cac-1_H3K4me2_Rep1_peaks.bed -wa > cac-1_K4_genes.bed
+# bedtools intersect -a all_genes_gff.bed -b cac-2_H3K4me2_Rep1_peaks.bed -wa > cac-2_K4_genes.bed
+# bedtools intersect -a all_genes_gff.bed -b cac-3_H3K4me2_Rep1_peaks.bed -wa > cac-3_K4_genes.bed
+# bedtools intersect -a all_genes_gff.bed -b set-7_H3K4me2_Rep1_peaks.bed -wa > set-7_K4_genes.bed
+# #retained
+# bedtools intersect -a WT_K4_genes.bed -b cac-1_K4_genes.bed -wa > WT_K4_genes_IN_cac-1.bed
+# bedtools intersect -a WT_K4_genes.bed -b cac-2_K4_genes.bed -wa > WT_K4_genes_IN_cac-2.bed
+# bedtools intersect -a WT_K4_genes.bed -b cac-3_K4_genes.bed -wa > WT_K4_genes_IN_cac-3.bed
+# bedtools intersect -a WT_K4_genes.bed -b set-7_K4_genes.bed -wa > WT_K4_genes_IN_set-7.bed
+# #lost
+# bedtools intersect -a WT_K4_genes.bed -b cac-1_K4_genes.bed -v > WT_K4_genes_NO_cac-1.bed
+# bedtools intersect -a WT_K4_genes.bed -b cac-2_K4_genes.bed -v > WT_K4_genes_NO_cac-2.bed
+# bedtools intersect -a WT_K4_genes.bed -b cac-3_K4_genes.bed -v > WT_K4_genes_NO_cac-3.bed
+# bedtools intersect -a WT_K4_genes.bed -b set-7_K4_genes.bed -v > WT_K4_genes_NO_set-7.bed
+# #ectopic
+# bedtools intersect -a cac-1_K4_genes.bed -b WT_K4_genes.bed -v > cac-1_ectopic_K4_genes.bed
+# bedtools intersect -a cac-2_K4_genes.bed -b WT_K4_genes.bed -v > cac-2_ectopic_K4_genes.bed
+# bedtools intersect -a cac-3_K4_genes.bed -b WT_K4_genes.bed -v > cac-3_ectopic_K4_genes.bed
+# bedtools intersect -a set-7_K4_genes.bed -b WT_K4_genes.bed -v > set-7_ectopic_K4_genes.bed
+# #ectopic K4 @ K27
+# bedtools intersect -a cac-1_ectopic_K4_genes.bed -b K27_genes_stringent.bed -wa > cac-1_ectopic_K4_genes_K27_regions.bed
+# bedtools intersect -a cac-2_ectopic_K4_genes.bed -b K27_genes_stringent.bed -wa > cac-2_ectopic_K4_genes_K27_regions.bed
+# bedtools intersect -a cac-3_ectopic_K4_genes.bed -b K27_genes_stringent.bed -wa > cac-3_ectopic_K4_genes_K27_regions.bed
+# bedtools intersect -a set-7_ectopic_K4_genes.bed -b K27_genes_stringent.bed -wa > set-7_ectopic_K4_genes_K27_regions.bed
 
 #Combining all overlapping peaks & merging
 # CAF-1
