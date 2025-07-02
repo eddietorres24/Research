@@ -32,4 +32,4 @@ module load SAMtools
 export AUGUSTUS_CONFIG_PATH=/scratch/evt82290/BRAKER/augustus_config
 
 #Run BRAKER
-braker.pl --genome /home/evt82290/Research/GCA_000182925.2_NC12_clean.fna --bam subregion.bam --softmasking --gff3 --species Neurospora_crassa_cac3 --workingdir /scratch/evt82290/BRAKER
+braker.pl --genome /home/evt82290/Research/GCA_000182925.2_NC12_clean.fna --bam subregion.bam --softmasking --gff3 --species Neurospora_crassa_cac3_new --workingdir /scratch/evt82290/BRAKER
