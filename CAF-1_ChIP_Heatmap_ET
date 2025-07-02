@@ -74,6 +74,7 @@ computeMatrix scale-regions -a 250 -b 250 \
                                         --startLabel "TSS" \
                                         --endLabel "TES" \
                                         --sortRegions descend \
+                                        --sortUsingSamples 1 2 \
                                         --missingDataColor 1 \
                                         --colorList 'white, violet, magenta' \
                                         --zMin 0 \
