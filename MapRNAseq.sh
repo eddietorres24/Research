@@ -41,6 +41,11 @@ fi
   read2=${fastqPath}/${accession}/${accession}*_2.fastq.gz
   unpaired=${fastqPath}/${accession}/${accession}.fastq.gz
 
+#For files not in SRA folder
+read1=${fastqPath}/${accession}*_1.fastq.gz
+read2=${fastqPath}/${accession}*_2.fastq.gz
+unpaired=${fastqPath}/${accession}.fastq.gz
+
 ###################################
 
 #make output file folders
