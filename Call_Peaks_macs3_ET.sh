@@ -340,7 +340,7 @@ bedtools intersect -a cac3_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed
 #
 
 #merge bed files, remove duplicates
-cat cac-1_ectopic_K27_peaks.bed cac-2_ectopic_K27_peaks.bed cac-3_ectopic_K27_peaks.bed | sort -k1,1 -k2,2n -k3,3n | uniq > CAF-1_K27_ectopic_peaks.bed
+# cat cac-1_ectopic_K27_peaks.bed cac-2_ectopic_K27_peaks.bed cac-3_ectopic_K27_peaks.bed | sort -k1,1 -k2,2n -k3,3n | uniq > CAF-1_K27_ectopic_peaks.bed
 
 #test for Duplicates
 # sort K27genes_in_cac1_2.bed | uniq -d > test.bed
@@ -351,8 +351,11 @@ cat cac-1_ectopic_K27_peaks.bed cac-2_ectopic_K27_peaks.bed cac-3_ectopic_K27_pe
 #     sort -k1,1 -k2,2n -k3,3n "$file" | uniq > "deduplicated_beds/$file"
 # done
 
-
-
+#REMOVE NON-CORE LG REGIONS
+# for file in *.bed; do
+#     echo "Processing $file..."
+#     awk '$1 ~ /^CM/' "$file" | sort -k1,1 -k2,2n -k3,3n | uniq > "deduplicated_beds/$file"
+# done
 
 ###BigWig Averages
 # ml ucsc
