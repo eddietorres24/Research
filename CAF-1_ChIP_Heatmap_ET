@@ -67,7 +67,6 @@ computeMatrix scale-regions -a 250 -b 250 \
                      -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
                         $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
                         $P149DIR/149-128_ChIP_cac-2_comp_H3K4me2_Rep1_S152.bin_25.smooth_75Bulk.bw \
-                        $P149DIR/149-129_ChIP_cac-2_comp_H3K4me2_Rep1_S153.bin_25.smooth_75Bulk.bw \
                         -R $BEDDIR2/WT_K4_genes_NO_cac-2.bed $BEDDIR2/cac-2_ectopic_K4_genes.bed --skipZeros -o matrix_PRC2_cac2_comp.gz
 
                         plotHeatmap -m matrix_PRC2_cac2_comp.gz -out cac-2_comp_K4_regions.pdf \
