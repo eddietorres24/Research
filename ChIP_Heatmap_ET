@@ -51,19 +51,44 @@ computeMatrix scale-regions \
     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
     -R $QABED/qa_recovered.bed $QABED/qa_unrecovered.bed $QABED/qa_ectopic.bed --skipZeros -o matrix_qa-suz12.gz
 
-    plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_sorted.pdf \
-               --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
-               --startLabel "5'" \
-         			 --endLabel "3'" \
-               --missingDataColor 1 \
-               --whatToShow "heatmap and colorbar" \
-               --sortUsing sum \
-               --sortUsingSamples 6 \
-               --sortRegions descend \
-               --outFileSortedRegions heatmap.bed \
-               --colorList 'white, g, darkgreen' \
-               --zMin 0 \
-               --zMax 50
+
+    # 1. Split matrix by BED groups
+    computeMatrixOperations subset -m matrix_qa-suz12.gz --regionIndices 0 -o matrix_recovered.gz
+    computeMatrixOperations subset -m matrix_qa-suz12.gz --regionIndices 1 -o matrix_unrecovered.gz
+    computeMatrixOperations subset -m matrix_qa-suz12.gz --regionIndices 2 -o matrix_ectopic.gz
+
+    # 2. Sort each group independently using relevant sample columns
+    computeMatrixOperations sort -m matrix_recovered.gz --sortRegions descend --sortUsing mean --sortUsingSamples 2 3 4 5 6 -o matrix_recovered_sorted.gz
+    computeMatrixOperations sort -m matrix_unrecovered.gz --sortRegions descend --sortUsing mean --sortUsingSamples 1 -o matrix_unrecovered_sorted.gz
+    computeMatrixOperations sort -m matrix_ectopic.gz --sortRegions descend --sortUsing mean --sortUsingSamples 2 3 4 5 6 -o matrix_ectopic_sorted.gz
+
+    # 3. Combine the sorted matrices
+    computeMatrixOperations rbind -m matrix_recovered_sorted.gz matrix_unrecovered_sorted.gz matrix_ectopic_sorted.gz -o matrix_qa-suz12_clusterSorted.gz
+
+    # 4. Plot heatmap with cluster-based sorting preserved
+    plotHeatmap -m matrix_qa-suz12_clusterSorted.gz -out H3K27me3_qa-suz12_clusterSorted.pdf \
+      --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
+      --startLabel "5'" --endLabel "3'" \
+      --missingDataColor 1 \
+      --whatToShow "heatmap and colorbar" \
+      --colorList 'white, g, darkgreen' \
+      --zMin 0 --zMax 50
+
+
+
+    # plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_sorted.pdf \
+    #            --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
+    #            --startLabel "5'" \
+    #      			 --endLabel "3'" \
+    #            --missingDataColor 1 \
+    #            --whatToShow "heatmap and colorbar" \
+    #            --sortUsing sum \
+    #            --sortUsingSamples 6 \
+    #            --sortRegions descend \
+    #            --outFileSortedRegions heatmap.bed \
+    #            --colorList 'white, g, darkgreen' \
+    #            --zMin 0 \
+    #            --zMax 50
 
 
     #$MISCDIR/SRR11806698.bin_25.smooth_75Bulk.bw \
