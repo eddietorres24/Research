@@ -174,10 +174,11 @@ module load deepTools
         --samplesLabel WT 4hr 24hr hpo h2az isw ash1 cac-3 \
         --startLabel "5'" --endLabel "3'" \
         --missingDataColor 1 \
+        --sortRegions descend --sortUsing sum --sortUsingSamples 1 3 \
         --whatToShow "heatmap and colorbar" \
         --colorList 'white,g,darkgreen' \
         --zMin 0 --zMax 50 \
-        --sortRegions no
+
 
         # $P144DIR/144-28_ChIP_WT_0hr_H3K27me3_Rep3_S28.bin_25.smooth_75Bulk.bw
         # $P144DIR/144-29_ChIP_WT_24hr_H3K27me3_Rep2_S29.bin_25.smooth_75Bulk.bw
