@@ -98,7 +98,7 @@ module load deepTools
 
 # Step 2: Sort with plotHeatmap (not computeMatrixOperations) and export new BEDs
 plotHeatmap -m matrix_recovered.gz -out recovered_sorted.pdf \
-  --sortRegions descend --sortUsing sum --sortUsingSamples 1 \
+  --sortRegions descend --sortUsing sum --sortUsingSamples 1 2 6 \
   --outFileSortedRegions recovered_sorted.bed
 
 plotHeatmap -m matrix_unrecovered.gz -out unrecovered_sorted.pdf \
