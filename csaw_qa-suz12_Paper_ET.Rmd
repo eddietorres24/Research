@@ -61,7 +61,7 @@ library(ComplexHeatmap)
 library(profileplyr)
 library(DiffBind)
 library(circlize)
-
+library(dplyr)
 ```
 
 ```{r ReadBams and countWindows}
@@ -796,8 +796,8 @@ All_FilteredHeatmap_mat_map <- subset(All_FilteredHeatmap_mat, rowSums(All_Filte
 #throwing our regions that are > 0.1 in suz12 (if any got through)
 All_FilteredHeatmap_mat_map <- subset(All_FilteredHeatmap_mat_map, All_FilteredHeatmap_mat_map[, 9] <= 0)
 
-#I want to look at qa-suz12 & CAF-1 mutants
-All_FilteredHeatmap_mat_map <- All_FilteredHeatmap_mat_map[,c(1,7,10:12)]
+#I want to look at qa-suz12 only
+All_FilteredHeatmap_mat_map <- All_FilteredHeatmap_mat_map[,c(1:7)]
 
 #cluster into areas that recover vs. not
 normal <- subset(All_FilteredHeatmap_mat_map, rowSums(All_FilteredHeatmap_mat_map[, 1:2] > 0) >= 1)
@@ -832,10 +832,114 @@ col_fun(seq(0, max, length = 20))
 
 #Plot
 All_Filtered_hm <- Heatmap(All_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(All_FilteredHeatmap_mat_sort)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "H3K27me3"))
+pdf("./ALL_H3K27me3_peaks_qa-suz12_paper.pdf", height = 9)
+# Draw the heatmap
+draw(All_Filtered_hm)
+# Close the device to save the file
+dev.off()
+
+```
+
+```{r, Heatmap for CAF-1 mutants}
+
+All_FilteredHeatmap_mat <- as.matrix(All_FilteredHeatmap_df)
+quantile(All_FilteredHeatmap_mat, c(.01, .50, .75, .95, .98, .995)) 
+max <- quantile(All_FilteredHeatmap_mat, 0.995) # identify the 98th percentile value and assign this to max
+All_FilteredHeatmap_mat[All_FilteredHeatmap_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0 in both WT samples
+All_FilteredHeatmap_mat_map <- subset(All_FilteredHeatmap_mat, rowSums(All_FilteredHeatmap_mat[, 1:7] > 0) > 0)
+
+#throwing our regions that are > 0.1 in suz12 (if any got through)
+All_FilteredHeatmap_mat_map <- subset(All_FilteredHeatmap_mat_map, All_FilteredHeatmap_mat_map[, 9] <= 0)
+
+#cluster into areas that recover vs. not
+normal <- subset(All_FilteredHeatmap_mat_map, rowSums(All_FilteredHeatmap_mat_map[, 1:2] > 0) >= 1)
+
+normal_recover <- subset(normal, rowSums(normal[, 3:7] > 0) > 0)
+
+normal_no_recover <- subset(normal, rowSums(normal[, 3:7] <= 0) == 5)
+
+#ectopic
+ectopic <- subset(All_FilteredHeatmap_mat_map, rowSums(All_FilteredHeatmap_mat_map[, 1:2] <= 0) == 2)
+
+normal_recover_order <- order(rowMeans(normal_recover[, c(1,3)]), decreasing = TRUE)
+normal_no_recover_order <- order(normal_no_recover[, 1], decreasing = TRUE)
+ectopic_order <- order(rowMeans(ectopic[, 3:7]), decreasing = TRUE)
+
+normal_recover_sort <- normal_recover[normal_recover_order, ]
+normal_no_recover_sort <- normal_no_recover[normal_no_recover_order, ]
+ectopic_sort <- ectopic[ectopic_order, ]
+
+forheat1 <- rownames(normal_recover_sort)
+forheat2 <- rownames(normal_no_recover_sort)
+forheat3 <- rownames(ectopic_sort)
+
+finalorder <- c(forheat1, forheat2, forheat3)
+
+#I want to look at qa-suz12 & CAF-1 mutants
+All_FilteredHeatmap_mat_map <- All_FilteredHeatmap_mat_map[,c(1,7,10:12)]
+
+#Final Order
+All_FilteredHeatmap_mat_sort = All_FilteredHeatmap_mat_map[finalorder, ]
+
+#setting color scale
+col_fun<- colorRamp2(c(0, max), c("white", "darkgreen"))
+col_fun(seq(0, max, length = 20))
+
+#Plot
+All_Filtered_hm <- Heatmap(All_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(All_FilteredHeatmap_mat_sort)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "H3K27me3"))
 pdf("./ALL_H3K27me3_peaks_qa-suz12_v_CAF-1_paper.pdf", height = 9)
 # Draw the heatmap
 draw(All_Filtered_hm)
 # Close the device to save the file
 dev.off()
+
+```
+
+```{r, making bed files w/ csaw measured K27 regions}
+
+# Utility function to convert rownames to a GRanges-like data.frame
+parse_regions <- function(region_names) {
+  region_parts <- do.call(rbind, strsplit(region_names, "\\."))
+  colnames(region_parts) <- c("chr", "start", "end")
+  df <- data.frame(
+    chr = region_parts[,1],
+    start = as.integer(region_parts[,2]),
+    end = as.integer(region_parts[,3])
+  ) %>% arrange(chr, start)
+  return(df)
+}
+
+# Merge consecutive regions (end of one == start of next)
+merge_adjacent <- function(df) {
+  out <- list()
+  i <- 1
+  while (i <= nrow(df)) {
+    chr <- df$chr[i]
+    start <- df$start[i]
+    end <- df$end[i]
+    j <- i + 1
+    while (j <= nrow(df) && df$chr[j] == chr && df$start[j] == end + 1) {
+      end <- df$end[j]
+      j <- j + 1
+    }
+    out[[length(out)+1]] <- data.frame(chr=chr, start=start, end=end)
+    i <- j
+  }
+  do.call(rbind, out)
+}
+
+# Process and write BED for each category
+write_bed_from_matrix <- function(mat, rownames_subset, out_file) {
+  df <- parse_regions(rownames_subset)
+  df_merged <- merge_adjacent(df)
+  write.table(df_merged, file = out_file, sep = "\t", quote = FALSE, col.names = FALSE, row.names = FALSE)
+}
+
+# Use the rownames from your subsets
+write_bed_from_matrix(All_FilteredHeatmap_mat_map, rownames(ectopic_sort), "ectopic_regions.bed")
+write_bed_from_matrix(All_FilteredHeatmap_mat_map, rownames(normal_recover_sort), "normal_recover_regions.bed")
+write_bed_from_matrix(All_FilteredHeatmap_mat_map, rownames(normal_no_recover_sort), "normal_no_recover_regions.bed")
 
 ```
