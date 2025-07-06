@@ -158,9 +158,9 @@ module load deepTools
 
 #Look at other mutants
       computeMatrix scale-regions \
-        -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
-           $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
-           $P146DIR/146-40_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S40.bin_25.smooth_75Bulk.bw \
+        -S $P137DIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bin_25.smooth_75Bulk.bw \
+           $P137DIR/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66.bin_25.smooth_75Bulk.bw \
+           $P137DIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72.bin_25.smooth_75Bulk.bw \
            $P136DIR/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2_S2.bin_25.smooth_75Bulk.bw \
            $P136DIR/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3.bin_25.smooth_75Bulk.bw \
            $P136DIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4.bin_25.smooth_75Bulk.bw \
@@ -169,12 +169,12 @@ module load deepTools
         -o matrix_qa-suz12_clustered.gz
 
       plotHeatmap -m matrix_qa-suz12_clustered.gz -out H3K27me3_qa-suz12_clustered_CAF-1.pdf \
-        --samplesLabel WT 0hr 24hr cac-1 cac-2 cac-3 \
+        --samplesLabel WT 4hr 24hr cac-1 cac-2 cac-3 \
         --startLabel "5'" --endLabel "3'" \
         --missingDataColor 1 \
         --whatToShow "heatmap and colorbar" \
         --colorList 'white,g,darkgreen' \
-        --zMin 0 --zMax 50 \
+        --zMin 0 \
         --sortRegions no
 
 
