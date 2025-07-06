@@ -110,9 +110,9 @@ plotHeatmap -m matrix_ectopic.gz -out ectopic_sorted.pdf \
   --outFileSortedRegions ectopic_sorted.bed
 
   # Step 3: Fix group column in each sorted BED
-  awk 'BEGIN{OFS="\t"} {$4="recovered"; print}' recovered_sorted.bed > recovered_fixed.bed
-  awk 'BEGIN{OFS="\t"} {$4="unrecovered"; print}' unrecovered_sorted.bed > unrecovered_fixed.bed
-  awk 'BEGIN{OFS="\t"} {$4="ectopic"; print}' ectopic_sorted.bed > ectopic_fixed.bed
+  awk 'BEGIN{OFS="\t"} {$NF="recovered"; print}' recovered_sorted.bed > recovered_grouped.bed
+  awk 'BEGIN{OFS="\t"} {$NF="unrecovered"; print}' unrecovered_sorted.bed > unrecovered_grouped.bed
+  awk 'BEGIN{OFS="\t"} {$NF="ectopic"; print}' ectopic_sorted.bed > ectopic_grouped.bed
 
 # Step 2: Final matrix using the sorted BEDs as separate region groups
 computeMatrix scale-regions \
