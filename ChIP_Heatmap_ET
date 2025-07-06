@@ -64,6 +64,8 @@ module load deepTools
 #                --zMin 0 \
 #                --zMax 50
 
+###Plotting ALL qa-suz12 K27 regions (normal & ectopic)
+
 # Step 1: Compute matrices for each BED category
 # computeMatrix scale-regions \
 #   -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
@@ -131,7 +133,6 @@ plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_clustered.pdf \
   --colorList 'white,g,darkgreen' \
   --zMin 0 --zMax 50 \
   --regionsLabel recovered unrecovered ectopic \
-  --perGroup
 
 
 
