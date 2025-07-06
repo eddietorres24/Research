@@ -50,60 +50,64 @@ module load deepTools
 #     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
 #     -R $QABED/qa_recovered.bed $QABED/qa_unrecovered.bed $QABED/qa_ectopic.bed --skipZeros -o matrix_qa-suz12.gz
 
-    # Step 1: Compute matrices for each BED file
-    computeMatrix scale-regions \
-      -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
-      -R $QABED/qa_recovered.bed --skipZeros -o matrix_recovered.gz
+# Step 1: Compute matrices for each BED file
+computeMatrix scale-regions \
+  -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
+  -R $QABED/qa_recovered.bed --skipZeros -o matrix_recovered.gz
 
-    computeMatrix scale-regions \
-      -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
-      -R $QABED/qa_unrecovered.bed --skipZeros -o matrix_unrecovered.gz
+computeMatrix scale-regions \
+  -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
+  -R $QABED/qa_unrecovered.bed --skipZeros -o matrix_unrecovered.gz
 
-    computeMatrix scale-regions \
-      -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
-         $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
-      -R $QABED/qa_ectopic.bed --skipZeros -o matrix_ectopic.gz
+computeMatrix scale-regions \
+  -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
+     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
+  -R $QABED/qa_ectopic.bed --skipZeros -o matrix_ectopic.gz
 
-    # Step 2: Sort each one individually
-    computeMatrixOperations sort -m matrix_recovered.gz \
-      --sortRegions descend --sortUsing sum --sortUsingSamples 2 3 4 5 6 \
-      -o matrix_recovered_sorted.gz
+# Step 2: Sort each matrix individually
+computeMatrixOperations sort -m matrix_recovered.gz \
+  --regionsFileName $QABED/qa_recovered.bed \
+  --sortRegions descend --sortUsing sum --sortUsingSamples 2 3 4 5 6 \
+  -o matrix_recovered_sorted.gz
 
-    computeMatrixOperations sort -m matrix_unrecovered.gz \
-      --sortRegions descend --sortUsing sum --sortUsingSamples 2 3 4 5 6 \
-      -o matrix_unrecovered_sorted.gz
+computeMatrixOperations sort -m matrix_unrecovered.gz \
+  --regionsFileName $QABED/qa_unrecovered.bed \
+  --sortRegions descend --sortUsing sum --sortUsingSamples 1 \
+  -o matrix_unrecovered_sorted.gz
 
-    computeMatrixOperations sort -m matrix_ectopic.gz \
-      --sortRegions descend --sortUsing sum --sortUsingSamples 1 \
-      -o matrix_ectopic_sorted.gz
+computeMatrixOperations sort -m matrix_ectopic.gz \
+  --regionsFileName $QABED/qa_ectopic.bed \
+  --sortRegions descend --sortUsing sum --sortUsingSamples 2 3 4 5 6 \
+  -o matrix_ectopic_sorted.gz
 
-    # Step 3: Combine the sorted matrices
-    computeMatrixOperations rbind \
-      -m matrix_recovered_sorted.gz matrix_unrecovered_sorted.gz matrix_ectopic_sorted.gz \
-      -o matrix_qa-suz12_clusterSorted.gz
+# Step 3: Concatenate sorted matrices
+computeMatrixOperations rbind \
+  -m matrix_recovered_sorted.gz matrix_unrecovered_sorted.gz matrix_ectopic_sorted.gz \
+  -o matrix_qa-suz12_clusterSorted.gz
 
-    # Step 4: Plot final heatmap
-    plotHeatmap -m matrix_qa-suz12_clusterSorted.gz -out H3K27me3_qa-suz12_clusterSorted.pdf \
-      --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
-      --startLabel "5'" --endLabel "3'" \
-      --missingDataColor 1 --whatToShow "heatmap and colorbar" \
-      --sortRegions no \
-      --colorList 'white,g,darkgreen' \
-      --zMin 0 --zMax 50
+# Step 4: Final heatmap plot
+plotHeatmap -m matrix_qa-suz12_clusterSorted.gz \
+  -out H3K27me3_qa-suz12_clusterSorted.pdf \
+  --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
+  --startLabel "5'" --endLabel "3'" \
+  --missingDataColor 1 --whatToShow "heatmap and colorbar" \
+  --sortRegions no \
+  --colorList 'white,g,darkgreen' \
+  --zMin 0 --zMax 50
 
 
     # plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_sorted.pdf \
