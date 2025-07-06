@@ -109,9 +109,6 @@ plotHeatmap -m matrix_ectopic.gz -out ectopic_sorted.pdf \
   --sortRegions descend --sortUsing sum --sortUsingSamples 2 3 4 5 6 \
   --outFileSortedRegions ectopic_sorted.bed
 
-# Step 3: Combine BEDs in desired final order
-cat recovered_sorted.bed unrecovered_sorted.bed ectopic_sorted.bed > combined_sorted.bed
-
 # Step 4: Final matrix using combined BED file
 computeMatrix scale-regions \
   -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
@@ -120,7 +117,7 @@ computeMatrix scale-regions \
      $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
      $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
      $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
-  -R combined_sorted.bed \
+  -R recovered_sorted.bed unrecovered_sorted.bed ectopic_sorted.bed \
   --skipZeros -o matrix_qa-suz12_clusterSorted.gz
 
 # Step 5: Final heatmap (already sorted)
@@ -131,7 +128,6 @@ plotHeatmap -m matrix_qa-suz12_clusterSorted.gz -out H3K27me3_qa-suz12_clustered
   --whatToShow "heatmap and colorbar" \
   --colorList 'white,g,darkgreen' \
   --zMin 0 --zMax 50 \
-  --regionsLabel recovered unrecovered ectopic \
 
 
 
