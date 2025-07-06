@@ -169,7 +169,7 @@ module load deepTools
         -o matrix_qa-suz12_clustered.gz
 
       plotHeatmap -m matrix_qa-suz12_clustered.gz -out H3K27me3_qa-suz12_clustered_CAF-1.pdf \
-        --samplesLabel WT 24hr 48hr 72hr 96hr \
+        --samplesLabel WT 0hr 24hr cac-1 cac-2 cac-3 \
         --startLabel "5'" --endLabel "3'" \
         --missingDataColor 1 \
         --whatToShow "heatmap and colorbar" \
