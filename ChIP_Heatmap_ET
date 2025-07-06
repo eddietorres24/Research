@@ -123,7 +123,6 @@ computeMatrix scale-regions \
 # Step 3: Final heatmap using grouped matrix
 plotHeatmap -m matrix_qa-suz12_clusterSorted.gz -out H3K27me3_qa-suz12_clustered.pdf \
   --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
-  --regionsLabel recovered unrecovered ectopic \
   --startLabel "5'" --endLabel "3'" \
   --missingDataColor 1 \
   --whatToShow "heatmap and colorbar" \
