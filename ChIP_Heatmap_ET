@@ -158,9 +158,9 @@ module load deepTools
 
 #Look at other mutants
       computeMatrix scale-regions \
-        -S $P137DIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bin_25.smooth_75Bulk.bw \
-           $P137DIR/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66.bin_25.smooth_75Bulk.bw \
-           $P137DIR/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72.bin_25.smooth_75Bulk.bw \
+        -S $P144DIR/144-28_ChIP_WT_0hr_H3K27me3_Rep3_S28.bin_25.smooth_75Bulk.bw \
+           $P144DIR/144-31_ChIP_qa-suz12_4hr_H3K27me3_Rep2_S31.bin_25.smooth_75Bulk.bw \
+           $P144DIR/144-34_ChIP_qa-suz12_24hr_H3K27me3_Rep3_S34.bin_25.smooth_75Bulk.bw \
            $P136DIR/6147_136-2_ChIP_cac-1_H3K27me3_abcam_Rep2_S2.bin_25.smooth_75Bulk.bw \
            $P136DIR/6147_136-3_ChIP_cac-2_H3K27me3_abcam_Rep2_S3.bin_25.smooth_75Bulk.bw \
            $P136DIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4.bin_25.smooth_75Bulk.bw \
@@ -177,7 +177,13 @@ module load deepTools
         --zMin 0 \
         --sortRegions no
 
-
+        # $P144DIR/144-28_ChIP_WT_0hr_H3K27me3_Rep3_S28.bin_25.smooth_75Bulk.bw
+        # $P144DIR/144-29_ChIP_WT_24hr_H3K27me3_Rep2_S29.bin_25.smooth_75Bulk.bw
+        # $P144DIR/144-30_ChIP_qa-suz12_0hr_H3K27me3_Rep3_S30.bin_25.smooth_75Bulk.bw
+        # $P144DIR/144-31_ChIP_qa-suz12_4hr_H3K27me3_Rep2_S31.bin_25.smooth_75Bulk.bw
+        # $P144DIR/144-32_ChIP_qa-suz12_8hr_H3K27me3_Rep2_S32.bin_25.smooth_75Bulk.bw
+        # $P144DIR/144-33_ChIP_qa-suz12_12hr_H3K27me3_Rep2_S33.bin_25.smooth_75Bulk.bw
+        # $P144DIR/144-34_ChIP_qa-suz12_24hr_H3K27me3_Rep3_S34.bin_25.smooth_75Bulk.bw
 
     #$MISCDIR/SRR11806698.bin_25.smooth_75Bulk.bw \
     #$P136DIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4.bin_25.smooth_75Bulk.bw \
