@@ -158,14 +158,14 @@ module load deepTools
 
 #Look at other mutants
       computeMatrix scale-regions \
-        -S $P144DIR/144-28_ChIP_WT_0hr_H3K27me3_Rep3_S28.bin_25.smooth_75Bulk.bw \
+        -S $P141DIR/141-88_ChIP_WT_H3K27me2_Rep1_S82.bin_25.smooth_75Bulk.bw \
            $P144DIR/144-31_ChIP_qa-suz12_4hr_H3K27me3_Rep2_S31.bin_25.smooth_75Bulk.bw \
            $P144DIR/144-34_ChIP_qa-suz12_24hr_H3K27me3_Rep3_S34.bin_25.smooth_75Bulk.bw \
            $MISCDIR/hpo_H3K27me3.bin_25.smooth_75Bulk.bw \
-           $MISCDIR/h2az_H3K27me2me3_Rep1.bin_25.smooth_75Bulk.bw \
+           $MISCDIR/h2az_H3K27me2me3_Rep2.bin_25.smooth_75Bulk.bw \
            $MISCDIR/isw_H3K27me2me3_rep1.bin_25.smooth_75Bulk.bw \
-           $MISCDIR/ash1_H3K27me2me3_Rep2.bin_25.smooth_75Bulk.bw \
-           $P136DIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4.bin_25.smooth_75Bulk.bw \
+           $MISCDIR/ash1_H3K27me2me3_Rep1.bin_25.smooth_75Bulk.bw  \
+           $P141DIR/141-91_ChIP_cac-3_H3K27me2_Rep1_S85.bin_25.smooth_75Bulk.bw  \
         -R recovered_grouped.bed unrecovered_grouped.bed ectopic_grouped.bed \
         --skipZeros \
         -o matrix_qa-suz12_clustered.gz
