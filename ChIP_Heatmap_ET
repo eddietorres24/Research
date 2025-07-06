@@ -124,7 +124,7 @@ computeMatrix scale-regions \
   --skipZeros -o matrix_qa-suz12_clusterSorted.gz
 
 # Step 5: Final heatmap (already sorted)
-plotHeatmap -m matrix_qa-suz12.gz -out H3K27me3_qa-suz12_clustered.pdf \
+plotHeatmap -m matrix_qa-suz12_clusterSorted.gz -out H3K27me3_qa-suz12_clustered.pdf \
   --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
   --startLabel "5'" --endLabel "3'" \
   --missingDataColor 1 \
