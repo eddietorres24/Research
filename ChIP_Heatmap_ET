@@ -122,7 +122,7 @@ computeMatrix scale-regions \
      $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
      $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
      $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
-  -R recovered_sorted.bed unrecovered_sorted.bed ectopic_sorted.bed \
+  -R recovered_grouped.bed unrecovered_grouped.bed ectopic_grouped.bed \
   --skipZeros \
   -o matrix_qa-suz12_clustered.gz
 
