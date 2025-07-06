@@ -322,6 +322,34 @@ FC_qa_24hrvInput.K27.tabular <- FC_qa_24hrvInput.merged$combined
 FC_qa_24hrvInput.K27.out.ranges <- FC_qa_24hrvInput.merged$regions
 mcols(FC_qa_24hrvInput.K27.out.ranges) <- DataFrame(FC_qa_24hrvInput.K27.tabular)
 
+#qa-suz12 48hr
+FC_qa_48hrvInput.K27.contrast <- makeContrasts(K27vqa_48hr=qa_48hr.H3K27me3-qa_48hr.input,levels=design.mat)
+FC_qa_48hrvInput.res <- glmQLFTest(fitK27, contrast=FC_qa_48hrvInput.K27.contrast)
+FC_qa_48hrvInput.merged <- mergeResults(filtered.dataK27, FC_qa_48hrvInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_qa_48hrvInput.K27.tabular <- FC_qa_48hrvInput.merged$combined
+FC_qa_48hrvInput.K27.out.ranges <- FC_qa_48hrvInput.merged$regions
+mcols(FC_qa_48hrvInput.K27.out.ranges) <- DataFrame(FC_qa_48hrvInput.K27.tabular)
+
+#qa-suz12 72hr
+FC_qa_72hrvInput.K27.contrast <- makeContrasts(K27vqa_72hr=qa_72hr.H3K27me3-qa_72hr.input,levels=design.mat)
+FC_qa_72hrvInput.res <- glmQLFTest(fitK27, contrast=FC_qa_72hrvInput.K27.contrast)
+FC_qa_72hrvInput.merged <- mergeResults(filtered.dataK27, FC_qa_72hrvInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_qa_72hrvInput.K27.tabular <- FC_qa_72hrvInput.merged$combined
+FC_qa_72hrvInput.K27.out.ranges <- FC_qa_72hrvInput.merged$regions
+mcols(FC_qa_72hrvInput.K27.out.ranges) <- DataFrame(FC_qa_72hrvInput.K27.tabular)
+
+#qa-suz12 96hr
+FC_qa_96hrvInput.K27.contrast <- makeContrasts(K27vqa_96hr=qa_96hr.H3K27me3-qa_96hr.input,levels=design.mat)
+FC_qa_96hrvInput.res <- glmQLFTest(fitK27, contrast=FC_qa_96hrvInput.K27.contrast)
+FC_qa_96hrvInput.merged <- mergeResults(filtered.dataK27, FC_qa_96hrvInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_qa_96hrvInput.K27.tabular <- FC_qa_96hrvInput.merged$combined
+FC_qa_96hrvInput.K27.out.ranges <- FC_qa_96hrvInput.merged$regions
+mcols(FC_qa_96hrvInput.K27.out.ranges) <- DataFrame(FC_qa_96hrvInput.K27.tabular)
+
+
 #suz12 0hr
 FC_suz12_0hrvInput.K27.contrast <- makeContrasts(K27vsuz12_0hr=suz12_0hr.H3K27me3-suz12_0hr.input,levels=design.mat)
 FC_suz12_0hrvInput.res <- glmQLFTest(fitK27, contrast=FC_suz12_0hrvInput.K27.contrast)
@@ -899,19 +927,24 @@ dev.off()
 
 ```{r, making bed files w/ csaw measured K27 regions}
 
-# Utility function to convert rownames to a GRanges-like data.frame
+# Parse rownames in format chr.version.start.end (e.g., CM002236.1.9782401.9782700)
 parse_regions <- function(region_names) {
-  region_parts <- do.call(rbind, strsplit(region_names, "\\."))
-  colnames(region_parts) <- c("chr", "start", "end")
-  df <- data.frame(
-    chr = region_parts[,1],
-    start = as.integer(region_parts[,2]),
-    end = as.integer(region_parts[,3])
-  ) %>% arrange(chr, start)
+  valid <- grepl("^.+\\.[0-9]+\\.[0-9]+\\.[0-9]+$", region_names)
+  region_names <- region_names[valid]
+  parts <- strsplit(region_names, "\\.")
+  
+  # Combine first two parts as chr, then extract start and end
+  chr <- sapply(parts, function(x) paste(x[1], x[2], sep = "."))
+  start <- as.integer(sapply(parts, function(x) x[3]))
+  end <- as.integer(sapply(parts, function(x) x[4]))
+  
+  df <- data.frame(chr = chr, start = start, end = end, stringsAsFactors = FALSE) %>%
+    arrange(chr, start)
+  
   return(df)
 }
 
-# Merge consecutive regions (end of one == start of next)
+# Merge adjacent or touching regions
 merge_adjacent <- function(df) {
   out <- list()
   i <- 1
@@ -920,26 +953,27 @@ merge_adjacent <- function(df) {
     start <- df$start[i]
     end <- df$end[i]
     j <- i + 1
-    while (j <= nrow(df) && df$chr[j] == chr && df$start[j] == end + 1) {
-      end <- df$end[j]
+    while (j <= nrow(df) && df$chr[j] == chr && df$start[j] <= end + 1) {
+      end <- max(end, df$end[j])
       j <- j + 1
     }
-    out[[length(out)+1]] <- data.frame(chr=chr, start=start, end=end)
+    out[[length(out) + 1]] <- data.frame(chr = chr, start = start, end = end)
     i <- j
   }
-  do.call(rbind, out)
+  bind_rows(out)
 }
 
-# Process and write BED for each category
-write_bed_from_matrix <- function(mat, rownames_subset, out_file) {
+# Write merged regions to BED
+write_bed_from_matrix <- function(rownames_subset, out_file) {
   df <- parse_regions(rownames_subset)
   df_merged <- merge_adjacent(df)
-  write.table(df_merged, file = out_file, sep = "\t", quote = FALSE, col.names = FALSE, row.names = FALSE)
+  write.table(df_merged, file = out_file, sep = "\t", quote = FALSE,
+              col.names = FALSE, row.names = FALSE)
 }
 
-# Use the rownames from your subsets
-write_bed_from_matrix(All_FilteredHeatmap_mat_map, rownames(ectopic_sort), "ectopic_regions.bed")
-write_bed_from_matrix(All_FilteredHeatmap_mat_map, rownames(normal_recover_sort), "normal_recover_regions.bed")
-write_bed_from_matrix(All_FilteredHeatmap_mat_map, rownames(normal_no_recover_sort), "normal_no_recover_regions.bed")
+# Export BED files for each category
+write_bed_from_matrix(rownames(ectopic_sort), "ectopic_regions.bed")
+write_bed_from_matrix(rownames(normal_recover_sort), "normal_recover_regions.bed")
+write_bed_from_matrix(rownames(normal_no_recover_sort), "normal_no_recover_regions.bed")
 
 ```
