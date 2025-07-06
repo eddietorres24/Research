@@ -127,8 +127,8 @@ plotHeatmap -m matrix_qa-suz12_clustered.gz -out H3K27me3_qa-suz12_clustered.pdf
   --missingDataColor 1 \
   --whatToShow "heatmap and colorbar" \
   --colorList 'white,g,darkgreen' \
-  --zMin 0 --zMax 50 \
-  --sortRegions no
+  --outFileSortedRegions TEST.bed \
+  --zMin 0 --zMax 50
 
     #$MISCDIR/SRR11806698.bin_25.smooth_75Bulk.bw \
     #$P136DIR/6147_136-4_ChIP_cac-3_H3K27me3_abcam_Rep2_S4.bin_25.smooth_75Bulk.bw \
