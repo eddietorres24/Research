@@ -34,6 +34,8 @@ QABED="/home/evt82290/Research/bed_files/qa-suz12"
 BEDDIR="/scratch/evt82290/RNAseqIGV/bedgraph"
 BEDDIR2="/home/evt82290/Research/bed_files"
 
+#load deepTools
+module load deepTools
 
 ###referencePoint
 # computeMatrix reference-point --referencePoint center -a 2500 -b 2500 -bs 2 --scale 0.5 \
