@@ -61,7 +61,7 @@ computeMatrix scale-regions \
                --sortUsingSamples 6 \
                --sortRegions descend \
                --outFileSortedRegions heatmap.bed \
-               --colorMap 'white, g, darkgreen' \
+               --colorList 'white, g, darkgreen' \
                --zMin 0 \
                --zMax 50
 
