@@ -56,28 +56,47 @@ module load deepTools
 #             --startLabel "TSS" \
 #             --endLabel "TES" \
 #             --sortRegions descend \
-#             --sortUsing 5 \
+#             --sortUsingSamples 5 \
 #             --missingDataColor 1 \
 #             --heatmapHeight 25 \
 #             --colorList 'white, violet, magenta' \
 #             --zMin 0 \
 
-#cac-2 comp (K4)
-computeMatrix scale-regions -a 250 -b 250 \
-                     -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
-                        $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
-                        $P149DIR/149-128_ChIP_cac-2_comp_H3K4me2_Rep1_S152.bin_25.smooth_75Bulk.bw \
-                        -R $BEDDIR2/cac-2_ectopic_K4_genes.bed --skipZeros -o matrix_PRC2_cac2_comp.gz
+# All K4 genes
+    computeMatrix scale-regions -a 500 -b 500 --regionBodyLength 2000 --scale 1.5 \
+     -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
+        $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
+        $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
+        $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
+        $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
+        -R $BEDDIR2/K4_genes_gff.bed --skipZeros -o matrix_PRC2_K4.gz
 
-                        plotHeatmap -m matrix_PRC2_cac2_comp.gz -out cac-2_comp_K4_regions.pdf \
-                                        --samplesLabel WT cac-2 comp \
-                                        --startLabel "TSS" \
-                                        --endLabel "TES" \
-                                        --sortRegions descend \
-                                        --sortUsingSamples 1 \
-                                        --missingDataColor 1 \
-                                        --colorList 'white, violet, magenta' \
-                                        --zMin 0 \
+    plotHeatmap -m matrix_PRC2_K4.gz -out CAF-1_K4_K27genes_CAF-1_clustered.pdf \
+            --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
+            --startLabel "TSS" \
+            --endLabel "TES" \
+            --sortRegions descend \
+            --missingDataColor 1 \
+            --heatmapHeight 25 \
+            --colorList 'white, magenta' \
+            --zMin 0 \
+
+# #cac-2 comp (K4)
+# computeMatrix scale-regions -a 250 -b 250 \
+#                      -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
+#                         $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
+#                         $P149DIR/149-128_ChIP_cac-2_comp_H3K4me2_Rep1_S152.bin_25.smooth_75Bulk.bw \
+#                         -R $BEDDIR2/cac-2_ectopic_K4_genes.bed --skipZeros -o matrix_PRC2_cac2_comp.gz
+#
+#                         plotHeatmap -m matrix_PRC2_cac2_comp.gz -out cac-2_comp_K4_regions.pdf \
+#                                         --samplesLabel WT cac-2 comp \
+#                                         --startLabel "TSS" \
+#                                         --endLabel "TES" \
+#                                         --sortRegions descend \
+#                                         --sortUsingSamples 1 \
+#                                         --missingDataColor 1 \
+#                                         --colorList 'white, violet, magenta' \
+#                                         --zMin 0 \
 
                                         # 146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw
                                         # 146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw
@@ -319,22 +338,22 @@ computeMatrix scale-regions -a 250 -b 250 \
 #
 # #cac-2 complement (K27)
 
-computeMatrix scale-regions -a 250 -b 250 \
-                     -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-                        $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-                        $P149DIR/149-123_ChIP_cac-2_comp_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
-                        $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-                        -R $BEDDIR2/WT_K27_peaks_IN_cac2.bed $BEDDIR2/WT_K27_peaks_NO_cac2.bed $BEDDIR2/cac-2_ectopic_K27_peaks.bed --skipZeros -o matrix_PRC2_cac2_comp_K27.gz
-
-                        plotHeatmap -m matrix_PRC2_cac2_comp_K27.gz -out cac-2_comp_K27_regions.pdf \
-                                        --samplesLabel WT cac-2 comp set-7 \
-                                        --startLabel "5'" \
-                                        --endLabel "3'" \
-                                        --sortRegions descend \
-                                        --sortUsingSamples 1 2 \
-                                        --missingDataColor 1 \
-                                        --colorList "white, g, darkgreen" \
-                                        --zMin 0 \
+# computeMatrix scale-regions -a 250 -b 250 \
+#                      -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+#                         $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+#                         $P149DIR/149-123_ChIP_cac-2_comp_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
+#                         $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
+#                         -R $BEDDIR2/WT_K27_peaks_IN_cac2.bed $BEDDIR2/WT_K27_peaks_NO_cac2.bed $BEDDIR2/cac-2_ectopic_K27_peaks.bed --skipZeros -o matrix_PRC2_cac2_comp_K27.gz
+#
+#                         plotHeatmap -m matrix_PRC2_cac2_comp_K27.gz -out cac-2_comp_K27_regions.pdf \
+#                                         --samplesLabel WT cac-2 comp set-7 \
+#                                         --startLabel "5'" \
+#                                         --endLabel "3'" \
+#                                         --sortRegions descend \
+#                                         --sortUsingSamples 1 2 \
+#                                         --missingDataColor 1 \
+#                                         --colorList "white, g, darkgreen" \
+#                                         --zMin 0 \
 
                                         # 149-122_ChIP_cac-2_comp_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw
                                         # 149-123_ChIP_cac-2_comp_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw

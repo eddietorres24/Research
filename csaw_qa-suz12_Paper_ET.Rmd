@@ -349,7 +349,6 @@ FC_qa_96hrvInput.K27.tabular <- FC_qa_96hrvInput.merged$combined
 FC_qa_96hrvInput.K27.out.ranges <- FC_qa_96hrvInput.merged$regions
 mcols(FC_qa_96hrvInput.K27.out.ranges) <- DataFrame(FC_qa_96hrvInput.K27.tabular)
 
-
 #suz12 0hr
 FC_suz12_0hrvInput.K27.contrast <- makeContrasts(K27vsuz12_0hr=suz12_0hr.H3K27me3-suz12_0hr.input,levels=design.mat)
 FC_suz12_0hrvInput.res <- glmQLFTest(fitK27, contrast=FC_suz12_0hrvInput.K27.contrast)

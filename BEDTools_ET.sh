@@ -13,32 +13,9 @@
 ###THIS SCRIPT CONTAINS COMMANDS I USE TO MANIPULATE BED FILES###
 
 #Convert Broadpeaks to bed format
-#Rep 1
-# cut -f 1-6 $OUTDIR1/WT_0hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/WT_0hr_H3K27me3_Rep1_peaks.bed
-# cut -f 1-6 $OUTDIR1/qa-suz12_0hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_0hr_H3K27me3_Rep1_peaks.bed
-# cut -f 1-6 $OUTDIR1/qa-suz12_4hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_4hr_H3K27me3_Rep1_peaks.bed
-# cut -f 1-6 $OUTDIR1/qa-suz12_8hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_8hr_H3K27me3_Rep1_peaks.bed
-# cut -f 1-6 $OUTDIR1/qa-suz12_12hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_12hr_H3K27me3_Rep1_peaks.bed
-# cut -f 1-6 $OUTDIR1/qa-suz12_24hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/qa-suz12_24hr_H3K27me3_Rep1_peaks.bed
-# cut -f 1-6 $OUTDIR1/WT_24hr_H3K27me3_Rep1_peaks.broadPeak > $OUTDIR1/WT_24hr_H3K27me3_Rep1_peaks.bed
-#Rep 3
-# cut -f 1-6 WT_H4K20me3_Rep2_peaks.broadPeak > WT_H4K20me3_peaks.bed
-# cut -f 1-6 cac-1_H4K20me3_Rep2_peaks.broadPeak > cac-1_H4K20me3_peaks.bed
-# cut -f 1-6 cac-2_H4K20me3_Rep2_peaks.broadPeak > cac-2_H4K20me3_peaks.bed
-# cut -f 1-6 WT_H3K36me3_Rep2_peaks.broadPeak > WT_H3K36me3_peaks.bed
-# cut -f 1-6 cac-1_H3K36me3_Rep2_peaks.broadPeak > cac-1_H3K36me3_peaks.bed
-# cut -f 1-6 cac-2_H3K36me3_Rep2_peaks.broadPeak > cac-2_H3K36me3_peaks.bed
 
-# cut -f 1-6 WT_CS_H3K27me3_Rep2_peaks.broadPeak > WT_H3K27me3_Rep2_peaks.bed
-# cut -f 1-6 cac-1_CS_H3K27me3_Rep2_peaks.broadPeak > cac1_H3K27me3_Rep2_peaks.bed
-# cut -f 1-6 cac-2_CS_H3K27me3_Rep2_peaks.broadPeak > cac2_H3K27me3_Rep2_peaks.bed
-# cut -f 1-6 cac-3_CS_H3K27me3_Rep2_peaks.broadPeak > cac3_H3K27me3_Rep2_peaks.bed
+#for file in *.broadPeak; do cut -f1-6 "$file" > "${file%.broadPeak}_peaks.bed"; done
 
-# cut -f 1-6 WT_H3K4me2_Rep1_peaks.broadPeak > WT_H3K4me2_Rep1_peaks.bed
-# cut -f 1-6 cac-1_H3K4me2_Rep1_peaks.broadPeak > cac-1_H3K4me2_Rep1_peaks.bed
-# cut -f 1-6 cac-2_H3K4me2_Rep1_peaks.broadPeak > cac-2_H3K4me2_Rep1_peaks.bed
-# cut -f 1-6 cac-3_H3K4me2_Rep1_peaks.broadPeak > cac-3_H3K4me2_Rep1_peaks.bed
-# cut -f 1-6 set-7_H3K4me2_Rep1_peaks.broadPeak > set-7_H3K4me2_Rep1_peaks.bed
 
 #bedtools
 # module load BEDTools
