@@ -63,7 +63,7 @@ module load deepTools
 #             --zMin 0 \
 
 # All K4 genes
-    computeMatrix scale-regions -a 500 -b 500 --regionBodyLength 2000 --scale 1.5 \
+    computeMatrix scale-regions -a 250 -b 250 --regionBodyLength 2000 --scale 1.5 \
      -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
         $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
         $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
@@ -72,7 +72,7 @@ module load deepTools
         -R $BEDDIR2/K4_genes_gff.bed --skipZeros -o matrix_PRC2_K4.gz
 
     plotHeatmap -m matrix_PRC2_K4.gz -out CAF-1_K4_genes.pdf \
-            --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
+            --samplesLabel WT cac-1 cac-2 set-7 cac-3 \
             --startLabel "TSS" \
             --endLabel "TES" \
             --sortRegions descend \

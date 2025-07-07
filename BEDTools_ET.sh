@@ -109,7 +109,7 @@ bedtools intersect -a cac3_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed
 #
 
 #merge bed files, remove duplicates
-sort -k1,1 -k2,2n -k3,3n All_qa_peaks.bed > All_qa_peaks_sorted.bed
+# sort -k1,1 -k2,2n -k3,3n All_qa_peaks.bed > All_qa_peaks_sorted.bed
 
 #test for Duplicates
 # sort K27genes_in_cac1_2.bed | uniq -d > test.bed
@@ -120,7 +120,7 @@ sort -k1,1 -k2,2n -k3,3n All_qa_peaks.bed > All_qa_peaks_sorted.bed
 #     sort -k1,1 -k2,2n -k3,3n "$file" | uniq > "deduplicated_beds/$file"
 # done
 
-#REMOVE NON-CORE LG REGIONS
+#REMOVE NON-CORE LG REGIONS AND DEDUPLICATE
 # for file in *.bed; do
 #     echo "Processing $file..."
 #     awk '$1 ~ /^CM/' "$file" | sort -k1,1 -k2,2n -k3,3n | uniq > "deduplicated_beds/$file"
@@ -135,17 +135,11 @@ sort -k1,1 -k2,2n -k3,3n All_qa_peaks.bed > All_qa_peaks_sorted.bed
 #                                ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed \
 #                                ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_overlap_peaks.bed
 
-# cat WT_macs_0hr_rep2.bed \
-#     qa-suz12_24hr_H3K27me3_Rep3_peaks.bed \
-#     qa-suz12_12hr_H3K27me3_Rep3_peaks.bed > qa-suz12_WT_K27.bed
-#
-# sort -k1,1 -k2,2n K27_genes_gff_1.bed > K27_genes_gff_1_sorted.bed
-# bedtools sort -i K27_genes_gff_1_sorted.bed > K27_genes_gff_1_sorted_bed.bed
-#
-# bedtools merge -i K27_genes_gff_1_sorted_bed.bed > K27_genes_gff_sorted.bed
-
-# bedtools sort -i ${OUTDIR1}/merged_sorted.bed > ${OUTDIR1}/merged_sorted_2.bed
-# bedtools merge -i ${OUTDIR1}/merged_sorted_2.bed > ${OUTDIR1}/merged_file.txt
+ # cat WT_macs_0hr_rep2.bed \
+ #     qa-suz12_24hr_H3K27me3_Rep3_peaks.bed \
+ #      qa-suz12_8hr_H3K27me3_Rep3_peaks.bed \
+ #      qa-suz12_4hr_H3K27me3_Rep3_peaks.bed \
+ #     qa-suz12_12hr_H3K27me3_Rep3_peaks.bed > qa-suz12_WT_K27.bed
 
 #processing csaw regions
 # Normal No Recover → qa_unrecovered.bed
