@@ -78,7 +78,7 @@ module load deepTools
             --sortRegions descend \
             --missingDataColor 1 \
             --heatmapHeight 25 \
-            --colorList 'white, magenta' \
+            --colorMap 'cool' \
             --zMin 0 \
 
 # #cac-2 comp (K4)

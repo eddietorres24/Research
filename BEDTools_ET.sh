@@ -108,8 +108,8 @@ bedtools intersect -a cac3_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed
 #                                ${OUTDIR3}/2024_04_23_136_abcam_cac-2_peaks.bed > ${OUTDIR3}/merge_peaks.txt
 #
 
-#merge bed files, remove duplicates
-# sort -k1,1 -k2,2n -k3,3n All_qa_peaks.bed > All_qa_peaks_sorted.bed
+#MERGE OVERLAPPING REGIONS WITHIN A BED FILE
+bedtools sort -i qa-suz12_WT_K27.bed | bedtools merge -i - > qa-suz12_WT_K27_merged.bed
 
 #test for Duplicates
 # sort K27genes_in_cac1_2.bed | uniq -d > test.bed
