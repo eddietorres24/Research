@@ -47,32 +47,32 @@
 #
 # bedtools intersect -a CAF1_ATAC_WT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > ATAC_WT_K27_regions.bed
 # bedtools intersect -a cac1_2_set7_ATAC_NoWT.bed -b WT_abc_H3K27me3_Rep2_peaks.narrowPeak -wa > cac1_2_set7_ATAC_NoWT_K27_regions.bed
-
-bedtools intersect -a all_genes_gff_names.bed -b K27_genes_trimmed.bed -v > nonK27_genes.bed
-
-bedtools intersect -a K27_genes_stringent.bed -b cac1_H3K27me3_Rep2_peaks.bed -v > K27genes_not_in_cac1_new.bed
-bedtools intersect -a K27_genes_stringent.bed -b cac2_H3K27me3_Rep2_peaks.bed -v > K27genes_not_in_cac2_new.bed
-bedtools intersect -a K27_genes_stringent.bed -b cac3_H3K27me3_Rep2_peaks.bed -wa > K27genes_in_cac3_new.bed
-bedtools intersect -a K27_genes_stringent.bed -b K27genes_in_cac1_2_new.bed -v > K27genes_NOT_in_cac1_2_new.bed
-bedtools intersect -a K27genes_in_cac1_2_new.bed -b cac3_H3K27me3_Rep2_peaks.bed -v > K27genes_in_cac1_2_NOT_in_cac3_new.bed
-bedtools intersect -a K27genes_in_cac1_2_new.bed -b K27genes_in_cac1_2_NOT_in_cac3_new.bed -v > K27genes_in_cac1_2_3_new.bed
-
-bedtools intersect -a all_genes_gff_names.bed -b CAF-1_Ectopic_K27 -wa -f 0.8 > CAF-1_ectopic_K27_genes.bed
-
-bedtools intersect -a all_genes_gff_names.bed -b cac-1_ectopic_K27_peaks.bed -wa -f 0.8 > cac-1_ectopic_K27_genes.bed
-bedtools intersect -a all_genes_gff_names.bed -b cac-2_ectopic_K27_peaks.bed -wa -f 0.8 > cac-2_ectopic_K27_genes.bed
-bedtools intersect -a all_genes_gff_names.bed -b cac-3_ectopic_K27_peaks.bed -wa -f 0.8 > cac-3_ectopic_K27_genes.bed
-
-#K27 peaks
-bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac2_H3K27me3_Rep2_peaks.bed -v > WT_K27_peaks_NO_cac2.bed
-bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac2_H3K27me3_Rep2_peaks.bed -wa > WT_K27_peaks_IN_cac2.bed
-bedtools intersect -a cac2_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-2_ectopic_K27_peaks.bed
-bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac1_H3K27me3_Rep2_peaks.bed -v > WT_K27_peaks_NO_cac1.bed
-bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac1_H3K27me3_Rep2_peaks.bed -wa > WT_K27_peaks_IN_cac1.bed
-bedtools intersect -a cac1_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-1_ectopic_K27_peaks.bed
-bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac3_H3K27me3_Rep2_peaks.bed -v > WT_K27_peaks_NO_cac3.bed
-bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac3_H3K27me3_Rep2_peaks.bed -wa > WT_K27_peaks_IN_cac3.bed
-bedtools intersect -a cac3_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-3_ectopic_K27_peaks.bed
+#
+# bedtools intersect -a all_genes_gff_names.bed -b K27_genes_trimmed.bed -v > nonK27_genes.bed
+#
+# bedtools intersect -a K27_genes_stringent.bed -b cac1_H3K27me3_Rep2_peaks.bed -v > K27genes_not_in_cac1_new.bed
+# bedtools intersect -a K27_genes_stringent.bed -b cac2_H3K27me3_Rep2_peaks.bed -v > K27genes_not_in_cac2_new.bed
+# bedtools intersect -a K27_genes_stringent.bed -b cac3_H3K27me3_Rep2_peaks.bed -wa > K27genes_in_cac3_new.bed
+# bedtools intersect -a K27_genes_stringent.bed -b K27genes_in_cac1_2_new.bed -v > K27genes_NOT_in_cac1_2_new.bed
+# bedtools intersect -a K27genes_in_cac1_2_new.bed -b cac3_H3K27me3_Rep2_peaks.bed -v > K27genes_in_cac1_2_NOT_in_cac3_new.bed
+# bedtools intersect -a K27genes_in_cac1_2_new.bed -b K27genes_in_cac1_2_NOT_in_cac3_new.bed -v > K27genes_in_cac1_2_3_new.bed
+#
+# bedtools intersect -a all_genes_gff_names.bed -b CAF-1_Ectopic_K27 -wa -f 0.8 > CAF-1_ectopic_K27_genes.bed
+#
+# bedtools intersect -a all_genes_gff_names.bed -b cac-1_ectopic_K27_peaks.bed -wa -f 0.8 > cac-1_ectopic_K27_genes.bed
+# bedtools intersect -a all_genes_gff_names.bed -b cac-2_ectopic_K27_peaks.bed -wa -f 0.8 > cac-2_ectopic_K27_genes.bed
+# bedtools intersect -a all_genes_gff_names.bed -b cac-3_ectopic_K27_peaks.bed -wa -f 0.8 > cac-3_ectopic_K27_genes.bed
+#
+# #K27 peaks
+# bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac2_H3K27me3_Rep2_peaks.bed -v > WT_K27_peaks_NO_cac2.bed
+# bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac2_H3K27me3_Rep2_peaks.bed -wa > WT_K27_peaks_IN_cac2.bed
+# bedtools intersect -a cac2_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-2_ectopic_K27_peaks.bed
+# bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac1_H3K27me3_Rep2_peaks.bed -v > WT_K27_peaks_NO_cac1.bed
+# bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac1_H3K27me3_Rep2_peaks.bed -wa > WT_K27_peaks_IN_cac1.bed
+# bedtools intersect -a cac1_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-1_ectopic_K27_peaks.bed
+# bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac3_H3K27me3_Rep2_peaks.bed -v > WT_K27_peaks_NO_cac3.bed
+# bedtools intersect -a WT_H3K27me3_Rep2_peaks.bed -b cac3_H3K27me3_Rep2_peaks.bed -wa > WT_K27_peaks_IN_cac3.bed
+# bedtools intersect -a cac3_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed -v > cac-3_ectopic_K27_peaks.bed
 
 #K4 marked genes
 # bedtools intersect -a all_genes_gff.bed -b WT_H3K4me2_Rep1_peaks.bed -wa > WT_K4_genes.bed
@@ -109,7 +109,7 @@ bedtools intersect -a cac3_H3K27me3_Rep2_peaks.bed -b WT_H3K27me3_Rep2_peaks.bed
 #
 
 #MERGE OVERLAPPING REGIONS WITHIN A BED FILE
-bedtools sort -i qa-suz12_WT_K27.bed | bedtools merge -i - > qa-suz12_WT_K27_merged.bed
+bedtools sort -i WT_qa_peaks_0_24hr.bed | bedtools merge -i - > WT_qa_peaks_0_24hr_merged.bed
 
 #test for Duplicates
 # sort K27genes_in_cac1_2.bed | uniq -d > test.bed
@@ -121,10 +121,10 @@ bedtools sort -i qa-suz12_WT_K27.bed | bedtools merge -i - > qa-suz12_WT_K27_mer
 # done
 
 #REMOVE NON-CORE LG REGIONS AND DEDUPLICATE
-# for file in *.bed; do
-#     echo "Processing $file..."
-#     awk '$1 ~ /^CM/' "$file" | sort -k1,1 -k2,2n -k3,3n | uniq > "deduplicated_beds/$file"
-# done
+for file in *.bed; do
+    echo "Processing $file..."
+    awk '$1 ~ /^CM/' "$file" | sort -k1,1 -k2,2n -k3,3n | uniq > "deduplicated_beds/$file"
+done
 
 ### qa-suz12 ###
 #Rep1
@@ -135,11 +135,15 @@ bedtools sort -i qa-suz12_WT_K27.bed | bedtools merge -i - > qa-suz12_WT_K27_mer
 #                                ${OUTDIR1}/qa-suz12_24hr_H3K27me3_Rep1_peaks_sorted.bed \
 #                                ${OUTDIR1}/WT_24hr_H3K27me3_Rep1_peaks_sorted.bed > ${OUTDIR1}/qa-suz12_rep1_overlap_peaks.bed
 
- # cat WT_macs_0hr_rep2.bed \
+ cat WT_macs_0hr_rep2.bed \
+  WT_24hr_rep2.bed > WT_qa_peaks_0_24hr.bed
  #     qa-suz12_24hr_H3K27me3_Rep3_peaks.bed \
  #      qa-suz12_8hr_H3K27me3_Rep3_peaks.bed \
  #      qa-suz12_4hr_H3K27me3_Rep3_peaks.bed \
  #     qa-suz12_12hr_H3K27me3_Rep3_peaks.bed > qa-suz12_WT_K27.bed
+
+###SUBETTING QA-SUZ12 BEDS
+bedtools intersect -a qa-suz12_WT_K27_merged.bed -b WT_qa_peaks_0_24hr_merged.bed -v > qa-suz12_ectopic_peaks.bed
 
 #processing csaw regions
 # Normal No Recover → qa_unrecovered.bed

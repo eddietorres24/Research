@@ -119,7 +119,7 @@ K27peaks_ectopic <- read.table(file="./bed_files/qa-suz12_no_WT_0_or_24.bed")
 
 K27_genes <- read.table(file="./bed_files/K27_genes_stringent.bed")
 
-Allpeaks <- read.table(file="./bed_files/All_qa_peaks_sorted.bed")
+Allpeaks <- read.table(file="./bed_files/qa-suz12_WT_K27_merged_FIXED_LGI.bed")
 
 #Get Genomic ranges from each bed files
 K27peaks.gr <- GRanges(K27peaks$V1, IRanges(K27peaks$V2, K27peaks$V3))
@@ -368,7 +368,7 @@ FC_suz12_24hrvInput.K27.out.ranges <- FC_suz12_24hrvInput.merged$regions
 mcols(FC_suz12_24hrvInput.K27.out.ranges) <- DataFrame(FC_suz12_24hrvInput.K27.tabular)
 
 #cac-1_CS
-FC_cac1_CSvInput.K27.contrast <- makeContrasts(K27vcac1_CS=cac1_CS.H3K27me3-cac1.input,levels=design.mat)
+FC_cac1_CSvInput.K27.contrast <- makeContrasts(K27vcac1_CS=cac1_CS.H3K27me3-cac1_CS.input,levels=design.mat)
 FC_cac1_CSvInput.res <- glmQLFTest(fitK27, contrast=FC_cac1_CSvInput.K27.contrast)
 FC_cac1_CSvInput.merged <- mergeResults(filtered.dataK27, FC_cac1_CSvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
@@ -377,7 +377,7 @@ FC_cac1_CSvInput.K27.out.ranges <- FC_cac1_CSvInput.merged$regions
 mcols(FC_cac1_CSvInput.K27.out.ranges) <- DataFrame(FC_cac1_CSvInput.K27.tabular)
 
 #cac-2_CS
-FC_cac2_CSvInput.K27.contrast <- makeContrasts(K27vcac2_CS=cac2_CS.H3K27me3-cac2.input,levels=design.mat)
+FC_cac2_CSvInput.K27.contrast <- makeContrasts(K27vcac2_CS=cac2_CS.H3K27me3-cac2_CS.input,levels=design.mat)
 FC_cac2_CSvInput.res <- glmQLFTest(fitK27, contrast=FC_cac2_CSvInput.K27.contrast)
 FC_cac2_CSvInput.merged <- mergeResults(filtered.dataK27, FC_cac2_CSvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
@@ -386,7 +386,7 @@ FC_cac2_CSvInput.K27.out.ranges <- FC_cac2_CSvInput.merged$regions
 mcols(FC_cac2_CSvInput.K27.out.ranges) <- DataFrame(FC_cac2_CSvInput.K27.tabular)
 
 #cac-3_CS
-FC_cac3_CSvInput.K27.contrast <- makeContrasts(K27vcac3_CS=cac3_CS.H3K27me3-cac3.input,levels=design.mat)
+FC_cac3_CSvInput.K27.contrast <- makeContrasts(K27vcac3_CS=cac3_CS.H3K27me3-cac3_CS.input,levels=design.mat)
 FC_cac3_CSvInput.res <- glmQLFTest(fitK27, contrast=FC_cac3_CSvInput.K27.contrast)
 FC_cac3_CSvInput.merged <- mergeResults(filtered.dataK27, FC_cac3_CSvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
@@ -396,7 +396,7 @@ mcols(FC_cac3_CSvInput.K27.out.ranges) <- DataFrame(FC_cac3_CSvInput.K27.tabular
 
 #cac-1_abc
 
-FC_cac1_abcvInput.K27.contrast <- makeContrasts(K27vcac1_abc=cac1_abc.H3K27me3-cac1.input,levels=design.mat)
+FC_cac1_abcvInput.K27.contrast <- makeContrasts(K27vcac1_abc=cac1_abc.H3K27me3-cac1_abc.input,levels=design.mat)
 FC_cac1_abcvInput.res <- glmQLFTest(fitK27, contrast=FC_cac1_abcvInput.K27.contrast)
 FC_cac1_abcvInput.merged <- mergeResults(filtered.dataK27, FC_cac1_abcvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
@@ -406,7 +406,7 @@ mcols(FC_cac1_abcvInput.K27.out.ranges) <- DataFrame(FC_cac1_abcvInput.K27.tabul
 
 #cac-2_abc
 
-FC_cac2_abcvInput.K27.contrast <- makeContrasts(K27vcac2_abc=cac2_abc.H3K27me3-cac2.input,levels=design.mat)
+FC_cac2_abcvInput.K27.contrast <- makeContrasts(K27vcac2_abc=cac2_abc.H3K27me3-cac2_abc.input,levels=design.mat)
 FC_cac2_abcvInput.res <- glmQLFTest(fitK27, contrast=FC_cac2_abcvInput.K27.contrast)
 FC_cac2_abcvInput.merged <- mergeResults(filtered.dataK27, FC_cac2_abcvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
@@ -416,7 +416,7 @@ mcols(FC_cac2_abcvInput.K27.out.ranges) <- DataFrame(FC_cac2_abcvInput.K27.tabul
 
 #cac-3_abc
 
-FC_cac3_abcvInput.K27.contrast <- makeContrasts(K27vcac3_abc=cac3_abc.H3K27me3-cac3.input,levels=design.mat)
+FC_cac3_abcvInput.K27.contrast <- makeContrasts(K27vcac3_abc=cac3_abc.H3K27me3-cac3_abc.input,levels=design.mat)
 FC_cac3_abcvInput.res <- glmQLFTest(fitK27, contrast=FC_cac3_abcvInput.K27.contrast)
 FC_cac3_abcvInput.merged <- mergeResults(filtered.dataK27, FC_cac3_abcvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
@@ -452,6 +452,15 @@ K27.chip.Filteredres.df <- data.frame(seqnames=seqnames(WT_0hrvI.K27.out.ranges)
   logFC_qa_24hrvInput_K27me3 = FC_qa_24hrvInput.K27.out.ranges$rep.logFC,
   PValue_qa_24hrvInput_K27me3 = FC_qa_24hrvInput.K27.out.ranges$PValue,
   FDR_qa_24hrvInput_K27me3 = FC_qa_24hrvInput.K27.out.ranges$FDR,
+  logFC_qa_48hrvInput_K27me3 = FC_qa_48hrvInput.K27.out.ranges$rep.logFC,
+  PValue_qa_48hrvInput_K27me3 = FC_qa_48hrvInput.K27.out.ranges$PValue,
+  FDR_qa_48hrvInput_K27me3 = FC_qa_48hrvInput.K27.out.ranges$FDR,
+  logFC_qa_72hrvInput_K27me3 = FC_qa_72hrvInput.K27.out.ranges$rep.logFC,
+  PValue_qa_72hrvInput_K27me3 = FC_qa_72hrvInput.K27.out.ranges$PValue,
+  FDR_qa_72hrvInput_K27me3 = FC_qa_72hrvInput.K27.out.ranges$FDR,
+  logFC_qa_96hrvInput_K27me3 = FC_qa_96hrvInput.K27.out.ranges$rep.logFC,
+  PValue_qa_96hrvInput_K27me3 = FC_qa_96hrvInput.K27.out.ranges$PValue,
+  FDR_qa_96hrvInput_K27me3 = FC_qa_96hrvInput.K27.out.ranges$FDR,
   logFC_suz12_0hrvInput_K27me3 = FC_suz12_0hrvInput.K27.out.ranges$rep.logFC,
   PValue_suz12_0hrvInput_K27me3 = FC_suz12_0hrvInput.K27.out.ranges$PValue,
   FDR_suz12_0hrvInput_K27me3 = FC_suz12_0hrvInput.K27.out.ranges$FDR,
@@ -493,6 +502,12 @@ K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logF
 
 K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_qa_24hrvInput_K27me3[FDR_qa_24hrvInput_K27me3 > 0.05] <- 0)
 
+K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_qa_48hrvInput_K27me3[FDR_qa_48hrvInput_K27me3 > 0.05] <- 0)
+
+K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_qa_72hrvInput_K27me3[FDR_qa_72hrvInput_K27me3 > 0.05] <- 0)
+
+K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_qa_96hrvInput_K27me3[FDR_qa_96hrvInput_K27me3 > 0.05] <- 0)
+
 K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_suz12_0hrvInput_K27me3[FDR_suz12_0hrvInput_K27me3 > 0.05] <- 0)
 
 K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_suz12_24hrvInput_K27me3[FDR_suz12_24hrvInput_K27me3 > 0.05] <- 0)
@@ -510,7 +525,7 @@ K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , log
 K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac3_abcvInput_K27me3[FDR_cac3_abcvInput_K27me3 > 0.05] <- 0)
 
 
-K27_FilteredHeatmap_df <- dplyr::select(K27.chip.Filteredres.df_SigOnly,7,10,13,16,19,22,25,28,31,34,37,40,43,46,49)
+K27_FilteredHeatmap_df <- dplyr::select(K27.chip.Filteredres.df_SigOnly,7,10,13,16,19,22,25,28,31,34,37,40,43,46,49,52,55,58)
 
 rownames(K27_FilteredHeatmap_df) <- paste(K27.chip.Filteredres.df_SigOnly$seqnames, K27.chip.Filteredres.df_SigOnly$start, K27.chip.Filteredres.df_SigOnly$end, sep=".")
 
@@ -526,17 +541,17 @@ K27_FilteredHeatmap_mat[K27_FilteredHeatmap_mat>max] = max    #replace any value
 K27_FilteredHeatmap_mat <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] > 0 | K27_FilteredHeatmap_mat[, 2] > 0)
 
 #throwing our regions that are > 0.1 in suz12 (if any got through)
-K27_FilteredHeatmap_mat <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 9] <= 0)
+K27_FilteredHeatmap_mat <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 11] <= 0)
 
 # #I only want to look at qa-suz12
-K27_FilteredHeatmap_mat_map <- K27_FilteredHeatmap_mat[,1:8]
+K27_FilteredHeatmap_mat_map <- K27_FilteredHeatmap_mat[,c(1:7,11)]
 
 #cluster into areas that recover vs. not
-recover <- subset(K27_FilteredHeatmap_mat, rowSums(K27_FilteredHeatmap_mat[, 3:7] > 0) > 0)
+recover <- subset(K27_FilteredHeatmap_mat_map, rowSums(K27_FilteredHeatmap_mat_map[, 3:7] > 0) > 0)
 
-no_recover <- subset(K27_FilteredHeatmap_mat, rowSums(K27_FilteredHeatmap_mat[, 3:7] <= 0) == 5)
+no_recover <- subset(K27_FilteredHeatmap_mat_map, rowSums(K27_FilteredHeatmap_mat_map[, 3:7] <= 0) == 5)
 
-recover_order <-order(recover[, 1], decreasing = TRUE)
+recover_order <-order(rowMeans(recover[, c(1,3)]), decreasing = TRUE)
 no_recover_order <-order(no_recover[, 1], decreasing = TRUE)
 
 recover_sort <- recover[recover_order, ]
@@ -560,12 +575,28 @@ col_fun(seq(0, max, length = 20))
 
 #Plot
 K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "H3K27me3"))
-pdf("./H3K27me3_peaks_qa-suz12_TEST.pdf", height = 9)
+pdf("./H3K27me3_peaks_qa-suz12_TESTing.pdf", height = 9)
 # Draw the heatmap
 draw(K27_Filtered_hm)
 # Close the device to save the file
 dev.off()
 
+```
+
+```{r, heatmap for 96hr timecourse}
+# #I only want to look at qa-suz12 96 hr timecourse
+K27_FilteredHeatmap_mat_map <- K27_FilteredHeatmap_mat[,c(1:2,7:10)]
+
+###keeping same order of genes here
+K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat_map[finalorder, ]
+
+#Plot
+K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "H3K27me3"))
+pdf("./H3K27me3_NORMAL_peaks_qa-suz12_96hr.pdf", height = 9)
+# Draw the heatmap
+draw(K27_Filtered_hm)
+# Close the device to save the file
+dev.off()
 ```
 
 ```{r START OF ALL K27 region Analysis}
@@ -643,6 +674,33 @@ FC_qa_24hrvInput.All.tabular <- FC_qa_24hrvInput.merged$combined
 FC_qa_24hrvInput.All.out.ranges <- FC_qa_24hrvInput.merged$regions
 mcols(FC_qa_24hrvInput.All.out.ranges) <- DataFrame(FC_qa_24hrvInput.All.tabular)
 
+#qa-suz12 48hr
+FC_qa_48hrvInput.All.contrast <- makeContrasts(K27vqa_48hr=qa_48hr.H3K27me3-qa_48hr.input,levels=design.mat)
+FC_qa_48hrvInput.res <- glmQLFTest(fitAll, contrast=FC_qa_48hrvInput.All.contrast)
+FC_qa_48hrvInput.merged <- mergeResults(filtered.dataAll, FC_qa_48hrvInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_qa_48hrvInput.All.tabular <- FC_qa_48hrvInput.merged$combined
+FC_qa_48hrvInput.All.out.ranges <- FC_qa_48hrvInput.merged$regions
+mcols(FC_qa_48hrvInput.All.out.ranges) <- DataFrame(FC_qa_48hrvInput.All.tabular)
+
+#qa-suz12 72hr
+FC_qa_72hrvInput.All.contrast <- makeContrasts(K27vqa_72hr=qa_72hr.H3K27me3-qa_72hr.input,levels=design.mat)
+FC_qa_72hrvInput.res <- glmQLFTest(fitAll, contrast=FC_qa_72hrvInput.All.contrast)
+FC_qa_72hrvInput.merged <- mergeResults(filtered.dataAll, FC_qa_72hrvInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_qa_72hrvInput.All.tabular <- FC_qa_72hrvInput.merged$combined
+FC_qa_72hrvInput.All.out.ranges <- FC_qa_72hrvInput.merged$regions
+mcols(FC_qa_72hrvInput.All.out.ranges) <- DataFrame(FC_qa_72hrvInput.All.tabular)
+
+#qa-suz12 96hr
+FC_qa_96hrvInput.All.contrast <- makeContrasts(K27vqa_96hr=qa_96hr.H3K27me3-qa_96hr.input,levels=design.mat)
+FC_qa_96hrvInput.res <- glmQLFTest(fitAll, contrast=FC_qa_96hrvInput.All.contrast)
+FC_qa_96hrvInput.merged <- mergeResults(filtered.dataAll, FC_qa_96hrvInput.res$table, tol=300, 
+                            merge.args=list(max.width=300))
+FC_qa_96hrvInput.All.tabular <- FC_qa_96hrvInput.merged$combined
+FC_qa_96hrvInput.All.out.ranges <- FC_qa_96hrvInput.merged$regions
+mcols(FC_qa_96hrvInput.All.out.ranges) <- DataFrame(FC_qa_96hrvInput.All.tabular)
+
 #suz12 0hr
 FC_suz12_0hrvInput.All.contrast <- makeContrasts(K27vsuz12_0hr=suz12_0hr.H3K27me3-suz12_0hr.input,levels=design.mat)
 FC_suz12_0hrvInput.res <- glmQLFTest(fitAll, contrast=FC_suz12_0hrvInput.All.contrast)
@@ -662,7 +720,7 @@ FC_suz12_24hrvInput.All.out.ranges <- FC_suz12_24hrvInput.merged$regions
 mcols(FC_suz12_24hrvInput.All.out.ranges) <- DataFrame(FC_suz12_24hrvInput.All.tabular)
 
 #cac-1_CS
-FC_cac1_CSvInput.All.contrast <- makeContrasts(K27vcac1_CS=cac1_CS.H3K27me3-cac1.input,levels=design.mat)
+FC_cac1_CSvInput.All.contrast <- makeContrasts(K27vcac1_CS=cac1_CS.H3K27me3-cac1_CS.input,levels=design.mat)
 FC_cac1_CSvInput.res <- glmQLFTest(fitAll, contrast=FC_cac1_CSvInput.All.contrast)
 FC_cac1_CSvInput.merged <- mergeResults(filtered.dataAll, FC_cac1_CSvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
@@ -671,7 +729,7 @@ FC_cac1_CSvInput.All.out.ranges <- FC_cac1_CSvInput.merged$regions
 mcols(FC_cac1_CSvInput.All.out.ranges) <- DataFrame(FC_cac1_CSvInput.All.tabular)
 
 #cac-2_CS
-FC_cac2_CSvInput.All.contrast <- makeContrasts(K27vcac2_CS=cac2_CS.H3K27me3-cac2.input,levels=design.mat)
+FC_cac2_CSvInput.All.contrast <- makeContrasts(K27vcac2_CS=cac2_CS.H3K27me3-cac2_CS.input,levels=design.mat)
 FC_cac2_CSvInput.res <- glmQLFTest(fitAll, contrast=FC_cac2_CSvInput.All.contrast)
 FC_cac2_CSvInput.merged <- mergeResults(filtered.dataAll, FC_cac2_CSvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
@@ -680,7 +738,7 @@ FC_cac2_CSvInput.All.out.ranges <- FC_cac2_CSvInput.merged$regions
 mcols(FC_cac2_CSvInput.All.out.ranges) <- DataFrame(FC_cac2_CSvInput.All.tabular)
 
 #cac-3_CS
-FC_cac3_CSvInput.All.contrast <- makeContrasts(K27vcac3_CS=cac3_CS.H3K27me3-cac3.input,levels=design.mat)
+FC_cac3_CSvInput.All.contrast <- makeContrasts(K27vcac3_CS=cac3_CS.H3K27me3-cac3_CS.input,levels=design.mat)
 FC_cac3_CSvInput.res <- glmQLFTest(fitAll, contrast=FC_cac3_CSvInput.All.contrast)
 FC_cac3_CSvInput.merged <- mergeResults(filtered.dataAll, FC_cac3_CSvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
@@ -690,7 +748,7 @@ mcols(FC_cac3_CSvInput.All.out.ranges) <- DataFrame(FC_cac3_CSvInput.All.tabular
 
 #cac-1_abc
 
-FC_cac1_abcvInput.All.contrast <- makeContrasts(K27vcac1_abc=cac1_abc.H3K27me3-cac1.input,levels=design.mat)
+FC_cac1_abcvInput.All.contrast <- makeContrasts(K27vcac1_abc=cac1_abc.H3K27me3-cac1_CS.input,levels=design.mat)
 FC_cac1_abcvInput.res <- glmQLFTest(fitAll, contrast=FC_cac1_abcvInput.All.contrast)
 FC_cac1_abcvInput.merged <- mergeResults(filtered.dataAll, FC_cac1_abcvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
@@ -700,7 +758,7 @@ mcols(FC_cac1_abcvInput.All.out.ranges) <- DataFrame(FC_cac1_abcvInput.All.tabul
 
 #cac-2_abc
 
-FC_cac2_abcvInput.All.contrast <- makeContrasts(K27vcac2_abc=cac2_abc.H3K27me3-cac2.input,levels=design.mat)
+FC_cac2_abcvInput.All.contrast <- makeContrasts(K27vcac2_abc=cac2_abc.H3K27me3-cac2_CS.input,levels=design.mat)
 FC_cac2_abcvInput.res <- glmQLFTest(fitAll, contrast=FC_cac2_abcvInput.All.contrast)
 FC_cac2_abcvInput.merged <- mergeResults(filtered.dataAll, FC_cac2_abcvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
@@ -710,7 +768,7 @@ mcols(FC_cac2_abcvInput.All.out.ranges) <- DataFrame(FC_cac2_abcvInput.All.tabul
 
 #cac-3_abc
 
-FC_cac3_abcvInput.All.contrast <- makeContrasts(K27vcac3_abc=cac3_abc.H3K27me3-cac3.input,levels=design.mat)
+FC_cac3_abcvInput.All.contrast <- makeContrasts(K27vcac3_abc=cac3_abc.H3K27me3-cac3_CS.input,levels=design.mat)
 FC_cac3_abcvInput.res <- glmQLFTest(fitAll, contrast=FC_cac3_abcvInput.All.contrast)
 FC_cac3_abcvInput.merged <- mergeResults(filtered.dataAll, FC_cac3_abcvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
@@ -746,6 +804,15 @@ All.chip.Filteredres.df <- data.frame(seqnames=seqnames(WT_0hrvI.All.out.ranges)
   logFC_qa_24hrvInput_K27me3 = FC_qa_24hrvInput.All.out.ranges$rep.logFC,
   PValue_qa_24hrvInput_K27me3 = FC_qa_24hrvInput.All.out.ranges$PValue,
   FDR_qa_24hrvInput_K27me3 = FC_qa_24hrvInput.All.out.ranges$FDR,
+  logFC_qa_48hrvInput_K27me3 = FC_qa_48hrvInput.All.out.ranges$rep.logFC,
+  PValue_qa_48hrvInput_K27me3 = FC_qa_48hrvInput.All.out.ranges$PValue,
+  FDR_qa_48hrvInput_K27me3 = FC_qa_48hrvInput.All.out.ranges$FDR,
+  logFC_qa_72hrvInput_K27me3 = FC_qa_72hrvInput.All.out.ranges$rep.logFC,
+  PValue_qa_72hrvInput_K27me3 = FC_qa_72hrvInput.All.out.ranges$PValue,
+  FDR_qa_72hrvInput_K27me3 = FC_qa_72hrvInput.All.out.ranges$FDR,
+  logFC_qa_96hrvInput_K27me3 = FC_qa_96hrvInput.All.out.ranges$rep.logFC,
+  PValue_qa_96hrvInput_K27me3 = FC_qa_96hrvInput.All.out.ranges$PValue,
+  FDR_qa_96hrvInput_K27me3 = FC_qa_96hrvInput.All.out.ranges$FDR,
   logFC_suz12_0hrvInput_K27me3 = FC_suz12_0hrvInput.All.out.ranges$rep.logFC,
   PValue_suz12_0hrvInput_K27me3 = FC_suz12_0hrvInput.All.out.ranges$PValue,
   FDR_suz12_0hrvInput_K27me3 = FC_suz12_0hrvInput.All.out.ranges$FDR,
@@ -791,6 +858,12 @@ All.chip.Filteredres.df_SigOnly  <- within(All.chip.Filteredres.df_SigOnly, logF
 
 All.chip.Filteredres.df_SigOnly  <- within(All.chip.Filteredres.df_SigOnly, logFC_suz12_24hrvInput_K27me3[FDR_suz12_24hrvInput_K27me3 > 0.05] <- 0)
 
+All.chip.Filteredres.df_SigOnly  <- within(All.chip.Filteredres.df_SigOnly, logFC_qa_48hrvInput_K27me3[FDR_qa_48hrvInput_K27me3 > 0.05] <- 0)
+
+All.chip.Filteredres.df_SigOnly  <- within(All.chip.Filteredres.df_SigOnly, logFC_qa_72hrvInput_K27me3[FDR_qa_72hrvInput_K27me3 > 0.05] <- 0)
+
+All.chip.Filteredres.df_SigOnly  <- within(All.chip.Filteredres.df_SigOnly, logFC_qa_96hrvInput_K27me3[FDR_qa_96hrvInput_K27me3 > 0.05] <- 0)
+
 All.chip.Filteredres.df_SigOnly  <- within(All.chip.Filteredres.df_SigOnly , logFC_cac1_CSvInput_K27me3[FDR_cac1_CSvInput_K27me3 > 0.05] <- 0)
 
 All.chip.Filteredres.df_SigOnly  <- within(All.chip.Filteredres.df_SigOnly , logFC_cac2_CSvInput_K27me3[FDR_cac2_CSvInput_K27me3 > 0.05] <- 0)
@@ -804,7 +877,7 @@ All.chip.Filteredres.df_SigOnly  <- within(All.chip.Filteredres.df_SigOnly , log
 All.chip.Filteredres.df_SigOnly  <- within(All.chip.Filteredres.df_SigOnly , logFC_cac3_abcvInput_K27me3[FDR_cac3_abcvInput_K27me3 > 0.05] <- 0)
 
 
-All_FilteredHeatmap_df <- dplyr::select(All.chip.Filteredres.df_SigOnly,7,10,13,16,19,22,25,28,31,34,37,40,43,46,49)
+All_FilteredHeatmap_df <- dplyr::select(All.chip.Filteredres.df_SigOnly,7,10,13,16,19,22,25,28,31,34,37,40,43,46,49,52,55,58)
 
 rownames(All_FilteredHeatmap_df) <- paste(All.chip.Filteredres.df_SigOnly$seqnames, All.chip.Filteredres.df_SigOnly$start, All.chip.Filteredres.df_SigOnly$end, sep=".")
 
@@ -818,13 +891,13 @@ max <- quantile(All_FilteredHeatmap_mat, 0.995) # identify the 98th percentile v
 All_FilteredHeatmap_mat[All_FilteredHeatmap_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
 
 #I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0 in both WT samples
-All_FilteredHeatmap_mat_map <- subset(All_FilteredHeatmap_mat, rowSums(All_FilteredHeatmap_mat[, 1:7] > 0) > 0)
+All_FilteredHeatmap_mat <- subset(All_FilteredHeatmap_mat, rowSums(All_FilteredHeatmap_mat[, 1:7] > 0) > 0)
 
 #throwing our regions that are > 0.1 in suz12 (if any got through)
-All_FilteredHeatmap_mat_map <- subset(All_FilteredHeatmap_mat_map, All_FilteredHeatmap_mat_map[, 9] <= 0)
+All_FilteredHeatmap_mat <- subset(All_FilteredHeatmap_mat, All_FilteredHeatmap_mat[, 11] <= 0)
 
 #I want to look at qa-suz12 only
-All_FilteredHeatmap_mat_map <- All_FilteredHeatmap_mat_map[,c(1:7)]
+All_FilteredHeatmap_mat_map <- All_FilteredHeatmap_mat[,c(1:7)]
 
 #cluster into areas that recover vs. not
 normal <- subset(All_FilteredHeatmap_mat_map, rowSums(All_FilteredHeatmap_mat_map[, 1:2] > 0) >= 1)
@@ -864,48 +937,11 @@ pdf("./ALL_H3K27me3_peaks_qa-suz12_paper.pdf", height = 9)
 draw(All_Filtered_hm)
 # Close the device to save the file
 dev.off()
-
 ```
 
 ```{r, Heatmap for CAF-1 mutants}
-
-All_FilteredHeatmap_mat <- as.matrix(All_FilteredHeatmap_df)
-quantile(All_FilteredHeatmap_mat, c(.01, .50, .75, .95, .98, .995)) 
-max <- quantile(All_FilteredHeatmap_mat, 0.995) # identify the 98th percentile value and assign this to max
-All_FilteredHeatmap_mat[All_FilteredHeatmap_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
-
-#I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0 in both WT samples
-All_FilteredHeatmap_mat_map <- subset(All_FilteredHeatmap_mat, rowSums(All_FilteredHeatmap_mat[, 1:7] > 0) > 0)
-
-#throwing our regions that are > 0.1 in suz12 (if any got through)
-All_FilteredHeatmap_mat_map <- subset(All_FilteredHeatmap_mat_map, All_FilteredHeatmap_mat_map[, 9] <= 0)
-
-#cluster into areas that recover vs. not
-normal <- subset(All_FilteredHeatmap_mat_map, rowSums(All_FilteredHeatmap_mat_map[, 1:2] > 0) >= 1)
-
-normal_recover <- subset(normal, rowSums(normal[, 3:7] > 0) > 0)
-
-normal_no_recover <- subset(normal, rowSums(normal[, 3:7] <= 0) == 5)
-
-#ectopic
-ectopic <- subset(All_FilteredHeatmap_mat_map, rowSums(All_FilteredHeatmap_mat_map[, 1:2] <= 0) == 2)
-
-normal_recover_order <- order(rowMeans(normal_recover[, c(1,3)]), decreasing = TRUE)
-normal_no_recover_order <- order(normal_no_recover[, 1], decreasing = TRUE)
-ectopic_order <- order(rowMeans(ectopic[, 3:7]), decreasing = TRUE)
-
-normal_recover_sort <- normal_recover[normal_recover_order, ]
-normal_no_recover_sort <- normal_no_recover[normal_no_recover_order, ]
-ectopic_sort <- ectopic[ectopic_order, ]
-
-forheat1 <- rownames(normal_recover_sort)
-forheat2 <- rownames(normal_no_recover_sort)
-forheat3 <- rownames(ectopic_sort)
-
-finalorder <- c(forheat1, forheat2, forheat3)
-
 #I want to look at qa-suz12 & CAF-1 mutants
-All_FilteredHeatmap_mat_map <- All_FilteredHeatmap_mat_map[,c(1,7,10:12)]
+All_FilteredHeatmap_mat_map <- All_FilteredHeatmap_mat[,c(1,7,13:15)]
 
 #Final Order
 All_FilteredHeatmap_mat_sort = All_FilteredHeatmap_mat_map[finalorder, ]
@@ -916,12 +952,38 @@ col_fun(seq(0, max, length = 20))
 
 #Plot
 All_Filtered_hm <- Heatmap(All_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(All_FilteredHeatmap_mat_sort)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "H3K27me3"))
-pdf("./ALL_H3K27me3_peaks_qa-suz12_v_CAF-1_paper.pdf", height = 9)
+pdf("./ALL_H3K27me3_peaks_qa-suz12_v_CAF-1_CS_paper.pdf", height = 9)
 # Draw the heatmap
 draw(All_Filtered_hm)
 # Close the device to save the file
 dev.off()
 
+```
+
+```{r, heatmap for 96hr timecourse}
+# #I only want to look at qa-suz12 96 hr timecourse
+All_FilteredHeatmap_mat_map <- All_FilteredHeatmap_mat[,c(1:2,7:10)]
+
+###keeping same order of genes here EXCEPT for ectopic group (reordering)
+ectopic <- subset(All_FilteredHeatmap_mat_map, rowSums(All_FilteredHeatmap_mat_map[, 1:2] <= 0) == 2)
+
+ectopic_order <- order(rowMeans(ectopic[,3:6]), decreasing = TRUE)
+
+ectopic_sort <- ectopic[ectopic_order, ]
+
+forheat3 <- rownames(ectopic_sort)
+
+finalorder <- c(forheat1, forheat2, forheat3)
+
+All_FilteredHeatmap_mat_sort = All_FilteredHeatmap_mat_map[finalorder, ]
+
+#Plot
+All_Filtered_hm <- Heatmap(All_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(All_FilteredHeatmap_mat_sort)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "H3K27me3"))
+pdf("./ALL_H3K27me3_peaks_qa-suz12_96hr_paper.pdf", height = 9)
+# Draw the heatmap
+draw(All_Filtered_hm)
+# Close the device to save the file
+dev.off()
 ```
 
 ```{r, making bed files w/ csaw measured K27 regions}
