@@ -18,8 +18,8 @@ THREADS=2
 #variables imported from submission script
 #accession=SRR10916163
 # fastqPath="/scratch/evt82290/SRA/FastqFiles"
-fastqPath=${Run150path}
-outdir="/scratch/evt82290/MappingOutputs/Run150"
+# fastqPath=${Run150path}
+# outdir="/scratch/evt82290/MappingOutputs/Run150"
 # fastqPath="/scratch/evt82290/FastqFiles/2025_Run149_ET/RNA"
 # outdir="/scratch/evt82290/MappingOutputs/Run149/RNA"
 
