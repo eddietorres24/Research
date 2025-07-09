@@ -34,7 +34,7 @@ fi
 #Run149path="/scratch/evt82290/FastqFiles/2025_Run149_ET/RNA"
 Run150path="/scratch/evt82290/FastqFiles/2025_Run150_ET"
 # outdir="/scratch/evt82290/RNAseq/cac_aberrant_transcripts"
-outdir="/scratch/evt82290/MappingOutputs/Run150
+outdir="/scratch/evt82290/MappingOutputs/Run150"
 
 mkdir ${outdir}
 mkdir ${outdir}/logs
