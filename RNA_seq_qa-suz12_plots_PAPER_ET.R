@@ -20,7 +20,9 @@ library("pheatmap")
 library("grid")
 library("corrplot")
 library(RColorBrewer)
-
+library(reshape2)
+library(grDevices)
+library("scater")
 
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -31,7 +33,6 @@ workingdir="C:/Users/eddie/Research/GitHub"
 #set working directory to the correct location for working machine
 knitr::opts_knit$set(root.dir = "workingdir")
 
-
 ##################################
 #start anaysis here, qa-suz12
 ##################################
@@ -39,10 +40,9 @@ knitr::opts_knit$set(root.dir = "workingdir")
 
 #Bring in table with unnormalized transcription counts; check.names is important if you have dashes in the gene names 
 #row.names=1 command sets geneIDs as the row name
-countdataInteractors <- read.table("./text_files/readcounts_qa.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
+countdataInteractors <- read.table("./text_files/readcounts_qa_new.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
 #countdataInteractors_final = cbind(countdataInteractors, countdataInteractors_ash3[,6:7])
 #countdataInteractors <- data.matrix(countdataInteractors_final)
-
 
 #################################################
 #Section 1: calculate tpm using the scater package
@@ -51,12 +51,10 @@ countdataInteractors <- read.table("./text_files/readcounts_qa.txt",skip=1, head
 #convert count file to matrix. Note:: I initially tried to use as.matrix, 
 #but this DID NOT WORK. once I used v <- data.matrix(countfile) then it all worked fine#
 
-
 #create matrix containing count data only; i.e. eliminate contig, start, stop, length fields
 Interactors_countsOnly <- data.matrix(countdataInteractors[ ,6:ncol(countdataInteractors)])
 
 ##Run calculateTPM function - must load "scater" library
-library("scater")
 Interactors_tpm <- calculateTPM(Interactors_countsOnly, lengths = countdataInteractors[,5])
 
 ##convert to matrix again
@@ -72,7 +70,6 @@ samplesname <- colnames(allDataTPM)
 #write the long sample names to a spreadsheet file so these can be manipulated in excel or text editor
 write.table(samplesname, file="samplenames.txt", sep="\t")
 
-
 #################
 
 #create a list of column names that you want to plot; !!!!You must include the column name for gene ID
@@ -80,13 +77,13 @@ write.table(samplesname, file="samplenames.txt", sep="\t")
 #move the subset of genes you want to plot into a new matrix
 sampleNames <- colnames(allDataTPM)
 write.table(sampleNames, file="names.txt")
-Ordered_KO_data <- cbind(allDataTPM[,4:7],allDataTPM[,11:13],allDataTPM[,8:10],allDataTPM[,1:3],allDataTPM[,14:15],allDataTPM[,19])
+Ordered_KO_data <- cbind(allDataTPM[,4:7],allDataTPM[,8:12],allDataTPM[,13:17],allDataTPM[,1:3],allDataTPM[,18:21],allDataTPM[,22:25])
 Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,4:7], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,11:13], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,8:10], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,8:12], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,13:17], na.rm = TRUE),
                                  rowMeans(allDataTPM[,1:3], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,14:15], na.rm = TRUE),
-                                 allDataTPM[,19])
+                                 rowMeans(allDataTPM[,18:21], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,22:25], na.rm = TRUE))
 averageRowIDs=c("WT","WT_0hr","WT_24hr","suz-12","qa-suz12_0hr", "qa-suz12_24hr")
 colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 
@@ -96,27 +93,19 @@ colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 #SECTION 3
 #subset data to sample only PRC2-target genes
 
-
 #read in geneIDs of PRC2 target genes
-Prc2targets <- read.table("./text_files/K27_narrow_genes_sorted.txt", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
-
-cac1up <- read.csv("./cac_DEseq/cac1_UP.csv", stringsAsFactors=FALSE, check.names=FALSE)
-cac2up <- read.csv("./cac_DEseq/cac2_UP.csv", stringsAsFactors=FALSE, check.names=FALSE)
+Prc2targets <- read.table("./bed_files/K27_genes_stringent.bed", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
 
 #reading in csvs w/ upregulated genes in CAF-1 mutants
 
 ###SUBSET DATA FOR ALL KO SAMPLES
-Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,1])
-
-#CAF-1 Upregulated mutants
-CAFUpTPM <- subset(allDataTPM, rownames(allDataTPM) %in% cac1up$NCU | rownames(allDataTPM) %in% cac2up$NCU)
+Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,10])
 
 ###SUBSET DATA FOR AVERAGED KO SAMPLES
-AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,1])
-AVERAGE_CAFTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data) %in% cac1up$NCU | rownames(allDataTPM) %in% cac2up$NCU)
+AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,10])
 
 ###Subset data to filter out non-PRC2 target regions that got through (cutting out any genes over 2 tpm in WT)
-AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 12.5))
+AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 5))
 AVERAGE_AlldataTPM <- subset(Averaged_Orderd_KO_data, (Averaged_Orderd_KO_data[,1] > -0.1))
 
 ###resubet PRC2 targets after filtering
@@ -126,13 +115,10 @@ Prc2targetTPM <- subset(Prc2targetTPM, rownames(Prc2targetTPM)%in%rownames(AVERA
 AVERAGE_Prc2targetTPM <- AVERAGE_Prc2targetTPM + 1
 AVERAGE_Prc2targetTPM <- log2(AVERAGE_Prc2targetTPM)
 
-AVERAGE_CAFTPM <- AVERAGE_CAFTPM + 1
-AVERAGE_CAFTPM <- log2(AVERAGE_CAFTPM)
-
 AVERAGE_AlldataTPM <- AVERAGE_AlldataTPM + 1
 AVERAGE_AlldataTPM <- log2(AVERAGE_AlldataTPM)
 #melt data to get it into a format ggplots can use (load library "reshape2")
-library(reshape2)
+
 
 meltedPRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
@@ -164,7 +150,6 @@ meltedAveragePRC2targetData$Sample <- factor(meltedAveragePRC2targetData$Sample)
 meltedAverageAllData$Sample <- factor(meltedAverageAllData$Sample)
 
 # Plot box & whisker chart
-library(ggplot2)
 xlabels = averageRowIDs
 colors = c( "#4575b4","#4575b4","#4575b4", "#fee090", "#fee090", "#4575b4")
 
@@ -192,17 +177,17 @@ ggsave(filename = "histone_chaperone_boxplot_PAPER_DELETE.pdf", plot = box, dpi=
 
 #t-test for significance in difference of mean expression values of PRC2 targets b/w WT & mutants
 
-set7_t <- t.test(PRC2meancalc$set.7, mu = mean(PRC2meancalc$WT))
-cac1_t <- t.test(PRC2meancalc$cac.1, mu = mean(PRC2meancalc$WT))
-cac2_t <- t.test(PRC2meancalc$cac.2, mu = mean(PRC2meancalc$WT))
-cac3_t <- t.test(PRC2meancalc$cac.3, mu = mean(PRC2meancalc$WT))
-naf1_t <- t.test(PRC2meancalc$naf.1, mu = mean(PRC2meancalc$WT))
-naf2_t <- t.test(PRC2meancalc$naf.2, mu = mean(PRC2meancalc$WT))
-asf1_t <- t.test(PRC2meancalc$asf.1, mu = mean(PRC2meancalc$WT))
-atrx_t <- t.test(PRC2meancalc$ATRX, mu = mean(PRC2meancalc$WT))
+# set7_t <- t.test(PRC2meancalc$set.7, mu = mean(PRC2meancalc$WT))
+# cac1_t <- t.test(PRC2meancalc$cac.1, mu = mean(PRC2meancalc$WT))
+# cac2_t <- t.test(PRC2meancalc$cac.2, mu = mean(PRC2meancalc$WT))
+# cac3_t <- t.test(PRC2meancalc$cac.3, mu = mean(PRC2meancalc$WT))
+# naf1_t <- t.test(PRC2meancalc$naf.1, mu = mean(PRC2meancalc$WT))
+# naf2_t <- t.test(PRC2meancalc$naf.2, mu = mean(PRC2meancalc$WT))
+# asf1_t <- t.test(PRC2meancalc$asf.1, mu = mean(PRC2meancalc$WT))
+# atrx_t <- t.test(PRC2meancalc$ATRX, mu = mean(PRC2meancalc$WT))
 
 #I want to make a violin plot instead of boxplot. Going to adapt Abby's code
-library(grDevices)
+
 
 total2 <- meltedAveragePRC2targetData %>%
   group_by(Sample)
@@ -232,9 +217,6 @@ ggsave("./qa-suz12_PRC2_Gene_expression.pdf", plot=violin, width = 10, height = 
 
 ########################3
 ############################################################################
-
-library(pheatmap)
-library(RColorBrewer)
 
 breaks1=seq(-4, 5, by=.09) #This is to set a custom heatmaps scale. Not used here.
 

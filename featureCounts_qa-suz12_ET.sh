@@ -40,14 +40,10 @@ featureCounts -T $THREADS \
 -g gene_name \
 -s 0 --primary \
 -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
--o $OUTDIR/readcounts_newseq.txt \
+-o $OUTDIR/readcounts_qa_WT0_only.txt \
 $BAMDIR/SRR9027658/SRR9027658_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR9027689/SRR9027689_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR9027759/SRR9027759_Aligned.sortedByCoord.out.bam \
-$BAMDIR2/SRR8269825/SRR8269825_Aligned.sortedByCoord.out.bam \
-$BAMDIR2/SRR8269775/SRR8269775_Aligned.sortedByCoord.out.bam \
-$BAMDIR2/SRR8269782/SRR8269782_Aligned.sortedByCoord.out.bam \
-$BAMDIR2/SRR8269810/SRR8269810_Aligned.sortedByCoord.out.bam \
 $B149DIR/149-87_RNA_WT_24hrqa__Rep1_S87/149-87_RNA_WT_24hrqa__Rep1_S87_Aligned.sortedByCoord.out.bam \
 $B149DIR/149-85_RNA_WT__Rep2_S85/149-85_RNA_WT__Rep2_S85_Aligned.sortedByCoord.out.bam \
 $B149DIR/149-86_RNA_WT__Rep3_S86/149-86_RNA_WT__Rep3_S86_Aligned.sortedByCoord.out.bam \
@@ -74,3 +70,9 @@ $B150DIR/150-115_RNA_qa_24hr__Rep6_S130/150-115_RNA_qa_24hr__Rep6_S130_Aligned.s
 # $B149DIR/149-92_RNA_qa-suz12__Rep3_S92/149-92_RNA_qa-suz12__Rep3_S92_Aligned.sortedByCoord.out.bam \
 
 # $B150DIR/150-110_RNA_WT_24hr__Rep6_S125/150-110_RNA_WT_24hr__Rep6_S125_Aligned.sortedByCoord.out.bam \
+
+###WT FROM SCREEN
+# $BAMDIR2/SRR8269825/SRR8269825_Aligned.sortedByCoord.out.bam \
+# $BAMDIR2/SRR8269775/SRR8269775_Aligned.sortedByCoord.out.bam \
+# $BAMDIR2/SRR8269782/SRR8269782_Aligned.sortedByCoord.out.bam \
+# $BAMDIR2/SRR8269810/SRR8269810_Aligned.sortedByCoord.out.bam \
