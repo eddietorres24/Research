@@ -397,7 +397,7 @@ module load deepTools
                                         --samplesLabel WT ash-1 cac-1 cac-2 cac-3 set-7 \
                                         --startLabel "TSS" \
                                         --endLabel "TES" \
-                                        --sortRegions no
+                                        --sortRegions no \
                                         --missingDataColor 1 \
                                         --colorList "white, lavender, mediumslateblue" \
                                         --zMin 0 \
