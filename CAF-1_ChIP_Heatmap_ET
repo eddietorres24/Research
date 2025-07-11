@@ -388,17 +388,17 @@ module load deepTools
                      -S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
                         $MISCDIR/ash-1_H3K27ac.bin_25.smooth_75Bulk.bw \
                         $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
-                        $P150DIR/149-81_ChIP_cac-2_H3K27ac_Rep2_S81.bin_25.smooth_75Bulk.bw \
-                        $P150DIR/149-82_ChIP_cac-3_H3K27ac_Rep2_S82.bin_25.smooth_75Bulk.bw \
-                        $P150DIR/149-83_ChIP_set-7_H3K27ac_Rep2_S83.bin_25.smooth_75Bulk.bw \
-                        -R $BEDDIR2/K27genes_CAF-1_clustered.bed --skipZeros -o matrix_PRC2_K27ac.gz
+                        $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
+                        $P150DIR/150-138_ChIP_cac-3_Kac_Rep2_S153.bin_25.smooth_75Bulk.bw \
+                        $P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw \
+                        -R $BEDDIR2/K27genes_CAF-1_clustered.bed --skipZeros -o matrix_PRC2_Kac.gz
 
-                        plotHeatmap -m matrix_PRC2_K27ac.gz -out CAF-1_Kac_K27_genes_CAF-1_clustered.pdf \
+                        plotHeatmap -m matrix_PRC2_Kac.gz -out CAF-1_Kac_K27_genes_CAF-1_clustered.pdf \
                                         --samplesLabel WT ash-1 cac-1 cac-2 cac-3 set-7 \
                                         --startLabel "TSS" \
                                         --endLabel "TES" \
                                         --sortRegions descend \
-                                        --sortUsingSamples 1 2 \
+                                        --sortUsingSamples 1 3 \
                                         --missingDataColor 1 \
                                         --colorList "white, lavender, mediumslateblue" \
                                         --zMin 0 \
