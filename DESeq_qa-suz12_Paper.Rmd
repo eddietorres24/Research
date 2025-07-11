@@ -33,11 +33,11 @@ library(dplyr)
 ## Importing featurecounts matrix
 Read in the featurecounts output, convert to a matrix, and remove unneccesary columns to include ONLY the count numbers, then convert columns to numeric.
 ```{r cts}
-setwd("C:\\Users\\eddie\\Desktop\\Research\\GitHub")
+# setwd("C:\\Users\\eddie\\Desktop\\Research\\GitHub")
 cts <- as.matrix(read.table("../text_files/readcounts_qa_paper.txt", sep="\t", row.names =1, header = TRUE))
 cts <- as.matrix(cts[,-c(1:5)])
 ## change ncol to match number of columns
-cts_numeric <- matrix(as.numeric(cts), ncol = 21)
+cts_numeric <- matrix(as.numeric(cts), ncol = 15)
 dimnames(cts_numeric) <- list(rownames(cts), colnames(cts))
 ```
 
@@ -64,8 +64,7 @@ suz12 <- rowMeans(cts_numeric_3[, 1:3], na.rm = TRUE)
 WT_0hr <- rowMeans(cts_numeric_3[, 4:6], na.rm = TRUE)
 WT_24hr <- rowMeans(cts_numeric_3[, 7:9], na.rm = TRUE)
 qa_0hr <- rowMeans(cts_numeric_3[, 10:12], na.rm = TRUE)
-qa_24hr <- cts_numeric_3[,13:15]
-#set3 <- rowMeans(cts_numeric[, 29:30], na.rm = TRUE)
+qa_24hr <- rowMeans(cts_numeric_3[, 13:15], na.rm = TRUE)
 ```
 
 ## Importing DEseq metadata
@@ -138,17 +137,17 @@ qa_24hr <- results(dds2, alpha=alpha, contrast=c("condition", "qa_24hr", "WT_0hr
 Subset to only export significant differentially expressed genes
 
 ```{r}
-suz12_sig <- subset(suz12, padj < 0.05)
-# WT_0hr_sig <- subset(WT_0hr, padj < 0.05)
-WT_24hr_sig <- subset(WT_24hr, padj < 0.05)
-qa_0hr_sig <- subset(qa_0hr, padj < 0.05)
-qa_24hr_sig <- subset(qa_24hr, padj < 0.05)
+suz12 <- subset(suz12, padj < 0.05)
+# WT_0hr <- subset(WT_0hr, padj < 0.05)
+WT_24hr <- subset(WT_24hr, padj < 0.05)
+qa_0hr <- subset(qa_0hr, padj < 0.05)
+qa_24hr <- subset(qa_24hr, padj < 0.05)
 
-write.csv(as.data.frame(suz12_sig), file = "suz12.csv")
-# write.csv(as.data.frame(WT_0hr_sig), file = "WT_0hr.csv")
-write.csv(as.data.frame(WT_24hr_sig), file = "WT_24hr.csv")
-write.csv(as.data.frame(qa_0hr_sig), file = "qa_0hr.csv")
-write.csv(as.data.frame(qa_24hr_sig), file = "qa_24hr.csv")
+write.csv(as.data.frame(suz12), file = "suz12.csv")
+# write.csv(as.data.frame(WT_0hr), file = "WT_0hr.csv")
+write.csv(as.data.frame(WT_24hr), file = "WT_24hr.csv")
+write.csv(as.data.frame(qa_0hr), file = "qa_0hr.csv")
+write.csv(as.data.frame(qa_24hr), file = "qa_24hr.csv")
 
 ```
 
@@ -245,7 +244,7 @@ categories.
 
 #IGV Track
 ```{r}
-ngenes = read.csv("../csv_files/neurospora_genes.csv")
+ngenes = read.csv("../csv_files/neurospora_genes_edit.csv")
 
 combine <- transform(merge(ngenes, l2fc, by = "VALUE"))
 track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", "suz12.csv", "WT_24hr.csv", "qa_0hr.csv", "qa_24hr.csv")
