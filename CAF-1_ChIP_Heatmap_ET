@@ -37,7 +37,7 @@ ATACDIR="/scratch/evt82290/MappingOutputs/ATAC/BigWigs"
 #bed file directories
 QABED="/home/evt82290/Research/bed_files/qa-suz12"
 BEDDIR="/scratch/evt82290/RNAseqIGV/bedgraph"
-BEDDIR2="/home/evt82290/Research/bed_files/deduplicated_beds"
+BEDDIR2="/home/evt82290/Research/bed_files"
 
 #load deeptools
 module load deepTools
