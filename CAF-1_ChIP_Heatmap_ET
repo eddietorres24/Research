@@ -195,7 +195,7 @@ computeMatrix scale-regions -a 250 -b 800 --regionBodyLength 2000 --scale 2 \
     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
     -R $BEDDIR2/K27_silent_genes.bed --skipZeros -o K36_matrix_PRC2_2.gz
 
-    plotHeatmap -m K36_matrix_PRC2_2.gz -out CAF-1_ash1_H3K36me3_K27genes_scaled_WTsort_Paper.pdf \
+    plotHeatmap -m K36_matrix_PRC2_2.gz -out CAF-1_ash1_H3K36me3_K27_silent_genes.pdf \
                     --samplesLabel WT cac-1 cac-2 cac-3 set-7 ash-1 \
                     --sortRegions descend \
                     --sortUsingSamples 1 2 \
