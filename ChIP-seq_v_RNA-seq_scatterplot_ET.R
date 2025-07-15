@@ -6,86 +6,6 @@ library(tidyr)
 #Read in PRC2 targets
 Prc2targets <- read.table("./bed_files/K27_genes_trimmed.bed", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
 
-#Read in All summary files
-# WT1 <- read.table("bigwig_summaries/WT_Rep1_K27signal_K27genes.tab", header = FALSE, col.names = c("gene", "size", "covered", "sum", "mean0", "mean"))
-# WT2 <- read.table("bigwig_summaries/WT_Rep2_K27signal_K27genes.tab", header = FALSE, col.names = c("gene", "size", "covered", "sum", "mean0", "mean"))
-# WT3 <- read.table("bigwig_summaries/WT_Rep3_K27signal_K27genes.tab", header = FALSE, col.names = c("gene", "size", "covered", "sum", "mean0", "mean"))
-# 
-# cac1_1 <- read.table("bigwig_summaries/cac1_Rep1_K27signal_K27genes.tab", header = FALSE, col.names = c("gene", "size", "covered", "sum", "mean0", "mean"))
-# cac1_2 <- read.table("bigwig_summaries/cac1_Rep2_K27signal_K27genes.tab", header = FALSE, col.names = c("gene", "size", "covered", "sum", "mean0", "mean"))
-# cac1_3 <- read.table("bigwig_summaries/cac1_Rep3_K27signal_K27genes.tab", header = FALSE, col.names = c("gene", "size", "covered", "sum", "mean0", "mean"))
-# 
-# cac2_1 <- read.table("bigwig_summaries/cac2_Rep1_K27signal_K27genes.tab", header = FALSE, col.names = c("gene", "size", "covered", "sum", "mean0", "mean"))
-# cac2_2 <- read.table("bigwig_summaries/cac2_Rep2_K27signal_K27genes.tab", header = FALSE, col.names = c("gene", "size", "covered", "sum", "mean0", "mean"))
-# cac2_3 <- read.table("bigwig_summaries/cac2_Rep3_K27signal_K27genes.tab", header = FALSE, col.names = c("gene", "size", "covered", "sum", "mean0", "mean"))
-# 
-# cac3_1 <- read.table("bigwig_summaries/cac3_Rep1_K27signal_K27genes.tab", header = FALSE, col.names = c("gene", "size", "covered", "sum", "mean0", "mean"))
-# cac3_2 <- read.table("bigwig_summaries/cac3_Rep2_K27signal_K27genes.tab", header = FALSE, col.names = c("gene", "size", "covered", "sum", "mean0", "mean"))
-# cac3_3 <- read.table("bigwig_summaries/cac3_Rep3_K27signal_K27genes.tab", header = FALSE, col.names = c("gene", "size", "covered", "sum", "mean0", "mean"))
-# 
-# cac1_2_1 <- read.table("bigwig_summaries/cac1-2_Rep1_K27signal_K27genes.tab", header = FALSE, col.names = c("gene", "size", "covered", "sum", "mean0", "mean"))
-# cac1_2_2 <- read.table("bigwig_summaries/cac1-2_Rep2_K27signal_K27genes.tab", header = FALSE, col.names = c("gene", "size", "covered", "sum", "mean0", "mean"))
-
-#assign rownames for later
-# rownames(WT1) = WT1$gene
-
-#combine replicates into 1 df (will take column w mean values)
-# combined_df <- data.frame(
-#   sample1 = WT1$mean,
-#   sample2 = WT2$mean,
-#   sample3 = WT3$mean,
-#   sample4 = cac1_1$mean,
-#   sample5 = cac1_2$mean,
-#   sample6 = cac1_3$mean,
-#   sample7 = cac2_1$mean,
-#   sample8 = cac2_2$mean,
-#   sample9 = cac2_3$mean,
-#   sample10 = cac3_1$mean,
-#   sample11 = cac3_2$mean,
-#   sample12 = cac3_3$mean,
-#   sample13 = cac1_2_1$mean,
-#   sample14 = cac1_2_2$mean
-# )
-
-#rename rows
-# rownames(combined_df) <- rownames(WT1)
-# 
-# #rename columns
-# newnames <- c("WT1", "WT2", "WT3", "cac1_1", "cac1_2", "cac1_3", "cac2_1", "cac2_2", "cac2_3", "cac3_1", "cac3_2", "cac3_3", "cac1_2_1", "cac1_2_2")
-# colnames(combined_df) <- newnames
-# 
-# #Average WT Data and eliminate rows that are below a mean of 4 (< 2 log2FC over background)
-# combined_df$WTavg <- rowMeans(combined_df[,1:3])
-# combined_df <- subset(combined_df, combined_df$WTavg > 4)
-# combined_df <- combined_df[,-15]
-# 
-# #calculate rowmeans
-# WT <- rowMeans(combined_df[, 1:3], na.rm = TRUE)
-# cac1 <- rowMeans(combined_df[, 4:6], na.rm = TRUE)
-# cac2 <- rowMeans(combined_df[, 7:9], na.rm = TRUE)
-# cac3 <- rowMeans(combined_df[, 10:12], na.rm = TRUE)
-# cac1_2 <- rowMeans(combined_df[, 13:14], na.rm = TRUE)
-# 
-# #calculate log2FC
-# log2FC_cac1 <- log2(WT / cac1)
-# log2FC_cac2 <- log2(WT / cac2)
-# log2FC_cac3 <- log2(WT / cac3)
-# log2FC_cac1_2 <- log2(WT / cac1_2)
-# 
-# ##make df for log2FC values
-# log2FC_df <- data.frame(
-#   log2FC_cac1   = log2FC_cac1,
-#   log2FC_cac2   = log2FC_cac2,
-#   log2FC_cac3   = log2FC_cac3,
-#   log2FC_cac1_2 = log2FC_cac1_2
-# )
-# 
-# ##assign a column for gene names
-# log2FC_df$gene <- rownames(log2FC_df)
-# ##add anmes to df in addition to NCU column
-# log2FC_df$name <- Prc2targets$V10[match(log2FC_df$gene, Prc2targets$gene)]
-
-
 ###Calculate ChIP-seq Signal Averages
 
 # Load your gene/promoter BED file as GRanges
@@ -100,6 +20,79 @@ gene_ranges <- GRanges(
 )
 mcols(gene_ranges)$gene_id <- K27_genes$V10
 
+
+```{r, Read in Data and Run Diffbind}
+#Read in H3K27me3 ChIP Data (This should contain 2+ replicates of ChIP data & controls with your desired modification & strains. we don't need peak calls here, since we are assigning our own regions)
+## reading in my sample sheet w/ all CAF-1 data and just using WT strains
+chip_data <- read.csv("../DiffBind_CAF-1_K27_CS_nopeak_ET.csv")
+chip_data <- chip_data[1:12,]
+
+# Fix paths and get rid of peaks (dont need to fix paths if in correct directory)
+chip_data$bamControl <- paste0("../", chip_data$bamControl)
+chip_data$bamReads <- paste0("../", chip_data$bamReads)
+
+#Make a diffbind object
+chip_data <- dba(sampleSheet = chip_data)
+
+###NOTE: unfortunately, we will have to run diffibnd on the + & - strand genes separately. This is because if 2 genes overlap, diffbind will combine them into one "peak". ideally, we want to measure the signal over each gene individually to get an accurate picture of K27 coverage. This is the strategy ChatGPT helped me devise to address this. There may be a better way to do this, but this also wasn't too difficult.
+
+plus_r  <- genes_gr[strand(genes_gr) == "+"]
+minus_r <- genes_gr[strand(genes_gr) == "-"]
+
+# Run dba.count separately
+chip_data_plus  <- dba.count(chip_data, peaks = plus_r, summits = FALSE, filter = 0, minOverlap = 0)
+chip_data_minus <- dba.count(chip_data, peaks = minus_r, summits = FALSE, filter = 0, minOverlap = 0)
+
+#dba analyze to obtain differential binding
+chip_data_plus <- dba.analyze(chip_data_plus)
+chip_data_minus <- dba.analyze(chip_data_minus)
+
+# Extract differentially bound sites for each contrast (automatically defined by dba.analyze)
+plus_db  <- dba.report(chip_data_plus, th=1)  # th=1 returns all sites regardless of FDR
+minus_db <- dba.report(chip_data_minus, th=1)
+
+# Convert to data.frame
+plus_df  <- as.data.frame(plus_db)
+minus_df <- as.data.frame(minus_db)
+
+# Add strand info for reference
+plus_df$strand  <- "+"
+minus_df$strand <- "-"
+
+# Combine
+combined_df <- rbind(plus_df, minus_df)
+
+# Optional: Create unique row names
+rownames(combined_df) <- paste0(combined_df$Chr, ":", combined_df$Start, "-", combined_df$End, "(", combined_df$strand, ")")
+
+
+
+
+
+
+
+# # Extract counts as GRanges
+# counts_plus  <- dba.peakset(chip_data_plus,  bRetrieve = TRUE)
+# counts_minus <- dba.peakset(chip_data_minus, bRetrieve = TRUE)
+# 
+# # Combine into full GRanges object
+# full_counts <- c(counts_plus, counts_minus)
+# 
+# # Extract metadata (sample names, counts matrix)
+# count_matrix <- as.data.frame(mcols(full_counts))
+# 
+# # Extract genomic coordinates
+# region_info <- data.frame(
+#   Chromosome = as.character(seqnames(full_counts)),
+#   Start = start(full_counts),
+#   End   = end(full_counts)
+# )
+# 
+# # Combine into final count dataframe with coordinate info
+# norm_counts <- cbind(region_info, count_matrix)
+```
+
+###############################################################
 # Step 1: Split gene_ranges by strand
 plus_ranges  <- gene_ranges[strand(gene_ranges) == "+"]
 minus_ranges <- gene_ranges[strand(gene_ranges) == "-"]
@@ -130,6 +123,8 @@ region_info <- data.frame(
 norm_counts <- cbind(region_info, count_matrix)
 
 # Ensure coordinate columns match in name
+####################################################################
+
 
 ###DEseq2 for ChIP data
 
@@ -188,7 +183,7 @@ summary_df <- summary_df[, c("gene_id", "CHR", "START", "END",
 ###Incorporate Analyzed RNA-seq data
 
 ###NEED TO RUN DEseq TO OBTAIN RNA-seq Log2FC VALUES###
-##assign RNA-seq Log2FC for each strain after running DEseq (I am not eliminating non-DE genes in this code because i want both DE & non-DE genes present on my plot, because we are correlating DE w/ K27 changes)
+##assign RNA-seq Log2FC for each strain after running DEseq (I am not eliminating non-DE genes in this code because i want both DE & non-DE genes present on my plot since we are correlating DE w/ K27 changes)
 cac1_seq <- read.csv("./CAF-1_RNA-seq_Analysis/csv_files/cac1_new_ALL.csv", stringsAsFactors=FALSE, row.names = 1, check.names=FALSE)
 cac2_seq <- read.csv("./CAF-1_RNA-seq_Analysis/csv_files/cac2_ALL.csv", stringsAsFactors=FALSE, row.names = 1, check.names=FALSE)
 cac3_seq <- read.csv("./CAF-1_RNA-seq_Analysis/csv_files/cac3_ALL.csv", stringsAsFactors=FALSE, row.names = 1, check.names=FALSE)
@@ -223,8 +218,6 @@ ggplot(summary_df, aes(x = log2FC_cac3_vs_WT, y = cac3RNA)) +
 
 
 ggsave(filename = "./K27_v_RNA_cac3_Paper.pdf", plot = plot, dpi=600, height=9, width=12, units = "in")
-
-
 
 ###TO-DO###
 #1. color genes that are located within ectopic CAF-1 peaks

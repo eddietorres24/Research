@@ -239,7 +239,7 @@ FC_WTvInput.K27.contrast <- makeContrasts(K27vWT=WT.H3K27me3_CS-WT.input, levels
 #analyze data
 FC_WTvI.K27.res <- glmQLFTest(fitK27, contrast=FC_WTvInput.K27.contrast)
 
-#merge results to generate FDR; #calculates FRD on a per-region basis. This is not appropriate here since you have set the window size to 1000
+#merge results to generate FDR; #calculates FDR on a per-region basis. This is not appropriate here since you have set the window size to 1000
 FC_WTvI.K27.merged <- mergeResults(filtered.dataK27, FC_WTvI.K27.res$table, tol=300, 
                             merge.args=list(max.width=300))
 

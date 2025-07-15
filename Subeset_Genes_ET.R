@@ -1,4 +1,4 @@
-#Code to subset genes with overlap in H3K27me3 regions
+#Code to subset genes that overlap with H3K27me3 marked regions
 
 library(GenomicRanges)
 library(rtracklayer)

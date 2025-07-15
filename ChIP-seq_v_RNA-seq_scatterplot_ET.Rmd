@@ -1,0 +1,333 @@
+---
+title: "ChIP_v_RNA_scatterplot_ET"
+author: "Eddie Torres"
+date: "2025-07-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(rtracklayer)
+library(ggplot2)
+library(tidyr)
+```
+
+#This code will be used to subset genes that overlap with H3K27me3 marked regions
+
+```{r, prepare gene dataframes}
+# Load gene data
+genes_df <- read.delim("../bed_files/all_genes_forR.bed", header = TRUE, stringsAsFactors = FALSE, sep = "\t", quote = "")
+
+# Our new strategy is to take 500 bp upstream (promoter) & 300 bp downstream (gene) of the TSS, and then determine the H3K27me3 ChIP-seq signal across these regions for all genes using csaw. This should give us a list of genes whose promoters & TSS are fully marked by H3K27me3 in a rigorous way
+
+#i am editing the values in column V2 & V3, which are currently set to TSS & TES, I want them to contain the coordinates stated above
+## This is a bit weird, as i need column 3 to be the larger value (going left to right on the chromosome), we will have to account for strandedness to get the correct ranges
+
+genes_edit <- genes_df
+
+# Reassign promoter column based on strandedness
+genes_edit$Start <- ifelse(genes_df$Strand == "+", 
+                            pmax(0, genes_df$Start -500), 
+                            pmax(0, genes_df$End - 300)) #pmax will avoid negative coordinates
+
+# Reassign gene column based on strandedness
+genes_edit$End <- ifelse(genes_df$Strand == "+", 
+                            genes_df$Start + 300,
+                            genes_df$End + 500)
+
+#End - Start columns should now all be = 800 except the rDNA gene on chromosome 5, this will print any rows that aren't = 800 to check
+genes_edit[genes_edit[[3]] - genes_edit[[2]] != 800, ]
+
+#in order to use csaw the way we want to, we will need to trun this list into a Granges object
+
+# Load your gene/promoter BED file as GRanges
+genes_gr <- GRanges(
+  seqnames = genes_edit$Chromosome,
+  ranges = IRanges(
+    start = genes_edit$Start,
+    end = genes_edit$End
+  ),
+  strand = genes_edit$Strand
+)
+
+```
+
+```{r, Read in Data and Run csaw}
+#Reading in my sample sheet w/ WT H3K27me3 data (3 reps CS antibody, 2 reps abcam)
+##The way I have my sheet set up will average the H3K27me3 signal form all 5 bams to determine log2FC over input. The samples shared the same inputs.
+
+##What I'm going to do first is get a list of all genes with > 1 log2FC H3K27me3 enrichment in any strain, then i will take
+
+chip_data <- read.csv("../csaw_samples_files/cac_csaw_K27.csv")
+
+#Fix paths (don't need to fix paths if working in correct directory)
+#
+chip_data$bamReads <- paste0("../", chip_data$bamReads)
+
+###NOTE: unfortunately, we will have to run csaw on the + & - strand genes separately then recombine the reads. This is because if 2 genes overlap, csaw will read them into one window. ideally, we want to measure the signal over each gene individually to get an accurate picture of K27 coverage. This is the strategy ChatGPT helped me devise to address this. There may be a better way to do this, but this was easy.
+plus_r  <- genes_gr[strand(genes_gr) == "+"]
+minus_r <- genes_gr[strand(genes_gr) == "-"]
+
+#Set Paramters
+matLocus <- GRanges("CM002236.1", IRanges(1856288, 1862459))  # optional
+param <- readParam(discard = matLocus, pe = "both", max.frag = 1500, minq = 20)
+
+# Count reads across genes & promoters
+data_csaw_plus <- regionCounts(bam.files = chip_data$bamReads, regions = plus_r, param = param)
+data_csaw_minus <- regionCounts(bam.files = chip_data$bamReads, regions = minus_r, param = param)
+
+#Build group factor and design matrix
+grouping <- factor(paste(chip_data$Strain, chip_data$Antibody, sep = "."))
+design.mat <- model.matrix(~ 0 + grouping)
+colnames(design.mat) <- levels(grouping)
+
+#Create DGELists
+dge_plus <- asDGEList(data_csaw_plus, group = grouping)
+dge_minus <- asDGEList(data_csaw_minus, group = grouping)
+
+#Estimate dispersions and fit GLM
+y_plus <- estimateDisp(dge_plus, design.mat)
+fit_plus <- glmQLFit(y_plus, design.mat, robust = TRUE)
+
+y_minus <- estimateDisp(dge_minus, design.mat)
+fit_minus <- glmQLFit(y_minus, design.mat, robust = TRUE)
+
+##########################################################################################
+
+#Define Strains (these should correspond to the groups from your csaw sheet)
+strains <- c("WT", "cac1", "cac2", "cac3")
+vs_input_list <- list()
+vs_wt_list <- list()
+
+# Loop 1: compute each strain over input
+for (strain in strains) {
+  chip <- paste0(strain, ".H3K27me3_CS")
+  input <- paste0(strain, ".input")
+  
+  if (!(chip %in% colnames(design.mat)) || !(input %in% colnames(design.mat))) next
+  
+  contrast <- makeContrasts(log2FC = paste0(chip, " - ", input), levels = design.mat)
+  
+  res_plus  <- glmQLFTest(fit_plus, contrast = contrast)
+  res_minus <- glmQLFTest(fit_minus, contrast = contrast)
+  
+  merged_plus  <- mergeResults(data_csaw_plus,  res_plus$table, tol = 100, merge.args = list(max.width = 100))
+  merged_minus <- mergeResults(data_csaw_minus, res_minus$table, tol = 100, merge.args = list(max.width = 100))
+  
+  mcols(merged_plus$regions)  <- DataFrame(merged_plus$combined)
+  mcols(merged_minus$regions) <- DataFrame(merged_minus$combined)
+  
+  df_plus  <- as.data.frame(merged_plus$regions)
+  df_minus <- as.data.frame(merged_minus$regions)
+  df_plus$strand  <- "+"
+  df_minus$strand <- "-"
+  
+  df_combined <- bind_rows(df_plus, df_minus)
+  
+  df_selected <- df_combined %>%
+  dplyr::select(seqnames, start, end, strand,
+                logFC = rep.logFC,
+                PValue = PValue,
+                FDR = FDR) %>%
+  dplyr::rename(
+    !!paste0("log2FC_", strain, "_vsInput") := logFC,
+    !!paste0("PValue_",  strain, "_vsInput") := PValue,
+    !!paste0("FDR_",     strain, "_vsInput") := FDR
+  )
+  
+  vs_input_list[[strain]] <- df_selected
+}
+
+# Merge log2FC vs Input for all strains
+input_enrichment <- Reduce(function(x, y) full_join(x, y, by = c("seqnames", "start", "end", "strand")), vs_input_list)
+
+# Loop 2: compute mutant vs WT contrast
+mutants <- setdiff(strains, "WT")
+
+for (strain in mutants) {
+  chip_mut <- paste0(strain, ".H3K27me3_CS")
+  chip_wt  <- "WT.H3K27me3_CS"
+  
+  if (!(chip_mut %in% colnames(design.mat)) || !(chip_wt %in% colnames(design.mat))) next
+  
+  contrast <- makeContrasts(log2FC = paste0(chip_mut, " - ", chip_wt), levels = design.mat)
+  
+  res_plus  <- glmQLFTest(fit_plus, contrast = contrast)
+  res_minus <- glmQLFTest(fit_minus, contrast = contrast)
+  
+  merged_plus  <- mergeResults(data_csaw_plus,  res_plus$table, tol = 100, merge.args = list(max.width = 100))
+  merged_minus <- mergeResults(data_csaw_minus, res_minus$table, tol = 100, merge.args = list(max.width = 100))
+  
+  mcols(merged_plus$regions)  <- DataFrame(merged_plus$combined)
+  mcols(merged_minus$regions) <- DataFrame(merged_minus$combined)
+  
+  df_plus  <- as.data.frame(merged_plus$regions)
+  df_minus <- as.data.frame(merged_minus$regions)
+  df_plus$strand  <- "+"
+  df_minus$strand <- "-"
+  
+  df_combined <- bind_rows(df_plus, df_minus)
+  
+  df_selected <- df_combined %>%
+    dplyr::select(seqnames, start, end, strand,
+                  logFC = rep.logFC, PValue = PValue, FDR = FDR) %>%
+    dplyr::rename(
+      !!paste0("log2FC_", strain, "_vsWT") := logFC,
+      !!paste0("PValue_", strain, "_vsWT") := PValue,
+      !!paste0("FDR_", strain, "_vsWT") := FDR
+    )
+  
+  vs_wt_list[[strain]] <- df_selected
+}
+
+# Merge all mutant-vs-WT results
+mut_vs_wt <- Reduce(function(x, y) full_join(x, y, by = c("seqnames", "start", "end", "strand")), vs_wt_list)
+
+#Merge both dfs
+all_results <- full_join(input_enrichment, mut_vs_wt, by = c("seqnames", "start", "end", "strand"))
+
+#Append gene names
+all_results <- all_results %>%
+  dplyr::rename(Chromosome = seqnames, Start = start, End = end, Strand = strand) %>%
+  dplyr::left_join(
+    genes_edit %>% dplyr::select(Chromosome, Start, End, Strand, Name, NCU),
+    by = c("Chromosome", "Start", "End", "Strand")
+  )
+
+#Pull out stats we will use to filter genes
+logfc_cols   <- grep("^log2FC_.*_vsInput$", colnames(all_results), value = TRUE)
+fdr_cols     <- gsub("log2FC_", "FDR_", logfc_cols)
+pvalue_cols  <- gsub("log2FC_", "PValue_", logfc_cols)
+
+#Apply filter
+K27_results <- all_results %>%
+  filter(
+    if_any(all_of(logfc_cols),   ~ . > 1) &
+    if_any(all_of(fdr_cols),     ~ . < 0.01) &
+    if_any(all_of(pvalue_cols),  ~ . < 0.01)
+  )
+
+############################################################################################
+#What we have now is a df that has log2FC change values, p values, and FDR values for genes that are enriched in atleast 1 strain. I now want to split this up into multiple dfs that only have the genes genes enriched in WT OR 1 of the mutants (i.e. enriched in WT or cac-1). I will use this df to make my plot at the end
+
+#subset K27 genes based on enrichment over  input for each strain
+K27_results_cac1 = subset(K27_results, K27_results$log2FC_WT_vsInput > 1 | K27_results$log2FC_cac1_vsInput > 1)
+K27_results_cac2 = subset(K27_results, K27_results$log2FC_WT_vsInput > 1| K27_results$log2FC_cac2_vsInput > 1)
+K27_results_cac3 = subset(K27_results, K27_results$log2FC_WT_vsInput > 1| K27_results$log2FC_cac3_vsInput > 1)
+
+#only save the info we want for the plot (mutant strain vs. WT enrichment)
+K27_results_cac1 = K27_results_cac1[,c(1:4,26:27,17)]
+K27_results_cac2 = K27_results_cac2[,c(1:4,26:27,20)]
+K27_results_cac3 = K27_results_cac3[,c(1:4,26:27,23)]
+
+```
+
+```{r, read in and incorporate RNA-seq data}
+###NEED TO RUN DEseq SEPARATELY TO OBTAIN RNA-seq Log2FC VALUES###
+##assign RNA-seq Log2FC for each strain after running DEseq (I did not eliminate non-DE genes in the code because i want both DE & non-DE genes present on my plot since we are correlating DE w/ K27 changes)
+cac1_seq <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1_new_ALL.csv", stringsAsFactors=FALSE, row.names = 1, check.names=FALSE)
+cac2_seq <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac2_ALL.csv", stringsAsFactors=FALSE, row.names = 1, check.names=FALSE)
+cac3_seq <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac3_ALL.csv", stringsAsFactors=FALSE, row.names = 1, check.names=FALSE)
+# cac1_cac2_seq <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1_cac2_ALL.csv", stringsAsFactors=FALSE, row.names = 1, check.names=FALSE)
+
+#append RNA-seq log2FC from DEseq to the end of the ChIP log2FC df for each strain
+K27_results_cac1$cac1RNA <- cac1_seq$log2FoldChange[match(K27_results_cac1$Name, rownames(cac1_seq))]
+K27_results_cac2$cac2RNA <- cac2_seq$log2FoldChange[match(K27_results_cac2$Name, rownames(cac2_seq))]
+K27_results_cac3$cac3RNA <- cac3_seq$log2FoldChange[match(K27_results_cac3$Name, rownames(cac3_seq))]
+# summary_df$cac1_cac2RNA <- cac1_cac2_seq$log2FoldChange[match(summary_df$gene_id, rownames(cac1_cac2_seq))]
+
+#remove any rows w/ NA (going to be genes that have not polyA tail, rRNA, tRNA, etc.)
+K27_results_cac1 <- na.omit(K27_results_cac1)
+K27_results_cac2 <- na.omit(K27_results_cac2)
+K27_results_cac3 <- na.omit(K27_results_cac3)
+
+##################################################################################
+#Make Plots
+
+###cac-1 vs WT
+
+#calculate statistics
+cor_test <- cor.test(K27_results_cac1$log2FC_cac1_vsWT, K27_results_cac1$cac1RNA, method = "pearson")
+r2 <- round(cor_test$estimate^2, 2)
+pval <- signif(cor_test$p.value, 3)
+
+# Add coloring
+K27_results_cac1$color_group <- ifelse(K27_results_cac1$cac1RNA > 2, "up", 
+                                       ifelse(K27_results_cac1$cac1RNA < -2, "down", "N.S."))
+
+# Plot with color mapping
+plot = ggplot(K27_results_cac1, aes(x = log2FC_cac1_vsWT, y = cac1RNA, color = color_group)) +
+  geom_point() +
+  scale_color_manual(values = c("up" = "red", "down" = "blue", "N.S." = "gray")) +
+  geom_smooth(method = "lm", se = FALSE, linetype = "dashed", color = "blue") +
+  annotate("text", x = 1, y = 12.5, 
+           label = paste0("R² = ", r2, ", p = ", pval), hjust = 0) +
+  theme_minimal() +
+  labs(
+    x = "H3K27me3 Signal (cac-1/WT)",
+    y = "log2 Fold Change (cac-1/WT)",
+    title = "ChIP-seq vs RNA-seq Scatter Plot",
+    color = "RNA log2FC"
+  )
+
+ggsave(filename = "./K27_v_RNA_cac1_Paper.pdf", plot = plot, dpi=600, height=9, width=12, units = "in")
+
+###cac-2 vs WT
+
+#calculate statistics
+cor_test <- cor.test(K27_results_cac2$log2FC_cac2_vsWT, K27_results_cac2$cac2RNA, method = "pearson")
+r2 <- round(cor_test$estimate^2, 2)
+pval <- signif(cor_test$p.value, 3)
+
+# Add coloring
+K27_results_cac2$color_group <- ifelse(K27_results_cac2$cac2RNA > 2, "up", 
+                                       ifelse(K27_results_cac2$cac2RNA < 2, "down",
+                                              "N.S."))
+
+#Scater Plot
+plot = ggplot(K27_results_cac2, aes(x = log2FC_cac2_vsWT, y = cac2RNA, color = color_group)) +
+  geom_point() +
+  scale_color_manual(values = c("up" = "red", "down" = "blue", "N.S." = "gray")) +
+  geom_smooth(method = "lm", se = FALSE, linetype = "dashed", color = "blue") +
+  annotate("text", x = 1, y = 12.5, 
+           label = paste0("R² = ", r2, ", p = ", pval), hjust = 0) +
+  theme_minimal() +
+  labs(
+    x = "H3K27me3 Signal (cac-2/WT)",
+    y = "log2 Fold Change (cac-2/WT)",
+    title = "ChIP-seq vs RNA-seq Scatter Plot",
+    color = "RNA log2FC"
+  )
+
+ggsave(filename = "./K27_v_RNA_cac2_Paper.pdf", plot = plot, dpi=600, height=9, width=12, units = "in")
+
+###cac-3 vs WT
+
+#calculate statistics
+cor_test <- cor.test(K27_results_cac3$log2FC_cac3_vsWT, K27_results_cac3$cac3RNA, method = "pearson")
+r2 <- round(cor_test$estimate^2, 2)
+pval <- signif(cor_test$p.value, 3)
+
+# Add coloring
+K27_results_cac3$color_group <- ifelse(K27_results_cac3$cac3RNA > 2, "up", 
+                                       ifelse(K27_results_cac3$cac3RNA < 2, "down",
+                                              "N.S."))
+
+#Scater Plot
+plot = ggplot(K27_results_cac3, aes(x = log2FC_cac3_vsWT, y = cac3RNA, color = color_group)) +
+  geom_point() +
+  scale_color_manual(values = c("up" = "red", "down" = "blue", "N.S." = "gray")) +
+  geom_smooth(method = "lm", se = FALSE, linetype = "dashed", color = "blue") +
+  annotate("text", x = 1, y = 12.5, 
+           label = paste0("R² = ", r2, ", p = ", pval), hjust = 0) +
+  theme_minimal() +
+  labs(
+    x = "H3K27me3 Signal (cac-3/WT)",
+    y = "log2 Fold Change (cac-3/WT)",
+    title = "ChIP-seq vs RNA-seq Scatter Plot",
+    color = "RNA log2FC"
+  )
+
+ggsave(filename = "./K27_v_RNA_cac3_Paper.pdf", plot = plot, dpi=600, height=9, width=12, units = "in")
+
+```

@@ -20,6 +20,7 @@ library("pheatmap")
 library("grid")
 library("corrplot")
 library(RColorBrewer)
+library("scater")
 
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -49,7 +50,6 @@ countdataInteractors <- read.table("./text_files/readcounts_FINAL.txt",skip=1, h
 Interactors_countsOnly <- data.matrix(countdataInteractors[ ,6:ncol(countdataInteractors)])
 
 ##Run calculateTPM function - must load "scater" library
-library("scater")
 Interactors_tpm <- calculateTPM(Interactors_countsOnly, lengths = countdataInteractors[,5])
 
 ##convert to matrix again
@@ -110,7 +110,7 @@ AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Order
 
 ###Subset data to filter out non-repressed PRC2 targets regions that got through (cutting out any genes over 10 tpm in WT).
 ###These are likely genes whose promoter are not marked by H3K27me3, genes on the edge of K27 regions, and/or bivalent genes
-AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 10))
+AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 2))
 AVERAGE_AlldataTPM <- subset(Averaged_Orderd_KO_data, (Averaged_Orderd_KO_data[,1] > -0.1))
 
 ###resubet PRC2 targets after filtering

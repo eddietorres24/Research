@@ -186,26 +186,26 @@ module load deepTools
     #                 --zMin 0 \
     #                 --zMax 10
 
-# computeMatrix scale-regions -a 250 -b 1000 --regionBodyLength 2000 --scale 2 \
-#  -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
-#     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
-#     $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
-#     $P149DIR/149-102_ChIP_cac-3_H3K36me3_Rep3_S126.bin_25.smooth_75Bulk.bw \
-#     $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
-#     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
-#     -R $BEDDIR2/K27_genes_stringent.bed --skipZeros -o K36_matrix_PRC2_2.gz
+computeMatrix scale-regions -a 250 -b 800 --regionBodyLength 2000 --scale 2 \
+ -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-102_ChIP_cac-3_H3K36me3_Rep3_S126.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
+    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
+    -R $BEDDIR2/K27_silent_genes.bed --skipZeros -o K36_matrix_PRC2_2.gz
 
-    # plotHeatmap -m K36_matrix_PRC2_2.gz -out CAF-1_ash1_H3K36me3_K27genes_scaled_WTsort_Paper.pdf \
-    #                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 ash-1 \
-    #                 --sortRegions descend \
-    #                 --sortUsingSamples 2 \
-    #                 --missingDataColor 1 \
-    #                 --boxAroundHeatmaps no \
-    #                 --heatmapHeight 20 \
-    #                 --whatToShow "heatmap and colorbar" \
-    #                 --colorMap "afmhot" \
-    #                 --zMin 0 \
-    #                 --zMax 20 \
+    plotHeatmap -m K36_matrix_PRC2_2.gz -out CAF-1_ash1_H3K36me3_K27genes_scaled_WTsort_Paper.pdf \
+                    --samplesLabel WT cac-1 cac-2 cac-3 set-7 ash-1 \
+                    --sortRegions descend \
+                    --sortUsingSamples 1 2 \
+                    --missingDataColor 1 \
+                    --boxAroundHeatmaps no \
+                    --heatmapHeight 20 \
+                    --whatToShow "heatmap and colorbar" \
+                    --colorMap "afmhot" \
+                    --zMin 0 \
+                    --zMax 20 \
 
 # #138-62_ChIP_WT_H3K36me3_Rep2_6252_S61.bin_25.smooth_75Bulk.bw
 # #138-63_ChIP_cac-1_H3K36me3_Rep2_6252_S62.bin_25.smooth_75Bulk.bw
@@ -384,23 +384,23 @@ module load deepTools
 
 #Pan Kac
 #clustered
-                  computeMatrix scale-regions -a 500 -b 2500 --regionBodyLength 2500 --scale 1.5 \
-                     -S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
-                        $MISCDIR/ash-1_H3K27ac.bin_25.smooth_75Bulk.bw \
-                        $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
-                        $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
-                        $P150DIR/150-138_ChIP_cac-3_Kac_Rep2_S153.bin_25.smooth_75Bulk.bw \
-                        $P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw \
-                        -R $BEDDIR2/K27genes_CAF-1_clustered.bed --skipZeros -o matrix_PRC2_Kac.gz
-
-                        plotHeatmap -m matrix_PRC2_Kac.gz -out CAF-1_Kac_K27_genes_CAF-1_clustered.pdf \
-                                        --samplesLabel WT ash-1 cac-1 cac-2 cac-3 set-7 \
-                                        --startLabel "TSS" \
-                                        --endLabel "TES" \
-                                        --sortRegions no \
-                                        --missingDataColor 1 \
-                                        --colorList "white, lavender, mediumslateblue" \
-                                        --zMin 0 \
+                  # computeMatrix scale-regions -a 500 -b 2500 --regionBodyLength 2500 --scale 1.5 \
+                  #    -S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
+                  #       $MISCDIR/ash-1_H3K27ac.bin_25.smooth_75Bulk.bw \
+                  #       $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
+                  #       $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
+                  #       $P150DIR/150-138_ChIP_cac-3_Kac_Rep2_S153.bin_25.smooth_75Bulk.bw \
+                  #       $P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw \
+                  #       -R $BEDDIR2/K27genes_CAF-1_clustered.bed --skipZeros -o matrix_PRC2_Kac.gz
+                  #
+                  #       plotHeatmap -m matrix_PRC2_Kac.gz -out CAF-1_Kac_K27_genes_CAF-1_clustered.pdf \
+                  #                       --samplesLabel WT ash-1 cac-1 cac-2 cac-3 set-7 \
+                  #                       --startLabel "TSS" \
+                  #                       --endLabel "TES" \
+                  #                       --sortRegions no \
+                  #                       --missingDataColor 1 \
+                  #                       --colorList "white, lavender, mediumslateblue" \
+                  #                       --zMin 0 \
 
 
 
