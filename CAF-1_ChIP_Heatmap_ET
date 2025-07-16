@@ -124,8 +124,8 @@ plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K27me3_CAF-1_K4_clustered.pdf
   --startLabel "5'" --endLabel "3'" \
   --missingDataColor 1 \
   --whatToShow "heatmap and colorbar" \
-  --colorList 'white,g,darkgreen' \
-  --zMin 0 --zMax 50 \
+  --colorList 'white,magenta' \
+  --zMin 0 \
   --sortRegions no
 
 ###Kac
@@ -142,8 +142,8 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out H3K27me3_CAF-1_Kac_clustered.p
   --startLabel "5'" --endLabel "3'" \
   --missingDataColor 1 \
   --whatToShow "heatmap and colorbar" \
-  --colorList 'white,g,darkgreen' \
-  --zMin 0 --zMax 50 \
+  --colorList 'lavender, mediumslateblue"' \
+  --zMin 0 \
   --sortRegions no
 
 ##################################
