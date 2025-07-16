@@ -48,66 +48,66 @@ module load deepTools
 
 ##Plotting ALL qa-suz12 K27 regions (normal & ectopic)
 #Step 1: Compute matrices for each BED category
-computeMatrix scale-regions \
--S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-  -R $BEDDIR2/K27_in_cac1.bed \
-  --skipZeros -o matrix_retained.gz
-
-computeMatrix scale-regions \
--S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-  -R $BEDDIR2/K27_lost_cac1.bed \
-  --skipZeros -o matrix_lost.gz
-
-computeMatrix scale-regions \
--S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-  -R $BEDDIR2/K27_gain_cac1.bed \
-  --skipZeros -o matrix_ectopic.gz
-
-#Step 2: Sort with plotHeatmap (not computeMatrixOperations) and export new BEDs
-plotHeatmap -m matrix_retained.gz -out retained_sorted.pdf \
-  --sortRegions descend --sortUsing sum --sortUsingSamples 1 2 \
-  --outFileSortedRegions retained_sorted.bed
-
-plotHeatmap -m matrix_lost.gz -out lost_sorted.pdf \
-  --sortRegions descend --sortUsing sum --sortUsingSamples 1 \
-  --outFileSortedRegions lost_sorted.bed
-
-plotHeatmap -m matrix_ectopic.gz -out ectopic_sorted.pdf \
-  --sortRegions descend --sortUsing sum --sortUsingSamples 2 \
-  --outFileSortedRegions ectopic_sorted.bed
-
-  # Step 3: Fix group column in each sorted BED
-  awk 'BEGIN{OFS="\t"} {$NF="retained"; print}' retained_sorted.bed > retained_grouped.bed
-  awk 'BEGIN{OFS="\t"} {$NF="lost"; print}' lost_sorted.bed > lost_grouped.bed
-  awk 'BEGIN{OFS="\t"} {$NF="gained"; print}' ectopic_sorted.bed > ectopic_grouped.bed
-
-# Step 4: Final matrix using the sorted BEDs as separate region groups
-computeMatrix scale-regions \
--S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-  -R retained_grouped.bed lost_grouped.bed ectopic_grouped.bed \
-  --skipZeros \
-  -o matrix_CAF-1_K27_clustered.gz
-
-plotHeatmap -m matrix_CAF-1_K27_clustered.gz -out H3K27me3_CAF-1_K27_clustered.pdf \
-  --samplesLabel WT cac-1 cac-2 set-7 \
-  --startLabel "5'" --endLabel "3'" \
-  --missingDataColor 1 \
-  --whatToShow "heatmap and colorbar" \
-  --colorList 'white,g,darkgreen' \
-  --zMin 0 --zMax 50 \
-  --sortRegions no
+# computeMatrix scale-regions \
+# -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
+#   -R $BEDDIR2/K27_in_cac1.bed \
+#   --skipZeros -o matrix_retained.gz
+#
+# computeMatrix scale-regions \
+# -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
+#   -R $BEDDIR2/K27_lost_cac1.bed \
+#   --skipZeros -o matrix_lost.gz
+#
+# computeMatrix scale-regions \
+# -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
+#   -R $BEDDIR2/K27_gain_cac1.bed \
+#   --skipZeros -o matrix_ectopic.gz
+#
+# #Step 2: Sort with plotHeatmap (not computeMatrixOperations) and export new BEDs
+# plotHeatmap -m matrix_retained.gz -out retained_sorted.pdf \
+#   --sortRegions descend --sortUsing sum --sortUsingSamples 1 2 \
+#   --outFileSortedRegions retained_sorted.bed
+#
+# plotHeatmap -m matrix_lost.gz -out lost_sorted.pdf \
+#   --sortRegions descend --sortUsing sum --sortUsingSamples 1 \
+#   --outFileSortedRegions lost_sorted.bed
+#
+# plotHeatmap -m matrix_ectopic.gz -out ectopic_sorted.pdf \
+#   --sortRegions descend --sortUsing sum --sortUsingSamples 2 \
+#   --outFileSortedRegions ectopic_sorted.bed
+#
+#   # Step 3: Fix group column in each sorted BED
+#   awk 'BEGIN{OFS="\t"} {$NF="retained"; print}' retained_sorted.bed > retained_grouped.bed
+#   awk 'BEGIN{OFS="\t"} {$NF="lost"; print}' lost_sorted.bed > lost_grouped.bed
+#   awk 'BEGIN{OFS="\t"} {$NF="gained"; print}' ectopic_sorted.bed > ectopic_grouped.bed
+#
+# # Step 4: Final matrix using the sorted BEDs as separate region groups
+# computeMatrix scale-regions \
+# -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
+#   -R retained_grouped.bed lost_grouped.bed ectopic_grouped.bed \
+#   --skipZeros \
+#   -o matrix_CAF-1_K27_clustered.gz
+#
+# plotHeatmap -m matrix_CAF-1_K27_clustered.gz -out H3K27me3_CAF-1_K27_clustered.pdf \
+#   --samplesLabel WT cac-1 cac-2 set-7 \
+#   --startLabel "5'" --endLabel "3'" \
+#   --missingDataColor 1 \
+#   --whatToShow "heatmap and colorbar" \
+#   --colorList 'white,g,darkgreen' \
+#   --zMin 0 --zMax 50 \
+#   --sortRegions no
 
 ##################################
 
@@ -132,6 +132,27 @@ plotHeatmap -m matrix_CAF-1_K27_clustered.gz -out H3K27me3_CAF-1_K27_clustered.p
 #             --colorList 'white, violet, magenta' \
 #             --zMin 0 \
 
+
+computeMatrix scale-regions \
+-S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+   $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+   $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+   $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
+  -R retained_grouped.bed lost_grouped.bed ectopic_grouped.bed \
+  --skipZeros \
+  -o matrix_CAF-1_K27_clustered.gz
+
+plotHeatmap -m matrix_CAF-1_K27_clustered.gz -out H3K27me3_CAF-1_K27_clustered.pdf \
+  --samplesLabel WT cac-1 cac-2 set-7 \
+  --startLabel "5'" --endLabel "3'" \
+  --missingDataColor 1 \
+  --whatToShow "heatmap and colorbar" \
+  --colorList 'white,g,darkgreen' \
+  --zMin 0 --zMax 50 \
+  --sortRegions no
+
+
+
 # All K4 genes
     # computeMatrix scale-regions -a 250 -b 250 --regionBodyLength 2000 --scale 1.5 \
     #  -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
@@ -150,6 +171,7 @@ plotHeatmap -m matrix_CAF-1_K27_clustered.gz -out H3K27me3_CAF-1_K27_clustered.p
     #         --heatmapHeight 25 \
     #         --colorMap 'cool' \
     #         --zMin 0 \
+
 
 # #cac-2 comp (K4)
 # computeMatrix scale-regions -a 250 -b 250 \
