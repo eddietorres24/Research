@@ -134,6 +134,7 @@ computeMatrix scale-regions \
    $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
    $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
    $P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw \
+  -R retained_grouped.bed lost_grouped.bed ectopic_grouped.bed \
   --skipZeros \
   -o matrix_CAF-1_Kac_clustered.gz
 
