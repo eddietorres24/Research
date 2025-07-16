@@ -143,9 +143,10 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out H3K27me3_CAF-1_Kac_clustered.p
   --startLabel "5'" --endLabel "3'" \
   --missingDataColor 1 \
   --whatToShow "heatmap and colorbar" \
-  --colorList 'lavender, mediumslateblue"' \
+  --colorList 'white, lavender, mediumslateblue' \
   --zMin 0 \
   --sortRegions no
+
 
 ##################################
 
