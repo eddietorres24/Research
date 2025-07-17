@@ -331,3 +331,28 @@ plot = ggplot(K27_results_cac3, aes(x = log2FC_cac3_vsWT, y = cac3RNA, color = c
 ggsave(filename = "./K27_v_RNA_cac3_Paper.pdf", plot = plot, dpi=600, height=9, width=12, units = "in")
 
 ```
+
+```{r, beds for heatmap}
+#combine cac-1 & cac-2 results
+K27_results_cac = full_join(K27_results_cac1, K27_results_cac2, by = "Name")
+K27_results_cac_bed = subset(genes_df, genes_df$Name %in% K27_results_cac)
+
+#subset results
+K27_lost_cac = subset(K27_results_cac, K27_results_cac1$log2FC_cac1_vsWT <= -1.5 | K27_results_cac1$log2FC_cac2_vsWT <= -1.5 )
+K27_in_cac = subset(K27_results_cac, K27_results_cac1$log2FC_cac1_vsWT > -1.5 & K27_results_cac1$log2FC_cac1_vsWT < 1.5 )
+K27_gain_cac = subset(K27_results_cac1, K27_results_cac1$log2FC_cac1_vsWT >= 1.5 )
+
+#subset beds
+K27_in_cac_bed = subset(K27_results_cac1_bed, K27_results_cac1_bed$Name %in% K27_in_cac1$Name)
+K27_gain_cac_bed = subset(K27_results_cac_bed, K27_results_cac1_bed$Name %in% K27_gain_cac$Name)
+K27_lost_cac_bed = subset(K27_results_cac1_bed, K27_results_cac1_bed$Name %in% K27_lost_cac1$Name)
+
+#write beds
+write.table(K27_gain_cac1_bed, file = "K27_gain_cac1.bed", quote = FALSE, sep = "\t",
+            row.names = FALSE, col.names = FALSE)
+write.table(K27_lost_cac1_bed, file = "K27_lost_cac1.bed", quote = FALSE, sep = "\t",
+            row.names = FALSE, col.names = FALSE)
+write.table(K27_in_cac1_bed, file = "K27_in_cac1.bed", quote = FALSE, sep = "\t",
+            row.names = FALSE, col.names = FALSE)
+
+```
