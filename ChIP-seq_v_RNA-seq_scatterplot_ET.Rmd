@@ -335,12 +335,15 @@ ggsave(filename = "./K27_v_RNA_cac3_Paper.pdf", plot = plot, dpi=600, height=9, 
 ```{r, beds for heatmap}
 #combine cac-1 & cac-2 results
 K27_results_cac = full_join(K27_results_cac1, K27_results_cac2, by = "Name")
-K27_results_cac_bed = subset(genes_df, genes_df$Name %in% K27_results_cac)
+K27_results_cac_bed = subset(genes_df, genes_df$Name %in% K27_results_cac$Name)
 
 #subset results
-K27_lost_cac = subset(K27_results_cac, K27_results_cac1$log2FC_cac1_vsWT <= -1.5 | K27_results_cac1$log2FC_cac2_vsWT <= -1.5 )
-K27_in_cac = subset(K27_results_cac, K27_results_cac1$log2FC_cac1_vsWT > -1.5 & K27_results_cac1$log2FC_cac1_vsWT < 1.5 )
-K27_gain_cac = subset(K27_results_cac1, K27_results_cac1$log2FC_cac1_vsWT >= 1.5 )
+K27_lost_cac = subset(K27_results_cac, K27_results_cac$log2FC_cac1_vsWT <= -1.5 | K27_results_cac$log2FC_cac2_vsWT <= -1.5 )
+
+K27_gain_cac = subset(K27_results_cac, K27_results_cac$log2FC_cac1_vsWT >= 1.5 | K27_results_cac$log2FC_cac2_vsWT >= 1.5 )
+
+K27_in_cac = subset(K27_results_cac, K27_results_cac$log2FC_cac1_vsWT > -1.5 & K27_results_cac$log2FC_cac1_vsWT < 1.5 )
+
 
 #subset beds
 K27_in_cac_bed = subset(K27_results_cac1_bed, K27_results_cac1_bed$Name %in% K27_in_cac1$Name)

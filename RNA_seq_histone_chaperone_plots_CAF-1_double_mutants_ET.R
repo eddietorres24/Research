@@ -72,15 +72,14 @@ allDataTPM  <- data.matrix(Interactors_tpm)
 #move the subset of genes you want to plot into a new matrix
 sampleNames <- colnames(allDataTPM)
 # write.table(sampleNames, file="names.txt")
-Ordered_KO_data <- cbind(allDataTPM[,22:25],allDataTPM[,29:31],allDataTPM[,4:6],allDataTPM[,32:34],allDataTPM[,35:37],allDataTPM[,7:9],allDataTPM[,26:28])
+Ordered_KO_data <- cbind(allDataTPM[,22:25],allDataTPM[,29:31],allDataTPM[,4:6],allDataTPM[,32:34],allDataTPM[,35:37],allDataTPM[,26:28])
 Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,22:25], na.rm = TRUE),
                                  rowMeans(allDataTPM[,29:31], na.rm = TRUE),
                                  rowMeans(allDataTPM[,4:6], na.rm = TRUE),
                                  rowMeans(allDataTPM[,32:34], na.rm = TRUE),
                                  rowMeans(allDataTPM[,35:37], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,7:9], na.rm = TRUE),
                                  rowMeans(allDataTPM[,26:28], na.rm = TRUE))
-averageRowIDs=c("WT","cac-1","cac-2", "cac-1_cac-2","cac-1_suz12","cac-3","set-7")
+averageRowIDs=c("WT", "cac-1", "cac-2", "cac-1_cac-2","cac-1_suz12","set-7")
 colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 
 
@@ -140,7 +139,7 @@ meltedAverageAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
 meltedAveragePRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
                                     varnames=c('GeneID', 'Sample'))
 
-altorder = rev(c( "WT","cac-1","cac-2","cac-1_cac-2","cac-1_suz12","cac-3","set-7"))
+altorder = rev(c( "WT","cac-1","cac-2","cac-1_cac-2","cac-1_suz12","set-7"))
 meltedAveragePRC2targetData$Sample <- factor(meltedAveragePRC2targetData$Sample, rev(altorder))
 
 # Plot box & whisker chart
