@@ -61,7 +61,6 @@ library(ComplexHeatmap)
 library(profileplyr)
 library(DiffBind)
 library(circlize)
-
 ```
 
 ```{r ReadBams and countWindows}
@@ -229,6 +228,119 @@ plot(yK27$AveLogCPM[o], sqrt(yK27$trended.dispersion[o]), type="l", lwd=2,
      ylab=("Biological coefficient of variation"))
 plotQLDisp(fitK27)
 ```
+
+
+
+```{r, Writing function to more easily process data}
+#Assigning this function to a varaible to iterate through all strains with data for a specific modification
+##Note: I am assigning this function to a variable, and we can use this to run the analysis for different mods or regions (filtered_data)
+run_csaw_analysis <- function(
+  modification,
+  strains,
+  fit_object,
+  filtered_data,
+  design.mat,
+  fdr_cutoff = 0.05
+) {
+  library(limma)
+  
+  res_list <- list()
+  
+  for (strain in strains) {
+    chip_col <- paste0(strain, ".", modification)
+    input_col <- paste0(strain, ".input")
+    
+    if (!(chip_col %in% colnames(design.mat)) || !(input_col %in% colnames(design.mat))) {
+      message("Skipping: ", strain, " — missing columns for ", modification)
+      next
+    }
+    
+    contrast_name <- paste0(modification, "v", strain)
+    message("Processing: ", contrast_name)
+    
+    # Define contrast
+    contrast <- makeContrasts(
+      contrasts = paste0(chip_col, " - ", input_col),
+      levels = design.mat
+    )
+    
+    # Run csaw test
+    res <- glmQLFTest(fit_object, contrast = contrast)
+    merged <- mergeResults(filtered_data, res$table, tol = 300,
+                           merge.args = list(max.width = 300))
+    
+    # Attach data to ranges
+    out_ranges <- merged$regions
+    mcols(out_ranges) <- DataFrame(merged$combined)
+    
+    res_list[[strain]] <- out_ranges
+  }
+  
+  if (length(res_list) == 0) stop("No valid contrasts for this modification.")
+  
+  # Use first entry as scaffold
+  base <- res_list[[1]]
+  
+  final_df <- data.frame(
+    seqnames = as.character(seqnames(base)),
+    start = start(base),
+    end = end(base),
+    names = rep(".", length(base)),
+    scores = rep(".", length(base)),
+    strand = as.character(strand(base))
+  )
+  
+  for (strain in names(res_list)) {
+    gr <- res_list[[strain]]
+    logFC_col <- paste0("logFC_", strain)
+    p_col     <- paste0("PValue_", strain)
+    fdr_col   <- paste0("FDR_", strain)
+    
+    final_df[[logFC_col]] <- gr$rep.logFC
+    final_df[[p_col]]     <- gr$PValue
+    final_df[[fdr_col]]   <- gr$FDR
+    
+    # Zero non-significant logFCs
+    final_df[[logFC_col]][final_df[[fdr_col]] > fdr_cutoff] <- 0
+  }
+  
+  # Heatmap matrix
+  heatmap_df <- final_df[, grep("^logFC_", colnames(final_df))]
+  rownames(heatmap_df) <- paste(final_df$seqnames, final_df$start, final_df$end, sep = ".")
+  
+  return(list(
+    result_df = final_df,
+    sig_logFC_matrix = heatmap_df,
+    granges_per_strain = res_list
+  ))
+}
+
+#applying function to H3k27me3 filtered regions
+##starting with H3K27me3
+
+# List of known strains from your dataset
+all_strains <- c("WT", "cac1", "cac2", "cac3", "set7", "cac1_cac2", "cac2_comp", 
+                 "WT_new", "cac1_new", "rtt106", "cac1_rtt106")
+
+# Run for K27me3
+k27_result <- run_csaw_analysis(
+  modification   = "H3K27me3_CS",
+  strains        = all_strains,
+  fit_object     = fitK27,
+  filtered_data  = filtered.dataK27,
+  design.mat     = design.mat,
+  fdr_cutoff     = 0.05
+)
+
+# Output result tables
+K27.chip.Filteredres.df <- k27_result$result_df
+K27_FilteredHeatmap_df  <- k27_result$sig_logFC_matrix
+
+```
+
+
+
+
 
 
 ```{r START OF CS K27 ChIP Analysis}

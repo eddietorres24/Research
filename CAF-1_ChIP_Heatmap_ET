@@ -44,11 +44,11 @@ module load deepTools
 
 
 #############################
-#Special strategy for plotting and ordering genes with retained, lost, and gained H3K27me3 in CAF-1 mutants
-
-#Plotting ALL qa-suz12 K27 regions (normal & ectopic)
+# Special strategy for plotting and ordering genes with retained, lost, and gained H3K27me3 in CAF-1 mutants
+#
+# Plotting ALL qa-suz12 K27 regions (normal & ectopic)
 # Step 1: Compute matrices for each BED category
-# computeMatrix scale-regions -a 250 -b 800 --regionBodyLength 2000 \
+# computeMatrix scale-regions -b 800 --regionBodyLength 2000 \
 # -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
 #    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
 #    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
@@ -56,7 +56,7 @@ module load deepTools
 #   -R $BEDDIR2/K27_in_cac1.bed \
 #   --skipZeros -o matrix_retained.gz
 #
-# computeMatrix scale-regions -a 250 -b 800 --regionBodyLength 2000 \
+# computeMatrix scale-regions -b 800 --regionBodyLength 2000 \
 # -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
 #    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
 #    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
@@ -64,7 +64,7 @@ module load deepTools
 #   -R $BEDDIR2/K27_lost_cac1.bed \
 #   --skipZeros -o matrix_lost.gz
 #
-# computeMatrix scale-regions -a 250 -b 800 --regionBodyLength 2000 \
+# computeMatrix scale-regions -b 800 --regionBodyLength 2000 \
 # -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
 #    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
 #    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
@@ -91,7 +91,7 @@ module load deepTools
 #   awk 'BEGIN{OFS="\t"} {$NF="gained"; print}' ectopic_sorted.bed > ectopic_grouped.bed
 #
 # # Step 4: Final matrix using the sorted BEDs as separate region groups
-# computeMatrix scale-regions -a 250 -b 800 --regionBodyLength 2000 \
+# computeMatrix scale-regions -b 800 --regionBodyLength 2000 \
 # -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
 #    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
 #    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
@@ -99,7 +99,7 @@ module load deepTools
 #   -R retained_grouped.bed lost_grouped.bed ectopic_grouped.bed \
 #   --skipZeros \
 #   -o matrix_CAF-1_K27_clustered.gz
-#
+# #
 # plotHeatmap -m matrix_CAF-1_K27_clustered.gz -out H3K27me3_CAF-1_K27_clustered_1-5.pdf \
 #   --samplesLabel WT cac-1 cac-2 set-7 \
 #   --startLabel "5'" --endLabel "3'" \
@@ -278,25 +278,25 @@ module load deepTools
 
 # computeMatrix scale-regions -a 250 -b 1000 --regionBodyLength 2000 --scale 1.5
 ## unclustered
-computeMatrix scale-regions -a 250 -b 800 --regionBodyLength 2000 --scale 2 \
+computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 2 \
  -S $P150DIR/150-93_ChIP_WT_H3K36me3_Rep4_S93.bin_25.smooth_75Bulk.bw \
     $P150DIR/150-94_ChIP_cac-1_H3K36me3_Rep4_S94.bin_25.smooth_75Bulk.bw \
     $P150DIR/150-116_ChIP_cac-2_H3K36me3_Rep4_S131.bin_25.smooth_75Bulk.bw \
     $P150DIR/150-134_ChIP_set-7_H3K36me3_Rep4_S149.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/nonK27_genes.bed --skipZeros -o K36_matrix_PRC2_1.gz
+    -R $BEDDIR2/no_K36_loss.bed $BEDDIR2/K36_prom_only_loss.bed $BEDDIR2/K36_gene_loss.bed --skipZeros -o K36_matrix_PRC2_1.gz
 
-    plotHeatmap -m K36_matrix_PRC2_1.gz -out CAF-1_ash1_H3K36me3_nonK27genes_scaled_GRC.pdf \
+    plotHeatmap -m K36_matrix_PRC2_1.gz -out H3K36me3_CAF-1_cluster.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \
                     --startLabel "TSS" \
                     --endLabel "TES" \
                     --sortRegions descend \
                     --boxAroundHeatmaps no \
-                    --sortUsingSamples 2 \
+                    --sortUsingSamples 1 2 3 \
                     --missingDataColor 1 \
                     --heatmapHeight 20 \
                     --colorMap "afmhot" \
                     --zMin 0 \
-                    --zMax 10
+                    --zMax 12
 
 #$P138DIR/138-65_ChIP_cac-3_H3K36me3_Rep2_6252_S64.bin_25.smooth_75Bulk.bw \
 

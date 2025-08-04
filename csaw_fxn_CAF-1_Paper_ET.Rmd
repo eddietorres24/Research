@@ -1,0 +1,1403 @@
+---
+title: "CSAW_cacs_ET"
+author: "Eddie Torres"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+# Set working environment
+
+workingdir="C:/Users/eddie/Research/GitHub"
+
+#set working directory to the correct location for working machine
+knitr::opts_knit$set(root.dir = "workingdir")
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+```{r load libraries, echo = TRUE, eval = FALSE }
+# 
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager", type = "source")
+# 
+# BiocManager::install("csaw") #INSTALL from source (I had to download a gfortran installer from CRAN (https://cran.r-project.org/bin/macosx/tools/) )
+# 
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# 
+# BiocManager::install("DiffBind")
+# 
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# 
+# BiocManager::install("profileplyr")
+# 
+# #edgeR
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# 
+# BiocManager::install("edgeR")
+# 
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# 
+# BiocManager::install("ComplexHeatmap")
+
+library(csaw)
+library(edgeR)
+library(dplyr)
+library(ComplexHeatmap)
+library(profileplyr)
+library(DiffBind)
+library(circlize)
+```
+
+```{r ReadBams and countWindows}
+#https://bioconductor.org/packages/release/bioc/manuals/csaw/man/csaw.pdf
+#read in sample sheet
+samples <- read.csv("./csaw_samples_files/cac_csaw.csv")
+
+#samples$bamReads <- paste("~/Desktop/COMPASS/SortedBamFiles/",samples$bamReads, sep="")
+
+##Step 1: create counts for all bins excluding the mat locus, which may be different in different strains
+
+###########remove mat locus               1856250. 1862401 36 - 37
+matLocus <- GRanges("CM002236.1", IRanges(1856288, 1862459)) # mat
+
+##set parameters for windowCounts
+param <- readParam(discard = matLocus, pe="both", max.frag=1500, minq=20 )
+
+##Estimate Fragment length to determine window size setting (csaw book, 2.4)
+# max.delay <- 1500
+# x <- correlateReads(samples$bamReads, max.delay, param=param)
+# plot(0:max.delay, x, type="l", ylab="CCF", xlab="Delay (bp)")
+
+#read counts from bam files
+data_csaw <- windowCounts(samples$bamReads, spacing=300, width=300, shift=0, filter=0, bin=TRUE, param=param)
+
+```
+
+```{r pre-process data}
+##Filter by global background calculation (csaw book, 4.4)
+# bin.size <- 2000L
+# binned <- windowCounts(samples$bamReads, bin=TRUE, width=bin.size, param=param)
+# filter.stat <- filterWindowsGlobal(data_csaw, background=binned)
+# 
+#  keep <- filter.stat$filter > log2(2.2)
+#  sum(keep)
+# 
+# #filtered data keeping all regions > background
+#      filtered.data <- data_csaw[keep,]
+# 
+# hist(filter.stat$filter, xlab="Log-fold change from global background", 
+#     breaks=100, main="", col="grey80", xlim=c(0, 5))
+# abline(v=log2(2.2), col="red", lwd=2)
+
+
+##Filter by negative controls #Try this second
+```
+
+```{r filter based on K27 peaks & genes}
+#Read in bed files
+K27peaks_merged <- read.table(file="./bed_files/CAF-1_All_K27_merge_peaks.bed")
+
+K27_genes <- read.table(file="./bed_files/K27_genes_stringent.bed")
+
+K27_genes_prom <- read.table(file="./bed_files/genes_and_promoters_overlap_100pct_edit.bed")
+
+K27_prom <- read.table(file="./bed_files/K27_gene_promoters.bed")
+
+#Get Genomic ranges from each bed files
+K27peaks_merged.gr <- GRanges(K27peaks_merged$V1, IRanges(K27peaks_merged$V2, K27peaks_merged$V3))
+
+K27_genes.gr <- GRanges(K27_genes$V1, IRanges(K27_genes$V2, K27_genes$V3))
+
+K27_genes_prom.gr <- GRanges(K27_genes_prom$V1, IRanges(K27_genes_prom$V2, K27_genes_prom$V3))
+
+K27_prom.gr <- GRanges(K27_prom$V1, IRanges(K27_prom$V2, K27_prom$V3))
+
+#Keep Regions within peaks
+suppressWarnings(keepK27 <- overlapsAny(rowRanges(data_csaw), K27peaks_merged.gr, type = "within"))
+summary(keepK27)
+
+suppressWarnings(keepK27_genes <- overlapsAny(rowRanges(data_csaw), K27_genes.gr, type = "within"))
+summary(keepK27_genes)
+
+suppressWarnings(keepK27_genes_prom <- overlapsAny(rowRanges(data_csaw), K27_genes_prom.gr, type = "within"))
+summary(keepK27_genes_prom)
+
+suppressWarnings(keepK27_prom <- overlapsAny(rowRanges(data_csaw), K27_prom.gr, type = "within"))
+summary(keepK27_prom)
+    
+#filter data keeping different regions for each modification
+filtered.dataK27 <- data_csaw[keepK27,]
+
+filtered.dataK27_genes <- data_csaw[keepK27_genes,]
+
+filtered.dataK27_genes_prom <- data_csaw[keepK27_genes_prom,]
+
+filtered.dataK27_prom <- data_csaw[keepK27_prom,]
+
+#Make dataframe objects for each modification
+K27.Windows.df <- as.data.frame(granges(filtered.dataK27))
+
+K27_genes.Windows.df <- as.data.frame(granges(filtered.dataK27_genes))
+
+K27_genes_prom.Windows.df <- as.data.frame(granges(filtered.dataK27_genes_prom))
+
+K27_prom.Windows.df <- as.data.frame(granges(filtered.dataK27_prom))
+
+```
+
+
+```{r prepare edgeR}
+####################### Analyze differential binding events
+
+#define groups for analysis (WT versus mutant timepoints)
+grouping <- factor(paste(samples$Strain, samples$Antibody, sep="."))
+
+#create a DGElistregions object, this creates an object with a counts DF and a samples DF
+DGElistK27 <- asDGEList(filtered.dataK27, group=factor(grouping)) 
+DGElistK27_genes <- asDGEList(filtered.dataK27_genes, group=factor(grouping))
+DGElistK27_genes_prom <- asDGEList(filtered.dataK27_genes_prom, group=factor(grouping))
+DGElistK27_prom <- asDGEList(filtered.dataK27_prom, group=factor(grouping))
+
+#replace generic "Sample1, Sample2" names with actual names of samples. Do for all mods
+
+#K27
+colnames(DGElistK27$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+rownames(DGElistK27$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+
+#K27_genes
+colnames(DGElistK27_genes$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+rownames(DGElistK27_genes$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+
+#K27_genes_promoters
+colnames(DGElistK27_genes_prom$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+rownames(DGElistK27_genes_prom$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+
+#K27_promoters
+colnames(DGElistK27_prom$counts) <- paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+rownames(DGElistK27_prom$samples) <-  paste(paste(samples$Strain,samples$Antibody, "R", sep="."), samples$Replicate, sep="")
+
+```
+
+```{r, Designing the matrix}
+#design a model matrix to compare groups, This Should be the same for all mods, as it depends on you sample sheet
+##In this case, I'm only looking at modifications within H3K27me3 regions, so i will use the H3K27me3 list to make the matrix
+design.mat <- model.matrix(~0 + DGElistK27$samples$group)
+#replace wonky column names with readable ones
+colnames(design.mat) <- levels(DGElistK27$samples$group)
+```
+
+```{r Estimate Dispersion}
+#We need to do this separately for each modification
+yK27 <- estimateDisp(DGElistK27, design.mat)
+yK27_gene <- estimateDisp(DGElistK27_genes, design.mat)
+yK27_gene_prom <- estimateDisp(DGElistK27_genes_prom, design.mat)
+yK27_prom <- estimateDisp(DGElistK27_prom, design.mat)
+
+#See summary if you want
+summary(yK27$trended.dispersion)
+
+#assign fit variable, THIS WILL BE USED FOR DOWNSTREAM ANALYSIS, need to do for each mod
+fitK27 <- glmQLFit(yK27, design.mat, robust=TRUE)
+fitK27_gene <- glmQLFit(yK27_gene, design.mat, robust=TRUE)
+fitK27_gene_prom <- glmQLFit(yK27_gene_prom, design.mat, robust=TRUE)
+fitK27_prom <- glmQLFit(yK27_prom, design.mat, robust=TRUE)
+
+#See summary & head of counts table
+summary(fitK27$var.post)
+head(yK27$counts)
+
+#plot fit, replace "y" variables to see fit for different mods
+par(mfrow=c(1,2))
+o <- order(yK27$AveLogCPM)
+plot(yK27$AveLogCPM[o], sqrt(yK27$trended.dispersion[o]), type="l", lwd=2,
+     ylim=c(0, 1), xlab=expression("Ave."~Log[2]~"CPM"),
+     ylab=("Biological coefficient of variation"))
+plotQLDisp(fitK27)
+```
+
+```{r, calculating signal over whole genes and promoters instead of reading data in windows}
+genes_gr <- GRanges(
+  seqnames = K27_genes$V1,
+  ranges = IRanges(
+    start = K27_genes$V2,
+    end = K27_genes$V3
+  ),
+  strand = K27_genes$V6
+)
+
+prom_gr <- GRanges(
+  seqnames = K27_prom$V1,
+  ranges = IRanges(
+    start = K27_prom$V2,
+    end = K27_prom$V3
+  ),
+  strand = K27_prom$V6
+)
+
+# Count reads across genes & promoters
+csaw_gene <- regionCounts(bam.files = samples$bamReads, regions = genes_gr, param = param)
+csaw_prom <- regionCounts(bam.files = samples$bamReads, regions = prom_gr, param = param)
+
+#Build group factor from csaw metadata
+grouping <- factor(paste(samples$Strain, samples$Antibody, sep = "."))
+
+#Design matrix using this grouping
+design.mat <- model.matrix(~ 0 + grouping)
+colnames(design.mat) <- levels(grouping)
+
+#Create DGELists for plus and minus strand counts
+dge_gene  <- asDGEList(csaw_gene,  group = grouping)
+dge_prom  <- asDGEList(csaw_prom,  group = grouping)
+
+#Estimate dispersions
+disp_gene  <- estimateDisp(dge_gene,  design.mat)
+disp_prom  <- estimateDisp(dge_prom,  design.mat)
+
+#Fit GLMs
+fit_gene  <- glmQLFit(disp_gene,  design.mat, robust = TRUE)
+fit_prom  <- glmQLFit(disp_prom,  design.mat, robust = TRUE)
+
+fullgene_K27 <- run_csaw_analysis(
+  modification   = "H3K27me3_CS",
+  strains        = all_strains,
+  fit_object     = fit_gene,
+  filtered_data  = csaw_gene,
+  design.mat     = design.mat
+)
+
+K27_fullgene_Results_df <- fullgene_K27$result_df
+K27_fullgene_FilteredHeatmap_df  <- fullgene_K27$sig_logFC_matrix
+
+fullprom_K27 <- run_csaw_analysis(
+  modification   = "H3K27me3_CS",
+  strains        = all_strains,
+  fit_object     = fit_prom,
+  filtered_data  = csaw_prom,
+  design.mat     = design.mat,
+)
+
+K27_fullprom_Results_df <- fullprom_K27$result_df
+K27_fullprom_FilteredHeatmap_df  <- fullprom_K27$sig_logFC_matrix
+
+fullgene_K36 <- run_csaw_analysis(
+  modification   = "H3K36me3",
+  strains        = all_strains,
+  fit_object     = fit_gene,
+  filtered_data  = csaw_gene,
+  design.mat     = design.mat,
+  normalize_to = "WT"
+)
+
+K36_fullgene_Results_df <- fullgene_K36$result_df
+K36_fullgene_FilteredHeatmap_df  <- fullgene_K36$sig_logFC_matrix
+
+fullprom_K36 <- run_csaw_analysis(
+  modification   = "H3K36me3",
+  strains        = all_strains,
+  fit_object     = fit_prom,
+  filtered_data  = csaw_prom,
+  design.mat     = design.mat,
+  normalize_to = "WT"
+)
+
+K36_fullprom_Results_df <- fullprom_K36$result_df
+K36_fullprom_FilteredHeatmap_df  <- fullprom_K36$sig_logFC_matrix
+
+```
+
+
+```{r, Writing function to more easily process data}
+#Assigning this function to a varaible to iterate through all strains with data for a specific modification
+##Note 1: I am assigning this function to a variable, and we can use this to run the analysis for different mods or regions (filtered_data)
+##Note 2: This function allows you to normalize to either input or another strain, you have to specify what you want to do in the "normalize_to" parameter. I have it set to "WT" as a default
+run_csaw_analysis <- function(
+  modification,
+  strains,
+  fit_object,
+  filtered_data,
+  design.mat,
+  normalize_to = "input",  # "input" or a strain name like "WT"
+  fdr_cutoff = 0.05 #0.05 is default
+) {
+  library(limma)
+  
+  res_list <- list()
+  
+  # Drop reference strain if using strain-vs-strain normalization
+  if (normalize_to != "input") {
+    ref_col <- paste0(normalize_to, ".", modification)
+    strains <- setdiff(strains, normalize_to)
+  }
+  
+  for (strain in strains) {
+    chip_col <- paste0(strain, ".", modification)
+    input_col <- paste0(strain, ".input")
+    
+    # Decide reference column
+    ref_col <- if (normalize_to == "input") input_col else paste0(normalize_to, ".", modification)
+    
+    # Skip if missing columns
+    if (!(chip_col %in% colnames(design.mat)) || !(ref_col %in% colnames(design.mat))) {
+      message("Skipping: ", strain, " — missing contrast columns: ", chip_col, " or ", ref_col)
+      next
+    }
+    
+    contrast_name <- paste0(modification, "v", strain)
+    message("Processing: ", contrast_name)
+    
+    contrast <- makeContrasts(
+      contrasts = paste0(chip_col, " - ", ref_col),
+      levels = design.mat
+    )
+    
+    res <- glmQLFTest(fit_object, contrast = contrast)
+    merged <- mergeResults(filtered_data, res$table, tol = 300,
+                           merge.args = list(max.width = 300))
+    
+    out_ranges <- merged$regions
+    mcols(out_ranges) <- DataFrame(merged$combined)
+    
+    res_list[[strain]] <- out_ranges
+  }
+  
+  if (length(res_list) == 0) stop("No valid contrasts for this modification.")
+  
+  base <- res_list[[1]]
+  final_df <- data.frame(
+    seqnames = as.character(seqnames(base)),
+    start = start(base),
+    end = end(base),
+    names = rep(".", length(base)),
+    scores = rep(".", length(base)),
+    strand = as.character(strand(base))
+  )
+  
+  for (strain in names(res_list)) {
+    gr <- res_list[[strain]]
+    logFC_col <- paste0("logFC_", strain)
+    p_col     <- paste0("PValue_", strain)
+    fdr_col   <- paste0("FDR_", strain)
+    
+    final_df[[logFC_col]] <- gr$rep.logFC
+    final_df[[p_col]]     <- gr$PValue
+    final_df[[fdr_col]]   <- gr$FDR
+    
+    final_df[[logFC_col]][final_df[[fdr_col]] > fdr_cutoff] <- 0
+  }
+  
+  heatmap_df <- final_df[, grep("^logFC_", colnames(final_df))]
+  rownames(heatmap_df) <- paste(final_df$seqnames, final_df$start, final_df$end, sep = ".")
+  
+  return(list(
+    result_df = final_df,
+    sig_logFC_matrix = heatmap_df,
+    granges_per_strain = res_list
+  ))
+}
+
+#applying function to H3k27me3 filtered regions
+##starting with H3K27me3
+
+#List of strains from sheet
+all_strains <- c("WT", "cac1", "cac2", "cac3", "set7", "cac1_cac2", "cac2_comp", 
+                 "WT_new", "cac1_new", "rtt106", "cac1_rtt106")
+
+#Example for running analysis for H3K27me3 at all H3K27me3 regions across CAF-1 mutants
+#vs input
+k27_input <- run_csaw_analysis_combined(
+  modification   = "H3K27me3_CS",
+  strains        = all_strains,
+  fit_object     = fitK27,
+  filtered_data  = filtered.dataK27,
+  design.mat     = design.mat,
+  normalize_to   = "input",  # default
+  fdr_cutoff     = 0.05
+)
+
+# Output result tables
+K27_Result_df <- k27_input$result_df
+K27_FilteredHeatmap_df  <- k27_input$sig_logFC_matrix
+
+#vs WT
+k27_vsWT <- run_csaw_analysis_combined(
+  modification   = "H3K27me3_CS",
+  strains        = all_strains,
+  fit_object     = fitK27,
+  filtered_data  = filtered.dataK27,
+  design.mat     = design.mat,
+  normalize_to   = "WT",     # WT is used as reference strain
+  fdr_cutoff     = 0.05
+)
+
+# Output result tables
+K27_vWT_Result_df <- k27_vsWT$result_df
+K27_vWT_FilteredHeatmap_df  <- k27_vsWT$sig_logFC_matrix
+
+```
+
+############################################
+
+```{r, Making dfs for genes + promoter heatmaps}
+###starting with genes
+
+#H3K27me3
+k27_gene <- run_csaw_analysis(
+  modification   = "H3K27me3_CS",
+  strains        = all_strains,
+  fit_object     = fitK27,
+  filtered_data  = filtered.dataK27,
+  design.mat     = design.mat,
+  normalize_to   = "input",
+  fdr_cutoff     = 0.05
+)
+K27_FilteredHeatmap_df
+# Output result tables
+K27_gene_Results_df <- k27_gene$result_df
+K27_gene_FilteredHeatmap_df  <- k27_gene$sig_logFC_matrix
+
+#H3K36me3
+k36_gene <- run_csaw_analysis(
+  modification   = "H3K36me3",
+  strains        = all_strains,
+  fit_object     = fitK27,
+  filtered_data  = filtered.dataK27,
+  design.mat     = design.mat,
+  normalize_to   = "input",
+  fdr_cutoff     = 0.05
+)
+
+# Output result tables
+K36_gene_Results_df <- k36_gene$result_df
+K36_gene_FilteredHeatmap_df  <- k36_gene$sig_logFC_matrix
+
+#H3K4me2
+k4_gene <- run_csaw_analysis(
+  modification   = "H3K4me2",
+  strains        = all_strains,
+  fit_object     = fitK27,
+  filtered_data  = filtered.dataK27,
+  design.mat     = design.mat,
+  normalize_to   = "input",
+  fdr_cutoff     = 0.05
+)
+
+# Output result tables
+K4_gene_Results_df <- k4_gene$result_df
+K4_gene_FilteredHeatmap_df  <- k4_gene$sig_logFC_matrix
+
+#Kac
+kac_gene <- run_csaw_analysis(
+  modification   = "Kac",
+  strains        = all_strains,
+  fit_object     = fitK27,
+  filtered_data  = filtered.dataK27,
+  design.mat     = design.mat,
+  normalize_to   = "input",
+  fdr_cutoff     = 0.05
+)
+
+# Output result tables
+Kac_gene_Results_df <- kac_gene$result_df
+Kac_gene_FilteredHeatmap_df  <- kac_gene$sig_logFC_matrix
+
+###now promoters
+
+#H3K27me3
+k27_prom <- run_csaw_analysis(
+  modification   = "H3K27me3_CS",
+  strains        = all_strains,
+  fit_object     = fitK27_prom,
+  filtered_data  = filtered.dataK27_prom,
+  design.mat     = design.mat,
+  normalize_to   = "input",
+  fdr_cutoff     = 0.05
+)
+
+# Output result tables
+K27_prom_Results_df <- k27_prom$result_df
+K27_prom_FilteredHeatmap_df  <- k27_prom$sig_logFC_matrix
+
+#H3K36me3
+k36_prom <- run_csaw_analysis(
+  modification   = "H3K36me3",
+  strains        = all_strains,
+  fit_object     = fitK27_prom,
+  filtered_data  = filtered.dataK27_prom,
+  design.mat     = design.mat,
+  normalize_to   = "input",
+  fdr_cutoff     = 0.05
+)
+
+# Output result tables
+K36_prom_Results_df <- k36_prom$result_df
+K36_prom_FilteredHeatmap_df  <- k36_prom$sig_logFC_matrix
+
+#H3K4me2
+k4_prom <- run_csaw_analysis(
+  modification   = "H3K4me2",
+  strains        = all_strains,
+  fit_object     = fitK27_prom,
+  filtered_data  = filtered.dataK27_prom,
+  design.mat     = design.mat,
+  normalize_to   = "input",
+  fdr_cutoff     = 0.05
+)
+
+# Output result tables
+K4_prom_Results_df <- k4_prom$result_df
+K4_prom_FilteredHeatmap_df  <- k4_prom$sig_logFC_matrix
+
+#Kac
+kac_prom <- run_csaw_analysis(
+  modification   = "Kac",
+  strains        = all_strains,
+  fit_object     = fitK27_prom,
+  filtered_data  = filtered.dataK27_prom,
+  design.mat     = design.mat,
+  normalize_to   = "input",
+  fdr_cutoff     = 0.05
+)
+
+# Output result tables
+Kac_prom_Results_df <- kac_prom$result_df
+Kac_prom_FilteredHeatmap_df  <- kac_prom$sig_logFC_matrix
+
+##############################
+
+#Want to do the same thing, but now normalize to WT
+##gonna just do this for H3K36me3 now, as i want to make a igv file & new bed file with regions where H3K36me3 is lower in CAF-1 mutants than WT
+###looking over genes & promoters for igv
+k36_vsWT <- run_csaw_analysis_combined(
+  modification   = "H3K36me3",
+  strains        = all_strains,
+  fit_object     = fitK27_gene_prom,
+  filtered_data  = filtered.dataK27_genes_prom,
+  design.mat     = design.mat,
+  normalize_to   = "WT",
+  fdr_cutoff     = 0.05
+)
+
+# Output result tables
+K36_vWT_Result_df <- k36_vsWT$result_df
+K36_vWT_FilteredHeatmap_df  <- k36_vsWT$sig_logFC_matrix
+
+```
+
+```{r, making igv tracks}
+# List of logFC columns to export
+track = K36_fullgene_Results_df %>% select("seqnames", "start", "end", "names", "logFC_cac1", "logFC_cac2", "logFC_cac3", "logFC_set7")
+
+write.table(track, file="./K36_CAF1_v_WT_K27_genes.igv", sep="\t", row.names = FALSE, quote = FALSE)
+
+track = K36_fullprom_Results_df %>% select("seqnames", "start", "end", "names", "logFC_cac1", "logFC_cac2", "logFC_cac3", "logFC_set7")
+
+write.table(track, file="./K36_CAF1_v_WT_K27_proms.igv", sep="\t", row.names = FALSE, quote = FALSE)
+
+```
+
+```{r, subsetting gene bed for deeptools analysis}
+gene_loss = subset(K36_fullgene_Results_df, K36_fullgene_Results_df$logFC_cac1 <= -0.8 | K36_fullgene_Results_df$logFC_cac2 <= -0.8)
+
+prom_loss = subset(K36_fullprom_Results_df, (K36_fullprom_Results_df$logFC_cac1 <= -0.8 | K36_fullprom_Results_df$logFC_cac2 <= -0.8) & ! K36_fullprom_Results_df$gene_id %in% gene_loss$gene_id)
+
+gene_loss_bed = subset(K27_genes, K27_genes$V10 %in% gene_loss$gene_id)
+prom_loss_bed = subset(K27_genes, K27_genes$V10 %in% prom_loss$gene_id)
+no_loss_bed = subset(K27_genes, ! K27_genes$V10 %in% gene_loss$gene_id & ! K27_genes$V10 %in% prom_loss$gene_id)
+
+write.table(gene_loss_bed, file = "K36_gene_loss.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(prom_loss_bed, file = "K36_prom_only_loss.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(no_loss_bed, file = "no_loss.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+
+```
+
+```{r, add gene names back to df}
+
+# K27 genes
+K27_fullgene_Results_df <- K27_fullgene_Results_df %>%
+  left_join(
+    select(K27_genes, V1, V2, V3, V10),
+    by = c("seqnames" = "V1", "start" = "V2", "end" = "V3")
+  ) %>%
+  rename(gene_id = V10)
+
+
+# K27 promoters
+K27_fullprom_Results_df <- K27_fullprom_Results_df %>%
+  left_join(
+    select(K27_prom, V1, V2, V3, V10),
+    by = c("seqnames" = "V1", "start" = "V2", "end" = "V3")
+  ) %>%
+  rename(gene_id = V10)
+
+
+# K36 genes
+K36_fullgene_Results_df <- K36_fullgene_Results_df %>%
+  left_join(
+    select(K27_genes, V1, V2, V3, V10),
+    by = c("seqnames" = "V1", "start" = "V2", "end" = "V3")
+  ) %>%
+  rename(gene_id = V10)
+
+
+# K36 promoters
+K36_fullprom_Results_df <- K36_fullprom_Results_df %>%
+  left_join(
+    select(K27_prom, V1, V2, V3, V10),
+    by = c("seqnames" = "V1", "start" = "V2", "end" = "V3")
+  ) %>%
+  rename(gene_id = V10)
+
+
+###subset for issues
+K27_fullgene_Results_df = subset(K27_fullgene_Results_df, K27_fullgene_Results_df$gene_id %in% K27_fullprom_Results_df$gene_id)
+K27_fullprom_Results_df = subset(K27_fullprom_Results_df, K27_fullprom_Results_df$gene_id %in% K27_fullgene_Results_df$gene_id)
+
+K36_fullgene_Results_df = subset(K36_fullgene_Results_df, K36_fullgene_Results_df$gene_id %in% K36_fullprom_Results_df$gene_id)
+K36_fullprom_Results_df = subset(K36_fullprom_Results_df, K36_fullprom_Results_df$gene_id %in% K36_fullgene_Results_df$gene_id)
+###
+
+#row names
+rownames(K27_fullgene_Results_df) <- K27_fullgene_Results_df$gene_id
+rownames(K27_fullprom_Results_df) <- K27_fullprom_Results_df$gene_id
+rownames(K36_fullgene_Results_df) <- K36_fullgene_Results_df$gene_id
+rownames(K36_fullprom_Results_df) <- K36_fullprom_Results_df$gene_id
+
+```
+
+```{r, code to run for single heatmaps sorted by themselves (just change variables)}
+#Make subset matrix for plotting
+K36_prom_mat <- K36_fullprom_Results_df %>% 
+  select(logFC_cac1, logFC_cac2, logFC_cac3, logFC_set7) %>% 
+  as.matrix() %>% cap_matrix()
+
+# Compute row-wise mean across all strains
+row_means <- rowMeans(K36_prom_mat, na.rm = TRUE)
+
+# Sort the matrix by decreasing row mean
+K36_prom_mat_sorted <- K36_prom_mat[order(row_means, decreasing = TRUE), ]
+
+# Define color scale using full uncapped range
+heatmap_colors <- colorRamp2(
+  c(-2, 0, 2),
+  c("blue", "white", "red")
+)
+
+# Plot heatmap
+plot = Heatmap(
+  K36_prom_mat_sorted,
+  name = "log2FC",
+  col = heatmap_colors,
+  cluster_rows = FALSE,
+  cluster_columns = FALSE,
+  show_row_names = FALSE,
+  column_names_gp = gpar(fontsize = 10),
+  heatmap_legend_param = list(
+    title_gp = gpar(fontsize = 10),
+    labels_gp = gpar(fontsize = 9)
+  )
+)
+
+pdf("K27_promoters_K36_CAFvWT.pdf", height = 9)
+draw(plot)
+dev.off()
+
+```
+
+```{r, code to run for multiple heatmaps sorted in same order}
+# Define function to cap matrix values at 99.5th percentile
+cap_matrix <- function(mat, quant = 0.995) {
+  cap <- quantile(mat, quant)
+  mat[mat > cap] <- cap
+  return(mat)
+}
+
+# Step 1: Extract logFC matrices and cap outliers
+K27_gene_mat <- K27_fullgene_Results_df %>% 
+  select(logFC_WT, logFC_cac1, logFC_cac2) %>% 
+  as.matrix() %>% cap_matrix()
+
+K27_prom_mat <- K27_fullprom_Results_df %>% 
+  select(logFC_WT, logFC_cac1, logFC_cac2) %>% 
+  as.matrix() %>% cap_matrix()
+
+K36_gene_mat <- K36_fullgene_Results_df %>% 
+  select(logFC_WT, logFC_cac1, logFC_cac2) %>% 
+  as.matrix() %>% cap_matrix()
+
+K36_prom_mat <- K36_fullprom_Results_df %>% 
+  select(logFC_WT, logFC_cac1, logFC_cac2) %>% 
+  as.matrix() %>% cap_matrix()
+
+# Step 2: Cluster genes by CAF-1 signal
+CAF1_cutoff <- 0.1
+CAF1_gene_mat <- K27_gene_mat[, c("logFC_cac1", "logFC_cac2")]
+WT_gene_vec  <- K27_gene_mat[, "logFC_WT"]
+
+no_CAF_rows <- rownames(K27_gene_mat)[
+  CAF1_gene_mat[, 1] <= CAF1_cutoff | CAF1_gene_mat[, 2] <= CAF1_cutoff
+  & WT_gene_vec > CAF1_cutoff
+]
+
+in_both_rows <- setdiff(rownames(K27_gene_mat), no_CAF_rows)
+
+# Step 3: Sort each set by mean K36 gene signal
+no_CAF_sort <- K36_gene_mat[no_CAF_rows, , drop = FALSE]
+in_both_sort <- K36_gene_mat[in_both_rows, , drop = FALSE]
+
+no_CAF_ordered <- rownames(no_CAF_sort)[order(rowMeans(no_CAF_sort), decreasing = TRUE)]
+in_both_ordered <- rownames(in_both_sort)[order(rowMeans(in_both_sort), decreasing = TRUE)]
+
+final_order <- c(no_CAF_ordered, in_both_ordered)
+
+# Step 4: Apply ordering to all matrices
+K27_gene_mat_sort <- K27_gene_mat[final_order, ]
+K27_prom_mat_sort <- K27_prom_mat[final_order, ]
+K36_gene_mat_sort <- K36_gene_mat[final_order, ]
+K36_prom_mat_sort <- K36_prom_mat[final_order, ]
+
+```
+
+
+```{r, Heatmap for H3K27me3 and H3K36me3 across genes & promoters}
+#Using newly generated order to sort other dfs for heatmap
+
+#Color
+col_fun <- colorRamp2(c(0, quantile(K27_FilteredHeatmap_gene_mat, 0.995)), c("white", "darkgreen"))
+col_fun(seq(0, quantile(K27_FilteredHeatmap_gene_mat, 0.995), length = 20))
+
+# Plot the heatmap
+htK27_gene <- Heatmap(
+  K27_gene_mat_sort,
+  name = "K27me3",
+  col = col_fun,
+  cluster_columns = FALSE,
+  cluster_rows = FALSE,
+  show_row_names = FALSE,
+  show_column_dend = FALSE,
+  show_row_dend = FALSE,
+)
+
+htK27_prom <- Heatmap(
+  K27_prom_mat_sort,
+  name = "K27me3_prom",
+  col = col_fun,
+  cluster_columns = FALSE,
+  cluster_rows = FALSE,
+  show_row_names = FALSE
+)
+
+#color
+col_fun <- colorRamp2(c(-1, 0, quantile(K36_FilteredHeatmap_gene_mat, 0.995)), c("white","white", "#A59D00"))
+col_fun(seq(-1, quantile(K36_FilteredHeatmap_gene_mat, 0.995), length = 20))
+
+# Plot the heatmap
+htK36_gene <- Heatmap(
+  K36_gene_mat_sort,
+  name = "K36me3",
+  col = col_fun,
+  cluster_columns = FALSE,
+  cluster_rows = FALSE,
+  show_row_names = FALSE,
+  show_column_dend = FALSE,
+  show_row_dend = FALSE,
+)
+
+htK36_prom <- Heatmap(
+  K36_prom_mat_sort,
+  name = "K36me3_prom",
+  col = col_fun,
+  cluster_columns = FALSE,
+  cluster_rows = FALSE,
+  show_row_names = FALSE,
+  show_column_dend = FALSE,
+  show_row_dend = FALSE
+)
+
+#plot combined heatmap
+final_hm <- htK27_gene + htK36_gene + htK36_prom 
+
+# Step 4: Plot
+pdf("K27_genes_K27_K36.pdf", width = 12, height = 9)
+draw(final_hm)
+dev.off()
+
+```
+
+###########################################################################
+
+```{r, Heatmaps for cac-1/2}
+#K27 Heatmap
+#genesmatrix
+K27_FilteredHeatmap_gene_mat <- as.matrix(K27_gene_FilteredHeatmap_df)
+quantile(K27_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K27_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27_FilteredHeatmap_gene_mat[K27_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 99.5th percentile value with the 99.5th
+
+#I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0.1 in all 3 CAF-1 mutants and WT
+K27_FilteredHeatmap_gene_mat <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 1] >= 0.101 | K27_FilteredHeatmap_gene_mat[, 2] >= 0.101 | K27_FilteredHeatmap_gene_mat[, 3] >= 0.101 | K27_FilteredHeatmap_gene_mat[, 4] >= 0.101)
+
+#Get rid of anything 0 or lower in WT
+K27_FilteredHeatmap_gene_mat <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 1] > 0)
+
+#Now, I only want to look at cac-1/2
+K27_FilteredHeatmap_gene_mat <- K27_FilteredHeatmap_gene_mat[,c(1:3)]
+
+#Manual Clustering to clean up heatmap
+no_cac1 <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1)
+
+in_both <- subset(K27_FilteredHeatmap_gene_mat, ! rownames(K27_FilteredHeatmap_gene_mat) %in% rownames(no_cac1))
+
+#Extract corresponding rows from K36 for sorting
+no_gene_cac1_K36 <- K36_FilteredHeatmap_gene_mat[rownames(no_cac1), , drop = FALSE]
+in_both_gene_K36 <- K36_FilteredHeatmap_gene_mat[rownames(in_both), , drop = FALSE]
+
+#Order by enrichment in K36 (same clusters, different sorting values)
+no_gene_cac1_order <- order(rowMeans(no_gene_cac1_K36[, 1:2]), decreasing = TRUE)
+in_both_gene_order <- order(rowMeans(in_both_gene_K36[, 1:2]), decreasing = TRUE)
+
+# #ordering the subsets so that enrichment is ordered from highest to lowest in each one
+# no_cac1_order <- order(no_cac1[, 1], decreasing = TRUE)
+# in_both_order <- order(rowMeans(in_both[, 1&2]), decreasing = TRUE)
+
+#I now have to sort each new subset df separately based on enrichment in desired sample (WT or mutant), then I have to extract the original sorted # to properly sort them on the final heatmap. This is probably a backwards way to do this.
+no_cac1_sort <- no_cac1[no_gene_cac1_order, ]
+in_both_sort <- in_both[in_both_gene_order, ]
+
+#need rownames of each subset in order
+forheat1 <- rownames(no_cac1_sort)
+forheat2 <- rownames(in_both_sort)
+  
+finalorder <- c(forheat1, forheat2)
+
+#Applying order to new variable in order to sort heatmap
+K27_FilteredHeatmap_gene_mat_sort = K27_FilteredHeatmap_gene_mat[finalorder, ]
+
+
+###Doing same for promoter matrix
+K27_FilteredHeatmap_prom_mat <- as.matrix(K27_prom_FilteredHeatmap_df)
+quantile(K27_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K27_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27_FilteredHeatmap_prom_mat[K27_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 99.5th percentile value with the 99.5th
+
+#I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0.1 in all 3 CAF-1 mutants and WT
+K27_FilteredHeatmap_prom_mat <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 1] >= 0.101 | K27_FilteredHeatmap_prom_mat[, 2] >= 0.101 | K27_FilteredHeatmap_prom_mat[, 3] >= 0.101 | K27_FilteredHeatmap_prom_mat[, 4] >= 0.101)
+
+#Get rid of anything 0 or lower in WT
+K27_FilteredHeatmap_prom_mat <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 1] > 0)
+
+#Lets Look at CAF-1 mutants only
+K27_FilteredHeatmap_prom_mat <- K27_FilteredHeatmap_prom_mat[,c(1:3)]
+
+#Manual Clustering to clean up heatmap
+no_prom_cac1 <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1)
+
+in_both_prom <- subset(K27_FilteredHeatmap_prom_mat, ! rownames(K27_FilteredHeatmap_prom_mat) %in% rownames(no_prom_cac1))
+
+#Extract corresponding rows from K36 for sorting
+no_prom_cac1_K36 <- K36_FilteredHeatmap_prom_mat[rownames(no_prom_cac1), , drop = FALSE]
+in_both_prom_K36 <- K36_FilteredHeatmap_prom_mat[rownames(in_both_prom), , drop = FALSE]
+
+#Order by enrichment in K36 (same clusters, different sorting values)
+no_prom_cac1_order <- order(rowMeans(no_prom_cac1_K36[, 1:2]), decreasing = TRUE)
+in_both_prom_order <- order(rowMeans(in_both_prom_K36[, 1:2]), decreasing = TRUE)
+
+#ordering the subsets so that enrichment is ordered from highest to lowest in K27me for each one
+# no_prom_cac1_order <- order(no_prom_cac1[, 1], decreasing = TRUE)
+# in_both_prom_order <- order(rowMeans(in_both_prom[, 1&2]), decreasing = TRUE)
+
+#I now have to sort each new subset df separately based on enrichment in desired sample (WT or mutant), then I have to extract the original sorted # to properly sort them on the final heatmap. This is probably a backwards way to do this.
+no_prom_cac1_sort <- no_prom_cac1[no_prom_cac1_order, ]
+in_both_prom_sort <- in_both_prom[in_both_prom_order, ]
+
+#need rownames of each subset in order
+forheat1_prom <- rownames(no_prom_cac1_sort)
+forheat2_prom <- rownames(in_both_prom_sort)
+  
+finalorder_prom <- c(forheat1_prom, forheat2_prom)
+
+#Applying order to new variable in order to sort heatmap
+K27_FilteredHeatmap_prom_mat_sort = K27_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#combined matrix for K27 enrichment
+K27_combined_mat <- rbind(K27_FilteredHeatmap_gene_mat_sort, K27_FilteredHeatmap_prom_mat_sort)
+
+#Color
+col_fun<- colorRamp2(c(0, quantile(K27_FilteredHeatmap_gene_mat, 0.995)), c("white", "darkgreen"))
+col_fun(seq(0, quantile(K27_FilteredHeatmap_gene_mat, 0.995), length = 20))
+
+# Plot the heatmap
+htK27 <- Heatmap(
+  K27_combined_mat,
+  name = "K27me3",
+  col = col_fun,
+  cluster_columns = FALSE,
+  cluster_rows = FALSE,
+  show_row_names = FALSE,
+  show_column_dend = FALSE,
+  show_row_dend = FALSE,
+)
+
+# Save to PDF
+pdf("K27_gene_promoter_combined_TEST.pdf", height = 12)
+draw(htK27)
+dev.off()
+
+#############################
+
+#K4 Heatmap
+#genes
+K4_FilteredHeatmap_gene_mat <- as.matrix(K4_gene_FilteredHeatmap_df)
+quantile(K4_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K4_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K4_FilteredHeatmap_gene_mat[K4_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#cac-1 only mutants
+K4_FilteredHeatmap_gene_mat <- K4_FilteredHeatmap_gene_mat[,1:3]
+
+#Applying order to new variable in order to sort heatmap
+K4_FilteredHeatmap_gene_mat_sort = K4_FilteredHeatmap_gene_mat[finalorder, ]
+
+#promoters
+K4_FilteredHeatmap_prom_mat <- as.matrix(K4_prom_FilteredHeatmap_df)
+quantile(K4_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K4_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K4_FilteredHeatmap_prom_mat[K4_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#cac-1 only
+K4_FilteredHeatmap_prom_mat <- K4_FilteredHeatmap_prom_mat[,1:3]
+
+#Applying order to new variable in order to sort heatmap
+K4_FilteredHeatmap_prom_mat_sort = K4_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#combined matrix for K4 enrichment
+K4_combined_mat <- rbind(K4_FilteredHeatmap_gene_mat_sort, K4_FilteredHeatmap_prom_mat_sort)
+
+#color
+col_fun<- colorRamp2(c(-1, 0, quantile(K4_FilteredHeatmap_gene_mat, 0.995)), c("white","white", "magenta"))
+col_fun(seq(-1, quantile(K4_FilteredHeatmap_gene_mat, 0.995), length = 20))
+
+# Plot the heatmap
+htK4 <- Heatmap(
+  K4_combined_mat,
+  name = "K4me2",
+  col = col_fun,
+  cluster_columns = FALSE,
+  cluster_rows = FALSE,
+  show_row_names = FALSE,
+  show_column_dend = FALSE,
+  show_row_dend = FALSE,
+)
+
+##################
+
+#Kac Heatmap
+#genes
+Kac_FilteredHeatmap_gene_mat <- as.matrix(Kac_gene_FilteredHeatmap_df)
+quantile(Kac_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(Kac_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+Kac_FilteredHeatmap_gene_mat[Kac_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#CAF-1 mutants
+Kac_FilteredHeatmap_gene_mat <- Kac_FilteredHeatmap_gene_mat[,1:3]
+
+#Applying order to new variable in order to sort heatmap
+Kac_FilteredHeatmap_gene_mat_sort = Kac_FilteredHeatmap_gene_mat[finalorder, ]
+
+#promoters
+Kac_FilteredHeatmap_prom_mat <- as.matrix(Kac_prom_FilteredHeatmap_df)
+quantile(Kac_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(Kac_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+Kac_FilteredHeatmap_prom_mat[Kac_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#cac-1 only
+Kac_FilteredHeatmap_prom_mat <- Kac_FilteredHeatmap_prom_mat[,1:3]
+
+#Applying order to new variable in order to sort heatmap
+Kac_FilteredHeatmap_prom_mat_sort = Kac_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#combined matrix for K4 enrichment
+Kac_combined_mat <- rbind(Kac_FilteredHeatmap_gene_mat_sort, Kac_FilteredHeatmap_prom_mat_sort)
+
+#color
+col_fun<- colorRamp2(c(-1, 0, quantile(Kac_FilteredHeatmap_gene_mat, 0.995)), c("white","white", "#A89CF6"))
+col_fun(seq(-1, quantile(Kac_FilteredHeatmap_gene_mat, 0.995), length = 20))
+
+# Plot the heatmap
+htKac <- Heatmap(
+  Kac_combined_mat,
+  name = "Kac",
+  col = col_fun,
+  cluster_columns = FALSE,
+  cluster_rows = FALSE,
+  show_row_names = FALSE,
+  show_column_dend = FALSE,
+  show_row_dend = FALSE,
+)
+
+###############################
+
+#K36 Heatmap
+#genes
+K36_FilteredHeatmap_gene_mat <- as.matrix(K36_gene_FilteredHeatmap_df)
+quantile(K36_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K36_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K36_FilteredHeatmap_gene_mat[K36_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#CAF-1 mutants
+K36_FilteredHeatmap_gene_mat <- K36_FilteredHeatmap_gene_mat[,1:3]
+
+#Applying order to new variable in order to sort heatmap
+K36_FilteredHeatmap_gene_mat_sort = K36_FilteredHeatmap_gene_mat[finalorder, ]
+
+#promoters
+K36_FilteredHeatmap_prom_mat <- as.matrix(K36_prom_FilteredHeatmap_df)
+quantile(K36_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K36_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K36_FilteredHeatmap_prom_mat[K36_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#cac-1 only
+K36_FilteredHeatmap_prom_mat <- K36_FilteredHeatmap_prom_mat[,1:3]
+
+#Applying order to new variable in order to sort heatmap
+K36_FilteredHeatmap_prom_mat_sort = K36_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#combined matrix for K4 enrichment
+K36_combined_mat <- rbind(K36_FilteredHeatmap_gene_mat_sort, K36_FilteredHeatmap_prom_mat_sort)
+
+#color
+col_fun<- colorRamp2(c(-1, 0, quantile(K36_FilteredHeatmap_gene_mat, 0.995)), c("white","white", "#A59D00"))
+col_fun(seq(-1, quantile(K36_FilteredHeatmap_gene_mat, 0.995), length = 20))
+
+# Plot the heatmap
+htK36 <- Heatmap(
+  K36_combined_mat,
+  name = "K36me3",
+  col = col_fun,
+  cluster_columns = FALSE,
+  cluster_rows = FALSE,
+  show_row_names = FALSE,
+  show_column_dend = FALSE,
+  show_row_dend = FALSE,
+)
+
+#plot combined heatmap
+final_hm <- htK27 + htK36 + htK4 
+
+# Step 4: Plot
+pdf("final_combined_heatmap_grid.pdf", width = 12, height = 9)
+draw(final_hm)
+dev.off()
+
+```
+
+###################################
+
+```{r, Heatmaps with separate promoters and genes}
+#K27 Heatmap
+#genesmatrix
+K27_FilteredHeatmap_gene_mat <- as.matrix(K27_FilteredHeatmap_gene_df)
+quantile(K27_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K27_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27_FilteredHeatmap_gene_mat[K27_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 99.5th percentile value with the 99.5th
+
+#I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0.1 in all 3 CAF-1 mutants and WT
+K27_FilteredHeatmap_gene_mat <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 1] >= 0.101 | K27_FilteredHeatmap_gene_mat[, 2] >= 0.101 | K27_FilteredHeatmap_gene_mat[, 3] >= 0.101 | K27_FilteredHeatmap_gene_mat[, 4] >= 0.101)
+
+#Get rid of anything 0 or lower in WT
+K27_FilteredHeatmap_gene_mat <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 1] > 0)
+
+#Lets Look at CAF-1 mutants only
+K27_FilteredHeatmap_gene_mat <- K27_FilteredHeatmap_gene_mat[,c(1:5)]
+
+#Manual Clustering to clean up heatmap
+no_caf <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 4] <= 0.1 )
+
+no_cac3 <- subset(K27_FilteredHeatmap_gene_mat, ! K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 4] <= 0.1)
+
+no_cac2 <- subset(K27_FilteredHeatmap_gene_mat, ! K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 4] <= 0.1)
+
+no_cac1 <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 4] <= 0.1)
+
+no_cac2_3 <- subset(K27_FilteredHeatmap_gene_mat, ! K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 4] <= 0.1)
+
+no_cac1_3 <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 4] <= 0.1)
+
+no_cac1_2 <- subset(K27_FilteredHeatmap_gene_mat, K27_FilteredHeatmap_gene_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 1] <= 0.1 & K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 4] <= 0.1)
+
+in_all <- subset(K27_FilteredHeatmap_gene_mat, ! K27_FilteredHeatmap_gene_mat[, 1] < 0.101 & ! K27_FilteredHeatmap_gene_mat[, 2] < 0.101 & ! K27_FilteredHeatmap_gene_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_gene_mat[, 4] <= 0.1)
+
+#ordering the subsets so that enrichment is ordered from highest to lowest in each one
+no_caf_order <-order(no_caf[, 1], decreasing = TRUE)
+no_cac3_order <-order(rowMeans(no_cac3[, 1:3]), decreasing = TRUE)
+no_cac2_order <- order(rowMeans(no_cac2[, 1&2&4]), decreasing = TRUE)
+no_cac1_order <- order(rowMeans(no_cac1[, 1&3&4]), decreasing = TRUE)
+no_cac2_3_order <- order(rowMeans(no_cac2_3[, 1:2]), decreasing = TRUE)
+no_cac1_3_order <- order(rowMeans(no_cac1_3[, 1&3]), decreasing = TRUE)
+no_cac1_2_order <- order(rowMeans(no_cac1_2[, 1&4]), decreasing = TRUE)
+in_all_order <- order(rowMeans(in_all[, 1:4]), decreasing = TRUE)
+
+#I now have to sort each new subset df separately based on enrichment in desired sample (WT or mutant), then I have to extract the original sorted # to properly sort them on the final heatmap. This is probably a backwards way to do this.
+no_caf_sort <- no_caf[no_caf_order, ]
+no_cac3_sort <- no_cac3[no_cac3_order, ]
+no_cac2_sort <- no_cac2[no_cac2_order, ]
+no_cac1_sort <- no_cac1[no_cac1_order, ]
+no_cac2_3_sort <- no_cac2_3[no_cac2_3_order, ]
+no_cac1_3_sort <- no_cac1_3[no_cac1_3_order, ]
+no_cac1_2_sort <- no_cac1_2[no_cac1_2_order, ]
+in_all_sort <- in_all[in_all_order, ]
+
+#need rownames of each subset in order
+forheat1 <- rownames(no_caf_sort)
+forheat2 <- rownames(no_cac3_sort)
+forheat3 <- rownames(no_cac2_sort)
+forheat4 <- rownames(no_cac1_sort)
+forheat5 <- rownames(no_cac2_3_sort)
+forheat6 <- rownames(no_cac1_3_sort)
+forheat7 <- rownames(no_cac1_2_sort)
+forheat8 <- rownames(in_all_sort)
+  
+finalorder <- c(forheat1, forheat2, forheat3, forheat4, forheat5, forheat6, forheat7, forheat8)
+
+#Applying order to new variable in order to sort heatmap
+K27_FilteredHeatmap_gene_mat_sort = K27_FilteredHeatmap_gene_mat[finalorder, ]
+
+
+#Doing same for promoter matrix
+K27_FilteredHeatmap_prom_mat <- as.matrix(K27_FilteredHeatmap_prom_df)
+quantile(K27_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K27_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27_FilteredHeatmap_prom_mat[K27_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 99.5th percentile value with the 99.5th
+
+#I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0.1 in all 3 CAF-1 mutants and WT
+K27_FilteredHeatmap_prom_mat <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 1] >= 0.101 | K27_FilteredHeatmap_prom_mat[, 2] >= 0.101 | K27_FilteredHeatmap_prom_mat[, 3] >= 0.101 | K27_FilteredHeatmap_prom_mat[, 4] >= 0.101)
+
+#Get rid of anything 0 or lower in WT
+K27_FilteredHeatmap_prom_mat <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 1] > 0)
+
+#Lets Look at CAF-1 mutants only
+K27_FilteredHeatmap_prom_mat <- K27_FilteredHeatmap_prom_mat[,c(1:5)]
+
+
+#Manual Clustering to clean up heatmap
+no_prom_caf <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 4] <= 0.1 )
+
+no_prom_cac3 <- subset(K27_FilteredHeatmap_prom_mat, ! K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 4] <= 0.1)
+
+no_prom_cac2 <- subset(K27_FilteredHeatmap_prom_mat, ! K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 4] <= 0.1)
+
+no_prom_cac1 <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 4] <= 0.1)
+
+no_prom_cac2_3 <- subset(K27_FilteredHeatmap_prom_mat, ! K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 4] <= 0.1)
+
+no_prom_cac1_3 <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 4] <= 0.1)
+
+no_prom_cac1_2 <- subset(K27_FilteredHeatmap_prom_mat, K27_FilteredHeatmap_prom_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 1] <= 0.1 & K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 4] <= 0.1)
+
+in_all_prom <- subset(K27_FilteredHeatmap_prom_mat, ! K27_FilteredHeatmap_prom_mat[, 1] < 0.101 & ! K27_FilteredHeatmap_prom_mat[, 2] < 0.101 & ! K27_FilteredHeatmap_prom_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_prom_mat[, 4] <= 0.1)
+
+#ordering the subsets so that enrichment is ordered from highest to lowest in each one
+no_prom_caf_order <-order(no_prom_caf[, 1], decreasing = TRUE)
+no_prom_cac3_order <-order(rowMeans(no_prom_cac3[, 1:3]), decreasing = TRUE)
+no_prom_cac2_order <- order(rowMeans(no_prom_cac2[, 1&2&4]), decreasing = TRUE)
+no_prom_cac1_order <- order(rowMeans(no_prom_cac1[, 1&3&4]), decreasing = TRUE)
+no_prom_cac2_3_order <- order(rowMeans(no_prom_cac2_3[, 1:2]), decreasing = TRUE)
+no_prom_cac1_3_order <- order(rowMeans(no_prom_cac1_3[, 1&3]), decreasing = TRUE)
+no_prom_cac1_2_order <- order(rowMeans(no_prom_cac1_2[, 1&4]), decreasing = TRUE)
+in_all_prom_order <- order(rowMeans(in_all_prom[, 1:4]), decreasing = TRUE)
+
+#I now have to sort each new subset df separately based on enrichment in desired sample (WT or mutant), then I have to extract the original sorted # to properly sort them on the final heatmap. This is probably a backwards way to do this.
+no_prom_caf_sort <- no_prom_caf[no_prom_caf_order, ]
+no_prom_cac3_sort <- no_prom_cac3[no_prom_cac3_order, ]
+no_prom_cac2_sort <- no_prom_cac2[no_prom_cac2_order, ]
+no_prom_cac1_sort <- no_prom_cac1[no_prom_cac1_order, ]
+no_prom_cac2_3_sort <- no_prom_cac2_3[no_prom_cac2_3_order, ]
+no_prom_cac1_3_sort <- no_prom_cac1_3[no_prom_cac1_3_order, ]
+no_prom_cac1_2_sort <- no_prom_cac1_2[no_prom_cac1_2_order, ]
+in_all_prom_sort <- in_all_prom[in_all_prom_order, ]
+
+#need rownames of each subset in order
+forheat_prom1 <- rownames(no_prom_caf_sort)
+forheat_prom2 <- rownames(no_prom_cac3_sort)
+forheat_prom3 <- rownames(no_prom_cac2_sort)
+forheat_prom4 <- rownames(no_prom_cac1_sort)
+forheat_prom5 <- rownames(no_prom_cac2_3_sort)
+forheat_prom6 <- rownames(no_prom_cac1_3_sort)
+forheat_prom7 <- rownames(no_prom_cac1_2_sort)
+forheat_prom8 <- rownames(in_all_prom_sort)
+  
+finalorder_prom <- c(forheat_prom1, forheat_prom2, forheat_prom3, forheat_prom4, forheat_prom5, forheat_prom6, forheat_prom7, forheat_prom8)
+
+#Applying order to new variable in order to sort heatmap
+K27_FilteredHeatmap_prom_mat_sort = K27_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#Color
+col_fun<- colorRamp2(c(0, quantile(K27_FilteredHeatmap_gene_mat, 0.995)), c("white", "darkgreen"))
+col_fun(seq(0, quantile(K27_FilteredHeatmap_gene_mat, 0.995), length = 20))
+
+# Create the heatmap objects for each matrix
+gene_hm <- Heatmap(K27_FilteredHeatmap_gene_mat_sort, name = "K27me3_gene", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_gene_mat_sort)))), heatmap_legend_param = list(title = "K27me3")
+)
+
+promoter_hm <- Heatmap(K27_FilteredHeatmap_prom_mat_sort, name = "K27me3_prom", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_prom_mat_sort))))
+)
+
+# Combine them vertically
+combined_hm <- gene_hm %v% promoter_hm 
+
+# Draw to PDF
+pdf("./H3K27me3_K27_genes_promoters_CAF.pdf", height = 9.5)
+draw(combined_hm)
+dev.off()
+
+#############################
+
+#K4 Heatmap
+#genes
+K4_FilteredHeatmap_gene_mat <- as.matrix(K4_FilteredHeatmap_gene_df)
+quantile(K4_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K4_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K4_FilteredHeatmap_gene_mat[K4_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#CAF-1 mutants
+K4_FilteredHeatmap_gene_mat <- K4_FilteredHeatmap_gene_mat[,1:5]
+
+#Applying order to new variable in order to sort heatmap
+K4_FilteredHeatmap_gene_mat_sort = K4_FilteredHeatmap_gene_mat[finalorder, ]
+
+#promoters
+K4_FilteredHeatmap_prom_mat <- as.matrix(K4_FilteredHeatmap_prom_df)
+quantile(K4_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K4_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K4_FilteredHeatmap_prom_mat[K4_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+K4_FilteredHeatmap_prom_mat <- K4_FilteredHeatmap_prom_mat[,1:5]
+
+#Applying order to new variable in order to sort heatmap
+K4_FilteredHeatmap_prom_mat_sort = K4_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#color
+col_fun<- colorRamp2(c(-1, 0, quantile(K4_FilteredHeatmap_mat, 0.995)), c("white","white", "magenta"))
+col_fun(seq(-1, quantile(K4_FilteredHeatmap_mat, 0.995), length = 20))
+
+# Create the heatmap objects for each matrix
+gene_hm <- Heatmap(K4_FilteredHeatmap_gene_mat_sort, name = "K4me2_gene", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K4_FilteredHeatmap_gene_mat_sort)))), heatmap_legend_param = list(title = "K4me2")
+)
+
+promoter_hm <- Heatmap(K4_FilteredHeatmap_prom_mat_sort, name = "K4me2_prom", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K4_FilteredHeatmap_prom_mat_sort))))
+)
+
+# Combine them vertically
+combined_hm <- gene_hm %v% promoter_hm 
+
+# Draw to PDF
+pdf("./H3K4me2_K27_genes_promoters_CAF.pdf", height = 9.5)
+draw(combined_hm)
+dev.off()
+
+##################
+
+#K27ac Heatmap
+#genes
+K27ac_FilteredHeatmap_gene_mat <- as.matrix(K27ac_FilteredHeatmap_gene_df)
+quantile(K27ac_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K27ac_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27ac_FilteredHeatmap_gene_mat[K27ac_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#CAF-1 mutants
+K27ac_FilteredHeatmap_gene_mat <- K27ac_FilteredHeatmap_gene_mat[,1:5]
+
+#Applying order to new variable in order to sort heatmap
+K27ac_FilteredHeatmap_gene_mat_sort = K27ac_FilteredHeatmap_gene_mat[finalorder, ]
+
+#promoters
+K27ac_FilteredHeatmap_prom_mat <- as.matrix(K27ac_FilteredHeatmap_prom_df)
+quantile(K27ac_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K27ac_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27ac_FilteredHeatmap_prom_mat[K27ac_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+K27ac_FilteredHeatmap_prom_mat <- K27ac_FilteredHeatmap_prom_mat[,1:5]
+
+#Applying order to new variable in order to sort heatmap
+K27ac_FilteredHeatmap_prom_mat_sort = K27ac_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#color
+col_fun<- colorRamp2(c(-1, 0, quantile(K27ac_FilteredHeatmap_mat, 0.995)), c("white","white", "#A89CF6"))
+col_fun(seq(-1, quantile(K27ac_FilteredHeatmap_mat, 0.995), length = 20))
+
+# Create the heatmap objects for each matrix
+gene_hm <- Heatmap(K27ac_FilteredHeatmap_gene_mat_sort, name = "K27ac_gene", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27ac_FilteredHeatmap_gene_mat_sort)))), heatmap_legend_param = list(title = "K27ac")
+)
+
+promoter_hm <- Heatmap(K27ac_FilteredHeatmap_prom_mat_sort, name = "K27ac_prom", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27ac_FilteredHeatmap_prom_mat_sort))))
+)
+
+# Combine them vertically
+combined_hm <- gene_hm %v% promoter_hm 
+
+# Draw to PDF
+pdf("./H3K27ac_K27_genes_promoters_CAF.pdf", height = 9.5)
+draw(combined_hm)
+dev.off()
+
+###############################
+
+#K36 Heatmap
+#genes
+K36_FilteredHeatmap_gene_mat <- as.matrix(K36_FilteredHeatmap_gene_df)
+quantile(K36_FilteredHeatmap_gene_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K36_FilteredHeatmap_gene_mat, 0.995) # identify the 98th percentile value and assign this to max
+K36_FilteredHeatmap_gene_mat[K36_FilteredHeatmap_gene_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#CAF-1 mutants
+K36_FilteredHeatmap_gene_mat <- K36_FilteredHeatmap_gene_mat[,1:5]
+
+#Applying order to new variable in order to sort heatmap
+K36_FilteredHeatmap_gene_mat_sort = K36_FilteredHeatmap_gene_mat[finalorder, ]
+
+#promoters
+K36_FilteredHeatmap_prom_mat <- as.matrix(K36_FilteredHeatmap_prom_df)
+quantile(K36_FilteredHeatmap_prom_mat, c(.01, .50, .75, .95, .98 , .995)) 
+max <- quantile(K36_FilteredHeatmap_prom_mat, 0.995) # identify the 98th percentile value and assign this to max
+K36_FilteredHeatmap_prom_mat[K36_FilteredHeatmap_prom_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+K36_FilteredHeatmap_prom_mat <- K36_FilteredHeatmap_prom_mat[,1:5]
+
+#Applying order to new variable in order to sort heatmap
+K36_FilteredHeatmap_prom_mat_sort = K36_FilteredHeatmap_prom_mat[finalorder_prom, ]
+
+#color
+col_fun<- colorRamp2(c(-1, 0, quantile(K36_FilteredHeatmap_mat, 0.995)), c("white","white", "#A59D00"))
+col_fun(seq(-1, quantile(K36_FilteredHeatmap_mat, 0.995), length = 20))
+
+# Create the heatmap objects for each matrix
+gene_hm <- Heatmap(K36_FilteredHeatmap_gene_mat_sort, name = "K36me3_gene", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K36_FilteredHeatmap_gene_mat_sort)))), heatmap_legend_param = list(title = "K36me3")
+)
+
+promoter_hm <- Heatmap(K36_FilteredHeatmap_prom_mat_sort, name = "K36me3_prom", col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, show_column_dend = FALSE, show_row_dend = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K36_FilteredHeatmap_prom_mat_sort))))
+)
+
+# Combine them vertically
+combined_hm <- gene_hm %v% promoter_hm 
+
+# Draw to PDF
+pdf("./H3K36me3_K27_genes_promoters_CAF.pdf", height = 9.5)
+draw(combined_hm)
+dev.off()
+```
