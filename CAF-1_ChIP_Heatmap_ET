@@ -283,7 +283,7 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 2 \
     $P150DIR/150-94_ChIP_cac-1_H3K36me3_Rep4_S94.bin_25.smooth_75Bulk.bw \
     $P150DIR/150-116_ChIP_cac-2_H3K36me3_Rep4_S131.bin_25.smooth_75Bulk.bw \
     $P150DIR/150-134_ChIP_set-7_H3K36me3_Rep4_S149.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/no_K36_loss.bed $BEDDIR2/K36_prom_only_loss.bed $BEDDIR2/K36_gene_loss.bed --skipZeros -o K36_matrix_PRC2_1.gz
+    -R $BEDDIR2/no_K36_loss.bed $BEDDIR2/K36_loss.bed --skipZeros -o K36_matrix_PRC2_1.gz
 
     plotHeatmap -m K36_matrix_PRC2_1.gz -out H3K36me3_CAF-1_cluster.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \
@@ -295,6 +295,7 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 2 \
                     --heatmapHeight 20 \
                     --colorMap "afmhot" \
                     --zMin 0 \
+                    --zMax 20
 
 #$P138DIR/138-65_ChIP_cac-3_H3K36me3_Rep2_6252_S64.bin_25.smooth_75Bulk.bw \
 
