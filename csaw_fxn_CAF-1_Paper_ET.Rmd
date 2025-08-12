@@ -113,7 +113,8 @@ data_csaw <- windowCounts(samples$bamReads, spacing=300, width=300, shift=0, fil
 #Read in bed files
 K27peaks_merged <- read.table(file="./bed_files/CAF-1_All_K27_merge_peaks.bed")
 
-K27_genes <- read.table(file="./bed_files/K27_genes_stringent.bed")
+#K27_genes <- read.table(file="./bed_files/K27_genes_stringent.bed")
+K27_genes <- read.table(file="./bed_files/genes_and_promoters_overlap_100pct_edit.bed")
 
 K27_genes_prom <- read.table(file="./bed_files/genes_and_promoters_overlap_100pct_edit.bed")
 
@@ -195,7 +196,7 @@ rownames(DGElistK27_prom$samples) <-  paste(paste(samples$Strain,samples$Antibod
 ```
 
 ```{r, Designing the matrix}
-#design a model matrix to compare groups, This Should be the same for all mods, as it depends on you sample sheet
+#design a model matrix to compare groups, This Should be the same for all mods, as it depends on your sample sheet
 ##In this case, I'm only looking at modifications within H3K27me3 regions, so i will use the H3K27me3 list to make the matrix
 design.mat <- model.matrix(~0 + DGElistK27$samples$group)
 #replace wonky column names with readable ones
@@ -232,6 +233,19 @@ plotQLDisp(fitK27)
 ```
 
 ```{r, calculating signal over whole genes and promoters instead of reading data in windows}
+samples <- read.csv("./csaw_samples_files/cac_csaw.csv")
+
+###########remove mat locus               1856250. 1862401 36 - 37
+matLocus <- GRanges("CM002236.1", IRanges(1856288, 1862459)) # mat
+
+##set parameters for windowCounts
+param <- readParam(discard = matLocus, pe="both", max.frag=1500, minq=20 )
+
+#read counts from bam files
+#data_csaw <- windowCounts(samples$bamReads, spacing=300, width=300, shift=0, filter=0, bin=TRUE, param=param)
+
+K27_genes <- read.table(file="./bed_files/genes_and_promoters_overlap_100pct_edit.bed")
+
 genes_gr <- GRanges(
   seqnames = K27_genes$V1,
   ranges = IRanges(
@@ -241,18 +255,8 @@ genes_gr <- GRanges(
   strand = K27_genes$V6
 )
 
-prom_gr <- GRanges(
-  seqnames = K27_prom$V1,
-  ranges = IRanges(
-    start = K27_prom$V2,
-    end = K27_prom$V3
-  ),
-  strand = K27_prom$V6
-)
-
 # Count reads across genes & promoters
 csaw_gene <- regionCounts(bam.files = samples$bamReads, regions = genes_gr, param = param)
-csaw_prom <- regionCounts(bam.files = samples$bamReads, regions = prom_gr, param = param)
 
 #Build group factor from csaw metadata
 grouping <- factor(paste(samples$Strain, samples$Antibody, sep = "."))
@@ -263,15 +267,15 @@ colnames(design.mat) <- levels(grouping)
 
 #Create DGELists for plus and minus strand counts
 dge_gene  <- asDGEList(csaw_gene,  group = grouping)
-dge_prom  <- asDGEList(csaw_prom,  group = grouping)
 
-#Estimate dispersions
+#Estimate dispersion
 disp_gene  <- estimateDisp(dge_gene,  design.mat)
-disp_prom  <- estimateDisp(dge_prom,  design.mat)
 
-#Fit GLMs
+#Fit GLM
 fit_gene  <- glmQLFit(disp_gene,  design.mat, robust = TRUE)
-fit_prom  <- glmQLFit(disp_prom,  design.mat, robust = TRUE)
+
+all_strains <- c("WT", "cac1", "cac2", "cac3", "set7", "cac1_cac2", "cac2_comp", 
+                 "WT_new", "cac1_new", "rtt106", "cac1_rtt106")
 
 fullgene_K27 <- run_csaw_analysis(
   modification   = "H3K27me3_CS",
@@ -466,7 +470,7 @@ k27_gene <- run_csaw_analysis(
   normalize_to   = "input",
   fdr_cutoff     = 0.05
 )
-K27_FilteredHeatmap_df
+
 # Output result tables
 K27_gene_Results_df <- k27_gene$result_df
 K27_gene_FilteredHeatmap_df  <- k27_gene$sig_logFC_matrix

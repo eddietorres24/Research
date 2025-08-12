@@ -1,0 +1,714 @@
+---
+title: "csaw_function_CLEAN_ET"
+author: "Eddie Torres"
+date: "2025-08-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+# Set working environment
+
+workingdir="C:/Users/eddie/Research/GitHub"
+
+#set working directory to the correct location for working machine
+knitr::opts_knit$set(root.dir = "workingdir")
+
+```
+
+```{r, read in metadata & regions of interest}
+#reading in metdata
+meta <- read.csv("../csaw_samples_files/cac_csaw.csv")
+
+#fix path (if necessary, should only be if you're in wrong directory)
+meta <- meta %>%
+  mutate(bamReads = paste0("../", bamReads))
+
+#Build group factor from csaw metadata
+grouping <- factor(paste(meta$Strain, meta$Antibody, sep = "."))
+
+#Design matrix using this grouping for downstream comaprisons
+design.mat <- model.matrix(~ 0 + grouping)
+colnames(design.mat) <- levels(grouping)
+
+###########remove mat locus               1856250. 1862401 36 - 37
+matLocus <- GRanges("CM002236.1", IRanges(1856288, 1862459)) # mat
+
+##set parameters for windowCounts
+param <- readParam(discard = matLocus, pe="both", max.frag=1500, minq=20 )
+
+#reading in regions of interest
+regions <- list(K27genes_proms = read.table("../bed_files/K27_genes_prom_100pct_overlap.bed"), K27genes = read.table("../bed_files/K27_genes_stringent.bed"), K27proms = read.table("../bed_files/K27_promoters.bed"), K27promTSS = read.table("../bed_files/K27_prom_TSS.bed"))
+
+###IMPORTANT: the tables you  read into your list should not have a header (i.e., the column names should be V1, V2, ... VX). If your columns have other names, the count function may not recognize it properly. even if the files you read in have headers, i believe you can adjust the way read.table reads it into a df object. check column names in the "regions" object before continuing
+
+#with "list" you can read multiple beds into the function
+
+#once you load in all the metadata and bed with regions, run the first function to count data and make a dge object
+
+```
+
+```{r, csaw count & dge function, echo = FALSE}
+###KEY NOTE: leave this and the following functions *unedited*, this is the default function, all you need to do is edit the parameters in the block below and its one-click (blocks flanked by hashtags ###). I explain what each paramter does below, and what each consecutive function does in each block###
+
+#This function will count in your data based on your loaded metadata and provided regions of interests. you will want to include any blacklisted regions (i.e. mat locus) with your param object.
+
+csaw_count_and_fit <- function(
+  metadata_df,
+  region_list = NULL,           # data frame OR named list of data frames (BED-like)
+  mode = c("window", "region"), # choose count mode
+  window_size = 300,            # used only for window mode
+  design_mat,                   # precomputed model matrix
+  param,                        # readParam() object
+  assign_to_global = TRUE,      # save named objects to global environment
+  return_list = TRUE            # return everything in a nested list
+) {
+  require(csaw)
+  require(edgeR)
+  require(GenomicRanges)
+  
+  mode <- match.arg(mode)
+
+  ## -------- helpers --------
+  df_to_granges <- function(df) {
+    cols <- names(df)
+    chr <- if ("V1" %in% cols) df$V1 else if ("chrom" %in% cols) df$chrom else stop("No chrom/V1 column in region data.frame")
+    start <- if ("V2" %in% cols) df$V2 else if ("start" %in% cols) df$start else stop("No start/V2 column in region data.frame")
+    end   <- if ("V3" %in% cols) df$V3 else if ("end"   %in% cols) df$end   else stop("No end/V3 column in region data.frame")
+    strd  <- if ("V6" %in% cols) df$V6 else if ("strand" %in% cols) df$strand else "*"
+    start <- as.integer(start); end <- as.integer(end)
+    if (any(is.na(start) | is.na(end))) stop("Start/end contain NAs after coercion. Check region input.")
+    GRanges(seqnames = chr, ranges = IRanges(start = start, end = end), strand = strd)
+  }
+  
+  as_named_list <- function(x) {
+    if (is.null(x)) return(NULL)
+    if (is.list(x) && !is.data.frame(x)) {
+      if (is.null(names(x)) || any(names(x) == "")) {
+        stop("region_list must be a *named* list, e.g. list(K27genes_proms = df).")
+      }
+      return(x)
+    } else if (is.data.frame(x)) {
+      return(list(genome_set = x))
+    } else {
+      stop("region_list must be a data.frame or a named list of data.frames.")
+    }
+  }
+  
+  ## -------- inputs & grouping --------
+  stopifnot(is.data.frame(metadata_df))
+  needed <- c("Strain","Antibody","bamReads","Replicate")
+  if (!all(needed %in% names(metadata_df))) {
+    stop("metadata_df must contain columns: Strain, Antibody, Replicate, bamReads")
+  }
+  grouping <- factor(paste(metadata_df$Strain, metadata_df$Antibody, sep = "."))
+  
+  if (!all(levels(grouping) %in% colnames(design_mat))) {
+    missing_cols <- setdiff(levels(grouping), colnames(design_mat))
+    stop(paste0("design_mat is missing columns for these groups: ", paste(missing_cols, collapse = ", ")))
+  }
+
+  # pretty sample labels used everywhere
+  nice_labels <- paste(
+    metadata_df$Strain,
+    metadata_df$Antibody,
+    paste0("R", metadata_df$Replicate),
+    sep = "."
+  )
+
+  # normalize region_list input shape
+  region_list <- as_named_list(region_list)
+  
+  # container for return
+  out <- list(genomewide = NULL, regions = list())
+
+  bam_files <- metadata_df$bamReads
+
+  if (mode == "window") {
+    message("Counting genome-wide windows (spacing/width = ", window_size, ") ...")
+    data_all <- windowCounts(bam_files, spacing = window_size, width = window_size,
+                             shift = 0, filter = 0, bin = TRUE, param = param)
+    
+    # genome-wide DGE/disp/fit with nice labels
+    dge_all  <- asDGEList(data_all, group = grouping)
+    colnames(dge_all$counts) <- nice_labels
+    rownames(dge_all$samples) <- nice_labels
+    disp_all <- estimateDisp(dge_all, design_mat)
+    fit_all  <- glmQLFit(disp_all, design_mat, robust = TRUE)
+    
+    if (assign_to_global) {
+      assign("dge_genomewide",  dge_all,  envir = .GlobalEnv)
+      assign("disp_genomewide", disp_all, envir = .GlobalEnv)
+      assign("fit_genomewide",  fit_all,  envir = .GlobalEnv)
+    }
+    out$genomewide <- list(dge = dge_all, disp = disp_all, fit = fit_all, counts = data_all)
+    
+    # If region_list supplied: filter to each region set and fit separately
+    if (!is.null(region_list)) {
+      rr_all <- rowRanges(data_all)
+      for (nm in names(region_list)) {
+        message("Filtering genome-wide windows to region set: ", nm)
+        gr <- df_to_granges(region_list[[nm]])
+        keep <- overlapsAny(rr_all, gr, type = "within")
+        filtered <- data_all[keep, ]
+        
+        dge  <- asDGEList(filtered, group = grouping)
+        colnames(dge$counts) <- nice_labels
+        rownames(dge$samples) <- nice_labels
+        disp <- estimateDisp(dge, design_mat)
+        fit  <- glmQLFit(disp, design_mat, robust = TRUE)
+        
+        safe <- make.names(nm)
+        if (assign_to_global) {
+          assign(paste0("gr_",   safe), gr,   envir = .GlobalEnv)
+          assign(paste0("dge_",  safe), dge,  envir = .GlobalEnv)
+          assign(paste0("disp_", safe), disp, envir = .GlobalEnv)
+          assign(paste0("fit_",  safe), fit,  envir = .GlobalEnv)
+        }
+        out$regions[[nm]] <- list(gr = gr, dge = dge, disp = disp, fit = fit, counts = filtered)
+      }
+    }
+
+  } else { # mode == "region"
+    if (is.null(region_list)) stop("In region mode, region_list (one or more BED data.frames) is required.")
+    for (nm in names(region_list)) {
+      message("Counting over regions: ", nm)
+      gr <- df_to_granges(region_list[[nm]])
+      counts <- regionCounts(bam.files = bam_files, regions = gr, param = param)
+      
+      dge  <- asDGEList(counts, group = grouping)
+      colnames(dge$counts) <- nice_labels
+      rownames(dge$samples) <- nice_labels
+      disp <- estimateDisp(dge, design_mat)
+      fit  <- glmQLFit(disp, design_mat, robust = TRUE)
+      
+      safe <- make.names(nm)
+      if (assign_to_global) {
+        assign(paste0("gr_",   safe), gr,   envir = .GlobalEnv)
+        assign(paste0("dge_",  safe), dge,  envir = .GlobalEnv)
+        assign(paste0("disp_", safe), disp, envir = .GlobalEnv)
+        assign(paste0("fit_",  safe), fit,  envir = .GlobalEnv)
+      }
+      out$regions[[nm]] <- list(gr = gr, dge = dge, disp = disp, fit = fit, counts = counts)
+    }
+  }
+  
+  if (return_list) return(out) else invisible(NULL)
+}
+
+
+```
+
+###########################################################################################
+```{r, run count & fit function}
+
+#This is where you change the paramters and run the function
+count_results <- csaw_count_and_fit(
+  metadata_df = meta,
+  region_list = regions,
+  mode = "region", #"region" or "window"
+  window_size = 300,
+  design_mat = design.mat,
+  param = param
+)
+
+```
+###########################################################################################
+
+```{r, csaw QC function}
+#This function can be used to run all relevant QC checks on the ChIP data you counted in the first function. you should choose "region" or "window based on what mode you used for the first function
+
+# ---------- QC function (run after your counting/fitting) ----------
+qc_csaw <- function(
+  metadata_df,
+  out_obj = NULL,                    # optional list returned by csaw_count_and_fit(); if NULL we autodiscover from .GlobalEnv
+  mode = c("window","region"),       # whichever you actually ran
+  out_dir = "qc_csaw",
+  which_sets = c("both","genomewide","regions")  # what to QC
+) {
+  mode <- match.arg(mode)
+  which_sets <- match.arg(which_sets)
+
+  stopifnot(is.data.frame(metadata_df))
+  if (!all(c("Strain","Antibody","bamReads") %in% names(metadata_df))) {
+    stop("metadata_df must have Strain, Antibody, bamReads")
+  }
+
+  # --- deps ---
+  require(edgeR)
+  require(ggplot2)
+
+  # --- helpers ---
+  safe_dir <- function(d){ 
+    if (!dir.exists(d)) dir.create(d, recursive = TRUE)
+    normalizePath(d, mustWork = FALSE) 
+  }
+  png_wrap  <- function(file, expr, w=1800, h=1200, res=200){
+    png(file, width=w, height=h, res=res)
+    on.exit(dev.off(), add=TRUE)
+    force(expr)
+  }
+
+  # Discover objects from GlobalEnv if no list provided
+  discover_from_global <- function() {
+    nm <- ls(.GlobalEnv)
+    res <- list()
+    if (which_sets %in% c("both","genomewide")) {
+      if (all(c("dge_genomewide","disp_genomewide","fit_genomewide") %in% nm)) {
+        res$genomewide <- list(
+          dge  = get("dge_genomewide",  envir = .GlobalEnv),
+          disp = get("disp_genomewide", envir = .GlobalEnv),
+          fit  = get("fit_genomewide",  envir = .GlobalEnv)
+        )
+      }
+    }
+    if (which_sets %in% c("both","regions")) {
+      region_names <- unique(gsub("^(dge|disp|fit)_", "", nm[grepl("^(dge|disp|fit)_", nm)]))
+      res$regions <- list()
+      for (rn in region_names) {
+        if (all(c(paste0("dge_",rn), paste0("disp_",rn), paste0("fit_",rn)) %in% nm)) {
+          res$regions[[rn]] <- list(
+            dge  = get(paste0("dge_", rn),  envir = .GlobalEnv),
+            disp = get(paste0("disp_", rn), envir = .GlobalEnv),
+            fit  = get(paste0("fit_", rn),  envir = .GlobalEnv)
+          )
+        }
+      }
+    }
+    res
+  }
+
+  # get objects
+  results <- if (!is.null(out_obj)) out_obj else discover_from_global()
+  out_dir <- safe_dir(out_dir)
+
+  qc_one <- function(dge, disp, fit, label) {
+    subdir <- safe_dir(file.path(out_dir, label))
+
+    # Library size barplot
+    libfile <- file.path(subdir, "libsize_barplot.png")
+    png_wrap(libfile, {
+      barplot(dge$samples$lib.size/1e6, names = colnames(dge), las = 2,
+              ylab = "Library size (millions)", main = paste("Library sizes -", label))
+    })
+
+    # MDS plot
+    mdsfile <- file.path(subdir, "MDS_plot.png")
+    png_wrap(mdsfile, {
+      plotMDS(dge, main = paste("MDS plot -", label))
+    })
+
+    # BCV plot
+    bcvfile <- file.path(subdir, "BCV_plot.png")
+    png_wrap(bcvfile, {
+      plotBCV(disp, main = paste("BCV plot -", label))
+    })
+
+    # Mean–variance plot (custom, log2 CPM)
+    mvfile <- file.path(subdir, "meanvar_plot.png")
+    png_wrap(mvfile, {
+      cpm_mat <- edgeR::cpm(dge, log = TRUE, prior.count = 2)
+      means <- rowMeans(cpm_mat)
+      vars  <- apply(cpm_mat, 1, var)
+      plot(means, vars, pch = 16, cex = 0.4,
+           xlab = "Mean log2 CPM", ylab = "Variance (log2 CPM)",
+           main = paste("Mean–Variance (log2 CPM) -", label))
+      lines(lowess(means, vars), lwd = 2, col = "red")
+    })
+
+    # QL dispersion plot
+    qldfile <- file.path(subdir, "QL_dispersion_plot.png")
+    png_wrap(qldfile, {
+      plotQLDisp(fit, main = paste("QL dispersion -", label))
+    })
+  }
+
+  # Run QC
+  if (which_sets %in% c("both","genomewide") && !is.null(results$genomewide)) {
+    with(results$genomewide, qc_one(dge, disp, fit, "genomewide"))
+  }
+  if (which_sets %in% c("both","regions") && !is.null(results$regions)) {
+    for (nm in names(results$regions)) {
+      with(results$regions[[nm]], qc_one(dge, disp, fit, nm))
+    }
+  }
+
+  message("QC complete. Plots saved to: ", out_dir)
+}
+
+```
+
+###########################################################################################
+```{r, Run QC function}
+
+#This is where you change the paramters and run the function
+qc_csaw(
+  metadata_df = meta,
+  out_obj = NULL, # autodiscover from global env, Use "count_results" if variables not in global
+  mode = "region", # "region" or "window" depending on choice in count fxn.
+  out_dir = "K27_gene_&_prom_QC", #output directory, name whatever you want
+  which_sets = "both" # "genomewide", "regions", or "both"
+)
+```
+###########################################################################################
+
+```{r, csaw analysis fucntion}
+#This function is going to now analyze the data that you have read in, and calculate the signal over background, normalized to input or WT (or another strain for interest). It will make a couple dataframes for each normalization, for each modifcation analyzed: one with all results (log2FC, FDR, etc.), and one with only log2FC values for heatmap generation. There is also options built in to write analyzed data & statistics to a csv, as well as make an igv track for browser visualization.
+
+# ---- Run csaw contrasts across ALL mods & ALL region sets ----
+# - FDR masking (set non-sig to 0) is applied ONLY for vInput in genome-wide window mode
+csaw_analysis <- function(
+  metadata_df,                       # metadata
+  design_mat,                        # design matrix
+  mode = c("window","region"),       # match other functions
+  out_obj = NULL,                    # REQUIRED: list returned by csaw_count_and_fit()
+  reference_strain = "WT",           # reference strain to normalize to when not vInput
+  fdr_cutoff = 0.05,                 # FDR threshold (see rules below)
+  write_csv_results = FALSE,         # write csv for results df
+  write_csv_heatmap = FALSE,         # write csv for heatmap df
+  write_igv = FALSE,                 # write igv tracks
+  out_dir = "csaw_results",          # output directory
+  merge_tol = 300                    # only affects genomewide window mode
+) {
+  require(edgeR)
+  require(limma)
+  require(csaw)
+  require(GenomicRanges)
+  require(S4Vectors)
+
+  mode <- match.arg(mode)
+  if (is.null(out_obj)) stop("out_obj is required (use the list returned by csaw_count_and_fit).")
+
+  # Output dir
+  if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+
+  # Helper: put WT first in column order if present
+  order_cols_wt_first <- function(nms, wt = "WT") {
+    wt_hit <- grep(paste0("^logFC_", wt, "$"), nms, value = TRUE)
+    rest   <- setdiff(nms, wt_hit)
+    c(wt_hit, rest)
+  }
+
+  # Helper: build final result/heatmap tables for a given norm type
+  run_norm <- function(mod, fit, counts, region_tag, norm_type, gr_for_region = NULL) {
+    # collect per-strain GRanges with stats
+    res_list <- list()
+
+    # strains we’ll consider: all strains mentioned in metadata
+    strains <- unique(metadata_df$Strain)
+
+    # if normalizing to a reference strain (e.g. WT), don’t compute that strain vs itself
+    if (norm_type != "input") {
+      strains <- setdiff(strains, reference_strain)
+    }
+
+    for (st in strains) {
+      chip_col <- paste0(st, ".", mod)
+      ref_col  <- if (norm_type == "input") paste0(st, ".input") else paste0(reference_strain, ".", mod)
+
+      # skip if columns absent
+      if (!(chip_col %in% colnames(design_mat)) || !(ref_col %in% colnames(design_mat))) {
+        message("    Skipping ", st, " (missing ", chip_col, " or ", ref_col, ")")
+        next
+      }
+
+      contrast <- limma::makeContrasts(contrasts = paste0("`", chip_col, "` - `", ref_col, "`"),
+                                       levels   = design_mat)
+      res <- edgeR::glmQLFTest(fit, contrast = contrast)
+
+      # Build GRanges with stats:
+      # - WINDOW mode: merge windows (peak-ish) and attach combined stats
+      # - REGION mode: never merge; attach per-region stats directly
+      if (mode == "window") {
+        merged <- mergeResults(counts, res$table, tol = merge_tol, merge.args = list(max.width = merge_tol))
+        gr <- merged$regions
+        mcols(gr) <- S4Vectors::DataFrame(merged$combined)
+      } else {
+        # keep user-specified regions exactly; use supplied gr if available to preserve original order
+        gr <- if (!is.null(gr_for_region)) gr_for_region else rowRanges(counts)
+        # attach stats parallel to rows
+        m <- S4Vectors::mcols(gr)
+        m$logFC  <- res$table$logFC
+        m$PValue <- res$table$PValue
+        m$FDR    <- if ("FDR" %in% colnames(res$table)) res$table$FDR else p.adjust(res$table$PValue, method = "BH")
+        S4Vectors::mcols(gr) <- m
+      }
+
+      res_list[[st]] <- gr
+    }
+
+    if (length(res_list) == 0) return(NULL)
+
+    # Base coordinates (use the first GRanges in the list)
+    base <- res_list[[1]]
+    final_df <- data.frame(
+      seqnames = as.character(GenomicRanges::seqnames(base)),
+      start    = GenomicRanges::start(base),
+      end      = GenomicRanges::end(base),
+      name     = rep(".", length(base)),
+      strand   = as.character(GenomicRanges::strand(base)),
+      stringsAsFactors = FALSE
+    )
+
+    # Fill columns per strain, auto-detecting the right logFC column
+    for (st in names(res_list)) {
+      gr <- res_list[[st]]
+      mnames <- colnames(S4Vectors::mcols(gr))
+      lfc_col <- if ("rep.logFC" %in% mnames) "rep.logFC" else
+                 if ("logFC"     %in% mnames) "logFC"     else
+                 stop("Neither rep.logFC nor logFC found for ", st, " (", mod, ")")
+
+      final_df[[paste0("logFC_", st)]] <- S4Vectors::mcols(gr)[[lfc_col]]
+      final_df[[paste0("PValue_", st)]] <- S4Vectors::mcols(gr)[["PValue"]]
+      if ("FDR" %in% mnames) {
+        final_df[[paste0("FDR_", st)]] <- S4Vectors::mcols(gr)[["FDR"]]
+      } else {
+        final_df[[paste0("FDR_", st)]] <- p.adjust(S4Vectors::mcols(gr)[["PValue"]], method = "BH")
+      }
+    }
+
+    # Build heatmap matrix (logFC only)
+    logfc_cols <- grep("^logFC_", colnames(final_df), value = TRUE)
+    # Put WT first if present
+    logfc_cols <- order_cols_wt_first(logfc_cols, wt = "logFC_WT")
+    heatmap_df <- final_df[, logfc_cols, drop = FALSE]
+    rownames(heatmap_df) <- paste(final_df$seqnames, final_df$start, final_df$end, sep = ".")
+
+    # Apply FDR logic
+    if (mode == "window") {
+      # For window genomewide/filtered-windows: drop rows from heatmap where ALL strains are non-sig
+      fdr_cols <- sub("^logFC_", "FDR_", logfc_cols)
+      keep <- rowSums(final_df[, fdr_cols, drop = FALSE] <= fdr_cutoff, na.rm = TRUE) > 0
+      heatmap_df <- heatmap_df[keep, , drop = FALSE]
+    } else {
+      # For region sets: zero out per-strain logFC where that strain’s FDR > cutoff (keep all rows)
+      for (st in names(res_list)) {
+        lcol <- paste0("logFC_", st)
+        fcol <- paste0("FDR_", st)
+        if (lcol %in% colnames(heatmap_df) && fcol %in% colnames(final_df)) {
+          heatmap_df[[lcol]][ final_df[[fcol]] > fdr_cutoff ] <- 0
+        }
+      }
+    }
+
+    list(results = final_df, heatmap = heatmap_df)
+  }
+
+  # Determine modifications to analyze (exclude "input")
+  all_mods <- setdiff(unique(metadata_df$Antibody), "input")
+
+  # Iterate region sets (region mode) or genomewide/filtered (window mode)
+  if (mode == "region") {
+    if (is.null(out_obj$regions) || !length(out_obj$regions)) stop("No region sets found in out_obj$regions.")
+    for (nm in names(out_obj$regions)) {
+      rg <- out_obj$regions[[nm]]
+      fit    <- rg$fit
+      counts <- rg$counts
+      gr_in  <- if (!is.null(rg$gr)) rg$gr else rowRanges(counts)
+
+      message("=== Region set: ", nm, " ===")
+      for (mod in all_mods) {
+        # skip any lingering "input"
+        if (identical(mod, "input")) next
+
+        # vInput
+        res_vin <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "input", gr_for_region = gr_in)
+        if (!is.null(res_vin)) {
+          res_df <- res_vin$results
+          hm_df  <- res_vin$heatmap
+
+          # Name & assign
+          res_name <- paste0(mod, "_Results_", nm, "_vInput")
+          hm_name  <- paste0(mod, "_Heatmap_", nm, "_vInput")
+          assign(res_name, res_df, envir = .GlobalEnv)
+          assign(hm_name,  hm_df,  envir = .GlobalEnv)
+
+          # IO
+          if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
+          if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
+          if (write_igv) {
+            igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_vInput.igv"))
+            igv_out  <- cbind(res_df[, c("seqnames","start","end","name")], hm_df)
+            write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
+          }
+          message("  Modification: ", mod, "\n    -> Saved: ", res_name, " (and ", hm_name, ")")
+        }
+
+        # vReference (e.g., vWT)
+        res_vref <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "ref", gr_for_region = gr_in)
+        if (!is.null(res_vref)) {
+          res_df <- res_vref$results
+          hm_df  <- res_vref$heatmap
+
+          norm_tag <- paste0("v", reference_strain)
+          res_name <- paste0(mod, "_Results_", nm, "_", norm_tag)
+          hm_name  <- paste0(mod, "_Heatmap_", nm, "_", norm_tag)
+          assign(res_name, res_df, envir = .GlobalEnv)
+          assign(hm_name,  hm_df,  envir = .GlobalEnv)
+
+          if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
+          if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
+          if (write_igv) {
+            igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_", norm_tag, ".igv"))
+            igv_out  <- cbind(res_df[, c("seqnames","start","end","name")], hm_df)
+            write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
+          }
+          message("    -> Saved: ", res_name, " (and ", hm_name, ")")
+        }
+      }
+    }
+  } else {
+    # WINDOW MODE
+    # genomewide first (if present)
+    if (!is.null(out_obj$genomewide)) {
+      gw <- out_obj$genomewide
+      fit    <- gw$fit
+      counts <- gw$counts
+      nm <- "GenomeWide"
+      message("=== Window mode: ", nm, " ===")
+      for (mod in all_mods) {
+        if (identical(mod, "input")) next
+
+        # vInput
+        res_vin <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "input", gr_for_region = NULL)
+        if (!is.null(res_vin)) {
+          res_df <- res_vin$results
+          hm_df  <- res_vin$heatmap
+
+          res_name <- paste0(mod, "_Results_", nm, "_vInput")
+          hm_name  <- paste0(mod, "_Heatmap_", nm, "_vInput")
+          assign(res_name, res_df, envir = .GlobalEnv)
+          assign(hm_name,  hm_df,  envir = .GlobalEnv)
+
+          if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
+          if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
+          if (write_igv) {
+            igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_vInput.igv"))
+            igv_out  <- cbind(res_df[, c("seqnames","start","end","name")], hm_df)
+            write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
+          }
+          message("  Modification: ", mod, "\n    -> Saved: ", res_name, " (and ", hm_name, ")")
+        }
+
+        # vReference
+        res_vref <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "ref", gr_for_region = NULL)
+        if (!is.null(res_vref)) {
+          res_df <- res_vref$results
+          hm_df  <- res_vref$heatmap
+
+          norm_tag <- paste0("v", reference_strain)
+          res_name <- paste0(mod, "_Results_", nm, "_", norm_tag)
+          hm_name  <- paste0(mod, "_Heatmap_", nm, "_", norm_tag)
+          assign(res_name, res_df, envir = .GlobalEnv)
+          assign(hm_name,  hm_df,  envir = .GlobalEnv)
+
+          if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
+          if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
+          if (write_igv) {
+            igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_", norm_tag, ".igv"))
+            igv_out  <- cbind(res_df[, c("seqnames","start","end","name")], hm_df)
+            write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
+          }
+          message("    -> Saved: ", res_name, " (and ", hm_name, ")")
+        }
+      }
+    }
+
+    # If you also filtered genomewide windows to region sets in out_obj$regions, handle them too
+    if (!is.null(out_obj$regions) && length(out_obj$regions)) {
+      for (nm in names(out_obj$regions)) {
+        rg <- out_obj$regions[[nm]]
+        fit    <- rg$fit
+        counts <- rg$counts
+        message("=== Window mode (filtered to regions): ", nm, " ===")
+        for (mod in all_mods) {
+          if (identical(mod, "input")) next
+
+          # vInput
+          res_vin <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "input", gr_for_region = NULL)
+          if (!is.null(res_vin)) {
+            res_df <- res_vin$results
+            hm_df  <- res_vin$heatmap
+
+            res_name <- paste0(mod, "_Results_", nm, "_vInput")
+            hm_name  <- paste0(mod, "_Heatmap_", nm, "_vInput")
+            assign(res_name, res_df, envir = .GlobalEnv)
+            assign(hm_name,  hm_df,  envir = .GlobalEnv)
+
+            if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
+            if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
+            if (write_igv) {
+              igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_vInput.igv"))
+              igv_out  <- cbind(res_df[, c("seqnames","start","end","name")], hm_df)
+              write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
+            }
+            message("  Modification: ", mod, "\n    -> Saved: ", res_name, " (and ", hm_name, ")")
+          }
+
+          # vReference
+          res_vref <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "ref", gr_for_region = NULL)
+          if (!is.null(res_vref)) {
+            res_df <- res_vref$results
+            hm_df  <- res_vref$heatmap
+
+            norm_tag <- paste0("v", reference_strain)
+            res_name <- paste0(mod, "_Results_", nm, "_", norm_tag)
+            hm_name  <- paste0(mod, "_Heatmap_", nm, "_", norm_tag)
+            assign(res_name, res_df, envir = .GlobalEnv)
+            assign(hm_name,  hm_df,  envir = .GlobalEnv)
+
+            if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
+            if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
+            if (write_igv) {
+              igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_", norm_tag, ".igv"))
+              igv_out  <- cbind(res_df[, c("seqnames","start","end","name")], hm_df)
+              write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
+            }
+            message("    -> Saved: ", res_name, " (and ", hm_name, ")")
+          }
+        }
+      }
+    }
+  }
+}
+
+```
+
+###########################################################################################
+```{r, run analysis function}
+
+csaw_analysis(
+  metadata_df = meta,
+  design_mat  = design.mat,
+  mode        = "region",             # "window" or "region"
+  out_obj     = count_results,        # <- REQUIRED so we have counts for merging/coords
+  reference_strain = "WT",
+  fdr_cutoff  = 0.05,
+  write_csv_results = TRUE,
+  write_csv_heatmap = TRUE,
+  write_igv   = TRUE,
+  out_dir     = "K27_gene_&_prom_analysis", #output dir, name whatever you want
+  merge_tol   = 300                   # only affects genomewide window mode
+)
+
+```
+###########################################################################################
+
+```{r, Processing Dataframes}
+#Use these template commands for processing dataframes to create csvs, bed files, etc. for downstream analysis or use outisde of R
+
+#reassign gene names to data frame of interest using dplyr
+library(dplyr)
+
+H3K36me3_Results_K27proms_vWT <- H3K36me3_Results_K27proms_vWT %>%
+  left_join(
+    regions$K27proms %>% select(V1, V2, V3, V10), #you may have to change the column names 
+    by = c("seqnames" = "V1", "start" = "V2", "end" = "V3")
+  )
+
+
+
+
+```

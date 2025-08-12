@@ -68,7 +68,7 @@ library(dplyr)
 #https://bioconductor.org/packages/release/bioc/manuals/csaw/man/csaw.pdf
 #read in sample sheet
 qasamples <- read.csv("./csaw_samples_files/csaw_qa-suz12_ET.csv")
-samples <- read.csv("./csaw_samples_files/cac_csaw.csv")
+# samples <- read.csv("./csaw_samples_files/cac_csaw.csv")
 #samples$bamReads <- paste("~/Desktop/COMPASS/SortedBamFiles/",samples$bamReads, sep="")
 
 ##Step 1: create counts for all bins excluding the mat locus, which may be different in different strains
@@ -86,6 +86,7 @@ param <- readParam(discard = matLocus, pe="both", max.frag=1500, minq=20 )
 
 #read counts from bam files
 data_csaw <- windowCounts(qasamples$bamReads, spacing=300, width=300, shift=0, filter=0, bin=TRUE, param=param)
+
 
 
 ```
@@ -203,17 +204,17 @@ design.mat <- model.matrix(~0 + DGElistAll$samples$group)
 #replace wonky column names with readable ones
 colnames(design.mat) <- levels(DGElistAll$samples$group)
 
-# keep.samples <- colSums(DGElistAll$counts) > 0
-# DGElistAll <- DGElistAll[, keep.samples]
-# 
-# keep.samples <- colSums(DGElistK27$counts) > 0
-# DGElistK27 <- DGElistK27[, keep.samples]
-# 
-# keep.samples <- colSums(DGElistK27_genes$counts) > 0
-# DGElistK27_genes <- DGElistK27_genes[, keep.samples]
-# 
-# keep.samples <- colSums(DGElistK27peaks_ectopic$counts) > 0
-# DGElistK27peaks_ectopic <- DGElistK27peaks_ectopic[, keep.samples]
+keep.samples <- colSums(DGElistAll$counts) > 0
+DGElistAll <- DGElistAll[, keep.samples]
+
+keep.samples <- colSums(DGElistK27$counts) > 0
+DGElistK27 <- DGElistK27[, keep.samples]
+
+keep.samples <- colSums(DGElistK27_genes$counts) > 0
+DGElistK27_genes <- DGElistK27_genes[, keep.samples]
+
+keep.samples <- colSums(DGElistK27peaks_ectopic$counts) > 0
+DGElistK27peaks_ectopic <- DGElistK27peaks_ectopic[, keep.samples]
 
 ```
 
@@ -232,6 +233,7 @@ fitK27 <- glmQLFit(yK27, design.mat, robust=TRUE)
 fitK27_gene <- glmQLFit(yK27_gene, design.mat, robust=TRUE)
 fitK27_ectopic <- glmQLFit(yK27_ectopic, design.mat, robust=TRUE)
 fitAll <- glmQLFit(yall, design.mat, robust=TRUE)
+
 
 #See summary & head of counts table
 summary(fitK27$var.post)
@@ -538,20 +540,23 @@ max <- quantile(K27_FilteredHeatmap_mat, 0.995) # identify the 98th percentile v
 K27_FilteredHeatmap_mat[K27_FilteredHeatmap_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
 
 #I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0 in both WT samples
-K27_FilteredHeatmap_mat <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] > 0 | K27_FilteredHeatmap_mat[, 2] > 0)
+K27_FilteredHeatmap_mat <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 2] > 2)
 
 #throwing our regions that are > 0.1 in suz12 (if any got through)
 K27_FilteredHeatmap_mat <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 11] <= 0)
 
 # #I only want to look at qa-suz12
-K27_FilteredHeatmap_mat_map <- K27_FilteredHeatmap_mat[,c(1:7,11)]
+K27_FilteredHeatmap_mat_map <- K27_FilteredHeatmap_mat[,c(2,11,3:7)]
+
+write.csv(K27_FilteredHeatmap_mat_map, file = "qa_suz12_matrix_24hr_Peaks.csv", row.names = FALSE)
 
 #cluster into areas that recover vs. not
 recover <- subset(K27_FilteredHeatmap_mat_map, rowSums(K27_FilteredHeatmap_mat_map[, 3:7] > 0) > 0)
 
-no_recover <- subset(K27_FilteredHeatmap_mat_map, rowSums(K27_FilteredHeatmap_mat_map[, 3:7] <= 0) == 5)
+no_recover <- subset(K27_FilteredHeatmap_mat_map, rowSums(K27_FilteredHeatmap_mat_map[, 3:7] <= 0) == 5) # == 5 because there will be 5 columns < 0
 
-recover_order <-order(rowMeans(recover[, c(1,3)]), decreasing = TRUE)
+#order rows based on mean value across timecourse
+recover_order <-order(rowMeans(recover[,c(3:7)]), decreasing = TRUE)
 no_recover_order <-order(no_recover[, 1], decreasing = TRUE)
 
 recover_sort <- recover[recover_order, ]
@@ -562,10 +567,6 @@ forheat2 <- rownames(no_recover_sort)
 
 finalorder <- c(forheat1, forheat2)
 
-# #order based on WT
-# row_order <- order(K27_FilteredHeatmap_mat[, 1], decreasing = TRUE)
-# K27_FilteredHeatmap_mat_sort <- K27_FilteredHeatmap_mat_map[row_order, ]
-
 #Final Order
 K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat_map[finalorder, ]
 
@@ -575,7 +576,7 @@ col_fun(seq(0, max, length = 20))
 
 #Plot
 K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "H3K27me3"))
-pdf("./H3K27me3_peaks_qa-suz12_TESTing.pdf", height = 9)
+png("./H3K27me3_24hr_peaks_qa-suz12_forZack_2FC.png", units = "in", height = 8, width = 6, res = 300)
 # Draw the heatmap
 draw(K27_Filtered_hm)
 # Close the device to save the file
