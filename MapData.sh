@@ -71,7 +71,7 @@ name=${bam/*.fq.gz/}
 ##################
 #Trimming
 #################
-	  ml Trim_Galore/0.6.7-GCCcore-11.2.0
+	  ml Trim_Galore/0.6.10-GCCcore-12.3.0
 
 	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
 
