@@ -293,8 +293,10 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 2 \
                     --sortUsingSamples 1 2 3 \
                     --missingDataColor 1 \
                     --colorMap "afmhot" \
+                    --heatmapHeight 20 \
+                    --plotWidth 12 \
                     --zMin 0 \
-                    --zMax 16
+                    --zMax 20
 
 #$P138DIR/138-65_ChIP_cac-3_H3K36me3_Rep2_6252_S64.bin_25.smooth_75Bulk.bw \
 
