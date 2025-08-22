@@ -283,7 +283,7 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 2 \
     $P150DIR/150-94_ChIP_cac-1_H3K36me3_Rep4_S94.bin_25.smooth_75Bulk.bw \
     $P150DIR/150-116_ChIP_cac-2_H3K36me3_Rep4_S131.bin_25.smooth_75Bulk.bw \
     $P150DIR/150-134_ChIP_set-7_H3K36me3_Rep4_S149.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/CAF-1_H3K36me3_not_lost_K27_genes $BEDDIR2/CAF-1_H3K36me3_lost_K27_genes --skipZeros -o K36_matrix_PRC2_1.gz
+    -R $BEDDIR2/CAF-1_H3K36me3_not_lost_K27_genes.bed $BEDDIR2/CAF-1_H3K36me3_lost_K27_genes.bed --skipZeros -o K36_matrix_PRC2_1.gz
 
     plotHeatmap -m K36_matrix_PRC2_1.gz -out H3K36me3_CAF-1_cluster.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \
