@@ -16,6 +16,9 @@ workingdir="C:/Users/eddie/Research/GitHub"
 #set working directory to the correct location for working machine
 knitr::opts_knit$set(root.dir = "workingdir")
 
+library(dplyr)
+
+
 ```
 
 ```{r, read in metadata & regions of interest}
@@ -359,13 +362,16 @@ qc_csaw(
 
 # ---- Run csaw contrasts across ALL mods & ALL region sets ----
 # - FDR masking (set non-sig to 0) is applied ONLY for vInput in genome-wide window mode
+# - Region mode masking is OFF by default; enable via mask_region and provide FDR/P cutoffs.
 csaw_analysis <- function(
   metadata_df,                       # metadata
   design_mat,                        # design matrix
   mode = c("window","region"),       # match other functions
   out_obj = NULL,                    # REQUIRED: list returned by csaw_count_and_fit()
   reference_strain = "WT",           # reference strain to normalize to when not vInput
-  fdr_cutoff = 0.05,                 # FDR threshold (see rules below)
+  fdr_cutoff = 0.05,                 # FDR threshold (used in window mode; usable in region mode if mask_region=TRUE)
+  pvalue_cutoff = NULL,              # OPTIONAL P-value threshold (usable in region mode if mask_region=TRUE)
+  mask_region = FALSE,               # If TRUE, in region mode zero heatmap logFC where (FDR>cutoff OR P>cutoff), respecting NULLs
   write_csv_results = FALSE,         # write csv for results df
   write_csv_heatmap = FALSE,         # write csv for heatmap df
   write_igv = FALSE,                 # write igv tracks
@@ -406,16 +412,35 @@ csaw_analysis <- function(
 
     for (st in strains) {
       chip_col <- paste0(st, ".", mod)
-      ref_col  <- if (norm_type == "input") paste0(st, ".input") else paste0(reference_strain, ".", mod)
 
-      # skip if columns absent
-      if (!(chip_col %in% colnames(design_mat)) || !(ref_col %in% colnames(design_mat))) {
-        message("    Skipping ", st, " (missing ", chip_col, " or ", ref_col, ")")
-        next
+      if (norm_type == "input") {
+        # (ChIP vs Input) within the same strain:  log2(ChIP_st / Input_st)
+        st_input_col <- paste0(st, ".input")
+        if (!(chip_col %in% colnames(design_mat)) || !(st_input_col %in% colnames(design_mat))) {
+          message("    Skipping ", st, " (missing ", chip_col, " or ", st_input_col, ")")
+          next
+        }
+        constr <- sprintf("`%s` - `%s`", chip_col, st_input_col)
+
+      } else {
+        # (ChIP/Input)_strain  -  (ChIP/Input)_reference
+        # i.e., (ChIP_st - Input_st) - (ChIP_ref - Input_ref) in log2 space
+        st_input_col  <- paste0(st,               ".input")
+        ref_chip_col  <- paste0(reference_strain, ".", mod)
+        ref_input_col <- paste0(reference_strain, ".input")
+
+        needed <- c(chip_col, st_input_col, ref_chip_col, ref_input_col)
+        if (!all(needed %in% colnames(design_mat))) {
+          missing <- paste(setdiff(needed, colnames(design_mat)), collapse = ", ")
+          message("    Skipping ", st, " (missing: ", missing, ")")
+          next
+        }
+
+        constr <- sprintf("`%s` - `%s` - (`%s` - `%s`)",
+                          chip_col, st_input_col, ref_chip_col, ref_input_col)
       }
 
-      contrast <- limma::makeContrasts(contrasts = paste0("`", chip_col, "` - `", ref_col, "`"),
-                                       levels   = design_mat)
+      contrast <- limma::makeContrasts(contrasts = constr, levels = design_mat)
       res <- edgeR::glmQLFTest(fit, contrast = contrast)
 
       # Build GRanges with stats:
@@ -472,25 +497,33 @@ csaw_analysis <- function(
     # Build heatmap matrix (logFC only)
     logfc_cols <- grep("^logFC_", colnames(final_df), value = TRUE)
     # Put WT first if present
-    logfc_cols <- order_cols_wt_first(logfc_cols, wt = "logFC_WT")
+    logfc_cols <- order_cols_wt_first(logfc_cols, wt = "WT")
     heatmap_df <- final_df[, logfc_cols, drop = FALSE]
     rownames(heatmap_df) <- paste(final_df$seqnames, final_df$start, final_df$end, sep = ".")
 
-    # Apply FDR logic
+    # Apply masking/significance logic
     if (mode == "window") {
-      # For window genomewide/filtered-windows: drop rows from heatmap where ALL strains are non-sig
+      # WINDOW: drop rows where ALL strains are non-significant by FDR (unchanged behavior)
       fdr_cols <- sub("^logFC_", "FDR_", logfc_cols)
       keep <- rowSums(final_df[, fdr_cols, drop = FALSE] <= fdr_cutoff, na.rm = TRUE) > 0
       heatmap_df <- heatmap_df[keep, , drop = FALSE]
-    } else {
-      # For region sets: zero out per-strain logFC where that strain’s FDR > cutoff (keep all rows)
+
+    } else if (isTRUE(mask_region)) {
+      # REGION: optional masking. Zero per-strain logFC if it fails EITHER provided cutoff.
       for (st in names(res_list)) {
-        lcol <- paste0("logFC_", st)
-        fcol <- paste0("FDR_", st)
-        if (lcol %in% colnames(heatmap_df) && fcol %in% colnames(final_df)) {
-          heatmap_df[[lcol]][ final_df[[fcol]] > fdr_cutoff ] <- 0
-        }
+        lcol <- paste0("logFC_",   st)
+        fcol <- paste0("FDR_",     st)
+        pcol <- paste0("PValue_",  st)
+        if (!(lcol %in% colnames(heatmap_df))) next
+
+        mask <- rep(FALSE, nrow(final_df))
+        if (!is.null(fdr_cutoff)    && fcol %in% colnames(final_df)) mask <- mask | (final_df[[fcol]] > fdr_cutoff)
+        if (!is.null(pvalue_cutoff) && pcol %in% colnames(final_df)) mask <- mask | (final_df[[pcol]] > pvalue_cutoff)
+
+        if (any(mask)) heatmap_df[[lcol]][mask] <- 0
       }
+    } else {
+      # REGION: no masking — keep raw logFCs.
     }
 
     list(results = final_df, heatmap = heatmap_df)
@@ -510,7 +543,6 @@ csaw_analysis <- function(
 
       message("=== Region set: ", nm, " ===")
       for (mod in all_mods) {
-        # skip any lingering "input"
         if (identical(mod, "input")) next
 
         # vInput
@@ -529,8 +561,10 @@ csaw_analysis <- function(
           if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
           if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
           if (write_igv) {
+            # IGV from RESULTS df: seqnames/start/end/name + all logFC_* columns
+            lfc_cols <- grep("^logFC_", colnames(res_df), value = TRUE)
+            igv_out  <- res_df[, c("seqnames","start","end","name", lfc_cols), drop = FALSE]
             igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_vInput.igv"))
-            igv_out  <- cbind(res_df[, c("seqnames","start","end","name")], hm_df)
             write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
           }
           message("  Modification: ", mod, "\n    -> Saved: ", res_name, " (and ", hm_name, ")")
@@ -551,8 +585,9 @@ csaw_analysis <- function(
           if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
           if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
           if (write_igv) {
+            lfc_cols <- grep("^logFC_", colnames(res_df), value = TRUE)
+            igv_out  <- res_df[, c("seqnames","start","end","name", lfc_cols), drop = FALSE]
             igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_", norm_tag, ".igv"))
-            igv_out  <- cbind(res_df[, c("seqnames","start","end","name")], hm_df)
             write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
           }
           message("    -> Saved: ", res_name, " (and ", hm_name, ")")
@@ -585,8 +620,9 @@ csaw_analysis <- function(
           if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
           if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
           if (write_igv) {
+            lfc_cols <- grep("^logFC_", colnames(res_df), value = TRUE)
+            igv_out  <- res_df[, c("seqnames","start","end","name", lfc_cols), drop = FALSE]
             igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_vInput.igv"))
-            igv_out  <- cbind(res_df[, c("seqnames","start","end","name")], hm_df)
             write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
           }
           message("  Modification: ", mod, "\n    -> Saved: ", res_name, " (and ", hm_name, ")")
@@ -607,8 +643,9 @@ csaw_analysis <- function(
           if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
           if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
           if (write_igv) {
+            lfc_cols <- grep("^logFC_", colnames(res_df), value = TRUE)
+            igv_out  <- res_df[, c("seqnames","start","end","name", lfc_cols), drop = FALSE]
             igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_", norm_tag, ".igv"))
-            igv_out  <- cbind(res_df[, c("seqnames","start","end","name")], hm_df)
             write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
           }
           message("    -> Saved: ", res_name, " (and ", hm_name, ")")
@@ -640,8 +677,9 @@ csaw_analysis <- function(
             if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
             if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
             if (write_igv) {
+              lfc_cols <- grep("^logFC_", colnames(res_df), value = TRUE)
+              igv_out  <- res_df[, c("seqnames","start","end","name", lfc_cols), drop = FALSE]
               igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_vInput.igv"))
-              igv_out  <- cbind(res_df[, c("seqnames","start","end","name")], hm_df)
               write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
             }
             message("  Modification: ", mod, "\n    -> Saved: ", res_name, " (and ", hm_name, ")")
@@ -662,8 +700,9 @@ csaw_analysis <- function(
             if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
             if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
             if (write_igv) {
+              lfc_cols <- grep("^logFC_", colnames(res_df), value = TRUE)
+              igv_out  <- res_df[, c("seqnames","start","end","name", lfc_cols), drop = FALSE]
               igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_", norm_tag, ".igv"))
-              igv_out  <- cbind(res_df[, c("seqnames","start","end","name")], hm_df)
               write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
             }
             message("    -> Saved: ", res_name, " (and ", hm_name, ")")
@@ -673,6 +712,7 @@ csaw_analysis <- function(
     }
   }
 }
+
 
 ```
 
@@ -696,19 +736,930 @@ csaw_analysis(
 ```
 ###########################################################################################
 
+```{r, Heatmap Function}
+#This function will be used to generate desired heatmaps using the generated dfs from the analysis function
+
+# --- Heatmap helper for csaw *_Heatmap_* data frames ---
+suppressPackageStartupMessages({
+  library(ComplexHeatmap)
+  library(circlize)
+  library(dplyr)
+  library(stringr)
+  library(grid)
+})
+
+`%||%` <- function(a, b) if (!is.null(a)) a else b
+
+make_csaw_heatmap_advanced <- function(
+  df,                                  # data.frame with columns like logFC_*
+  debug_logic = FALSE,
+  debug_bucket = NULL,
+  select_cols = NULL,                  # NULL = all; integer indices or strain names (e.g., c("WT","cac1"))
+  present_threshold = NULL,            # NULL = none; numeric -> values < threshold set to 0 (affects plotting & "presence")
+  clip_negatives_to_zero = FALSE,      # after thresholding: set negatives to 0
+  global_filter = list(type = "any_ge", cols = "all", value = 0),  # drop rows failing this rule post-threshold
+                                      # types: "any_ge","any_gt","all_ge","all_gt"
+  use_buckets = FALSE,                 # TRUE = rule-based clusters (mutually exclusive, in order)
+  buckets = NULL,                      # named list of rules, e.g. list(no_caf=list(present="WT", absent_all=c("cac1","cac2","cac3")))
+                                      # rule keys: present, absent, present_all, present_any, absent_all, absent_any
+  bucket_order_by = NULL,              # named list: for each bucket name, a strain or vector => rowMeans
+  global_order_by = NULL,              # when buckets=FALSE: strain name or vector for rowMeans; NULL = no ordering
+  cap_percentile = 0.995,              # winsorize upper tail to this percentile over selected columns; NULL = disable
+  color_limits = NULL,                 # c(min,max); supports NA endpoints, e.g. c(0, NA) or c(NA, 2); NULL = auto from data
+  colors = NULL,                       # NULL = auto; else vector or function for circlize::colorRamp2
+  zero_white_band = NULL,
+  show_row_names = FALSE,
+  show_col_names = TRUE,
+  cluster_rows = FALSE,                # ignored when use_buckets=TRUE (ordering determines row order)
+  cluster_cols = FALSE,
+  row_distance = "euclidean",
+  row_linkage  = "complete",
+  col_distance = "euclidean",
+  col_linkage  = "complete",
+  row_order = NULL,                    # enforce a predetermined rownames order (overrides buckets/ordering)
+  out_dir = "csaw_heatmaps",
+  out_stem = "csaw_heatmap",
+  formats = c("pdf","png"),
+  width_in = 6.5,                      # figure width (inches)
+  base_height_in = 1.5,                # base height added regardless of rows
+  per_row_height_in = 0.006,           # added height per row (inches)
+  dpi = 300,
+  return_objects = TRUE                # returns list(matrix, row_order, bucket_labels, heatmap)
+) {
+  stopifnot(is.data.frame(df))
+
+  # keep only logFC_* columns
+  lfccols <- grep("^logFC_", names(df), value = TRUE)
+  if (length(lfccols) == 0) stop("No columns named like 'logFC_*' found.")
+  M <- as.matrix(df[, lfccols, drop = FALSE])
+  rownames(M) <- if (!is.null(rownames(df))) rownames(df) else paste0("row", seq_len(nrow(df)))
+
+  # column selection
+  strains_all <- sub("^logFC_", "", colnames(M))
+  if (is.null(select_cols)) {
+    keep_idx <- seq_along(strains_all)
+  } else if (is.numeric(select_cols)) {
+    keep_idx <- select_cols
+  } else {
+    want <- sub("^logFC_", "", select_cols)
+    keep_idx <- match(want, strains_all)
+    if (anyNA(keep_idx)) stop("Some selected strain names not found: ", paste(want[is.na(keep_idx)], collapse = ", "))
+  }
+  M <- M[, keep_idx, drop = FALSE]
+  strains <- sub("^logFC_", "", colnames(M))
+
+  # threshold: values below threshold -> 0 (also defines "presence")
+  if (!is.null(present_threshold)) {
+    M[M < present_threshold] <- 0
+  }
+  # optional: clip negatives to zero
+  if (clip_negatives_to_zero) {
+    M[M < 0] <- 0
+  }
+
+  # global row filter
+  if (!is.null(global_filter)) {
+    rule <- global_filter
+    cols_sel <- if (is.null(rule$cols) || identical(rule$cols, "all")) {
+      seq_len(ncol(M))
+    } else {
+      if (is.numeric(rule$cols)) rule$cols else match(rule$cols, strains)
+    }
+    if (anyNA(cols_sel)) stop("global_filter$cols contains unknown columns.")
+    subM <- M[, cols_sel, drop = FALSE]
+    val  <- as.numeric(rule$value %||% 0)
+    keep <- switch(rule$type,
+                   any_ge = rowSums(subM >= val, na.rm = TRUE) > 0,
+                   any_gt = rowSums(subM >  val, na.rm = TRUE) > 0,
+                   all_ge = rowSums(subM >= val, na.rm = TRUE) == ncol(subM),
+                   all_gt = rowSums(subM >  val, na.rm = TRUE) == ncol(subM),
+                   stop("Unknown global_filter$type: ", rule$type))
+    M <- M[keep, , drop = FALSE]
+  }
+  if (nrow(M) == 0) stop("No rows left after filtering.")
+
+  # winsorize upper cap
+  if (!is.null(cap_percentile)) {
+    cap <- as.numeric(stats::quantile(M, probs = cap_percentile, na.rm = TRUE))
+    M[M > cap] <- cap
+  }
+
+  # presence/absence matrices for bucket rules (after threshold/clip)
+  present_mat <- M > 0
+  absent_mat  <- M == 0     # exact-zero definition for "absent_*" rules
+
+  .debug <- list()
+
+  # helper: map strain names → indices
+  .col_idx <- function(cols) {
+    if (is.null(cols) || length(cols) == 0) integer(0)
+    if (is.numeric(cols)) return(cols)
+    idx <- match(cols, strains)
+    if (anyNA(idx)) stop("Unknown strains in rule: ", paste(cols[is.na(idx)], collapse = ", "))
+    idx
+  }
+
+  # bucket assignment (exclusive, sequential)
+  bucket_for_row <- rep(NA_character_, nrow(M))
+  bucket_levels  <- character(0)
+
+  if (isTRUE(use_buckets)) {
+    if (is.null(buckets) || length(buckets) == 0) stop("use_buckets=TRUE but 'buckets' is empty.")
+    for (bk in names(buckets)) {
+      rule <- buckets[[bk]]
+      pr  <- .col_idx(rule$present)
+      ab  <- .col_idx(rule$absent)
+      pra <- .col_idx(rule$present_all)
+      pry <- .col_idx(rule$present_any)
+      aba <- .col_idx(rule$absent_all)
+      aby <- .col_idx(rule$absent_any)
+
+      # Optional debug (pre-order)
+      if (isTRUE(debug_logic) && (!is.null(debug_bucket) && identical(bk, debug_bucket))) {
+        .debug$strains   <- strains
+        .debug$rule_cols <- list(
+          present      = pr,
+          absent       = ab,
+          present_all  = pra,
+          present_any  = pry,
+          absent_all   = aba,
+          absent_any   = aby
+        )
+        .debug$clauses <- list(
+          present_all  = if (length(pra)) rowSums(present_mat[, pra, drop = FALSE], na.rm = TRUE) == length(pra) else rep(TRUE, nrow(M)),
+          present_any  = if (length(pry)) rowSums(present_mat[, pry, drop = FALSE], na.rm = TRUE) >= 1           else rep(TRUE, nrow(M)),
+          absent_all   = if (length(aba)) rowSums(absent_mat[,  aba, drop = FALSE], na.rm = TRUE) == length(aba) else rep(TRUE, nrow(M)),
+          absent_any   = if (length(aby)) rowSums(absent_mat[,  aby, drop = FALSE], na.rm = TRUE) >= 1           else rep(TRUE, nrow(M)),
+          present_list = if (length(pr))  rowSums(present_mat[, pr,  drop = FALSE], na.rm = TRUE) == length(pr)  else rep(TRUE, nrow(M)),
+          absent_list  = if (length(ab))  rowSums(absent_mat[,  ab,  drop = FALSE], na.rm = TRUE) == length(ab)  else rep(TRUE, nrow(M))
+        )
+      }
+
+      # ---- FIX: combine ONLY the rule keys actually provided ----
+      conds <- list()
+      if (!is.null(rule$present)      && length(pr))  conds$present_list <- rowSums(present_mat[, pr,  drop = FALSE], na.rm = TRUE) == length(pr)
+      if (!is.null(rule$absent)       && length(ab))  conds$absent_list  <- rowSums(absent_mat[,  ab,  drop = FALSE], na.rm = TRUE) == length(ab)
+      if (!is.null(rule$present_all)  && length(pra)) conds$present_all  <- rowSums(present_mat[, pra, drop = FALSE], na.rm = TRUE) == length(pra)
+      if (!is.null(rule$present_any)  && length(pry)) conds$present_any  <- rowSums(present_mat[, pry, drop = FALSE], na.rm = TRUE) >= 1
+      if (!is.null(rule$absent_all)   && length(aba)) conds$absent_all   <- rowSums(absent_mat[,  aba, drop = FALSE], na.rm = TRUE) == length(aba)
+      if (!is.null(rule$absent_any)   && length(aby)) conds$absent_any   <- rowSums(absent_mat[,  aby, drop = FALSE], na.rm = TRUE) >= 1
+
+      ok <- if (length(conds)) Reduce("&", conds) else rep(TRUE, nrow(M))
+      # -----------------------------------------------------------
+
+      if (isTRUE(debug_logic) && (!is.null(debug_bucket) && identical(bk, debug_bucket))) {
+        .debug$conds_names <- names(conds)
+        .debug$ok <- ok
+      }
+
+      assignable <- which(ok & is.na(bucket_for_row))
+      if (length(assignable)) bucket_for_row[assignable] <- bk
+      bucket_levels <- c(bucket_levels, bk)
+    }
+    bucket_for_row[is.na(bucket_for_row)] <- "unassigned"
+    bucket_levels <- unique(c(bucket_levels, "unassigned"))
+  } else {
+    bucket_for_row[] <- "all"
+    bucket_levels <- "all"
+  }
+
+  # row ordering
+  ord_rows <- integer(0)
+  bucket_lab <- character(0)
+
+  if (!is.null(row_order)) {
+    present_rows <- rownames(M)
+    rr <- intersect(row_order, present_rows)
+    if (!length(rr)) stop("Provided row_order has no overlap with data.")
+    M <- M[rr, , drop = FALSE]
+    bucket_for_row <- bucket_for_row[match(rr, present_rows)]
+    ord_rows <- seq_len(nrow(M))
+    bucket_lab <- bucket_for_row
+  } else if (isTRUE(use_buckets)) {
+    for (bk in bucket_levels) {
+      idx <- which(bucket_for_row == bk)
+      if (!length(idx)) next
+      sub <- M[idx, , drop = FALSE]
+      sorter <- bucket_order_by[[bk]] %||% NULL
+      if (is.null(sorter)) {
+        # default: order by means of "present" columns in this bucket, else global rowMeans
+        rule <- buckets[[bk]]
+        pres_cols <- .col_idx(c(rule$present, rule$present_all, rule$present_any))
+        score <- if (length(pres_cols) == 0) rowMeans(sub, na.rm = TRUE)
+                 else rowMeans(sub[, unique(pres_cols), drop = FALSE], na.rm = TRUE)
+      } else {
+        sidx <- .col_idx(sorter)
+        score <- if (length(sidx) == 1) sub[, sidx] else rowMeans(sub[, sidx, drop = FALSE], na.rm = TRUE)
+      }
+      o <- order(score, decreasing = TRUE, na.last = TRUE)
+      ord_rows <- c(ord_rows, idx[o])
+      bucket_lab <- c(bucket_lab, rep(bk, length(o)))
+    }
+  } else {
+    if (!is.null(global_order_by)) {
+      sidx <- .col_idx(global_order_by)
+      score <- if (length(sidx) == 1) M[, sidx] else rowMeans(M[, sidx, drop = FALSE], na.rm = TRUE)
+      ord_rows <- order(score, decreasing = TRUE, na.last = TRUE)
+    } else {
+      ord_rows <- seq_len(nrow(M))
+    }
+    bucket_lab <- rep("all", length(ord_rows))
+  }
+
+  M <- M[ord_rows, , drop = FALSE]
+  bucket_lab <- factor(bucket_lab, levels = bucket_levels)
+
+  # post-order debug recompute (so you can compare on the displayed matrix)
+  if (isTRUE(debug_logic) && !is.null(debug_bucket) && debug_bucket %in% names(buckets)) {
+    rule <- buckets[[debug_bucket]]
+    pr  <- .col_idx(rule$present)
+    ab  <- .col_idx(rule$absent)
+    pra <- .col_idx(rule$present_all)
+    pry <- .col_idx(rule$present_any)
+    aba <- .col_idx(rule$absent_all)
+    aby <- .col_idx(rule$absent_any)
+
+    present_mat_post <- M > 0
+    absent_mat_post  <- M == 0
+
+    .debug$clauses_post <- list(
+      present_all  = if (length(pra)) rowSums(present_mat_post[, pra, drop = FALSE], na.rm = TRUE) == length(pra) else rep(TRUE, nrow(M)),
+      present_any  = if (length(pry)) rowSums(present_mat_post[, pry, drop = FALSE], na.rm = TRUE) >= 1           else rep(TRUE, nrow(M)),
+      absent_all   = if (length(aba)) rowSums(absent_mat_post[,  aba, drop = FALSE], na.rm = TRUE) == length(aba) else rep(TRUE, nrow(M)),
+      absent_any   = if (length(aby)) rowSums(absent_mat_post[,  aby, drop = FALSE], na.rm = TRUE) >= 1           else rep(TRUE, nrow(M)),
+      present_list = if (length(pr))  rowSums(present_mat_post[, pr,  drop = FALSE], na.rm = TRUE) == length(pr)  else rep(TRUE, nrow(M)),
+      absent_list  = if (length(ab))  rowSums(absent_mat_post[,  ab,  drop = FALSE], na.rm = TRUE) == length(ab)  else rep(TRUE, nrow(M))
+    )
+  }
+
+  # color limits (support NA endpoints)
+  if (is.null(color_limits)) {
+    minv <- min(M, na.rm = TRUE)
+    maxv <- max(M, na.rm = TRUE)
+    lims <- c(minv, maxv)
+  } else {
+    lims <- as.numeric(color_limits)
+    if (length(lims) != 2) stop("color_limits must be length-2.")
+    if (any(is.na(lims))) {
+      minv <- min(M, na.rm = TRUE)
+      maxv <- max(M, na.rm = TRUE)
+      if (is.na(lims[1])) lims[1] <- minv
+      if (is.na(lims[2])) lims[2] <- maxv
+    }
+  }
+
+  # color function
+    # color function
+  # Helper to pick endpoint colors from your 'colors' argument
+  .neg_pos_colors <- function(lims, colors) {
+    if (is.null(colors)) {
+      # your defaults
+      if (lims[1] < 0 && lims[2] > 0) {
+        list(neg = "#3B4CC0", mid = "white", pos = "#B40426")
+      } else {
+        list(low = "white", high = "#006400")
+      }
+    } else if (is.function(colors)) {
+      return(colors)  # user-provided colorRamp2
+    } else {
+      if (length(colors) == 2) {
+        list(low = colors[1], high = colors[2])
+      } else if (length(colors) >= 3 && lims[1] < 0 && lims[2] > 0) {
+        list(neg = colors[1], mid = colors[2], pos = colors[length(colors)])
+      } else {
+        # 3+ colors but not a diverging scale crossing 0
+        list(vec = colors)
+      }
+    }
+  }
+
+  cols_spec <- .neg_pos_colors(lims, colors)
+
+  if (is.function(cols_spec)) {
+    col_fun <- cols_spec
+  } else if (!is.null(zero_white_band) && lims[1] < 0 && lims[2] > 0) {
+    # --- NEW: white band around zero ---
+    band <- if (length(zero_white_band) == 1) {
+      c(-abs(zero_white_band), abs(zero_white_band))
+    } else {
+      sort(as.numeric(zero_white_band))[1:2]
+    }
+    neg_col <- if (!is.null(cols_spec$neg)) cols_spec$neg else if (!is.null(cols_spec$low)) cols_spec$low else "blue"
+    pos_col <- if (!is.null(cols_spec$pos)) cols_spec$pos else if (!is.null(cols_spec$high)) cols_spec$high else "red"
+    mid_col <- if (!is.null(cols_spec$mid)) cols_spec$mid else "white"
+
+    # breaks: min → band_lo → 0 → band_hi → max
+    brks <- c(lims[1], band[1], 0, band[2], lims[2])
+    # colors: blue gradient to band_lo, then white stays flat until band_hi, then gradient to red
+    cols <- c(neg_col, mid_col, mid_col, mid_col, pos_col)
+    col_fun <- circlize::colorRamp2(brks, cols)
+  } else {
+    # Original behaviors
+    if (is.null(colors)) {
+      if (lims[1] < 0 && lims[2] > 0) {
+        col_fun <- circlize::colorRamp2(c(lims[1], 0, lims[2]),
+                                        c("#3B4CC0", "#F7F7F7", "#B40426"))
+      } else {
+        col_fun <- circlize::colorRamp2(c(lims[1], lims[2]),
+                                        c("white", "#006400"))
+      }
+    } else if (is.vector(colors) && !is.null(cols_spec$vec)) {
+      # arbitrary multi-stop palette
+      col_fun <- circlize::colorRamp2(seq(lims[1], lims[2], length.out = length(colors)),
+                                      colors)
+    } else if (is.vector(colors) && length(colors) == 2) {
+      col_fun <- circlize::colorRamp2(c(lims[1], lims[2]), colors)
+    } else if (is.vector(colors) && length(colors) >= 3 && lims[1] < 0 && lims[2] > 0) {
+      col_fun <- circlize::colorRamp2(c(lims[1], 0, lims[2]),
+                                      c(cols_spec$neg, cols_spec$mid, cols_spec$pos))
+    } else {
+      col_fun <- circlize::colorRamp2(seq(lims[1], lims[2], length.out = length(colors)), colors)
+    }
+  }
+
+  # row split if using buckets
+  row_split <- if (isTRUE(use_buckets)) bucket_lab else NULL
+
+  # build Heatmap
+  ht <- Heatmap(
+    M,
+    name = "signal",
+    col = col_fun,
+    cluster_rows = if (isTRUE(use_buckets)) FALSE else cluster_rows,
+    cluster_columns = cluster_cols,
+    clustering_distance_rows = row_distance,
+    clustering_method_rows   = row_linkage,
+    clustering_distance_columns = col_distance,
+    clustering_method_columns   = col_linkage,
+    show_row_names = show_row_names,
+    show_column_names = show_col_names,
+    row_split = row_split,
+    use_raster = TRUE, raster_quality = 4
+  )
+
+  # export
+  if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+  height_in <- base_height_in + nrow(M) * per_row_height_in
+  out_files <- character(0)
+
+  if ("png" %in% tolower(formats)) {
+    png_file <- file.path(out_dir, paste0(out_stem, ".png"))
+    png(png_file, width = width_in, height = height_in, units = "in", res = dpi)
+    draw(ht, heatmap_legend_side = "right", annotation_legend_side = "right")
+    dev.off()
+    out_files <- c(out_files, png_file)
+  }
+  if ("pdf" %in% tolower(formats)) {
+    pdf_file <- file.path(out_dir, paste0(out_stem, ".pdf"))
+    pdf(pdf_file, width = width_in, height = height_in, useDingbats = FALSE)
+    draw(ht, heatmap_legend_side = "right", annotation_legend_side = "right")
+    dev.off()
+    out_files <- c(out_files, pdf_file)
+  }
+  message("Saved: ", paste(out_files, collapse = " | "))
+
+  if (return_objects) {
+    invisible(list(
+      matrix = M,
+      row_order = rownames(M),
+      bucket_labels = if (isTRUE(use_buckets)) as.character(row_split) else NULL,
+      heatmap = ht,
+      debug = .debug  # may be empty list if debug_logic=FALSE
+    ))
+  } else {
+    invisible(NULL)
+  }
+}
+
+```
+
+```{r, Run Heatmap Function}
+#Use without clustering
+make_csaw_heatmap_advanced(
+  df = H3K36me3_Heatmap_K27genes_proms_vInput,
+  select_cols = NULL,                   # NULL = use all strains
+  present_threshold = 0.1,                # everything <1 → 0
+  clip_negatives_to_zero = FALSE,        # keep negatives
+  color_limits = c(0, NA),               # start at 0, auto-max
+  colors = c("white", "#A59D00"),            # white → red scale
+  global_order_by = c("WT","cac1"),
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  show_row_names = FALSE,
+  out_stem = "H3K36me3_K27genes_proms_vInput_heatmap"
+)
+
+# define the rule set: one bucket for absent in cac1 OR cac2
+buck <- list(
+  absent_cac1_or_cac2 = list(absent_any = c("cac1", "cac2"))
+)
+
+res <- make_csaw_heatmap_advanced(
+  df = H3K36me3_Heatmap_K27genes_proms_vInput,
+  select_cols = c("WT","cac1","cac2","cac3","set7"),
+  present_threshold = 0.1,
+  use_buckets = TRUE,
+  buckets = buck,
+  bucket_order_by = list(absent_cac1_or_cac2 = "WT"),
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  color_limits = c(0, NA),
+  colors = c("white","#A59D00"),
+  out_stem = "H3K36me3_bucket_absent_cac1_or_cac2_TEST",
+  debug_logic = TRUE,
+  debug_bucket = "absent_cac1_or_cac2"
+)
+
+# TEMPLATE: full call with all params set to their defaults and commented.
+
+res <- make_csaw_heatmap_advanced(
+  df = H3K36me3_Heatmap_K27promTSS_vWT,
+  select_cols = c("cac1","cac2","set7"),
+  global_filter = NULL,              # <- keep ALL rows
+  cap_percentile = 0.98,
+  color_limits = c(-2, 2),
+  colors = c("blue","white","red"),
+  zero_white_band = 0.5,
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  global_order_by = c("cac1","cac2"),
+  out_dir = "csaw_heatmaps",
+  out_stem = "H3K36me3_promTSS_vWT",
+  formats = c("pdf","png"),
+  width_in = 6.5,
+  base_height_in = 1.5,
+  per_row_height_in = 0.006,
+  dpi = 300,
+  return_objects = TRUE
+)
+
+```
+
 ```{r, Processing Dataframes}
 #Use these template commands for processing dataframes to create csvs, bed files, etc. for downstream analysis or use outisde of R
 
-#reassign gene names to data frame of interest using dplyr
+#reassign gene names to data frame of interest using dplyr. This is useful if you are wanting to extract out a list of genes of interest (like genes that lose K27me3 in a mutant). 
 library(dplyr)
 
-H3K36me3_Results_K27proms_vWT <- H3K36me3_Results_K27proms_vWT %>%
+H3K36me3_Results_K27promTSS_vWT <- H3K36me3_Results_K27promTSS_vWT %>%
   left_join(
-    regions$K27proms %>% select(V1, V2, V3, V10), #you may have to change the column names 
+    regions$K27promTSS %>% select(V1, V2, V3, V10), #you may have to change the column names 
     by = c("seqnames" = "V1", "start" = "V2", "end" = "V3")
   )
 
+#subset your original bed file for genes/regions of interest. For example, here, I will subset my promoter-TSS bed to only include genes that lose H3K36me3 in cac-1 or cac-2
 
+##isolate genes of interest
+CAF1_K36_lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.5 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.5)
 
+##subset the bed
+K36_lost_bed = subset(K27_genes, K27_genes$V10 %in% CAF1_K36_lost$V10)
+
+```
+
+```{r, plotting w RNA-seq data}
+#script to make a heatmap w ChIP log2FC data & RNA-seq log2FC data (will use csaw results, which is why i have it here)
+
+#read in log2FC Expression data saved from DESeq for whatever strains you want
+cac1RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1_new_ALL.csv", row.names = 1)
+cac2RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac2_ALL.csv", row.names = 1)
+set7RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/set7_05.csv", row.names = 1)
+
+#Plot heatmap with ChIP & RNA-seq log2FC
+
+suppressPackageStartupMessages({
+  library(ComplexHeatmap)
+  library(circlize)
+})
+
+make_chip_rna_heatmap <- function(
+  chip_results_df,
+  chip_heatmap_res,                         # list from make_csaw_heatmap_advanced()
+  rna_list,                                 # named list of RNA dfs; rownames are NCU IDs
+  chip_cols      = c("logFC_cac1","logFC_cac2","logFC_set7"),
+  rna_colname    = "log2FoldChange",
+
+  # visual scales (ChIP)
+  chip_limits    = c(-2, 2),
+  chip_zero_band = 0.5,                     # white band around 0 for ChIP (visual only)
+  chip_colors    = c("#3B4CC0", "white", "#B40426"),
+
+  # visual scales (RNA)
+  rna_limits     = c(-4, 4),
+  rna_zero_band  = NULL,                    # e.g. 0.5 to mirror ChIP
+  rna_colors     = c("blue", "white", "red"),
+
+  # scaling
+  row_scale      = c("none", "zscore_chip", "zscore_rna", "zscore_both"),
+
+  # sorting
+  sort_by        = c("none","chip","rna"),
+  sort_strains   = NULL,                    # e.g. c("cac1","set7"); NULL = all columns in chosen block
+
+  # data filter
+  drop_na        = TRUE,                    # drop rows with any NA in either block
+
+  # clamp & legends
+  clamp_chip     = TRUE,
+  clamp_rna      = TRUE,
+  chip_legend_at     = NULL,
+  chip_legend_labels = NULL,
+  rna_legend_at      = NULL,
+  rna_legend_labels  = NULL,
+
+  # ---- OUTPUT & SIZE CONTROL ----
+  out_dir        = NULL,                    # if non-NULL, save files here
+  file_prefix    = "chip_rna_heatmap",
+  save_formats   = c("pdf","png"),          # any of "pdf","png"
+  width_in       = 6.5,                     # figure width in inches
+  height_in      = NULL,                    # figure height in inches; if NULL -> auto by row count
+  base_height_in = 1.5,                     # base height (in) added regardless of rows (used if height_in is NULL)
+  per_row_height_in = 0.006,                # added height per row (in) if height_in is NULL
+  dpi            = 300                      # PNG resolution; px = inches * dpi
+) {
+  `%||%` <- function(a, b) if (!is.null(a)) a else b
+
+  row_scale <- match.arg(row_scale)
+  sort_by   <- match.arg(sort_by)
+
+  stopifnot(is.list(chip_heatmap_res), !is.null(chip_heatmap_res$matrix))
+  chip_mat_full <- chip_heatmap_res$matrix
+
+  # Map ChIP rows -> gene IDs via "seq.start.end"
+  chip_key <- with(chip_results_df, paste(seqnames, start, end, sep = "."))
+  gene_map <- setNames(chip_results_df$V10, chip_key)
+  if (!all(rownames(chip_mat_full) %in% names(gene_map))) {
+    missing_keys <- setdiff(rownames(chip_mat_full), names(gene_map))
+    stop("Some heatmap rows not in chip_results_df key (seq.start.end). Examples: ",
+         paste(head(missing_keys, 5), collapse = ", "))
+  }
+  genes_in_order <- gene_map[ rownames(chip_mat_full) ]
+
+  # Keep requested ChIP columns
+  keep_chip <- intersect(chip_cols, colnames(chip_mat_full))
+  if (length(keep_chip) == 0) stop("None of chip_cols present in the ChIP heatmap matrix.")
+  chip_sub <- chip_mat_full[, keep_chip, drop = FALSE]
+
+  # Build RNA matrix in identical row order
+  pull_rna <- function(df, genes, col = rna_colname) {
+    rn <- trimws(rownames(df))
+    if (is.null(rn)) stop("RNA data frame is missing rownames (NCU IDs).")
+    v <- df[genes, col, drop = TRUE]
+    suppressWarnings(as.numeric(v))
+  }
+  rna_mat <- do.call(cbind, lapply(names(rna_list), function(nm) {
+    pull_rna(rna_list[[nm]], genes_in_order, rna_colname)
+  }))
+  colnames(rna_mat) <- paste0("RNA_", names(rna_list))
+  rownames(rna_mat) <- rownames(chip_sub)
+
+  # Drop rows with any NA across either block (e.g., rRNA/tRNA lacking RNA)
+  if (isTRUE(drop_na)) {
+    keep <- rowSums(is.na(chip_sub)) == 0 & rowSums(is.na(rna_mat)) == 0
+    chip_sub       <- chip_sub[keep, , drop = FALSE]
+    rna_mat        <- rna_mat [keep, , drop = FALSE]
+    genes_in_order <- genes_in_order[keep]
+  }
+
+  # Row-wise z-scoring (post-alignment, pre-sorting, pre-clamping)
+  zrow <- function(m) {
+    if (ncol(m) == 1) return(m * 0)  # single column z-score -> flat zero
+    mc <- m - rowMeans(m, na.rm = TRUE)
+    s  <- apply(mc, 1, function(x) sd(x, na.rm = TRUE))
+    s[s == 0 | is.na(s)] <- 1
+    mc / s
+  }
+  if (row_scale %in% c("zscore_chip","zscore_both")) chip_sub <- zrow(chip_sub)
+  if (row_scale %in% c("zscore_rna","zscore_both"))  rna_mat  <- zrow(rna_mat)
+
+  # Optional sorting
+  if (sort_by != "none") {
+    if (sort_by == "chip") {
+      cols_to_use <- if (is.null(sort_strains)) colnames(chip_sub) else {
+        wanted <- paste0("logFC_", sort_strains)
+        intersect(wanted, colnames(chip_sub))
+      }
+      mat_for_order <- chip_sub
+    } else { # sort_by == "rna"
+      cols_to_use <- if (is.null(sort_strains)) colnames(rna_mat) else {
+        wanted <- paste0("RNA_", sort_strains)
+        intersect(wanted, colnames(rna_mat))
+      }
+      mat_for_order <- rna_mat
+    }
+    if (length(cols_to_use) > 0) {
+      score <- if (length(cols_to_use) == 1) {
+        as.numeric(mat_for_order[, cols_to_use])
+      } else {
+        rowMeans(mat_for_order[, cols_to_use, drop = FALSE], na.rm = TRUE)
+      }
+      ord <- order(score, decreasing = TRUE, na.last = TRUE)
+      chip_sub       <- chip_sub[ord, , drop = FALSE]
+      rna_mat        <- rna_mat [ord, , drop = FALSE]
+      genes_in_order <- genes_in_order[ord]
+    }
+  }
+
+  # Clamp to limits so legend and colors match exactly
+  if (isTRUE(clamp_chip)) chip_sub <- pmin(pmax(chip_sub, chip_limits[1]), chip_limits[2])
+  if (isTRUE(clamp_rna))  rna_mat  <- pmin(pmax(rna_mat,  rna_limits[1]), rna_limits[2])
+
+  # Color mapping with optional flat white band around 0
+  make_diverging_fun <- function(lims, band, cols) {
+    if (is.null(cols) || length(cols) < 3) cols <- c("#3B4CC0","white","#B40426")
+    if (!is.null(band) && lims[1] < 0 && lims[2] > 0) {
+      band <- abs(as.numeric(band))[1]
+      brks <- c(lims[1], -band, 0, band, lims[2])
+      pal  <- c(cols[1], "white", "white", "white", tail(cols, 1))
+      circlize::colorRamp2(brks, pal)
+    } else if (lims[1] < 0 && lims[2] > 0) {
+      circlize::colorRamp2(c(lims[1], 0, lims[2]),
+                           c(cols[1], "white", tail(cols, 1)))
+    } else {
+      circlize::colorRamp2(c(lims[1], lims[2]),
+                           c(cols[1], tail(cols, 1)))
+    }
+  }
+  col_fun_chip <- make_diverging_fun(chip_limits, chip_zero_band, chip_colors)
+  col_fun_rna  <- make_diverging_fun(rna_limits,  rna_zero_band,  rna_colors)
+
+  # Legend ticks default to limits
+  if (is.null(chip_legend_at)) chip_legend_at <- pretty(chip_limits, n = 5)
+  if (is.null(rna_legend_at))  rna_legend_at  <- pretty(rna_limits,  n = 5)
+
+  # Build heatmaps
+  ht_chip <- Heatmap(
+    chip_sub,
+    name = if (row_scale %in% c("zscore_chip","zscore_both")) "ChIP (z)" else "ChIP log2FC",
+    col = col_fun_chip,
+    cluster_rows = FALSE,
+    cluster_columns = FALSE,
+    show_row_names = FALSE,
+    heatmap_legend_param = list(at = chip_legend_at, labels = chip_legend_labels %||% chip_legend_at)
+  )
+  ht_rna <- Heatmap(
+    rna_mat,
+    name = if (row_scale %in% c("zscore_rna","zscore_both")) "RNA (z)" else "RNA log2FC",
+    col = col_fun_rna,
+    na_col = "white",
+    cluster_rows = FALSE,
+    cluster_columns = FALSE,
+    show_row_names = FALSE,
+    heatmap_legend_param = list(at = rna_legend_at, labels = rna_legend_labels %||% rna_legend_at)
+  )
+
+  ht_all <- ht_chip + ht_rna
+
+  # Determine output height
+  n_rows <- nrow(chip_sub)
+  eff_height_in <- if (is.null(height_in)) base_height_in + n_rows * per_row_height_in else height_in
+  png_width_px  <- as.integer(round(width_in * dpi))
+  png_height_px <- as.integer(round(eff_height_in * dpi))
+
+  # Save to files if requested
+  if (!is.null(out_dir)) {
+    dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+    fmts <- tolower(save_formats)
+
+    if ("pdf" %in% fmts) {
+      pdf_file <- file.path(out_dir, paste0(file_prefix, ".pdf"))
+      grDevices::pdf(pdf_file, width = width_in, height = eff_height_in, useDingbats = FALSE)
+      draw(ht_all, heatmap_legend_side = "right")
+      grDevices::dev.off()
+    }
+
+    if ("png" %in% fmts) {
+      png_file <- file.path(out_dir, paste0(file_prefix, ".png"))
+      grDevices::png(png_file, width = png_width_px, height = png_height_px, res = dpi)
+      draw(ht_all, heatmap_legend_side = "right")
+      grDevices::dev.off()
+    }
+  }
+
+  # Also draw interactively (uses current device size)
+  draw(ht_all, heatmap_legend_side = "right")
+
+  invisible(list(
+    chip_matrix = chip_sub,
+    rna_matrix  = rna_mat,
+    genes       = genes_in_order,
+    size_used   = list(width_in = width_in, height_in = eff_height_in, dpi = dpi)
+  ))
+}
+
+# ---------------------- Example usage ----------------------
+out <- make_chip_rna_heatmap(
+  chip_results_df  = H3K36me3_Results_K27promTSS_vWT,
+  chip_heatmap_res = res,
+  rna_list = list(cac1 = cac1RNA, cac2 = cac2RNA, set7 = set7RNA),
+  chip_cols      = c("logFC_cac1","logFC_cac2","logFC_set7"),
+  chip_limits    = c(-2, 2),
+  chip_zero_band = 0.5,
+  rna_limits     = c(-10, 10),
+  rna_zero_band  = 2,
+  sort_by      = "rna",
+  drop_na     = TRUE,
+  sort_strains = c("cac1","cac2"),
+  clamp_rna      = FALSE,                        
+  rna_legend_at  = NULL,
+  out_dir        = "csaw_heatmaps",
+  file_prefix    = "H3K36me3_vWT_vs_RNA_vWT_RNAsorted",
+  save_formats = c("pdf","png"),
+  width_in     = 8,
+  height_in    = 7,
+  dpi          = 300
+)
+
+#View RNA matrix being plotted (in correct order)
+rna_df <- data.frame(GeneID = out$genes, out$rna_matrix)
+View(rna_df)
+
+```
+
+```{r, ChIP vs. RNA scatter plot code}
+#Use this to make scatterplots of ChIP-seq signal over genes vs. their RNA-seq expression values
+
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(dplyr)
+  library(stringr)
+  library(tibble)
+})
+
+# ChIP vs RNA scatter (align by gene id; auto-pick logFC_<strain>)
+chip_rna_scatter <- function(
+  chip_results_df,
+  rna_df,
+  strain,                          # e.g. "cac1"
+  gene_col      = "V10",
+  rna_col       = "log2FoldChange",
+  chip_col      = NULL,            # auto: prefers "logFC_<strain>"
+
+  # coloring by RNA thresholds
+  rna_up_thresh   =  2,
+  rna_down_thresh = -2,
+  colors_map      = c(up = "red", down = "blue", ns = "gray50"),
+  legend_title    = "RNA log2FC group",
+
+  # correlation / regression line
+  cor_method   = c("pearson","spearman"),
+  add_lm       = TRUE,
+  fit_global   = TRUE,             # TRUE = one global fit; FALSE = one per color group
+  fit_color    = "black",
+  fit_linetype = "dashed",
+  fit_se       = FALSE,
+
+  # points
+  point_alpha  = 0.75,
+  point_size   = 1.6,
+
+  # labels (auto if NULL)
+  xlab = NULL, ylab = NULL, title = NULL,
+
+  # axes (no data drop)
+  xlim = NULL, ylim = NULL,
+
+  # data hygiene
+  drop_na = TRUE,
+
+  # output controls (like your heatmap helper)
+  out_dir      = NULL,                   # if non-NULL, save here
+  file_prefix  = NULL,                   # if NULL: "chip_vs_rna_<strain>"
+  save_formats = c("pdf","png"),         # any of "pdf","png"
+  width_in     = 12,
+  height_in    = 9,
+  dpi          = 600
+) {
+  `%||%` <- function(a, b) if (!is.null(a)) a else b
+  cor_method <- match.arg(cor_method)
+
+  # --- pick ChIP column ---
+  stopifnot(gene_col %in% names(chip_results_df))
+  stopifnot(!is.null(rownames(rna_df)))
+  stopifnot(rna_col %in% colnames(rna_df))
+
+  if (is.null(chip_col)) {
+    pref <- paste0("logFC_",  strain)
+    fall <- paste0("log2FC_", strain)
+    if (pref %in% names(chip_results_df)) chip_col <- pref
+    else if (fall %in% names(chip_results_df)) chip_col <- fall
+    else {
+      pats <- paste0("^log2?fc[._-]?", tolower(strain), "(?:\\b|[_./-])?")
+      hits <- names(chip_results_df)[str_detect(tolower(names(chip_results_df)), pats)]
+      if (!length(hits)) stop("Could not find ChIP column for strain '", strain, "'. Expected '", pref, "'.")
+      chip_col <- hits[1]
+    }
+  }
+  stopifnot(chip_col %in% names(chip_results_df))
+
+  # --- align by gene id ---
+  chip_tbl <- chip_results_df |>
+    transmute(GeneID = .data[[gene_col]], chip = suppressWarnings(as.numeric(.data[[chip_col]])))
+
+  rna_tbl <- rna_df |>
+    as.data.frame() |>
+    rownames_to_column("GeneID") |>
+    transmute(GeneID, rna = suppressWarnings(as.numeric(.data[[rna_col]])))
+
+  plot_df <- inner_join(chip_tbl, rna_tbl, by = "GeneID")
+  if (isTRUE(drop_na)) plot_df <- filter(plot_df, is.finite(chip), is.finite(rna))
+  if (nrow(plot_df) < 3) stop("Not enough overlapping genes with finite values to plot.")
+
+  # groups & colors
+  plot_df <- mutate(plot_df,
+    color_group = case_when(
+      rna >  rna_up_thresh   ~ "up",
+      rna <  rna_down_thresh ~ "down",
+      TRUE                   ~ "ns"
+    )
+  )
+  # force a well-named mapping vector
+  col_vals <- setNames(as.character(colors_map[c("up","down","ns")]), c("up","down","ns"))
+
+  # stats
+  ct <- suppressWarnings(cor.test(plot_df$chip, plot_df$rna, method = cor_method))
+  r2 <- sprintf("%.2f", ct$estimate^2)
+  pval <- signif(ct$p.value, 3)
+
+  # labels
+  if (is.null(xlab)) xlab <- paste0("ChIP log2FC (", strain, ")")
+  if (is.null(ylab)) ylab <- paste0("RNA log2FC (", strain, ")")
+  if (is.null(title)) title <- paste0("ChIP vs RNA (", strain, ")")
+
+  xr <- range(plot_df$chip, na.rm = TRUE); yr <- range(plot_df$rna, na.rm = TRUE)
+  x_anno <- xr[1] + 0.02 * diff(xr); y_anno <- yr[2] - 0.05 * diff(yr)
+  anno_txt <- paste0("R² = ", r2, ", p = ", pval)
+
+  # plot
+  p <- ggplot(plot_df, aes(chip, rna, color = color_group)) +
+    geom_point(alpha = point_alpha, size = point_size) +
+    scale_color_manual(values = col_vals,
+                       breaks = c("up","down","ns"),
+                       labels = c("Up","Down","N.S."),
+                       name   = legend_title) +
+    theme_minimal(base_size = 12) +
+    labs(x = xlab, y = ylab, title = title) +
+    annotate("text", x = x_anno, y = y_anno, label = anno_txt, hjust = 0, size = 4)
+
+  # single global fit (doesn't inherit color grouping)
+  if (isTRUE(add_lm) && isTRUE(fit_global)) {
+    p <- p + geom_smooth(
+      data = plot_df,
+      aes(chip, rna),
+      method = "lm", se = fit_se,
+      color = fit_color, linetype = fit_linetype,
+      inherit.aes = FALSE
+    )
+  } else if (isTRUE(add_lm)) {
+    # one fit per color group
+    p <- p + geom_smooth(method = "lm", se = fit_se, linetype = fit_linetype)
+  }
+
+  if (!is.null(xlim) || !is.null(ylim)) p <- p + coord_cartesian(xlim = xlim, ylim = ylim, expand = TRUE)
+
+  # save
+  saved <- character(0)
+  if (!is.null(out_dir)) {
+    dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+    stem <- file_prefix %||% paste0("chip_vs_rna_", strain)
+    fmts <- tolower(save_formats)
+    if ("pdf" %in% fmts) {
+      f <- file.path(out_dir, paste0(stem, ".pdf"))
+      ggsave(f, plot = p, width = width_in, height = height_in, units = "in", dpi = dpi)
+      saved <- c(saved, f)
+    }
+    if ("png" %in% fmts) {
+      f <- file.path(out_dir, paste0(stem, ".png"))
+      ggsave(f, plot = p, width = width_in, height = height_in, units = "in", dpi = dpi)
+      saved <- c(saved, f)
+    }
+  }
+
+  invisible(list(data = plot_df,
+                 cor  = list(r = unname(ct$estimate), r2 = r2, p = ct$p.value, method = cor_method),
+                 gg   = p, saved = saved,
+                 columns = list(chip_col = chip_col, rna_col = rna_col, gene_col = gene_col)))
+}
+
+#Example Use
+out <- chip_rna_scatter(
+  chip_results_df = H3K36me3_Results_K27promTSS_vWT,
+  rna_df          = cac1RNA,
+  strain          = "cac1",
+  out_dir         = "scatter_outputs",
+  file_prefix     = "K27_vs_RNA_cac1",
+  rna_up_thresh   =  2,
+  rna_down_thresh = -2,
+  width_in        = 12,
+  height_in = 9,
+  dpi = 600,
+  add_lm = TRUE, 
+  fit_global = TRUE, 
+  fit_color = "blue"
+)
+out$gg
+
+#View what your plotting
+View(out$data)  
 
 ```

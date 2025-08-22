@@ -21,6 +21,7 @@ library("grid")
 library("corrplot")
 library(RColorBrewer)
 library("scater")
+library(tidyr)
 
 knitr::opts_chunk$set(echo = TRUE)
 

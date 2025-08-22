@@ -244,7 +244,7 @@ param <- readParam(discard = matLocus, pe="both", max.frag=1500, minq=20 )
 #read counts from bam files
 #data_csaw <- windowCounts(samples$bamReads, spacing=300, width=300, shift=0, filter=0, bin=TRUE, param=param)
 
-K27_genes <- read.table(file="./bed_files/genes_and_promoters_overlap_100pct_edit.bed")
+K27_genes <- read.table(file="./bed_files/K27_genes_prom_100pct_overlap.bed")
 
 genes_gr <- GRanges(
   seqnames = K27_genes$V1,
