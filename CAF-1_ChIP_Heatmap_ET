@@ -292,7 +292,6 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 2 \
                     --sortRegions descend \
                     --sortUsingSamples 1 2 3 \
                     --missingDataColor 1 \
-                    --heatmapHeight 20 \
                     --colorMap "afmhot" \
                     --zMin 0 \
                     --zMax 16
