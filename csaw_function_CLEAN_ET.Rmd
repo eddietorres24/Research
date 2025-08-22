@@ -1210,7 +1210,7 @@ H3K36me3_Results_K27promTSS_vWT <- H3K36me3_Results_K27promTSS_vWT %>%
 #subset your original bed file for genes/regions of interest. For example, here, I will subset my promoter-TSS bed to only include genes that lose H3K36me3 in cac-1 or cac-2
 
 ##isolate genes of interest
-CAF1_K36_lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.5 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.5)
+CAF1_K36_lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.8 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.8)
 
 ##subset the bed
 K36_lost_bed = subset(K27_genes, K27_genes$V10 %in% CAF1_K36_lost$V10)
