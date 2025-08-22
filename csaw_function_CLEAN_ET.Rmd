@@ -1214,7 +1214,10 @@ CAF1_K36_lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27prom
 
 ##subset the bed
 K36_lost_bed = subset(K27_genes, K27_genes$V10 %in% CAF1_K36_lost$V10)
+K36_not_lost_bed = subset(K27_genes, ! K27_genes$V10 %in% K36_lost_bed$V10)
 
+write.table(K36_lost_bed, file = "CAF-1_H3K36me3_lost_K27_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K36_not_lost_bed, file = "CAF-1_H3K36me3_not_lost_K27_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 ```
 
 ```{r, plotting w RNA-seq data}
