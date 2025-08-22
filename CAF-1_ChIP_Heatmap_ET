@@ -294,6 +294,7 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 2 \
                     --missingDataColor 1 \
                     --colorMap "afmhot" \
                     --heatmapHeight 20 \
+                    --plotHeight 24 \
                     --plotWidth 12 \
                     --zMin 0 \
                     --zMax 20
