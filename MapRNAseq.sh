@@ -37,9 +37,9 @@ fi
 #input file variables
   # read1=${fastqPath}/${accession}*R1_001.fastq.gz
   # read2=${fastqPath}/${accession}*R2_001.fastq.gz
-  read1=${fastqPath}/${accession}/${accession}*_1.fastq.gz
-  read2=${fastqPath}/${accession}/${accession}*_2.fastq.gz
-  # unpaired=${fastqPath}/${accession}/${accession}.fastq.gz
+  read1=${fastqPath}/${accession}*_1.fastq.gz
+  read2=${fastqPath}/${accession}*_2.fastq.gz
+  # unpaired=${fastqPath}/${accession}/${accession}*.fastq.gz
 #For files not in SRA folder
 # read1=${fastqPath}/${accession}*_1.fastq.gz
 # read2=${fastqPath}/${accession}*_2.fastq.gz
