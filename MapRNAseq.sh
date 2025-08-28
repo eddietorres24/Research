@@ -35,10 +35,10 @@ fi
 ####################################################
 
 #input file variables
-  read1=${fastqPath}/${accession}*R1_001.fastq.gz
-  read2=${fastqPath}/${accession}*R2_001.fastq.gz
-  # read1=${fastqPath}/${accession}/${accession}*_1.fastq.gz
-  # read2=${fastqPath}/${accession}/${accession}*_2.fastq.gz
+  # read1=${fastqPath}/${accession}*R1_001.fastq.gz
+  # read2=${fastqPath}/${accession}*R2_001.fastq.gz
+  read1=${fastqPath}/${accession}/${accession}*_1.fastq.gz
+  read2=${fastqPath}/${accession}/${accession}*_2.fastq.gz
   # unpaired=${fastqPath}/${accession}/${accession}.fastq.gz
 
 #For files not in SRA folder
@@ -262,7 +262,6 @@ else
          	    module load deepTools/3.5.2-foss-2022a
          	    #Plot all reads
          	    bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}Aligned.sortedByCoord.out.bam" -o "${bw}"
-
 
 fi
 

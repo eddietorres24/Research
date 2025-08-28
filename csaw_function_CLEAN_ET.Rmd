@@ -17,6 +17,12 @@ workingdir="C:/Users/eddie/Research/GitHub"
 knitr::opts_knit$set(root.dir = "workingdir")
 
 library(dplyr)
+  require(csaw)
+  require(edgeR)
+  library(GenomicRanges)
+  library(Rsamtools)
+  library(S4Vectors)
+  library(SummarizedExperiment)
 
 
 ```
@@ -40,10 +46,10 @@ colnames(design.mat) <- levels(grouping)
 matLocus <- GRanges("CM002236.1", IRanges(1856288, 1862459)) # mat
 
 ##set parameters for windowCounts
-param <- readParam(discard = matLocus, pe="both", max.frag=1500, minq=20 )
+param <- readParam(discard = matLocus, pe="none", max.frag=1500, minq=20 )
 
 #reading in regions of interest
-regions <- list(K27genes_proms = read.table("../bed_files/K27_genes_prom_100pct_overlap.bed"), K27genes = read.table("../bed_files/K27_genes_stringent.bed"), K27proms = read.table("../bed_files/K27_promoters.bed"), K27promTSS = read.table("../bed_files/K27_prom_TSS.bed"))
+regions <- list(K27genes_proms = read.table("../bed_files/K27_genes_prom_100pct_overlap.bed"), K27genes = read.table("../bed_files/K27_genes_stringent.bed"), K27proms = read.table("../bed_files/K27_promoters.bed"), K27promTSS = read.table("../bed_files/K27_prom_TSS.bed"), allgenes = read.table("../bed_files/all_genes_forR.bed")) 
 
 ###IMPORTANT: the tables you  read into your list should not have a header (i.e., the column names should be V1, V2, ... VX). If your columns have other names, the count function may not recognize it properly. even if the files you read in have headers, i believe you can adjust the way read.table reads it into a df object. check column names in the "regions" object before continuing
 
@@ -64,17 +70,20 @@ csaw_count_and_fit <- function(
   mode = c("window", "region"), # choose count mode
   window_size = 300,            # used only for window mode
   design_mat,                   # precomputed model matrix
-  param,                        # readParam() object
+  param,                        # readParam() object (your defaults will be copied)
   assign_to_global = TRUE,      # save named objects to global environment
   return_list = TRUE            # return everything in a nested list
 ) {
   require(csaw)
   require(edgeR)
   require(GenomicRanges)
-  
+  require(Rsamtools)
+  require(S4Vectors)
+  require(SummarizedExperiment)
+
   mode <- match.arg(mode)
 
-  ## -------- helpers --------
+  ## ---------------- sanity helpers ----------------
   df_to_granges <- function(df) {
     cols <- names(df)
     chr <- if ("V1" %in% cols) df$V1 else if ("chrom" %in% cols) df$chrom else stop("No chrom/V1 column in region data.frame")
@@ -85,7 +94,7 @@ csaw_count_and_fit <- function(
     if (any(is.na(start) | is.na(end))) stop("Start/end contain NAs after coercion. Check region input.")
     GRanges(seqnames = chr, ranges = IRanges(start = start, end = end), strand = strd)
   }
-  
+
   as_named_list <- function(x) {
     if (is.null(x)) return(NULL)
     if (is.list(x) && !is.data.frame(x)) {
@@ -99,56 +108,168 @@ csaw_count_and_fit <- function(
       stop("region_list must be a data.frame or a named list of data.frames.")
     }
   }
-  
-  ## -------- inputs & grouping --------
+
+  detect_paired <- function(bam, n = 5000L) {
+    bf <- BamFile(bam, yieldSize = n)
+    open(bf); on.exit(close(bf), add = TRUE)
+    x <- scanBam(bf, param = ScanBamParam(what = "flag"))[[1]]$flag
+    if (length(x) == 0) return(FALSE)
+    # bit 0x1 => isPaired
+    any(bitwAnd(x, 1L) != 0L)
+  }
+
+  # try to clone readParam() while overriding `pe=`
+  set_pe <- function(param_in, pe_mode = c("none","both")) {
+    pe_mode <- match.arg(pe_mode)
+    # Best effort: copy main knobs if present; otherwise fall back to defaults from `param_in`
+    # Extract what we can via show() parsing fallback is messy; instead we accept common fields explicitly:
+    # If slot access works, use it; otherwise default.
+    get_slot <- function(obj, nm, default = NULL) {
+      if (nm %in% slotNames(obj)) slot(obj, nm) else default
+    }
+    rp <- readParam(
+      pe      = pe_mode,
+      max.frag = get_slot(param_in, "max.frag", 1500L),
+      dedup   = get_slot(param_in, "dedup", FALSE),
+      minq    = get_slot(param_in, "minq", 20L),
+      forward = get_slot(param_in, "forward", NA),
+      restrict = get_slot(param_in, "restrict", NULL)
+    )
+    rp
+  }
+
   stopifnot(is.data.frame(metadata_df))
   needed <- c("Strain","Antibody","bamReads","Replicate")
   if (!all(needed %in% names(metadata_df))) {
     stop("metadata_df must contain columns: Strain, Antibody, Replicate, bamReads")
   }
+
+  # grouping (used for design compatibility check)
   grouping <- factor(paste(metadata_df$Strain, metadata_df$Antibody, sep = "."))
-  
   if (!all(levels(grouping) %in% colnames(design_mat))) {
     missing_cols <- setdiff(levels(grouping), colnames(design_mat))
     stop(paste0("design_mat is missing columns for these groups: ", paste(missing_cols, collapse = ", ")))
   }
 
-  # pretty sample labels used everywhere
-  nice_labels <- paste(
-    metadata_df$Strain,
-    metadata_df$Antibody,
-    paste0("R", metadata_df$Replicate),
-    sep = "."
-  )
+  # pretty column labels (samples) used in DGE objects
+  nice_labels <- paste(metadata_df$Strain, metadata_df$Antibody, paste0("R", metadata_df$Replicate), sep = ".")
 
   # normalize region_list input shape
   region_list <- as_named_list(region_list)
-  
-  # container for return
+
+  # file existence
+  bam_files <- metadata_df$bamReads
+  exist <- file.exists(bam_files)
+  if (!all(exist)) {
+    stop("Missing BAM(s): ", paste(bam_files[!exist], collapse = ", "))
+  }
+
+  # warn about old index timestamps (harmless but noisy)
+  if (interactive()) {
+    bai_exists <- file.exists(paste0(bam_files, ".bai")) | file.exists(sub("\\.bam$", ".bai", bam_files))
+    if (!all(bai_exists)) {
+      warning("One or more BAM index (.bai) files are missing; samtools will auto-index or counts may be slow.")
+    }
+  }
+
+  # detect PE/SE per BAM
+  is_pe <- vapply(bam_files, detect_paired, logical(1))
+  pe_bams <- bam_files[is_pe]
+  se_bams <- bam_files[!is_pe]
+
+  if (length(pe_bams) == 0L && length(se_bams) == 0L) stop("No BAMs detected.")
+  message(sprintf("Detected %d PE and %d SE BAMs.", length(pe_bams), length(se_bams)))
+
+  # build param variants
+  param_pe <- set_pe(param, "both")
+  param_se <- set_pe(param, "none")
+
+  # container
   out <- list(genomewide = NULL, regions = list())
 
-  bam_files <- metadata_df$bamReads
+  # helper: ensure columns are in the original metadata order
+  reorder_se_cols <- function(se_obj, order_bams) {
+    cb <- colData(se_obj)
+    if (!"bam.files" %in% colnames(cb)) {
+      # older csaw versions: rownames of colData are file paths
+      current <- rownames(cb)
+    } else {
+      current <- as.character(cb$bam.files)
+    }
+    idx <- match(order_bams, current)
+    if (anyNA(idx)) {
+      stop("Failed to match counted columns back to original BAM order.")
+    }
+    se_obj[, idx]
+  }
 
+  # helper: run windowCounts for a vector of BAMs (possibly length 0)
+  run_window <- function(bams, rp) {
+    if (length(bams) == 0L) return(NULL)
+    windowCounts(bam.files = bams, spacing = window_size, width = window_size,
+                 shift = 0, filter = 0, bin = TRUE, param = rp)
+  }
+
+  # helper: run regionCounts for a vector of BAMs
+  run_region <- function(bams, rp, gr) {
+    if (length(bams) == 0L) return(NULL)
+    regionCounts(bam.files = bams, regions = gr, param = rp)
+  }
+
+  # helper: bind two SE objects after verifying rows match
+  bind2 <- function(a, b) {
+    if (is.null(a)) return(b)
+    if (is.null(b)) return(a)
+    if (!identical(rowRanges(a), rowRanges(b))) {
+      stop("Row ranges do not match between SE and PE counting—this should not happen. Check genome/spacing/regions.")
+    }
+    cbind(a, b)
+  }
+
+  # helper: fast fail if any sample has zero total counts
+  stop_if_zero_totals <- function(se_obj, context_label) {
+    tot <- colSums(assay(se_obj))
+    bad <- which(tot == 0)
+    if (length(bad)) {
+      cb <- colData(se_obj)
+      labs <- if ("bam.files" %in% colnames(cb)) as.character(cb$bam.files) else rownames(cb)
+      stop(sprintf("Zero total counts in %s for samples: %s\nThis yields non-finite offsets; fix inputs or region set and retry.",
+                   context_label, paste(labs[bad], collapse = ", ")))
+    }
+    invisible(NULL)
+  }
+
+  ## ---------------- counting & modeling ----------------
   if (mode == "window") {
     message("Counting genome-wide windows (spacing/width = ", window_size, ") ...")
-    data_all <- windowCounts(bam_files, spacing = window_size, width = window_size,
-                             shift = 0, filter = 0, bin = TRUE, param = param)
-    
-    # genome-wide DGE/disp/fit with nice labels
+
+    data_pe <- run_window(pe_bams, param_pe)
+    data_se <- run_window(se_bams, param_se)
+    data_all <- bind2(data_se, data_pe)
+    if (is.null(data_all)) stop("No windows counted (empty result).")
+
+    # Put columns back to original metadata order
+    data_all <- reorder_se_cols(data_all, bam_files)
+
+    # fail fast on zero sums
+    stop_if_zero_totals(data_all, "genome-wide windows")
+
+    # DGE/disp/fit with sample labels and grouping
     dge_all  <- asDGEList(data_all, group = grouping)
     colnames(dge_all$counts) <- nice_labels
     rownames(dge_all$samples) <- nice_labels
+
     disp_all <- estimateDisp(dge_all, design_mat)
     fit_all  <- glmQLFit(disp_all, design_mat, robust = TRUE)
-    
+
     if (assign_to_global) {
       assign("dge_genomewide",  dge_all,  envir = .GlobalEnv)
       assign("disp_genomewide", disp_all, envir = .GlobalEnv)
       assign("fit_genomewide",  fit_all,  envir = .GlobalEnv)
     }
     out$genomewide <- list(dge = dge_all, disp = disp_all, fit = fit_all, counts = data_all)
-    
-    # If region_list supplied: filter to each region set and fit separately
+
+    # Optional: filtered genome-wide → region subsets
     if (!is.null(region_list)) {
       rr_all <- rowRanges(data_all)
       for (nm in names(region_list)) {
@@ -156,13 +277,15 @@ csaw_count_and_fit <- function(
         gr <- df_to_granges(region_list[[nm]])
         keep <- overlapsAny(rr_all, gr, type = "within")
         filtered <- data_all[keep, ]
-        
+
+        stop_if_zero_totals(filtered, paste0("filtered windows (", nm, ")"))
+
         dge  <- asDGEList(filtered, group = grouping)
         colnames(dge$counts) <- nice_labels
         rownames(dge$samples) <- nice_labels
         disp <- estimateDisp(dge, design_mat)
         fit  <- glmQLFit(disp, design_mat, robust = TRUE)
-        
+
         safe <- make.names(nm)
         if (assign_to_global) {
           assign(paste0("gr_",   safe), gr,   envir = .GlobalEnv)
@@ -179,14 +302,23 @@ csaw_count_and_fit <- function(
     for (nm in names(region_list)) {
       message("Counting over regions: ", nm)
       gr <- df_to_granges(region_list[[nm]])
-      counts <- regionCounts(bam.files = bam_files, regions = gr, param = param)
-      
-      dge  <- asDGEList(counts, group = grouping)
+
+      counts_pe <- run_region(pe_bams, param_pe, gr)
+      counts_se <- run_region(se_bams, param_se, gr)
+      counts_all <- bind2(counts_se, counts_pe)
+      if (is.null(counts_all)) stop("No region counts returned (empty result).")
+
+      # Reorder to original BAM order
+      counts_all <- reorder_se_cols(counts_all, bam_files)
+
+      stop_if_zero_totals(counts_all, paste0("regions (", nm, ")"))
+
+      dge  <- asDGEList(counts_all, group = grouping)
       colnames(dge$counts) <- nice_labels
       rownames(dge$samples) <- nice_labels
       disp <- estimateDisp(dge, design_mat)
       fit  <- glmQLFit(disp, design_mat, robust = TRUE)
-      
+
       safe <- make.names(nm)
       if (assign_to_global) {
         assign(paste0("gr_",   safe), gr,   envir = .GlobalEnv)
@@ -194,10 +326,10 @@ csaw_count_and_fit <- function(
         assign(paste0("disp_", safe), disp, envir = .GlobalEnv)
         assign(paste0("fit_",  safe), fit,  envir = .GlobalEnv)
       }
-      out$regions[[nm]] <- list(gr = gr, dge = dge, disp = disp, fit = fit, counts = counts)
+      out$regions[[nm]] <- list(gr = gr, dge = dge, disp = disp, fit = fit, counts = counts_all)
     }
   }
-  
+
   if (return_list) return(out) else invisible(NULL)
 }
 
@@ -207,11 +339,11 @@ csaw_count_and_fit <- function(
 ###########################################################################################
 ```{r, run count & fit function}
 
-#This is where you change the paramters and run the function
+#This is where you change the parameters and run the function
 count_results <- csaw_count_and_fit(
   metadata_df = meta,
   region_list = regions,
-  mode = "region", #"region" or "window"
+  mode = "window", #"region" or "window"
   window_size = 300,
   design_mat = design.mat,
   param = param
@@ -722,14 +854,15 @@ csaw_analysis <- function(
 csaw_analysis(
   metadata_df = meta,
   design_mat  = design.mat,
-  mode        = "region",             # "window" or "region"
+  mode        = "window",             # "window" or "region"
   out_obj     = count_results,        # <- REQUIRED so we have counts for merging/coords
   reference_strain = "WT",
-  fdr_cutoff  = 0.05,
+  fdr_cutoff  = 0.01,
+  pvalue_cutoff = 0.01, 
   write_csv_results = TRUE,
   write_csv_heatmap = TRUE,
   write_igv   = TRUE,
-  out_dir     = "K27_gene_&_prom_analysis", #output dir, name whatever you want
+  out_dir     = "CAF-1_Full_genome_Analysis", #output dir, name whatever you want
   merge_tol   = 300                   # only affects genomewide window mode
 )
 
@@ -1210,7 +1343,7 @@ H3K36me3_Results_K27promTSS_vWT <- H3K36me3_Results_K27promTSS_vWT %>%
 #subset your original bed file for genes/regions of interest. For example, here, I will subset my promoter-TSS bed to only include genes that lose H3K36me3 in cac-1 or cac-2
 
 ##isolate genes of interest
-CAF1_K36_lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.8 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.8)
+CAF1_K36_lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.75)
 
 ##subset the bed
 K36_lost_bed = subset(K27_genes, K27_genes$V10 %in% CAF1_K36_lost$V10)
@@ -1220,7 +1353,7 @@ write.table(K36_lost_bed, file = "CAF-1_H3K36me3_lost_K27_genes.bed", sep = "\t"
 write.table(K36_not_lost_bed, file = "CAF-1_H3K36me3_not_lost_K27_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 ```
 
-```{r, plotting w RNA-seq data}
+```{r, plotting HEATMAP w/ RNA-seq data}
 #script to make a heatmap w ChIP log2FC data & RNA-seq log2FC data (will use csaw results, which is why i have it here)
 
 #read in log2FC Expression data saved from DESeq for whatever strains you want
@@ -1480,7 +1613,8 @@ View(rna_df)
 ```
 
 ```{r, ChIP vs. RNA scatter plot code}
-#Use this to make scatterplots of ChIP-seq signal over genes vs. their RNA-seq expression values
+#Use this to make scatterplots of ChIP-seq signal over genes vs. their RNA-seq expression values or another modifcation
+## Would probably only try to use with region mode
 
 suppressPackageStartupMessages({
   library(ggplot2)
@@ -1489,132 +1623,189 @@ suppressPackageStartupMessages({
   library(tibble)
 })
 
-# ChIP vs RNA scatter (align by gene id; auto-pick logFC_<strain>)
-chip_rna_scatter <- function(
-  chip_results_df,
-  rna_df,
-  strain,                          # e.g. "cac1"
-  gene_col      = "V10",
-  rna_col       = "log2FoldChange",
-  chip_col      = NULL,            # auto: prefers "logFC_<strain>"
+# Flexible scatter: ChIP vs RNA  OR  ChIP vs ChIP (with skew coloring)
+chip_scatter_flex <- function(
+  mode = c("chip_vs_rna","chip_vs_chip"),
 
-  # coloring by RNA thresholds
-  rna_up_thresh   =  2,
-  rna_down_thresh = -2,
-  colors_map      = c(up = "red", down = "blue", ns = "gray50"),
-  legend_title    = "RNA log2FC group",
+  # --- inputs shared / aligned by gene id ---
+  gene_col       = "V10",          # gene id column inside ChIP dfs
 
-  # correlation / regression line
-  cor_method   = c("pearson","spearman"),
-  add_lm       = TRUE,
-  fit_global   = TRUE,             # TRUE = one global fit; FALSE = one per color group
-  fit_color    = "black",
-  fit_linetype = "dashed",
-  fit_se       = FALSE,
+  # X axis (ChIP set A)
+  chip_df_x,                        # ChIP df for X (e.g., H3K27me3 promoters)
+  strain_x,                         # e.g., "cac1"
+  chip_col_x     = NULL,            # auto-detect "logFC_<strain_x>"
 
-  # points
-  point_alpha  = 0.75,
-  point_size   = 1.6,
+  # Y axis (depends on mode)
+  # mode="chip_vs_rna"
+  rna_df         = NULL,            # rownames = gene IDs, has rna_col
+  rna_col        = "log2FoldChange",
+  # mode="chip_vs_chip"
+  chip_df_y      = NULL,            # second ChIP df (e.g., H3K36me3 promoters)
+  strain_y       = NULL,            # strain for Y
+  chip_col_y     = NULL,            # auto-detect "logFC_<strain_y>"
 
-  # labels (auto if NULL)
-  xlab = NULL, ylab = NULL, title = NULL,
+  # --- coloring ---
+  # ChIP vs RNA: color by RNA magnitude
+  up_thresh      =  2,
+  down_thresh    = -2,
+  rna_colors_map = c(up = "red", down = "blue", ns = "gray50"),
+  rna_legend_title = "RNA log2FC group",
 
-  # axes (no data drop)
-  xlim = NULL, ylim = NULL,
+  # ChIP vs ChIP: color by skew (difference) between modifications
+  chip_diff_thresh = 1,             # threshold on (x - y) in log2 space
+  chip_colors_map  = c(x_dom = "#d62728", y_dom = "#1f77b4", similar = "gray70"),
+  chip_legend_title = "Skew (X vs Y)",
 
-  # data hygiene
-  drop_na = TRUE,
+  # stats / fit
+  cor_method     = c("pearson","spearman"),
+  add_lm         = TRUE,
+  fit_global     = TRUE,
+  fit_color      = "black",
+  fit_linetype   = "dashed",
+  fit_se         = FALSE,
 
-  # output controls (like your heatmap helper)
-  out_dir      = NULL,                   # if non-NULL, save here
-  file_prefix  = NULL,                   # if NULL: "chip_vs_rna_<strain>"
-  save_formats = c("pdf","png"),         # any of "pdf","png"
-  width_in     = 12,
-  height_in    = 9,
-  dpi          = 600
-) {
-  `%||%` <- function(a, b) if (!is.null(a)) a else b
-  cor_method <- match.arg(cor_method)
-
-  # --- pick ChIP column ---
-  stopifnot(gene_col %in% names(chip_results_df))
-  stopifnot(!is.null(rownames(rna_df)))
-  stopifnot(rna_col %in% colnames(rna_df))
-
-  if (is.null(chip_col)) {
-    pref <- paste0("logFC_",  strain)
-    fall <- paste0("log2FC_", strain)
-    if (pref %in% names(chip_results_df)) chip_col <- pref
-    else if (fall %in% names(chip_results_df)) chip_col <- fall
-    else {
-      pats <- paste0("^log2?fc[._-]?", tolower(strain), "(?:\\b|[_./-])?")
-      hits <- names(chip_results_df)[str_detect(tolower(names(chip_results_df)), pats)]
-      if (!length(hits)) stop("Could not find ChIP column for strain '", strain, "'. Expected '", pref, "'.")
-      chip_col <- hits[1]
-    }
-  }
-  stopifnot(chip_col %in% names(chip_results_df))
-
-  # --- align by gene id ---
-  chip_tbl <- chip_results_df |>
-    transmute(GeneID = .data[[gene_col]], chip = suppressWarnings(as.numeric(.data[[chip_col]])))
-
-  rna_tbl <- rna_df |>
-    as.data.frame() |>
-    rownames_to_column("GeneID") |>
-    transmute(GeneID, rna = suppressWarnings(as.numeric(.data[[rna_col]])))
-
-  plot_df <- inner_join(chip_tbl, rna_tbl, by = "GeneID")
-  if (isTRUE(drop_na)) plot_df <- filter(plot_df, is.finite(chip), is.finite(rna))
-  if (nrow(plot_df) < 3) stop("Not enough overlapping genes with finite values to plot.")
-
-  # groups & colors
-  plot_df <- mutate(plot_df,
-    color_group = case_when(
-      rna >  rna_up_thresh   ~ "up",
-      rna <  rna_down_thresh ~ "down",
-      TRUE                   ~ "ns"
-    )
-  )
-  # force a well-named mapping vector
-  col_vals <- setNames(as.character(colors_map[c("up","down","ns")]), c("up","down","ns"))
-
-  # stats
-  ct <- suppressWarnings(cor.test(plot_df$chip, plot_df$rna, method = cor_method))
-  r2 <- sprintf("%.2f", ct$estimate^2)
-  pval <- signif(ct$p.value, 3)
+  # aesthetics
+  point_alpha    = 0.75,
+  point_size     = 1.6,
 
   # labels
-  if (is.null(xlab)) xlab <- paste0("ChIP log2FC (", strain, ")")
-  if (is.null(ylab)) ylab <- paste0("RNA log2FC (", strain, ")")
-  if (is.null(title)) title <- paste0("ChIP vs RNA (", strain, ")")
+  xlab           = NULL,
+  ylab           = NULL,
+  title          = NULL,
+  chip_x_label   = NULL,            # e.g., "H3K27me3"
+  chip_y_label   = NULL,            # e.g., "H3K36me3"
 
-  xr <- range(plot_df$chip, na.rm = TRUE); yr <- range(plot_df$rna, na.rm = TRUE)
+  # axes (no data drop)
+  xlim           = NULL,
+  ylim           = NULL,
+
+  # hygiene
+  drop_na        = TRUE,
+
+  # output (same style as your heatmap helper)
+  out_dir        = NULL,
+  file_prefix    = NULL,
+  save_formats   = c("pdf","png"),
+  width_in       = 12,
+  height_in      = 9,
+  dpi            = 600
+) {
+  `%||%` <- function(a,b) if (!is.null(a)) a else b
+  mode <- match.arg(mode)
+  cor_method <- match.arg(cor_method)
+
+  # helper: pick column
+  pick_chip_col <- function(df, strain) {
+    pref <- paste0("logFC_",  strain)
+    fall <- paste0("log2FC_", strain)
+    if (pref %in% names(df)) return(pref)
+    if (fall %in% names(df)) return(fall)
+    pats <- paste0("^log2?fc[._-]?", tolower(strain))
+    hits <- names(df)[str_detect(tolower(names(df)), pats)]
+    if (!length(hits)) stop("Could not find a ChIP column for strain '", strain, "'. Expected '", pref, "'.")
+    hits[1]
+  }
+
+  # X: ChIP A
+  stopifnot(gene_col %in% names(chip_df_x))
+  if (is.null(chip_col_x)) chip_col_x <- pick_chip_col(chip_df_x, strain_x)
+  stopifnot(chip_col_x %in% names(chip_df_x))
+  x_tbl <- chip_df_x %>%
+    transmute(GeneID = .data[[gene_col]], x = suppressWarnings(as.numeric(.data[[chip_col_x]])))
+
+  # Y: depends on mode
+  if (mode == "chip_vs_rna") {
+    if (is.null(rna_df)) stop("Provide rna_df for mode='chip_vs_rna'.")
+    if (is.null(rownames(rna_df))) stop("rna_df must have rownames as gene IDs.")
+    if (!rna_col %in% colnames(rna_df)) stop("rna_col '", rna_col, "' not found in rna_df.")
+    y_tbl <- rna_df %>%
+      as.data.frame() %>%
+      rownames_to_column("GeneID") %>%
+      transmute(GeneID, y = suppressWarnings(as.numeric(.data[[rna_col]])))
+  } else {
+    if (is.null(chip_df_y) || is.null(strain_y)) {
+      stop("Provide chip_df_y and strain_y for mode='chip_vs_chip'.")
+    }
+    stopifnot(gene_col %in% names(chip_df_y))
+    if (is.null(chip_col_y)) chip_col_y <- pick_chip_col(chip_df_y, strain_y)
+    stopifnot(chip_col_y %in% names(chip_df_y))
+    y_tbl <- chip_df_y %>%
+      transmute(GeneID = .data[[gene_col]], y = suppressWarnings(as.numeric(.data[[chip_col_y]])))
+  }
+
+  # align and clean
+  plot_df <- inner_join(x_tbl, y_tbl, by = "GeneID")
+  if (isTRUE(drop_na)) plot_df <- filter(plot_df, is.finite(x), is.finite(y))
+  if (nrow(plot_df) < 3) stop("Not enough overlapping genes with finite values to plot.")
+
+  # color grouping
+  if (mode == "chip_vs_rna") {
+    plot_df <- mutate(plot_df,
+      color_group = case_when(
+        y >  up_thresh   ~ "up",
+        y <  down_thresh ~ "down",
+        TRUE             ~ "ns"
+      )
+    )
+    col_vals <- setNames(as.character(rna_colors_map[c("up","down","ns")]), c("up","down","ns"))
+    legend_title <- rna_legend_title
+  } else {
+    # skew by difference (x - y) ~ log2 ratio x/y
+    plot_df <- mutate(plot_df,
+      diff_xy = x - y,
+      color_group = case_when(
+        diff_xy >=  chip_diff_thresh ~ "x_dom",
+        diff_xy <= -chip_diff_thresh ~ "y_dom",
+        TRUE                         ~ "similar"
+      )
+    )
+    col_vals <- setNames(as.character(chip_colors_map[c("x_dom","y_dom","similar")]),
+                         c("x_dom","y_dom","similar"))
+    legend_title <- chip_legend_title
+  }
+
+  # stats
+  ct   <- suppressWarnings(cor.test(plot_df$x, plot_df$y, method = cor_method))
+  r2_s <- sprintf("%.2f", unname(ct$estimate)^2)  # always 2 decimals
+  pval <- signif(ct$p.value, 3)
+
+  # labels & title
+  x_comp <- chip_x_label %||% paste0("ChIP (", strain_x, ")")
+  if (mode == "chip_vs_rna") {
+    y_comp <- "RNA"
+  } else {
+    y_comp <- chip_y_label %||% paste0("ChIP (", strain_y, ")")
+  }
+  if (is.null(xlab)) xlab <- paste0(x_comp, " log2FC")
+  if (is.null(ylab)) ylab <- paste0(y_comp, " log2FC")
+  if (is.null(title)) {
+    left  <- chip_x_label %||% paste0("ChIP-", strain_x)
+    right <- if (mode == "chip_vs_rna") "RNA" else (chip_y_label %||% paste0("ChIP-", strain_y))
+    title <- paste0(left, " vs ", right)
+  }
+
+  # annotation
+  xr <- range(plot_df$x, na.rm = TRUE); yr <- range(plot_df$y, na.rm = TRUE)
   x_anno <- xr[1] + 0.02 * diff(xr); y_anno <- yr[2] - 0.05 * diff(yr)
-  anno_txt <- paste0("R² = ", r2, ", p = ", pval)
+  anno_txt <- paste0("R² = ", r2_s, ", p = ", pval)
 
   # plot
-  p <- ggplot(plot_df, aes(chip, rna, color = color_group)) +
+  p <- ggplot(plot_df, aes(x, y, color = color_group)) +
     geom_point(alpha = point_alpha, size = point_size) +
-    scale_color_manual(values = col_vals,
-                       breaks = c("up","down","ns"),
-                       labels = c("Up","Down","N.S."),
-                       name   = legend_title) +
+    scale_color_manual(values = col_vals, name = legend_title) +
     theme_minimal(base_size = 12) +
     labs(x = xlab, y = ylab, title = title) +
     annotate("text", x = x_anno, y = y_anno, label = anno_txt, hjust = 0, size = 4)
 
-  # single global fit (doesn't inherit color grouping)
+  # regression line (global by default)
   if (isTRUE(add_lm) && isTRUE(fit_global)) {
     p <- p + geom_smooth(
-      data = plot_df,
-      aes(chip, rna),
+      data = plot_df, aes(x, y),
       method = "lm", se = fit_se,
       color = fit_color, linetype = fit_linetype,
       inherit.aes = FALSE
     )
   } else if (isTRUE(add_lm)) {
-    # one fit per color group
     p <- p + geom_smooth(method = "lm", se = fit_se, linetype = fit_linetype)
   }
 
@@ -1624,7 +1815,12 @@ chip_rna_scatter <- function(
   saved <- character(0)
   if (!is.null(out_dir)) {
     dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
-    stem <- file_prefix %||% paste0("chip_vs_rna_", strain)
+    default_stem <- if (mode == "chip_vs_rna") {
+      paste0("chip", strain_x, "_vs_rna")
+    } else {
+      paste0("chip", strain_x, "_vs_chip", strain_y)
+    }
+    stem <- file_prefix %||% default_stem
     fmts <- tolower(save_formats)
     if ("pdf" %in% fmts) {
       f <- file.path(out_dir, paste0(stem, ".pdf"))
@@ -1638,31 +1834,75 @@ chip_rna_scatter <- function(
     }
   }
 
-  invisible(list(data = plot_df,
-                 cor  = list(r = unname(ct$estimate), r2 = r2, p = ct$p.value, method = cor_method),
-                 gg   = p, saved = saved,
-                 columns = list(chip_col = chip_col, rna_col = rna_col, gene_col = gene_col)))
+  invisible(list(
+    data  = plot_df,   # GeneID, x, y, (diff_xy), color_group
+    cor   = list(r = unname(ct$estimate), r2 = as.numeric(r2_s), p = ct$p.value, method = cor_method),
+    gg    = p,
+    saved = saved,
+    cols  = list(chip_col_x = chip_col_x, chip_col_y = chip_col_y, rna_col = rna_col, mode = mode)
+  ))
 }
 
-#Example Use
-out <- chip_rna_scatter(
-  chip_results_df = H3K36me3_Results_K27promTSS_vWT,
-  rna_df          = cac1RNA,
-  strain          = "cac1",
-  out_dir         = "scatter_outputs",
-  file_prefix     = "K27_vs_RNA_cac1",
-  rna_up_thresh   =  2,
-  rna_down_thresh = -2,
-  width_in        = 12,
-  height_in = 9,
-  dpi = 600,
-  add_lm = TRUE, 
-  fit_global = TRUE, 
-  fit_color = "blue"
+```
+
+```{r, use scatter plot function}
+#Example Use (ChIP vs RNA)
+out <- chip_scatter_flex(
+  mode        = "chip_vs_rna",
+  chip_df_x   = H3K36me3_Results_K27promTSS_vWT,  # X = H3K36me3
+  strain_x    = "cac1",
+  rna_df      = cac1RNA,                          # RNA for cac1
+  chip_x_label = "H3K36me3",                      # label in axes/title
+  out_dir     = "scatter_outputs",
+  file_prefix = "H3K36me3_vs_RNA_cac1",
+  width_in    = 12, height_in = 9, dpi = 600
 )
 out$gg
 
+
+#Example Use (ChIP vs ChIP)
+out <- chip_scatter_flex(
+  mode        = "chip_vs_chip",
+  chip_df_x   = H3K27me3_CS_Results_K27promTSS_vWT,  # X = H3K27me3
+  strain_x    = "cac1",
+  chip_df_y   = H3K36me3_Results_K27promTSS_vWT,  # Y = H3K36me3
+  strain_y    = "cac1",
+  chip_x_label = "H3K27me3",
+  chip_y_label = "H3K36me3",
+  chip_diff_thresh = 1,   # needs ≥1 log2 unit advantage to be called dominant
+  chip_colors_map  = c(x_dom = "darkgreen", y_dom = "#A59D00", similar = "gray70"),
+  chip_legend_title = "Skew (K27 vs K36)",
+  out_dir     = "scatter_outputs",
+  file_prefix = "H3K27me3_vs_H3K36me3_cac1_skew",
+  width_in    = 12, height_in = 9, dpi = 600
+)
+out$gg
+
+
 #View what your plotting
 View(out$data)  
+
+```
+
+```{function to make bed files from windowCounts}
+#This function will utilize enrichment calls from windowCounts to make a bed file with significantly enriched regions for a desired modification. You will feed in a data frame obtained from the analysis function, which will already contain enrichment filtered for significance (FDR &/or p-value). This function will then merge regions that neighbor each other (i.e. chromosome 1 bp 600-899 will merge with chromosome 1 bp 900-1199 if they are both present in the df), and this will create a "peak-call" like bed file with all enriched regions. it will iterate across each strain (column) in the df. you can also set a threshold for size of the fragment to be included in the df to avoid interspersed small fragments (which are likely not real enrichment). For example, a threshold set to 1000 bp would not include any fragments (post-merge) below that size (i.e. at least 4 300 bp will have to be merged to create a frag size large enough to be included in the bed)
+
+# Normal No Recover → qa_unrecovered.bed
+awk '{ if ($3 - $2 >= 301) print }' normal_no_recover_regions.bed | \
+bedtools sort -i - | \
+bedtools merge -i - -d 1000 | \
+awk '{ if ($3 - $2 >= 1000) print }' > qa_unrecovered.bed
+
+# Normal Recover → qa_recovered.bed
+awk '{ if ($3 - $2 >= 301) print }' normal_recover_regions.bed | \
+bedtools sort -i - | \
+bedtools merge -i - -d 1000 | \
+awk '{ if ($3 - $2 >= 1000) print }' > qa_recovered.bed
+
+# Ectopic → qa_ectopic.bed
+awk '{ if ($3 - $2 >= 301) print }' ectopic_regions.bed | \
+bedtools sort -i - | \
+bedtools merge -i - -d 1000 | \
+awk '{ if ($3 - $2 >= 1000) print }' > qa_ectopic.bed
 
 ```
