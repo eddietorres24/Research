@@ -40,7 +40,6 @@ fi
   read1=${fastqPath}/${accession}/${accession}*_1.fastq.gz
   read2=${fastqPath}/${accession}/${accession}*_2.fastq.gz
   # unpaired=${fastqPath}/${accession}/${accession}.fastq.gz
-
 #For files not in SRA folder
 # read1=${fastqPath}/${accession}*_1.fastq.gz
 # read2=${fastqPath}/${accession}*_2.fastq.gz
@@ -106,14 +105,14 @@ if [ ! -f $read1 ]; then
 #trim reads
   echo "${line} running as unpaired file only"
 
-  module load Trim_Galore/0.6.7-GCCcore-11.2.0
+  module load Trim_Galore
 
   trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $unpaired
 
   wait
 
 #map with STAR
-  module load STAR/2.7.10b-GCC-11.3.0
+  module load STAR
 
   STAR --runMode alignReads \
   --runThreadN $THREADS \
@@ -129,11 +128,11 @@ if [ ! -f $read1 ]; then
   --limitBAMsortRAM 19990000000
 
   #create index
-  module load SAMtools/1.16.1-GCC-11.3.0
+  module load SAMtools
   samtools index "${bam}Aligned.sortedByCoord.out.bam"
 
   ##quantify with featureCounts
-  module load Subread/2.0.6-GCC-11.3.0
+  module load Subread
 
   featureCounts -T $THREADS \
   -t CDS \
@@ -145,12 +144,12 @@ if [ ! -f $read1 ]; then
 
 
 ##Plot reads to visualize tracks if needed
-       module load deepTools/3.5.2-foss-2022a
+       module load deepTools
        #Plot all reads
        bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}Aligned.sortedByCoord.out.bam" -o "${bw}"
 
 #log-transformed BigWigs
-module load ucsc/434
+module load ucsc
 
 bigWigToBedGraph ${bw} ${bg}
 awk '{ $4=(log($4+1)/log(2)); } 1' < ${bg} > ${bg2}
@@ -167,13 +166,13 @@ elif [ -f $read2 ]; then
   ##################
   #Trimming
   #################
-  	  module load Trim_Galore/0.6.7-GCCcore-11.2.0
+  	  module load Trim_Galore
 
   	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
   	  wait
 
   ##map with STAR
-  	  module load STAR/2.7.10b-GCC-11.3.0
+  	  module load STAR
   	    STAR --runMode alignReads \
   	    --runThreadN $THREADS \
   	    --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
@@ -187,11 +186,11 @@ elif [ -f $read2 ]; then
         --outSAMattributes Standard \
         --limitBAMsortRAM 19990000000
         #create index
-        module load SAMtools/1.16.1-GCC-11.3.0
+        module load SAMtools
         samtools index "${bam}Aligned.sortedByCoord.out.bam"
 
         ##quantify with featureCounts
-        module load Subread/2.0.6-GCC-11.3.0
+        module load Subread/
 
         featureCounts -T $THREADS \
         -p \
@@ -204,13 +203,13 @@ elif [ -f $read2 ]; then
 
 
         ##Plot reads to visualize tracks if needed
-             module load deepTools/3.5.2-foss-2022a
+             module load deepTools
 
              #Plot all reads
              bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}Aligned.sortedByCoord.out.bam" -o "${bw}"
 
 #log-transformed BigWigs
-module load ucsc/434
+module load ucsc
 
 bigWigToBedGraph ${bw} ${bg}
 awk '{ $4=(log($4+1)/log(2)); } 1' < ${bg} > ${bg2}
@@ -242,11 +241,11 @@ else
 
 
          #create index
-         module load SAMtools/1.16.1-GCC-11.3.0
+         module load SAMtools
          samtools index "${bam}Aligned.sortedByCoord.out.bam"
 
          ##quantify with featureCounts
-         module load Subread/2.0.6-GCC-11.3.0
+         module load Subread
 
          featureCounts -T $THREADS \
          -t CDS \
@@ -259,7 +258,7 @@ else
 
 
          ##Plot reads to visualize tracks if needed
-         	    module load deepTools/3.5.2-foss-2022a
+         	    module load deepTools
          	    #Plot all reads
          	    bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}Aligned.sortedByCoord.out.bam" -o "${bw}"
 
