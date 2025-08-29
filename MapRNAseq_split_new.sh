@@ -35,13 +35,13 @@ CHROMSIZES="/home/ad45368/chrom_sizes.txt"
 #   "forward" for forward-stranded kits
 LIB_STRAND="reverse"
 
-# Modules (Sapelo2 names you’ve been using)
+# Modules
 module load Trim_Galore
 module load STAR
-module load SAMtools/1.16.1-GCC-11.3.0
+module load SAMtools
 module load Subread              # featureCounts
 module load BEDTools
-module load deepTools/3.5.2-foss-2022a
+module load deepToolsF
 # UCSC tools if available (else leave as plain names if on $PATH)
 BWTOBEDGRAPH=${BWTOBEDGRAPH:-bigWigToBedGraph}
 BEDGRAPHTOBW=${BEDGRAPHTOBW:-bedGraphToBigWig}
