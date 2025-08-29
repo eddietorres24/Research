@@ -29,12 +29,10 @@ fi
 # fastqPath="/scratch/evt82290/FastqFiles/2025_Run149_ET/RNA"
 # outdir="/scratch/evt82290/MappingOutputs/Run149/RNA"
 
-fastqPath="/scratch/evt82290/SRA/FastqFiles"
+fastqPath="/scratch/evt82290/SRA/FastqFiles /scratch/evt82290/FastqFiles/2025_Run149_ET/RNA /scratch/evt82290/FastqFiles/2025_Run150_ET"
 # fastqPath="/scratch/evt82290/FastqFiles/misc_RNA"
-#Run149path="/scratch/evt82290/FastqFiles/2025_Run149_ET/RNA"
-# fastqPath="/scratch/evt82290/FastqFiles/2025_Run150_ET"
 # outdir="/scratch/evt82290/RNAseq/cac_aberrant_transcripts"
-outdir="/scratch/evt82290/MappingOutputs/RNAseq"
+outdir="/scratch/evt82290/MappingOutputs/RNAseq_split"
 
 mkdir ${outdir}
 mkdir ${outdir}/logs
@@ -50,7 +48,6 @@ mkdir "${outdir}/beds"
 while read -r line
 
 	do
-	sleep 2
+	sleep 1
 	echo "$line mapping job submitted"
-	sbatch --export=ALL,accession="${line}",fastqPath="${fastqPath}",outdir="${outdir}" MapRNAseq.sh & done <"$1"
-  #sbatch --export=ALL,accession="${line}",fastqPath="${fastqPath}",Run149path="${Run149path}",outdir="${outdir}" MapRNAseq_split_new.sh & done <"$1"
+	sbatch --export=ALL,accession="${line}",fastqPath="${fastqPath}",outdir="${outdir}" MapRNAseq_split_new.sh & done <"$1"
