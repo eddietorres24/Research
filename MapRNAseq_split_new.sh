@@ -41,7 +41,7 @@ module load STAR
 module load SAMtools
 module load Subread              # featureCounts
 module load BEDTools
-module load deepToolsF
+module load deepTools
 # UCSC tools if available (else leave as plain names if on $PATH)
 BWTOBEDGRAPH=${BWTOBEDGRAPH:-bigWigToBedGraph}
 BEDGRAPHTOBW=${BEDGRAPHTOBW:-bedGraphToBigWig}
