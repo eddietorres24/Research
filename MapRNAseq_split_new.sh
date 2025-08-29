@@ -35,10 +35,10 @@ LIB_STRAND="reverse"
 # Modules
 module load Trim_Galore
 module load STAR
-module load SAMtools/1.16.1-GCC-11.3.0
+module load SAMtools
 module load Subread
 module load BEDTools
-module load deepTools/3.5.2-foss-2022a
+module load deepTools
 # UCSC tools (use module if available or ensure on PATH)
 BWTOBEDGRAPH=${BWTOBEDGRAPH:-bigWigToBedGraph}
 BEDGRAPHTOBW=${BEDGRAPHTOBW:-bedGraphToBigWig}
