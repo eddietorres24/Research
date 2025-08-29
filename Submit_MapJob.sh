@@ -29,10 +29,11 @@ fi
 # fastqPath="/scratch/evt82290/FastqFiles/2025_Run149_ET/RNA"
 # outdir="/scratch/evt82290/MappingOutputs/Run149/RNA"
 
-fastqPath="/scratch/evt82290/SRA/FastqFiles /scratch/evt82290/FastqFiles/2025_Run149_ET/RNA /scratch/evt82290/FastqFiles/2025_Run150_ET"
+fastqPath="/scratch/evt82290/SRA/FastqFiles /scratch/evt82290/FastqFiles/2025_Run149_ET/RNA"
 # fastqPath="/scratch/evt82290/FastqFiles/misc_RNA"
 # outdir="/scratch/evt82290/RNAseq/cac_aberrant_transcripts"
 outdir="/scratch/evt82290/MappingOutputs/RNAseq_split"
+# scratch/evt82290/FastqFiles/2025_Run150_ET
 
 mkdir ${outdir}
 mkdir ${outdir}/logs
