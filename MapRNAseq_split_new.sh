@@ -20,29 +20,26 @@ cd "$SLURM_SUBMIT_DIR"
 : "${fastqPath:?Missing fastqPath (exported by submit script)}"
 : "${outdir:?Missing outdir (exported by submit script)}"
 
-# Auto-detect available threads from SLURM, default to 4
 THREADS="${SLURM_CPUS_PER_TASK:-4}"
 
 ############################
-# Reference / tools (edit if needed)
+# Reference / tools
 ############################
 STAR_INDEX="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR"
 GTF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf"
 CHROMSIZES="/home/ad45368/chrom_sizes.txt"
 
-# Library strandedness:
-#   "reverse" = NEB Ultra II Directional (dUTP) (most common)
-#   "forward" for forward-stranded kits
+# Library strandedness: "reverse" (NEB dUTP) or "forward"
 LIB_STRAND="reverse"
 
 # Modules
 module load Trim_Galore
 module load STAR
-module load SAMtools
-module load Subread              # featureCounts
+module load SAMtools/1.16.1-GCC-11.3.0
+module load Subread
 module load BEDTools
-module load deepTools
-# UCSC tools if available (else leave as plain names if on $PATH)
+module load deepTools/3.5.2-foss-2022a
+# UCSC tools (use module if available or ensure on PATH)
 BWTOBEDGRAPH=${BWTOBEDGRAPH:-bigWigToBedGraph}
 BEDGRAPHTOBW=${BEDGRAPHTOBW:-bedGraphToBigWig}
 
@@ -60,40 +57,67 @@ TMPDIR="${outdir}/tmp/${accession}"
 mkdir -p "$TRIMDIR" "$BAMDIR" "$COUNTDIR" "$BWDIR" "$BEDGRAPHDIR" "$BEDDIR" "$TMPDIR"
 
 ############################
-# FASTQ discovery
-# - Supports multiple dirs via fastqPath as:
-#     /dir1:/dir2:/dir3
-#   or "/dir1 /dir2 /dir3"
-#   or "/dir1,/dir2,/dir3"
+# [STRICT FASTQ DISCOVERY + DEBUG]
 ############################
+echo "[DEBUG] accession=$accession"
+echo "[DEBUG] fastqPath=$fastqPath"
+
 normalize_path_list() {
-  # Convert commas and colons to spaces; squeeze repeats
+  # Accept "dir1 dir2", "dir1:dir2", or "dir1,dir2"
   echo "$1" | tr ',:' ' ' | xargs -n999 echo
+}
+
+basename_matches_accession () {
+  # Accept only files whose basename STARTS with the accession (before first underscore)
+  local f="$1" base root
+  base="$(basename "$f")"
+  root="${base%%_*}"
+  [[ "$root" == "$accession" ]]
 }
 
 find_fastqs() {
   local paths=($(normalize_path_list "$fastqPath"))
-  local d
+  local d r1 r2 ru
   shopt -s nullglob
   for d in "${paths[@]}"; do
-    # SRA paired: acc_1/acc_2
-    if [[ -f "${d}/${accession}_1.fastq.gz" && -f "${d}/${accession}_2.fastq.gz" ]]; then
-      R1="${d}/${accession}_1.fastq.gz"; R2="${d}/${accession}_2.fastq.gz"; MODE="PE"; echo "[INFO] Found PE (SRA) in $d"; return 0
+    echo "[DEBUG] scanning dir: $d"
+    ls -1 "${d}/${accession}"* 2>/dev/null | head -n 5 | sed 's/^/[DEBUG] cand: /' || true
+
+    # 1) SRA paired: accession_1.fastq.gz / accession_2.fastq.gz (exact-root)
+    r1="${d}/${accession}_1.fastq.gz"
+    r2="${d}/${accession}_2.fastq.gz"
+    if [[ -f "$r1" && -f "$r2" ]] && basename_matches_accession "$r1" && basename_matches_accession "$r2"; then
+      R1="$r1"; R2="$r2"; MODE="PE"
+      echo "[INFO] Found PE (SRA)"; echo "[INFO] R1=$R1"; echo "[INFO] R2=$R2"
+      shopt -u nullglob; return 0
     fi
-    # Illumina paired: *R1_001/*R2_001
+
+    # 2) Illumina paired: accession*R1_001.fastq.gz / accession*R2_001.fastq.gz (exact-root)
     mapfile -t candR1 < <(ls -1 "${d}/${accession}"*R1*_001.fastq.gz 2>/dev/null || true)
     mapfile -t candR2 < <(ls -1 "${d}/${accession}"*R2*_001.fastq.gz 2>/dev/null || true)
+    candR1=($(for f in "${candR1[@]:-}"; do basename_matches_accession "$f" && echo "$f"; done))
+    candR2=($(for f in "${candR2[@]:-}"; do basename_matches_accession "$f" && echo "$f"; done))
     if [[ ${#candR1[@]} -gt 0 && ${#candR2[@]} -gt 0 ]]; then
-      R1="${candR1[0]}"; R2="${candR2[0]}"; MODE="PE"; echo "[INFO] Found PE (Illumina) in $d"; return 0
+      R1="${candR1[0]}"; R2="${candR2[0]}"; MODE="PE"
+      echo "[INFO] Found PE (Illumina)"; echo "[INFO] R1=$R1"; echo "[INFO] R2=$R2"
+      shopt -u nullglob; return 0
     fi
-    # Single-end: acc.fastq.gz
-    if [[ -f "${d}/${accession}.fastq.gz" ]]; then
-      RU="${d}/${accession}.fastq.gz"; MODE="SE"; echo "[INFO] Found SE in $d"; return 0
+
+    # 3) Single-end exact: accession.fastq.gz
+    ru="${d}/${accession}.fastq.gz"
+    if [[ -f "$ru" ]] && basename_matches_accession "$ru"; then
+      RU="$ru"; MODE="SE"
+      echo "[INFO] Found SE"; echo "[INFO] RU=$RU"
+      shopt -u nullglob; return 0
     fi
-    # SE using R1-only
+
+    # 4) SE via R1-only Illumina (exact-root)
     mapfile -t candR1only < <(ls -1 "${d}/${accession}"*R1*_001.fastq.gz 2>/dev/null || true)
+    candR1only=($(for f in "${candR1only[@]:-}"; do basename_matches_accession "$f" && echo "$f"; done))
     if [[ ${#candR1only[@]} -gt 0 ]]; then
-      R1="${candR1only[0]}"; MODE="SE"; echo "[INFO] Found SE (R1-only) in $d"; return 0
+      R1="${candR1only[0]}"; MODE="SE"
+      echo "[INFO] Found SE (R1-only)"; echo "[INFO] R1=$R1"
+      shopt -u nullglob; return 0
     fi
   done
   shopt -u nullglob
@@ -104,6 +128,16 @@ R1=""; R2=""; RU=""; MODE=""
 if ! find_fastqs; then
   echo "[ERROR] Could not locate FASTQs for ${accession} under: ${fastqPath}" >&2
   exit 1
+fi
+
+# Safety: paired-end must not point to the same file
+if [[ "$MODE" == "PE" ]]; then
+  if [[ -z "${R1:-}" || -z "${R2:-}" ]]; then
+    echo "[ERROR] Paired-end mode but R1 or R2 is empty." >&2; exit 1
+  fi
+  if [[ "$R1" == "$R2" ]]; then
+    echo "[ERROR] R1 and R2 resolved to the same file: $R1" >&2; exit 1
+  fi
 fi
 
 ############################
@@ -177,7 +211,7 @@ log_transform_bw () {
        {print}' "$tmpbg" > "$tmpbg2"
   sort -k1,1 -k2,2n "$tmpbg2" > "${tmpbg2}.sorted"
   $BEDGRAPHTOBW "${tmpbg2}.sorted" "$CHROMSIZES" "$outbw"
-  # optional keep bedGraphs:
+  # Keep the transformed bedGraph for optional inspection
   cp "$tmpbg2" "${BEDGRAPHDIR}/${base}.log2p1.bedGraph" || true
   rm -f "$tmpbg" "$tmpbg2" "${tmpbg2}.sorted"
 }
