@@ -32,14 +32,14 @@ CHROMSIZES="/home/ad45368/chrom_sizes.txt"
 # Library strandedness: "reverse" (NEB dUTP) or "forward"
 LIB_STRAND="reverse"
 
-# Modules
+# Modules (plain names)
 module load Trim_Galore
 module load STAR
 module load SAMtools
 module load Subread
 module load BEDTools
 module load deepTools
-# UCSC tools (use module if available or ensure on PATH)
+# UCSC tools (ensure available on PATH or module-loaded separately)
 BWTOBEDGRAPH=${BWTOBEDGRAPH:-bigWigToBedGraph}
 BEDGRAPHTOBW=${BEDGRAPHTOBW:-bedGraphToBigWig}
 
@@ -57,66 +57,79 @@ TMPDIR="${outdir}/tmp/${accession}"
 mkdir -p "$TRIMDIR" "$BAMDIR" "$COUNTDIR" "$BWDIR" "$BEDGRAPHDIR" "$BEDDIR" "$TMPDIR"
 
 ############################
-# [STRICT FASTQ DISCOVERY + DEBUG]
+# [STRICT FASTQ DISCOVERY + DEBUG v2]
 ############################
 echo "[DEBUG] accession=$accession"
 echo "[DEBUG] fastqPath=$fastqPath"
 
+# Parse "dir1 dir2", "dir1:dir2", or "dir1,dir2" into array
 normalize_path_list() {
-  # Accept "dir1 dir2", "dir1:dir2", or "dir1,dir2"
   echo "$1" | tr ',:' ' ' | xargs -n999 echo
 }
 
-basename_matches_accession () {
-  # Accept only files whose basename STARTS with the accession (before first underscore)
-  local f="$1" base root
+# Build final search list, also try /lustre2 mirror for each /scratch dir
+collect_search_dirs() {
+  local in=($(normalize_path_list "$fastqPath"))
+  local out=() d alt
+  for d in "${in[@]}"; do
+    out+=("$d")
+    if [[ "$d" == /scratch/* ]]; then
+      alt="/lustre2${d}"
+      [[ -d "$alt" ]] && out+=("$alt")
+    fi
+  done
+  printf '%s\n' "${out[@]}"
+}
+
+# Accept if basename STARTS with "${accession}" (handles underscores + lane suffixes)
+basename_has_accession_prefix () {
+  local f="$1" base
   base="$(basename "$f")"
-  root="${base%%_*}"
-  [[ "$root" == "$accession" ]]
+  [[ "$base" == "${accession}.fastq.gz" || "$base" == ${accession}_* ]]
 }
 
 find_fastqs() {
-  local paths=($(normalize_path_list "$fastqPath"))
+  local paths=($(collect_search_dirs))
   local d r1 r2 ru
   shopt -s nullglob
   for d in "${paths[@]}"; do
     echo "[DEBUG] scanning dir: $d"
-    ls -1 "${d}/${accession}"* 2>/dev/null | head -n 5 | sed 's/^/[DEBUG] cand: /' || true
+    ls -1 "${d}/${accession}"* 2>/dev/null | head -n 6 | sed 's/^/[DEBUG] cand: /' || true
 
-    # 1) SRA paired: accession_1.fastq.gz / accession_2.fastq.gz (exact-root)
+    # 1) SRA paired: accession_1.fastq.gz / accession_2.fastq.gz
     r1="${d}/${accession}_1.fastq.gz"
     r2="${d}/${accession}_2.fastq.gz"
-    if [[ -f "$r1" && -f "$r2" ]] && basename_matches_accession "$r1" && basename_matches_accession "$r2"; then
+    if [[ -f "$r1" && -f "$r2" ]] && basename_has_accession_prefix "$r1" && basename_has_accession_prefix "$r2" ; then
       R1="$r1"; R2="$r2"; MODE="PE"
-      echo "[INFO] Found PE (SRA)"; echo "[INFO] R1=$R1"; echo "[INFO] R2=$R2"
+      echo "[INFO] PE (SRA)"; echo "[INFO] R1=$R1"; echo "[INFO] R2=$R2"
       shopt -u nullglob; return 0
     fi
 
-    # 2) Illumina paired: accession*R1_001.fastq.gz / accession*R2_001.fastq.gz (exact-root)
+    # 2) Illumina paired: accession*R1_001.fastq.gz / accession*R2_001.fastq.gz (lane-aware)
     mapfile -t candR1 < <(ls -1 "${d}/${accession}"*R1*_001.fastq.gz 2>/dev/null || true)
     mapfile -t candR2 < <(ls -1 "${d}/${accession}"*R2*_001.fastq.gz 2>/dev/null || true)
-    candR1=($(for f in "${candR1[@]:-}"; do basename_matches_accession "$f" && echo "$f"; done))
-    candR2=($(for f in "${candR2[@]:-}"; do basename_matches_accession "$f" && echo "$f"; done))
+    candR1=($(for f in "${candR1[@]:-}"; do basename_has_accession_prefix "$f" && echo "$f"; done))
+    candR2=($(for f in "${candR2[@]:-}"; do basename_has_accession_prefix "$f" && echo "$f"; done))
     if [[ ${#candR1[@]} -gt 0 && ${#candR2[@]} -gt 0 ]]; then
       R1="${candR1[0]}"; R2="${candR2[0]}"; MODE="PE"
-      echo "[INFO] Found PE (Illumina)"; echo "[INFO] R1=$R1"; echo "[INFO] R2=$R2"
+      echo "[INFO] PE (Illumina)"; echo "[INFO] R1=$R1"; echo "[INFO] R2=$R2"
       shopt -u nullglob; return 0
     fi
 
     # 3) Single-end exact: accession.fastq.gz
     ru="${d}/${accession}.fastq.gz"
-    if [[ -f "$ru" ]] && basename_matches_accession "$ru"; then
+    if [[ -f "$ru" ]] && basename_has_accession_prefix "$ru"; then
       RU="$ru"; MODE="SE"
-      echo "[INFO] Found SE"; echo "[INFO] RU=$RU"
+      echo "[INFO] SE"; echo "[INFO] RU=$RU"
       shopt -u nullglob; return 0
     fi
 
-    # 4) SE via R1-only Illumina (exact-root)
+    # 4) SE via R1-only Illumina
     mapfile -t candR1only < <(ls -1 "${d}/${accession}"*R1*_001.fastq.gz 2>/dev/null || true)
-    candR1only=($(for f in "${candR1only[@]:-}"; do basename_matches_accession "$f" && echo "$f"; done))
+    candR1only=($(for f in "${candR1only[@]:-}"; do basename_has_accession_prefix "$f" && echo "$f"; done))
     if [[ ${#candR1only[@]} -gt 0 ]]; then
       R1="${candR1only[0]}"; MODE="SE"
-      echo "[INFO] Found SE (R1-only)"; echo "[INFO] R1=$R1"
+      echo "[INFO] SE (R1-only)"; echo "[INFO] R1=$R1"
       shopt -u nullglob; return 0
     fi
   done
@@ -124,20 +137,18 @@ find_fastqs() {
   return 1
 }
 
+# Init + discover
 R1=""; R2=""; RU=""; MODE=""
 if ! find_fastqs; then
   echo "[ERROR] Could not locate FASTQs for ${accession} under: ${fastqPath}" >&2
+  echo "[HINT] If files are under /lustre2/scratch/..., either include that in fastqPath or rely on the auto-mirror."
   exit 1
 fi
 
-# Safety: paired-end must not point to the same file
-if [[ "$MODE" == "PE" ]]; then
-  if [[ -z "${R1:-}" || -z "${R2:-}" ]]; then
-    echo "[ERROR] Paired-end mode but R1 or R2 is empty." >&2; exit 1
-  fi
-  if [[ "$R1" == "$R2" ]]; then
-    echo "[ERROR] R1 and R2 resolved to the same file: $R1" >&2; exit 1
-  fi
+# Safety: paired-end must not be same file
+if [[ "$MODE" == "PE" && "$R1" == "$R2" ]]; then
+  echo "[ERROR] R1 and R2 resolved to the same file: $R1" >&2
+  exit 1
 fi
 
 ############################
