@@ -492,26 +492,33 @@ qc_csaw(
 ```{r, csaw analysis fucntion}
 #This function is going to now analyze the data that you have read in, and calculate the signal over background, normalized to input or WT (or another strain for interest). It will make a couple dataframes for each normalization, for each modifcation analyzed: one with all results (log2FC, FDR, etc.), and one with only log2FC values for heatmap generation. There is also options built in to write analyzed data & statistics to a csv, as well as make an igv track for browser visualization.
 
-# ---- Run csaw contrasts across ALL mods & ALL region sets ----
-# - FDR masking (set non-sig to 0) is applied ONLY for vInput in genome-wide window mode
-# - Region mode masking is OFF by default; enable via mask_region and provide FDR/P cutoffs.
+# - WINDOW mode:
+#     * vInput: keep windows where >=1 strain is (FDR<=cut &/or P<=cut) AND logFC>0,
+#               then zero per-strain logFC where that strain FAILS (or logFC<=0)
+#     * vRef  : keep windows where >=1 strain is (FDR<=cut &/or P<=cut) (+ or -),
+#               then zero per-strain logFC where that strain FAILS.
+# - REGION mode:
+#     * No masking by default; if mask_region=TRUE, zero per-strain logFC by FDR/P-val
 csaw_analysis <- function(
   metadata_df,
   design_mat,
   mode = c("window","region"),
   out_obj = NULL,
   reference_strain = "WT",
-  fdr_cutoff = 0.05,       # used in window mode; also usable in region mode when mask_region=TRUE
-  pvalue_cutoff = NULL,    # optional; same rules as FDR when provided
-  mask_region = FALSE,     # region mode only: zero heatmap entries failing (FDR or P) thresholds
+  fdr_cutoff = 0.05,
+  pvalue_cutoff = NULL,
+  mask_region = FALSE,               # applies only in region mode
   write_csv_results = FALSE,
   write_csv_heatmap = FALSE,
   write_igv = FALSE,
   out_dir = "csaw_results",
   merge_tol = 300
 ) {
-  require(edgeR); require(limma); require(csaw)
-  require(GenomicRanges); require(S4Vectors)
+  require(edgeR)
+  require(limma)
+  require(csaw)
+  require(GenomicRanges)
+  require(S4Vectors)
 
   mode <- match.arg(mode)
   if (is.null(out_obj)) stop("out_obj is required (use the list returned by csaw_count_and_fit).")
@@ -519,19 +526,8 @@ csaw_analysis <- function(
 
   order_cols_wt_first <- function(nms, wt = "WT") {
     wt_hit <- grep(paste0("^logFC_", wt, "$"), nms, value = TRUE)
-    c(wt_hit, setdiff(nms, wt_hit))
-  }
-
-  # helper: significance mask builder given a results df column stem (FDR_, PValue_, logFC_)
-  sig_mask <- function(df, stem, need_positive = FALSE) {
-    fcol <- paste0("FDR_",    stem)
-    pcol <- paste0("PValue_", stem)
-    lcol <- paste0("logFC_",  stem)
-    ok <- rep(TRUE, nrow(df))
-    if (!is.null(fdr_cutoff)    && fcol %in% names(df)) ok <- ok & (df[[fcol]] <= fdr_cutoff)
-    if (!is.null(pvalue_cutoff) && pcol %in% names(df)) ok <- ok & (df[[pcol]] <= pvalue_cutoff)
-    if (need_positive && lcol %in% names(df)) ok <- ok & (df[[lcol]] > 0)
-    ok
+    rest   <- setdiff(nms, wt_hit)
+    c(wt_hit, rest)
   }
 
   run_norm <- function(mod, fit, counts, region_tag, norm_type, gr_for_region = NULL) {
@@ -541,21 +537,27 @@ csaw_analysis <- function(
 
     for (st in strains) {
       chip_col <- paste0(st, ".", mod)
+
       if (norm_type == "input") {
         st_input_col <- paste0(st, ".input")
         if (!(chip_col %in% colnames(design_mat)) || !(st_input_col %in% colnames(design_mat))) {
-          message("    Skipping ", st, " (missing ", chip_col, " or ", st_input_col, ")"); next
+          message("    Skipping ", st, " (missing ", chip_col, " or ", st_input_col, ")")
+          next
         }
         constr <- sprintf("`%s` - `%s`", chip_col, st_input_col)
+
       } else {
         st_input_col  <- paste0(st,               ".input")
         ref_chip_col  <- paste0(reference_strain, ".", mod)
         ref_input_col <- paste0(reference_strain, ".input")
-        need <- c(chip_col, st_input_col, ref_chip_col, ref_input_col)
-        if (!all(need %in% colnames(design_mat))) {
-          message("    Skipping ", st, " (missing: ", paste(setdiff(need, colnames(design_mat)), collapse=", "), ")"); next
+        needed <- c(chip_col, st_input_col, ref_chip_col, ref_input_col)
+        if (!all(needed %in% colnames(design_mat))) {
+          missing <- paste(setdiff(needed, colnames(design_mat)), collapse = ", ")
+          message("    Skipping ", st, " (missing: ", missing, ")")
+          next
         }
-        constr <- sprintf("`%s` - `%s` - (`%s` - `%s`)", chip_col, st_input_col, ref_chip_col, ref_input_col)
+        constr <- sprintf("`%s` - `%s` - (`%s` - `%s`)",
+                          chip_col, st_input_col, ref_chip_col, ref_input_col)
       }
 
       contrast <- limma::makeContrasts(contrasts = constr, levels = design_mat)
@@ -564,7 +566,7 @@ csaw_analysis <- function(
       if (mode == "window") {
         merged <- mergeResults(counts, res$table, tol = merge_tol, merge.args = list(max.width = merge_tol))
         gr <- merged$regions
-        mcols(gr) <- S4Vectors::DataFrame(merged$combined)
+        mcols(gr) <- S4Vectors::DataFrame(merged$combined)  # has logFC, PValue, FDR
       } else {
         gr <- if (!is.null(gr_for_region)) gr_for_region else rowRanges(counts)
         m <- S4Vectors::mcols(gr)
@@ -575,8 +577,7 @@ csaw_analysis <- function(
       }
       res_list[[st]] <- gr
     }
-
-    if (!length(res_list)) return(NULL)
+    if (length(res_list) == 0) return(NULL)
 
     base <- res_list[[1]]
     final_df <- data.frame(
@@ -593,77 +594,71 @@ csaw_analysis <- function(
       mnames <- colnames(S4Vectors::mcols(gr))
       lfc_col <- if ("rep.logFC" %in% mnames) "rep.logFC" else if ("logFC" %in% mnames) "logFC" else
         stop("Neither rep.logFC nor logFC found for ", st, " (", mod, ")")
-
       final_df[[paste0("logFC_", st)]]  <- S4Vectors::mcols(gr)[[lfc_col]]
       final_df[[paste0("PValue_", st)]] <- S4Vectors::mcols(gr)[["PValue"]]
       final_df[[paste0("FDR_", st)]]    <- if ("FDR" %in% mnames) S4Vectors::mcols(gr)[["FDR"]] else
         p.adjust(S4Vectors::mcols(gr)[["PValue"]], method = "BH")
     }
 
-    # heatmap matrix
-    logfc_cols <- grep("^logFC_", names(final_df), value = TRUE)
+    logfc_cols <- grep("^logFC_", colnames(final_df), value = TRUE)
     logfc_cols <- order_cols_wt_first(logfc_cols, wt = "WT")
     heatmap_df <- final_df[, logfc_cols, drop = FALSE]
     rownames(heatmap_df) <- paste(final_df$seqnames, final_df$start, final_df$end, sep = ".")
 
-    # ---------- masking / filtering ----------
-    wt_possig_mask <- NULL
-
+    # --------- MASKING / KEEP RULES ----------
     if (mode == "window") {
+      # Build per-strain significance masks
+      strain_names <- sub("^logFC_", "", logfc_cols)
+
+      sig_mat <- matrix(TRUE, nrow(final_df), length(strain_names), dimnames = list(NULL, strain_names))
+      if (!is.null(fdr_cutoff))    sig_mat <- sig_mat & (as.matrix(final_df[, sub("^", "FDR_",   strain_names)])    <= fdr_cutoff)
+      if (!is.null(pvalue_cutoff)) sig_mat <- sig_mat & (as.matrix(final_df[, sub("^", "PValue_",strain_names)]) <= pvalue_cutoff)
+
       if (norm_type == "input") {
-        # keep rows where ANY strain is significant (FDR/P) AND has positive logFC vs input
-        keep_any <- rep(FALSE, nrow(final_df))
-        for (st in sub("^logFC_", "", logfc_cols)) {
-          keep_any <- keep_any | sig_mask(final_df, stem = st, need_positive = TRUE)
-        }
-        heatmap_df <- heatmap_df[keep_any, , drop = FALSE]
-
-        # save WT positive+significant mask (on the *unfiltered* full table alignment)
-        if ("WT" %in% sub("^logFC_", "", logfc_cols)) {
-          wt_possig_mask <- sig_mask(final_df, stem = "WT", need_positive = TRUE)
-          names(wt_possig_mask) <- rownames(final_df)  # key by coord string
-        }
-
-        # also return which rows we kept so vWT can align if needed
-        kept_rows <- rownames(heatmap_df)
-
-      } else { # norm_type == "ref" (e.g., vWT)
-        # keep rows if (A) any mutant is significant by FDR/P (no sign constraint)
-        keep_any_mut <- rep(FALSE, nrow(final_df))
-        for (st in sub("^logFC_", "", logfc_cols)) {
-          keep_any_mut <- keep_any_mut | sig_mask(final_df, stem = st, need_positive = FALSE)
-        }
-
-        # OR (B) WT vInput was pos+sig at that locus (from the vInput run)
-        # We'll read the mask later from the parent env if available.
-        if (!exists(".wt_possig_lookup", inherits = FALSE)) {
-          .wt_possig_lookup <- NULL
-        }
-        keep_wt_possig <- rep(FALSE, nrow(final_df))
-        if (!is.null(.wt_possig_lookup)) {
-          rn <- paste(final_df$seqnames, final_df$start, final_df$end, sep = ".")
-          keep_wt_possig <- !is.na(.wt_possig_lookup[rn]) & .wt_possig_lookup[rn]
-        }
-
-        keep <- keep_any_mut | keep_wt_possig
+        # Require positive enrichment vs input for a strain to be considered "passing"
+        pos_mat <- as.matrix(final_df[, logfc_cols]) > 0
+        pass_mat <- sig_mat & pos_mat
+        # Keep a window if ANY strain passes
+        keep <- rowSums(pass_mat, na.rm = TRUE) > 0
         heatmap_df <- heatmap_df[keep, , drop = FALSE]
+        final_df   <- final_df[keep, , drop = FALSE]
+        pass_mat   <- pass_mat[keep, , drop = FALSE]
+        # Per-strain zeroing: set logFC to 0 where NOT passing for that strain
+        for (st in colnames(pass_mat)) {
+          lcol <- paste0("logFC_", st)
+          heatmap_df[[lcol]][ !pass_mat[, st] ] <- 0
+        }
+
+      } else {
+        # vRef (e.g., vWT): sign can be +/-; passing = sig by FDR/P only
+        pass_mat <- sig_mat
+        keep <- rowSums(pass_mat, na.rm = TRUE) > 0
+        heatmap_df <- heatmap_df[keep, , drop = FALSE]
+        final_df   <- final_df[keep, , drop = FALSE]
+        pass_mat   <- pass_mat[keep, , drop = FALSE]
+        # Per-strain zeroing where NOT significant
+        for (st in colnames(pass_mat)) {
+          lcol <- paste0("logFC_", st)
+          heatmap_df[[lcol]][ !pass_mat[, st] ] <- 0
+        }
       }
 
     } else if (isTRUE(mask_region)) {
-      # region mode: optional per-cell zeroing based on thresholds
-      for (st in sub("^logFC_", "", logfc_cols)) {
-        lcol <- paste0("logFC_", st)
-        fcol <- paste0("FDR_", st)
-        pcol <- paste0("PValue_", st)
+      # REGION mode optional zeroing
+      for (st in names(res_list)) {
+        lcol <- paste0("logFC_",   st)
+        fcol <- paste0("FDR_",     st)
+        pcol <- paste0("PValue_",  st)
+        if (!(lcol %in% colnames(heatmap_df))) next
         mask <- rep(FALSE, nrow(final_df))
-        if (!is.null(fdr_cutoff)    && fcol %in% names(final_df)) mask <- mask | (final_df[[fcol]] > fdr_cutoff)
-        if (!is.null(pvalue_cutoff) && pcol %in% names(final_df)) mask <- mask | (final_df[[pcol]] > pvalue_cutoff)
+        if (!is.null(fdr_cutoff)    && fcol %in% colnames(final_df)) mask <- mask | (final_df[[fcol]] > fdr_cutoff)
+        if (!is.null(pvalue_cutoff) && pcol %in% colnames(final_df)) mask <- mask | (final_df[[pcol]] > pvalue_cutoff)
         if (any(mask)) heatmap_df[[lcol]][mask] <- 0
       }
     }
-    # ----------------------------------------
+    # -----------------------------------------
 
-    list(results = final_df, heatmap = heatmap_df, wt_possig_mask = wt_possig_mask)
+    list(results = final_df, heatmap = heatmap_df)
   }
 
   all_mods <- setdiff(unique(metadata_df$Antibody), "input")
@@ -691,15 +686,15 @@ csaw_analysis <- function(
           if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
           if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
           if (write_igv) {
-            lfc_cols <- grep("^logFC_", names(res_df), value = TRUE)
+            lfc_cols <- grep("^logFC_", colnames(res_df), value = TRUE)
             igv_out  <- res_df[, c("seqnames","start","end","name", lfc_cols), drop = FALSE]
-            write.table(igv_out, file.path(out_dir, paste0(mod, "_logFC_", nm, "_vInput.igv")),
-                        sep = "\t", quote = FALSE, row.names = FALSE)
+            igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_vInput.igv"))
+            write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
           }
           message("  Modification: ", mod, "\n    -> Saved: ", res_name, " (and ", hm_name, ")")
         }
 
-        # vReference
+        # vReference (e.g., vWT)
         res_vref <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "ref", gr_for_region = gr_in)
         if (!is.null(res_vref)) {
           res_df <- res_vref$results; hm_df <- res_vref$heatmap
@@ -711,10 +706,10 @@ csaw_analysis <- function(
           if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
           if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
           if (write_igv) {
-            lfc_cols <- grep("^logFC_", names(res_df), value = TRUE)
+            lfc_cols <- grep("^logFC_", colnames(res_df), value = TRUE)
             igv_out  <- res_df[, c("seqnames","start","end","name", lfc_cols), drop = FALSE]
-            write.table(igv_out, file.path(out_dir, paste0(mod, "_logFC_", nm, "_", norm_tag, ".igv")),
-                        sep = "\t", quote = FALSE, row.names = FALSE)
+            igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_", norm_tag, ".igv"))
+            write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
           }
           message("    -> Saved: ", res_name, " (and ", hm_name, ")")
         }
@@ -722,7 +717,6 @@ csaw_analysis <- function(
     }
 
   } else {
-    # WINDOW MODE
     if (!is.null(out_obj$genomewide)) {
       gw <- out_obj$genomewide
       fit    <- gw$fit
@@ -732,13 +726,8 @@ csaw_analysis <- function(
       for (mod in all_mods) {
         if (identical(mod, "input")) next
 
-        # vInput first, so we can collect WT pos+sig mask for vWT pass
+        # vInput
         res_vin <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "input", gr_for_region = NULL)
-        wt_lookup <- NULL
-        if (!is.null(res_vin$wt_possig_mask)) {
-          wt_lookup <- res_vin$wt_possig_mask
-        }
-
         if (!is.null(res_vin)) {
           res_df <- res_vin$results; hm_df <- res_vin$heatmap
           res_name <- paste0(mod, "_Results_", nm, "_vInput")
@@ -748,21 +737,16 @@ csaw_analysis <- function(
           if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
           if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
           if (write_igv) {
-            lfc_cols <- grep("^logFC_", names(res_df), value = TRUE)
+            lfc_cols <- grep("^logFC_", colnames(res_df), value = TRUE)
             igv_out  <- res_df[, c("seqnames","start","end","name", lfc_cols), drop = FALSE]
-            write.table(igv_out, file.path(out_dir, paste0(mod, "_logFC_", nm, "_vInput.igv")),
-                        sep = "\t", quote = FALSE, row.names = FALSE)
+            igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_vInput.igv"))
+            write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
           }
           message("  Modification: ", mod, "\n    -> Saved: ", res_name, " (and ", hm_name, ")")
         }
 
-        # Make WT vInput mask visible to the next call (vWT)
-        .wt_possig_lookup <<- wt_lookup
-
-        # vReference (e.g., vWT)
+        # vReference
         res_vref <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "ref", gr_for_region = NULL)
-        .wt_possig_lookup <<- NULL  # clear after use
-
         if (!is.null(res_vref)) {
           res_df <- res_vref$results; hm_df <- res_vref$heatmap
           norm_tag <- paste0("v", reference_strain)
@@ -773,10 +757,10 @@ csaw_analysis <- function(
           if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
           if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
           if (write_igv) {
-            lfc_cols <- grep("^logFC_", names(res_df), value = TRUE)
+            lfc_cols <- grep("^logFC_", colnames(res_df), value = TRUE)
             igv_out  <- res_df[, c("seqnames","start","end","name", lfc_cols), drop = FALSE]
-            write.table(igv_out, file.path(out_dir, paste0(mod, "_logFC_", nm, "_", norm_tag, ".igv")),
-                        sep = "\t", quote = FALSE, row.names = FALSE)
+            igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_", norm_tag, ".igv"))
+            write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
           }
           message("    -> Saved: ", res_name, " (and ", hm_name, ")")
         }
@@ -792,9 +776,8 @@ csaw_analysis <- function(
         for (mod in all_mods) {
           if (identical(mod, "input")) next
 
+          # vInput
           res_vin <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "input", gr_for_region = NULL)
-          wt_lookup <- if (!is.null(res_vin$wt_possig_mask)) res_vin$wt_possig_mask else NULL
-
           if (!is.null(res_vin)) {
             res_df <- res_vin$results; hm_df <- res_vin$heatmap
             res_name <- paste0(mod, "_Results_", nm, "_vInput")
@@ -804,18 +787,16 @@ csaw_analysis <- function(
             if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
             if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
             if (write_igv) {
-              lfc_cols <- grep("^logFC_", names(res_df), value = TRUE)
+              lfc_cols <- grep("^logFC_", colnames(res_df), value = TRUE)
               igv_out  <- res_df[, c("seqnames","start","end","name", lfc_cols), drop = FALSE]
-              write.table(igv_out, file.path(out_dir, paste0(mod, "_logFC_", nm, "_vInput.igv")),
-                          sep = "\t", quote = FALSE, row.names = FALSE)
+              igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_vInput.igv"))
+              write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
             }
             message("  Modification: ", mod, "\n    -> Saved: ", res_name, " (and ", hm_name, ")")
           }
 
-          .wt_possig_lookup <<- wt_lookup
+          # vReference
           res_vref <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "ref", gr_for_region = NULL)
-          .wt_possig_lookup <<- NULL
-
           if (!is.null(res_vref)) {
             res_df <- res_vref$results; hm_df <- res_vref$heatmap
             norm_tag <- paste0("v", reference_strain)
@@ -826,10 +807,10 @@ csaw_analysis <- function(
             if (write_csv_results) write.csv(res_df, file.path(out_dir, paste0(res_name, ".csv")), row.names = FALSE)
             if (write_csv_heatmap) write.csv(hm_df,  file.path(out_dir, paste0(hm_name,  ".csv")), row.names = TRUE)
             if (write_igv) {
-              lfc_cols <- grep("^logFC_", names(res_df), value = TRUE)
+              lfc_cols <- grep("^logFC_", colnames(res_df), value = TRUE)
               igv_out  <- res_df[, c("seqnames","start","end","name", lfc_cols), drop = FALSE]
-              write.table(igv_out, file.path(out_dir, paste0(mod, "_logFC_", nm, "_", norm_tag, ".igv")),
-                          sep = "\t", quote = FALSE, row.names = FALSE)
+              igv_file <- file.path(out_dir, paste0(mod, "_logFC_", nm, "_", norm_tag, ".igv"))
+              write.table(igv_out, igv_file, sep = "\t", quote = FALSE, row.names = FALSE)
             }
             message("    -> Saved: ", res_name, " (and ", hm_name, ")")
           }
@@ -837,8 +818,6 @@ csaw_analysis <- function(
       }
     }
   }
-
-  invisible(NULL)
 }
 
 ```
