@@ -39,7 +39,7 @@ module load SAMtools
 module load Subread
 module load BEDTools
 module load deepTools
-module load ucsc   # provides bigWigToBedGraph / bedGraphToBigWig
+module load ucsc
 
 # UCSC tool names (from module)
 BWTOBEDGRAPH=${BWTOBEDGRAPH:-bigWigToBedGraph}
@@ -238,7 +238,14 @@ log_transform_bw "${BWDIR}/${accession}.${RSTRAND}.cpm.bw" "${BWDIR}/${accession
 # Make flipped GTF (once per accession dir)
 FLIPGTF="${BAMDIR}/$(basename "$GTF" .gtf).flipped.gtf"
 if [[ ! -s "$FLIPGTF" ]]; then
-  awk 'BEGIN{OFS="\t"} $3=="exon"{if($7=="+")$7="-"; else if($7=="-")$7="+"} {print}' \
+  # Flip strand and remove extra spaces in the 9th column
+  awk 'BEGIN{OFS="\t"}
+       $3=="exon"{if($7=="+")$7="-"; else if($7=="-")$7="+"}
+       {
+         # Clean up extra spaces in the 9th column (attributes part)
+         gsub(/ +/, " ", $9);  # Replace multiple spaces with a single space in the 9th column
+         print $1,$2,$3,$4,$5,$6,$7,$8,$9
+       }' \
     "$GTF" > "$FLIPGTF"
 fi
 
