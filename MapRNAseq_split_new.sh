@@ -157,15 +157,15 @@ fi
 ############################
 if [[ "$MODE" == "PE" ]]; then
   echo "[INFO] Trimming PE"
-  trim_galore --illumina --paired --length 25 --basename "${accession}" --gzip \
-              -o "$TRIMDIR" "$R1" "$R2"
+  # trim_galore --illumina --paired --length 25 --basename "${accession}" --gzip \
+  #             -o "$TRIMDIR" "$R1" "$R2"
   R1T="${TRIMDIR}/${accession}_val_1.fq.gz"
   R2T="${TRIMDIR}/${accession}_val_2.fq.gz"
 else
   echo "[INFO] Trimming SE"
   SE_IN="${RU:-$R1}"
-  trim_galore --illumina --length 25 --basename "${accession}" --gzip \
-              -o "$TRIMDIR" "$SE_IN"
+  # trim_galore --illumina --length 25 --basename "${accession}" --gzip \
+  #             -o "$TRIMDIR" "$SE_IN"
   RUT="${TRIMDIR}/${accession}_trimmed.fq.gz"
 fi
 
@@ -255,9 +255,11 @@ fi
 # Stranded argument for featureCounts
 FC_STRAND_ARG="-s 2"; [[ "$LIB_STRAND" == "forward" ]] && FC_STRAND_ARG="-s 1"
 
-featureCounts -T "$THREADS" $FC_STRAND_ARG $FC_PE_ARGS -t exon -g gene_id \
+featureCounts -T "$THREADS" $FC_STRAND_ARG $FC_PE_ARGS -t exon -g gene_name \
   -a "$GTF"     -o "${COUNTDIR}/${accession}.sense.txt"     "$BAM"
-featureCounts -T "$THREADS" $FC_STRAND_ARG $FC_PE_ARGS -t exon -g gene_id \
+
+featureCounts -T "$THREADS" $FC_STRAND_ARG $FC_PE_ARGS -t exon -g gene_name \
   -a "$FLIPGTF" -o "${COUNTDIR}/${accession}.antisense.txt" "$BAM"
+
 
 echo "[DONE] ${accession}"
