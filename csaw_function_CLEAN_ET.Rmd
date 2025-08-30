@@ -539,7 +539,6 @@ csaw_analysis <- function(
       warning("Heatmap df has 0 rows; skipping IGV: ", basename(file_path))
       return(invisible(NULL))
     }
-    # build key in results and match heatmap order
     res_key <- paste(res_df$seqnames, res_df$start, res_df$end, sep = ".")
     idx <- match(rownames(hm_df), res_key)
     miss <- which(is.na(idx))
@@ -558,7 +557,9 @@ csaw_analysis <- function(
     write.table(out, file_path, sep = "\t", quote = FALSE, row.names = FALSE)
   }
 
+  # store vInput row keys and masked vInput heatmaps per (mod, region_tag)
   keep_coords_env <- new.env(parent = emptyenv())
+  vin_heatmap_env <- new.env(parent = emptyenv())
 
   run_norm <- function(mod, fit, counts, region_tag, norm_type, gr_for_region = NULL) {
     res_list <- list()
@@ -584,6 +585,7 @@ csaw_analysis <- function(
           message("    Skipping ", st, " (missing: ", missing, ")")
           next
         }
+        # still compute the proper contrast for the RESULTS table
         constr <- sprintf("`%s` - `%s` - (`%s` - `%s`)", chip_col, st_input_col, ref_chip_col, ref_input_col)
       }
 
@@ -633,12 +635,13 @@ csaw_analysis <- function(
 
     # HEATMAP (masked/filtered)
     logfc_cols <- grep("^logFC_", colnames(final_df), value = TRUE)
-    logfc_cols <- order_cols_wt_first(logfc_cols, wt = "WT")
+    logfc_cols <- order_cols_wt_first(logfc_cols, wt = reference_strain)
     heatmap_df <- final_df[, logfc_cols, drop = FALSE]
     rownames(heatmap_df) <- base_key_coords
 
     if (mode == "window") {
       if (norm_type == "input") {
+        # per-strain masking & keep rows with any positive/sig
         for (st in sub("^logFC_", "", logfc_cols)) {
           lcol <- paste0("logFC_",  st)
           fcol <- paste0("FDR_",    st)
@@ -650,31 +653,55 @@ csaw_analysis <- function(
         }
         keep_any <- rowSums(heatmap_df > 0, na.rm = TRUE) > 0
         heatmap_df <- heatmap_df[keep_any, , drop = FALSE]
+
         key <- paste(mod, region_tag, sep = "::")
         keep_coords_env[[key]] <- rownames(heatmap_df)
+        vin_heatmap_env[[key]] <- heatmap_df  # <-- store masked vInput for vWT derivation
 
       } else {
+        # vWT derived from vInput: (strain - WT) row-wise using masked vInput values
         key <- paste(mod, region_tag, sep = "::")
-        kept_coords <- keep_coords_env[[key]]
-        if (is.null(kept_coords)) {
-          warning("No stored vInput rowset for ", key, " — vWT not row-restricted.")
-          keep_rows <- rep(TRUE, nrow(heatmap_df))
+        vin <- vin_heatmap_env[[key]]
+
+        if (is.null(vin)) {
+          warning("No stored vInput heatmap for ", key, "; falling back to contrast-based masking.")
+          # fallback (old behavior): mask by FDR/P, restrict rows if we have coords
+          kept_coords <- keep_coords_env[[key]]
+          keep_rows <- if (is.null(kept_coords)) rep(TRUE, nrow(heatmap_df)) else (rownames(heatmap_df) %in% kept_coords)
+          for (st in sub("^logFC_", "", logfc_cols)) {
+            lcol <- paste0("logFC_",  st)
+            fcol <- paste0("FDR_",    st)
+            pcol <- paste0("PValue_", st)
+            mask <- rep(FALSE, nrow(final_df))
+            if (!is.null(fdr_cutoff)    && fcol %in% colnames(final_df))  mask <- mask | (final_df[[fcol]] > fdr_cutoff)
+            if (!is.null(pvalue_cutoff) && pcol %in% colnames(final_df))  mask <- mask | (final_df[[pcol]] > pvalue_cutoff)
+            heatmap_df[[lcol]][mask] <- 0
+          }
+          heatmap_df <- heatmap_df[keep_rows, , drop = FALSE]
         } else {
-          keep_rows <- rownames(heatmap_df) %in% kept_coords
+          # ensure WT column present
+          wt_col <- paste0("logFC_", reference_strain)
+          if (!(wt_col %in% colnames(vin))) {
+            warning("WT column (", wt_col, ") not found in vInput heatmap for ", key, "; cannot compute vWT from vInput.")
+            kept_coords <- keep_coords_env[[key]]
+            keep_rows <- if (is.null(kept_coords)) rep(TRUE, nrow(heatmap_df)) else (rownames(heatmap_df) %in% kept_coords)
+            heatmap_df <- heatmap_df[keep_rows, , drop = FALSE]
+          } else {
+            # make sure same row set & order as vInput
+            heatmap_df <- vin
+            # subtract WT row-wise, drop WT column
+            non_wt_cols <- setdiff(colnames(heatmap_df), wt_col)
+            if (length(non_wt_cols)) {
+              heatmap_df <- sweep(heatmap_df[, non_wt_cols, drop = FALSE], 1, vin[[wt_col]], FUN = "-")
+            } else {
+              heatmap_df <- heatmap_df[, 0, drop = FALSE]
+            }
+          }
         }
-        for (st in sub("^logFC_", "", logfc_cols)) {
-          lcol <- paste0("logFC_",  st)
-          fcol <- paste0("FDR_",    st)
-          pcol <- paste0("PValue_", st)
-          mask <- rep(FALSE, nrow(final_df))
-          if (!is.null(fdr_cutoff)    && fcol %in% colnames(final_df))  mask <- mask | (final_df[[fcol]] > fdr_cutoff)
-          if (!is.null(pvalue_cutoff) && pcol %in% colnames(final_df))  mask <- mask | (final_df[[pcol]] > pvalue_cutoff)
-          heatmap_df[[lcol]][mask] <- 0
-        }
-        heatmap_df <- heatmap_df[keep_rows, , drop = FALSE]
       }
 
     } else {
+      # REGION MODE: unchanged behavior; optional masking only
       if (isTRUE(mask_region)) {
         for (st in sub("^logFC_", "", logfc_cols)) {
           lcol <- paste0("logFC_",  st)
@@ -724,7 +751,7 @@ csaw_analysis <- function(
           message("  Modification: ", mod, "\n    -> Saved: ", res_name, " (and ", hm_name, ")")
         }
 
-        # vWT
+        # vWT (derived from vInput if available)
         res_vref <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "ref", gr_for_region = gr_in)
         if (!is.null(res_vref)) {
           res_df <- res_vref$results
@@ -773,7 +800,7 @@ csaw_analysis <- function(
           message("  Modification: ", mod, "\n    -> Saved: ", res_name, " (and ", hm_name, ")")
         }
 
-        # vWT
+        # vWT (derived from vInput)
         res_vref <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "ref", gr_for_region = NULL)
         if (!is.null(res_vref)) {
           res_df <- res_vref$results
@@ -804,6 +831,7 @@ csaw_analysis <- function(
         for (mod in all_mods) {
           if (identical(mod, "input")) next
 
+          # vInput
           res_vin <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "input", gr_for_region = NULL)
           if (!is.null(res_vin)) {
             res_df <- res_vin$results
@@ -821,6 +849,7 @@ csaw_analysis <- function(
             message("  Modification: ", mod, "\n    -> Saved: ", res_name, " (and ", hm_name, ")")
           }
 
+          # vWT (derived from vInput)
           res_vref <- run_norm(mod, fit, counts, region_tag = nm, norm_type = "ref", gr_for_region = NULL)
           if (!is.null(res_vref)) {
             res_df <- res_vref$results
