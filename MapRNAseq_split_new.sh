@@ -39,8 +39,9 @@ module load SAMtools
 module load Subread
 module load BEDTools
 module load deepTools
-module load ucsc
-# UCSC tools (ensure available on PATH or module-loaded separately)
+module load ucsc   # provides bigWigToBedGraph / bedGraphToBigWig
+
+# UCSC tool names (from module)
 BWTOBEDGRAPH=${BWTOBEDGRAPH:-bigWigToBedGraph}
 BEDGRAPHTOBW=${BEDGRAPHTOBW:-bedGraphToBigWig}
 
@@ -63,13 +64,13 @@ mkdir -p "$TRIMDIR" "$BAMDIR" "$COUNTDIR" "$BWDIR" "$BEDGRAPHDIR" "$BEDDIR" "$TM
 echo "[DEBUG] accession=$accession"
 echo "[DEBUG] fastqPath=$fastqPath"
 
-# Parse "dir1 dir2", "dir1:dir2", or "dir1,dir2" into array
 normalize_path_list() {
+  # Accept "dir1 dir2", "dir1:dir2", or "dir1,dir2"
   echo "$1" | tr ',:' ' ' | xargs -n999 echo
 }
 
-# Build final search list, also try /lustre2 mirror for each /scratch dir
 collect_search_dirs() {
+  # Also try /lustre2 mirror for any /scratch paths
   local in=($(normalize_path_list "$fastqPath"))
   local out=() d alt
   for d in "${in[@]}"; do
@@ -82,8 +83,8 @@ collect_search_dirs() {
   printf '%s\n' "${out[@]}"
 }
 
-# Accept if basename STARTS with "${accession}" (handles underscores + lane suffixes)
 basename_has_accession_prefix () {
+  # Accept if basename STARTS with "${accession}"
   local f="$1" base
   base="$(basename "$f")"
   [[ "$base" == "${accession}.fastq.gz" || "$base" == ${accession}_* ]]
@@ -97,7 +98,7 @@ find_fastqs() {
     echo "[DEBUG] scanning dir: $d"
     ls -1 "${d}/${accession}"* 2>/dev/null | head -n 6 | sed 's/^/[DEBUG] cand: /' || true
 
-    # 1) SRA paired: accession_1.fastq.gz / accession_2.fastq.gz
+    # 1) SRA paired
     r1="${d}/${accession}_1.fastq.gz"
     r2="${d}/${accession}_2.fastq.gz"
     if [[ -f "$r1" && -f "$r2" ]] && basename_has_accession_prefix "$r1" && basename_has_accession_prefix "$r2" ; then
@@ -106,7 +107,7 @@ find_fastqs() {
       shopt -u nullglob; return 0
     fi
 
-    # 2) Illumina paired: accession*R1_001.fastq.gz / accession*R2_001.fastq.gz (lane-aware)
+    # 2) Illumina paired (lane-aware)
     mapfile -t candR1 < <(ls -1 "${d}/${accession}"*R1*_001.fastq.gz 2>/dev/null || true)
     mapfile -t candR2 < <(ls -1 "${d}/${accession}"*R2*_001.fastq.gz 2>/dev/null || true)
     candR1=($(for f in "${candR1[@]:-}"; do basename_has_accession_prefix "$f" && echo "$f"; done))
@@ -117,7 +118,7 @@ find_fastqs() {
       shopt -u nullglob; return 0
     fi
 
-    # 3) Single-end exact: accession.fastq.gz
+    # 3) Single-end exact
     ru="${d}/${accession}.fastq.gz"
     if [[ -f "$ru" ]] && basename_has_accession_prefix "$ru"; then
       RU="$ru"; MODE="SE"
@@ -146,31 +147,30 @@ if ! find_fastqs; then
   exit 1
 fi
 
-# Safety: paired-end must not be same file
 if [[ "$MODE" == "PE" && "$R1" == "$R2" ]]; then
   echo "[ERROR] R1 and R2 resolved to the same file: $R1" >&2
   exit 1
 fi
 
 ############################
-# Trimming
+# Trimming  (comment these calls to skip)
 ############################
 if [[ "$MODE" == "PE" ]]; then
   echo "[INFO] Trimming PE"
-  # trim_galore --illumina --paired --length 25 --basename "${accession}" --gzip \
-              # -o "$TRIMDIR" "$R1" "$R2"
+  trim_galore --illumina --paired --length 25 --basename "${accession}" --gzip \
+              -o "$TRIMDIR" "$R1" "$R2"
   R1T="${TRIMDIR}/${accession}_val_1.fq.gz"
   R2T="${TRIMDIR}/${accession}_val_2.fq.gz"
 else
   echo "[INFO] Trimming SE"
   SE_IN="${RU:-$R1}"
-  # trim_galore --illumina --length 25 --basename "${accession}" --gzip \
-               # -o "$TRIMDIR" "$SE_IN"
+  trim_galore --illumina --length 25 --basename "${accession}" --gzip \
+              -o "$TRIMDIR" "$SE_IN"
   RUT="${TRIMDIR}/${accession}_trimmed.fq.gz"
 fi
 
 ############################
-# STAR alignment
+# STAR alignment  (with RAM + temp dir)
 ############################
 OUTPFX="${BAMDIR}/${accession}_"
 STAR_COMMON=(
@@ -186,6 +186,8 @@ STAR_COMMON=(
   --outSAMattributes Standard
   --outSAMstrandField intronMotif
   --quantMode GeneCounts
+  --limitBAMsortRAM 16000000000
+  --outTmpDir "${TMPDIR}/STAR_${accession}"
 )
 if [[ "$MODE" == "PE" ]]; then
   STAR "${STAR_COMMON[@]}" --readFilesIn "$R1T" "$R2T"
@@ -211,7 +213,7 @@ bamCoverage -b "$BAM" -o "${BWDIR}/${accession}.${FSTRAND}.cpm.bw" \
 bamCoverage -b "$BAM" -o "${BWDIR}/${accession}.${RSTRAND}.cpm.bw" \
   --normalizeUsing CPM --binSize $BIN --filterRNAstrand "$RSTRAND" -p "$THREADS" --skipNonCoveredRegions
 
-# Log2(CPM+1) via bedGraph roundtrip
+# Log2(CPM+1) via bedGraph roundtrip (requires ucsc module)
 log_transform_bw () {
   local inbw="$1" outbw="$2" base tmpbg tmpbg2
   base="$(basename "$inbw" .bw)"
@@ -231,19 +233,31 @@ log_transform_bw "${BWDIR}/${accession}.${FSTRAND}.cpm.bw" "${BWDIR}/${accession
 log_transform_bw "${BWDIR}/${accession}.${RSTRAND}.cpm.bw" "${BWDIR}/${accession}.${RSTRAND}.log2p1.bw"
 
 ############################
-# Gene sense vs antisense counts
+# Gene sense vs antisense counts (auto PE/SE)
 ############################
+# Make flipped GTF (once per accession dir)
 FLIPGTF="${BAMDIR}/$(basename "$GTF" .gtf).flipped.gtf"
 if [[ ! -s "$FLIPGTF" ]]; then
   awk 'BEGIN{OFS="\t"} $3=="exon"{if($7=="+")$7="-"; else if($7=="-")$7="+"} {print}' \
     "$GTF" > "$FLIPGTF"
 fi
 
+# Detect if BAM is paired-end
+IS_PAIRED=$(samtools view -c -f 1 "$BAM" || echo 0)
+if [[ "$IS_PAIRED" -gt 0 ]]; then
+  FC_PE_ARGS="-p -B -C"
+  echo "[INFO] featureCounts: paired-end mode"
+else
+  FC_PE_ARGS=""
+  echo "[INFO] featureCounts: single-end mode"
+fi
+
+# Stranded argument for featureCounts
 FC_STRAND_ARG="-s 2"; [[ "$LIB_STRAND" == "forward" ]] && FC_STRAND_ARG="-s 1"
 
-featureCounts -T "$THREADS" $FC_STRAND_ARG -t exon -g gene_id \
+featureCounts -T "$THREADS" $FC_STRAND_ARG $FC_PE_ARGS -t exon -g gene_id \
   -a "$GTF"     -o "${COUNTDIR}/${accession}.sense.txt"     "$BAM"
-featureCounts -T "$THREADS" $FC_STRAND_ARG -t exon -g gene_id \
+featureCounts -T "$THREADS" $FC_STRAND_ARG $FC_PE_ARGS -t exon -g gene_id \
   -a "$FLIPGTF" -o "${COUNTDIR}/${accession}.antisense.txt" "$BAM"
 
 echo "[DONE] ${accession}"
