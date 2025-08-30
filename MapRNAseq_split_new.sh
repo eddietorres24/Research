@@ -41,10 +41,6 @@ module load BEDTools
 module load deepTools
 module load ucsc   # provides bigWigToBedGraph / bedGraphToBigWig
 
-# Initialize UCSC tool variables (if not already set)
-BWTOBEDGRAPH=${BWTOBEDGRAPH:-bigWigToBedGraph}
-BEDGRAPHTOBW=${BEDGRAPHTOBW:-bedGraphToBigWig}
-
 ############################
 # Output dirs (your structure)
 ############################
@@ -57,6 +53,18 @@ BEDDIR="${outdir}/beds/${accession}"
 TMPDIR="${outdir}/tmp/${accession}"
 
 mkdir -p "$TRIMDIR" "$BAMDIR" "$COUNTDIR" "$BWDIR" "$BEDGRAPHDIR" "$BEDDIR" "$TMPDIR"
+
+############################
+# Cleanup temp files after job finishes or fails
+############################
+cleanup() {
+    echo "[INFO] Cleaning up temporary files..."
+    rm -rf "$TMPDIR"
+    echo "[INFO] Temporary files removed."
+}
+
+# Trap cleanup on exit or error
+trap cleanup EXIT
 
 ############################
 # GTF flipping (once per accession dir)
