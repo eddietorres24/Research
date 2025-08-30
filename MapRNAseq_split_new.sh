@@ -41,6 +41,10 @@ module load BEDTools
 module load deepTools
 module load ucsc   # provides bigWigToBedGraph / bedGraphToBigWig
 
+# Initialize UCSC tool variables (if not already set)
+BWTOBEDGRAPH=${BWTOBEDGRAPH:-bigWigToBedGraph}
+BEDGRAPHTOBW=${BEDGRAPHTOBW:-bedGraphToBigWig}
+
 ############################
 # Output dirs (your structure)
 ############################
@@ -63,7 +67,7 @@ if [[ ! -s "$FLIPGTF" ]]; then
   awk 'BEGIN{OFS="\t"}
        $3=="exon"{if($7=="+")$7="-"; else if($7=="-")$7="+"}
        {
-         gsub(/ +/, " ", $9);
+         gsub(/ +/, " ", $9);  # Replace multiple spaces with a single space in the 9th column
          print $1,$2,$3,$4,$5,$6,$7,$8,$9
        }' \
     "$GTF" > "$FLIPGTF"
