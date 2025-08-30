@@ -29,6 +29,9 @@ STAR_INDEX="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR"
 GTF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf"
 CHROMSIZES="/home/ad45368/chrom_sizes.txt"
 
+# Use the one flipped GTF you generated manually in outdir
+FLIPGTF="${outdir}/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.flipped.gtf"
+
 # Library strandedness: "reverse" (NEB dUTP) or "forward"
 LIB_STRAND="reverse"
 
@@ -39,7 +42,11 @@ module load SAMtools
 module load Subread
 module load BEDTools
 module load deepTools
-module load ucsc   # provides bigWigToBedGraph / bedGraphToBigWig
+module load ucsc
+
+# UCSC tool names (from module)
+BWTOBEDGRAPH=${BWTOBEDGRAPH:-bigWigToBedGraph}
+BEDGRAPHTOBW=${BEDGRAPHTOBW:-bedGraphToBigWig}
 
 ############################
 # Output dirs (your structure)
@@ -54,32 +61,8 @@ TMPDIR="${outdir}/tmp/${accession}"
 
 mkdir -p "$TRIMDIR" "$BAMDIR" "$COUNTDIR" "$BWDIR" "$BEDGRAPHDIR" "$BEDDIR" "$TMPDIR"
 
-############################
-# Cleanup temp files after job finishes or fails
-############################
-cleanup() {
-    echo "[INFO] Cleaning up temporary files..."
-    rm -rf "$TMPDIR"
-    echo "[INFO] Temporary files removed."
-}
-
-# Trap cleanup on exit or error
-trap cleanup EXIT
-
-############################
-# GTF flipping (once per accession dir)
-############################
-FLIPGTF="${BAMDIR}/$(basename "$GTF" .gtf).flipped.gtf"
-if [[ ! -s "$FLIPGTF" ]]; then
-  # Flip strand and clean up extra spaces in the 9th column
-  awk 'BEGIN{OFS="\t"}
-       $3=="exon"{if($7=="+")$7="-"; else if($7=="-")$7="+"}
-       {
-         gsub(/ +/, " ", $9);  # Replace multiple spaces with a single space in the 9th column
-         print $1,$2,$3,$4,$5,$6,$7,$8,$9
-       }' \
-    "$GTF" > "$FLIPGTF"
-fi
+# Always clean temp dir at the end (success or failure)
+trap 'rm -rf "$TMPDIR"' EXIT
 
 ############################
 # [STRICT FASTQ DISCOVERY + DEBUG v2]
@@ -196,23 +179,22 @@ fi
 # STAR alignment  (with RAM + temp dir)
 ############################
 OUTPFX="${BAMDIR}/${accession}_"
-STAR_COMMON=( \
-  --runThreadN "$THREADS" \
-  --genomeDir "$STAR_INDEX" \
-  --outFileNamePrefix "$OUTPFX" \
-  --readFilesCommand zcat \
-  --outSAMtype BAM SortedByCoordinate \
-  --twopassMode Basic \
-  --outFilterType BySJout \
-  --alignIntronMax 10000 \
-  --outSAMunmapped Within \
-  --outSAMattributes Standard \
-  --outSAMstrandField intronMotif \
-  --quantMode GeneCounts \
-  --limitBAMsortRAM 16000000000 \
-  --outTmpDir "${TMPDIR}/STAR_${accession}" \
+STAR_COMMON=(
+  --runThreadN "$THREADS"
+  --genomeDir "$STAR_INDEX"
+  --outFileNamePrefix "$OUTPFX"
+  --readFilesCommand zcat
+  --outSAMtype BAM SortedByCoordinate
+  --twopassMode Basic
+  --outFilterType BySJout
+  --alignIntronMax 10000
+  --outSAMunmapped Within
+  --outSAMattributes Standard
+  --outSAMstrandField intronMotif
+  --quantMode GeneCounts
+  --limitBAMsortRAM 16000000000
+  --outTmpDir "${TMPDIR}/STAR_${accession}"
 )
-
 if [[ "$MODE" == "PE" ]]; then
   STAR "${STAR_COMMON[@]}" --readFilesIn "$R1T" "$R2T"
 else
@@ -241,6 +223,7 @@ bamCoverage -b "$BAM" -o "${BWDIR}/${accession}.${RSTRAND}.cpm.bw" \
 log_transform_bw () {
   local inbw="$1" outbw="$2" base tmpbg tmpbg2
   base="$(basename "$inbw" .bw)"
+  tmpbg="${TMPDIR}/${base}.bedGraph}"
   tmpbg="${TMPDIR}/${base}.bedGraph"
   tmpbg2="${TMPDIR}/${base}.log2p1.bedGraph"
   $BWTOBEDGRAPH "$inbw" "$tmpbg"
@@ -259,8 +242,25 @@ log_transform_bw "${BWDIR}/${accession}.${RSTRAND}.cpm.bw" "${BWDIR}/${accession
 ############################
 # Gene sense vs antisense counts (auto PE/SE)
 ############################
+# Remove per-accession flipping; use the single flipped GTF in outdir
+# FLIPGTF is already defined at the top to point to ${outdir}/...flipped.gtf
+
+# Detect if BAM is paired-end
+IS_PAIRED=$(samtools view -c -f 1 "$BAM" || echo 0)
+if [[ "$IS_PAIRED" -gt 0 ]]; then
+  FC_PE_ARGS="-p -B -C"
+  echo "[INFO] featureCounts: paired-end mode"
+else
+  FC_PE_ARGS=""
+  echo "[INFO] featureCounts: single-end mode"
+fi
+
+# Stranded argument for featureCounts
+FC_STRAND_ARG="-s 2"; [[ "$LIB_STRAND" == "forward" ]] && FC_STRAND_ARG="-s 1"
+
 featureCounts -T "$THREADS" $FC_STRAND_ARG $FC_PE_ARGS -t exon -g gene_name \
-  -a "$GTF" -o "${COUNTDIR}/${accession}.sense.txt" "$BAM"
+  -a "$GTF"     -o "${COUNTDIR}/${accession}.sense.txt"     "$BAM"
+
 featureCounts -T "$THREADS" $FC_STRAND_ARG $FC_PE_ARGS -t exon -g gene_name \
   -a "$FLIPGTF" -o "${COUNTDIR}/${accession}.antisense.txt" "$BAM"
 
