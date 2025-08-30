@@ -39,11 +39,7 @@ module load SAMtools
 module load Subread
 module load BEDTools
 module load deepTools
-module load ucsc
-
-# UCSC tool names (from module)
-BWTOBEDGRAPH=${BWTOBEDGRAPH:-bigWigToBedGraph}
-BEDGRAPHTOBW=${BEDGRAPHTOBW:-bedGraphToBigWig}
+module load ucsc   # provides bigWigToBedGraph / bedGraphToBigWig
 
 ############################
 # Output dirs (your structure)
@@ -57,6 +53,21 @@ BEDDIR="${outdir}/beds/${accession}"
 TMPDIR="${outdir}/tmp/${accession}"
 
 mkdir -p "$TRIMDIR" "$BAMDIR" "$COUNTDIR" "$BWDIR" "$BEDGRAPHDIR" "$BEDDIR" "$TMPDIR"
+
+############################
+# GTF flipping (once per accession dir)
+############################
+FLIPGTF="${BAMDIR}/$(basename "$GTF" .gtf).flipped.gtf"
+if [[ ! -s "$FLIPGTF" ]]; then
+  # Flip strand and clean up extra spaces in the 9th column
+  awk 'BEGIN{OFS="\t"}
+       $3=="exon"{if($7=="+")$7="-"; else if($7=="-")$7="+"}
+       {
+         gsub(/ +/, " ", $9);
+         print $1,$2,$3,$4,$5,$6,$7,$8,$9
+       }' \
+    "$GTF" > "$FLIPGTF"
+fi
 
 ############################
 # [STRICT FASTQ DISCOVERY + DEBUG v2]
@@ -173,22 +184,23 @@ fi
 # STAR alignment  (with RAM + temp dir)
 ############################
 OUTPFX="${BAMDIR}/${accession}_"
-STAR_COMMON=(
-  --runThreadN "$THREADS"
-  --genomeDir "$STAR_INDEX"
-  --outFileNamePrefix "$OUTPFX"
-  --readFilesCommand zcat
-  --outSAMtype BAM SortedByCoordinate
-  --twopassMode Basic
-  --outFilterType BySJout
-  --alignIntronMax 10000
-  --outSAMunmapped Within
-  --outSAMattributes Standard
-  --outSAMstrandField intronMotif
-  --quantMode GeneCounts
-  --limitBAMsortRAM 16000000000
-  --outTmpDir "${TMPDIR}/STAR_${accession}"
+STAR_COMMON=( \
+  --runThreadN "$THREADS" \
+  --genomeDir "$STAR_INDEX" \
+  --outFileNamePrefix "$OUTPFX" \
+  --readFilesCommand zcat \
+  --outSAMtype BAM SortedByCoordinate \
+  --twopassMode Basic \
+  --outFilterType BySJout \
+  --alignIntronMax 10000 \
+  --outSAMunmapped Within \
+  --outSAMattributes Standard \
+  --outSAMstrandField intronMotif \
+  --quantMode GeneCounts \
+  --limitBAMsortRAM 16000000000 \
+  --outTmpDir "${TMPDIR}/STAR_${accession}" \
 )
+
 if [[ "$MODE" == "PE" ]]; then
   STAR "${STAR_COMMON[@]}" --readFilesIn "$R1T" "$R2T"
 else
@@ -235,38 +247,9 @@ log_transform_bw "${BWDIR}/${accession}.${RSTRAND}.cpm.bw" "${BWDIR}/${accession
 ############################
 # Gene sense vs antisense counts (auto PE/SE)
 ############################
-# Make flipped GTF (once per accession dir)
-FLIPGTF="${BAMDIR}/$(basename "$GTF" .gtf).flipped.gtf"
-if [[ ! -s "$FLIPGTF" ]]; then
-  # Flip strand and remove extra spaces in the 9th column
-  awk 'BEGIN{OFS="\t"}
-       $3=="exon"{if($7=="+")$7="-"; else if($7=="-")$7="+"}
-       {
-         # Clean up extra spaces in the 9th column (attributes part)
-         gsub(/ +/, " ", $9);  # Replace multiple spaces with a single space in the 9th column
-         print $1,$2,$3,$4,$5,$6,$7,$8,$9
-       }' \
-    "$GTF" > "$FLIPGTF"
-fi
-
-# Detect if BAM is paired-end
-IS_PAIRED=$(samtools view -c -f 1 "$BAM" || echo 0)
-if [[ "$IS_PAIRED" -gt 0 ]]; then
-  FC_PE_ARGS="-p -B -C"
-  echo "[INFO] featureCounts: paired-end mode"
-else
-  FC_PE_ARGS=""
-  echo "[INFO] featureCounts: single-end mode"
-fi
-
-# Stranded argument for featureCounts
-FC_STRAND_ARG="-s 2"; [[ "$LIB_STRAND" == "forward" ]] && FC_STRAND_ARG="-s 1"
-
 featureCounts -T "$THREADS" $FC_STRAND_ARG $FC_PE_ARGS -t exon -g gene_name \
-  -a "$GTF"     -o "${COUNTDIR}/${accession}.sense.txt"     "$BAM"
-
+  -a "$GTF" -o "${COUNTDIR}/${accession}.sense.txt" "$BAM"
 featureCounts -T "$THREADS" $FC_STRAND_ARG $FC_PE_ARGS -t exon -g gene_name \
   -a "$FLIPGTF" -o "${COUNTDIR}/${accession}.antisense.txt" "$BAM"
-
 
 echo "[DONE] ${accession}"
