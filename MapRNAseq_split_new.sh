@@ -35,14 +35,14 @@ FLIPGTF_GLOBAL="${outdir}/$(basename "$GTF" .gtf).flipped.gtf"
 # Library strandedness of your RNA-seq (NEB dUTP = reverse)
 LIB_STRAND="reverse"
 
-# Modules (plain names)
+# Modules
 module load Trim_Galore
 module load STAR
 module load SAMtools
 module load Subread
 module load BEDTools
 module load deepTools
-module load ucsc   # provides bigWigToBedGraph / bedGraphToBigWig
+module load ucsc   # bigWigToBedGraph / bedGraphToBigWig
 
 ############################
 # Output dirs
@@ -57,16 +57,10 @@ TMPDIR="${outdir}/tmp/${accession}"
 
 mkdir -p "$TRIMDIR" "$BAMDIR" "$COUNTDIR" "$BWDIR" "$BEDGRAPHDIR" "$BEDDIR" "$TMPDIR"
 
-# Unique STAR tmp dir (avoids collisions) + cleanup on exit
+# STAR tmp path (let STAR create it; do NOT pre-create)
 OUTTMP="${TMPDIR}/STAR_${accession}_${SLURM_JOB_ID:-$$}"
-# If a stale dir with the old name exists, remove it once:
-[ -d "${TMPDIR}/STAR_${accession}" ] && rm -rf "${TMPDIR}/STAR_${accession}"
-# Ensure our tmp exists and is empty
 [ -d "$OUTTMP" ] && rm -rf "$OUTTMP"
-mkdir -p "$OUTTMP"
-
-# Clean even if the job fails or is cancelled
-trap 'rm -rf "$OUTTMP" "$TMPDIR" 2>/dev/null || true' EXIT
+trap 'rm -rf "$OUTTMP" 2>/dev/null || true' EXIT
 
 ############################
 # FASTQ discovery (supports multiple dirs; mirrors /scratch -> /lustre2)
@@ -157,7 +151,7 @@ if [[ "$MODE" == "PE" && "$R1" == "$R2" ]]; then
 fi
 
 ############################
-# Trimming
+# Trimming (SKIPPED)
 ############################
 if [[ "$MODE" == "PE" ]]; then
   echo "[INFO] Trimming PE (SKIPPED)"
@@ -174,7 +168,7 @@ else
 fi
 
 ############################
-# STAR alignment  (with RAM + temp dir)
+# STAR alignment
 ############################
 OUTPFX="${BAMDIR}/${accession}_"
 STAR_COMMON=(
@@ -239,14 +233,13 @@ log_transform_bw "${BWDIR}/${accession}.${FSTRAND}.cpm.bw" "${BWDIR}/${accession
 log_transform_bw "${BWDIR}/${accession}.${RSTRAND}.cpm.bw" "${BWDIR}/${accession}.${RSTRAND}.log2p1.bw"
 
 ############################
-# NEW (A): Antisense-only BAM + bigWigs  (FIXED)
+# NEW (A): Antisense-only BAM + bigWigs
 ############################
 # Split exons by strand (no edit to col 9)
 awk '($3=="exon" && $7=="+")' "$GTF" > "$TMPDIR/exons.plus.gtf"
 awk '($3=="exon" && $7=="-")' "$GTF" > "$TMPDIR/exons.minus.gtf"
 
 # Antisense reads = reads overlapping features on the OPPOSITE strand
-# Use -S (opposite) and output BAM directly; no samtools FLAG filtering.
 bedtools intersect -S -abam "$BAM" -b "$TMPDIR/exons.plus.gtf"  > "$TMPDIR/${accession}.plus_antisense.bam"
 bedtools intersect -S -abam "$BAM" -b "$TMPDIR/exons.minus.gtf" > "$TMPDIR/${accession}.minus_antisense.bam"
 
@@ -261,7 +254,7 @@ rm -f "$BAMDIR/${accession}_antisense.unsorted.bam" \
       "$TMPDIR/${accession}.minus_antisense.bam"
 samtools index "$BAMDIR/${accession}_antisense.bam"
 
-# Skip bigWig generation gracefully if no mapped reads (prevents ZeroDivisionError)
+# Skip bigWig generation if antisense BAM has 0 mapped reads (prevents ZeroDivisionError)
 ANTI_BAM="$BAMDIR/${accession}_antisense.bam"
 ANTI_MAPPED=$(samtools view -c -F 4 "$ANTI_BAM" || echo 0)
 if [[ "$ANTI_MAPPED" -eq 0 ]]; then
@@ -319,6 +312,6 @@ featureCounts -T "$THREADS" $FC_STRAND_ARG $FC_PE_ARGS -t exon -g gene_name \
 echo "[DONE] ${accession}"
 
 ############################
-# Cleanup per-sample TMP
+# Optional per-sample TMP cleanup
 ############################
 rm -rf "${TMPDIR}" 2>/dev/null || true
