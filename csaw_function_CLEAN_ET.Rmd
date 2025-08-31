@@ -1911,25 +1911,168 @@ View(out$data)
 
 ```
 
-```{function to make bed files from windowCounts}
-#This function will utilize enrichment calls from windowCounts to make a bed file with significantly enriched regions for a desired modification. You will feed in a data frame obtained from the analysis function, which will already contain enrichment filtered for significance (FDR &/or p-value). This function will then merge regions that neighbor each other (i.e. chromosome 1 bp 600-899 will merge with chromosome 1 bp 900-1199 if they are both present in the df), and this will create a "peak-call" like bed file with all enriched regions. it will iterate across each strain (column) in the df. you can also set a threshold for size of the fragment to be included in the df to avoid interspersed small fragments (which are likely not real enrichment). For example, a threshold set to 1000 bp would not include any fragments (post-merge) below that size (i.e. at least 4 300 bp will have to be merged to create a frag size large enough to be included in the bed)
+```{r, function to make bed files from windowCounts}
+#This function will utilize enrichment calls from windowCounts to make a bed file with significantly enriched regions for a desired modification. You will feed in a data frame obtained from the analysis function, which will already contain enrichment filtered for significance (FDR &/or p-value). This function will then merge regions that neighbor each other (i.e. chromosome 1 bp 600-899 will merge with chromosome 1 bp 900-1199 if they are both present in the df), and this will create a "peak-call" like bed file with all enriched regions. It will so this by extracting the chromosome, start, and end values from the row name of the df and make it 3 separate columns, characteristic of a bed/peak call file. it will iterate across each strain (column) in the df. you can also set a threshold for size of the fragment to be included in the df to avoid interspersed small fragments (which are likely not real enrichment). For example, a threshold set to 1000 bp would not include any fragments (post-merge) below that size (i.e. at least 4 300 bp windows will have to be merged to create a frag size large enough to be included in the bed)
 
-# Normal No Recover → qa_unrecovered.bed
-awk '{ if ($3 - $2 >= 301) print }' normal_no_recover_regions.bed | \
-bedtools sort -i - | \
-bedtools merge -i - -d 1000 | \
-awk '{ if ($3 - $2 >= 1000) print }' > qa_unrecovered.bed
+# Make BED-like "peak calls" from a masked heatmap df (e.g., *_Heatmap_*_vInput)
+# - Expects rownames like "chrom.start.end" (we robustly parse even if chrom has dots)
+# - For EACH strain column (logFC_*):
+#     * keeps rows by sign (positive/negative/any) and minimum absolute value
+#     * merges abutting windows (control max inter-window gap in bp)
+#     * drops merged fragments smaller than min_width_bp
+# - Writes one .bed per strain (3-column BED: chrom, start(0-based), end)
+# - Returns a named list of data.frames invisibly
+# - WINDOW mode: optional merging of nearby windows (gap <= max_gap_bp) then min-width filter
+# - REGION mode: no window merging and no min-width filter (keeps your predefined regions)
 
-# Normal Recover → qa_recovered.bed
-awk '{ if ($3 - $2 >= 301) print }' normal_recover_regions.bed | \
-bedtools sort -i - | \
-bedtools merge -i - -d 1000 | \
-awk '{ if ($3 - $2 >= 1000) print }' > qa_recovered.bed
+heatmap_to_bed_peaks <- function(
+  hm_df,
+  out_dir,
+  prefix            = "peaks",
+  mode              = c("window","region"),
+  direction         = c("positive","nonzero","negative"),
+  min_value         = 0,        # threshold on logFC for direction check
+  merge_windows     = TRUE,     # only used in mode="window"; ignored in "region"
+  max_gap_bp        = 0,        # merge windows with gaps <= this many bp (mode="window")
+  min_width_bp      = 0,        # drop merged blocks narrower than this (mode="window")
+  zero_based        = TRUE,     # BED = 0-based start by convention
+  write_empty_files = FALSE     # write empty BEDs for strains with no peaks
+) {
+  if (!requireNamespace("GenomicRanges", quietly = TRUE) ||
+      !requireNamespace("IRanges", quietly = TRUE)) {
+    stop("Packages 'GenomicRanges' and 'IRanges' are required.")
+  }
 
-# Ectopic → qa_ectopic.bed
-awk '{ if ($3 - $2 >= 301) print }' ectopic_regions.bed | \
-bedtools sort -i - | \
-bedtools merge -i - -d 1000 | \
-awk '{ if ($3 - $2 >= 1000) print }' > qa_ectopic.bed
+  mode      <- match.arg(mode)
+  direction <- match.arg(direction)
+
+  if (!is.data.frame(hm_df))
+    stop("hm_df must be a data.frame with rownames like 'chr.start.end'.")
+
+  rn <- rownames(hm_df)
+  if (is.null(rn) || anyNA(rn))
+    stop("hm_df must have non-NA rownames like 'chr.start.end'.")
+
+  # Parse rownames: take last two dot fields as start/end (chr can contain dots)
+  m  <- regexec("^(.+)\\.([0-9]+)\\.([0-9]+)$", rn)
+  mm <- regmatches(rn, m)
+  bad <- vapply(mm, length, integer(1L)) != 4L
+  if (any(bad)) {
+    stop("Could not parse some rownames into chr.start.end. Example bad rowname: ",
+         rn[which(bad)[1L]])
+  }
+  chr   <- vapply(mm, `[`, "", 2L)
+  start <- as.integer(vapply(mm, `[`, "", 3L))
+  end   <- as.integer(vapply(mm, `[`, "", 4L))
+  if (any(!is.finite(start)) || any(!is.finite(end)))
+    stop("Non-finite starts/ends after parsing rownames.")
+
+  base_gr <- GenomicRanges::GRanges(
+    seqnames = chr,
+    ranges   = IRanges::IRanges(start = start, end = end)
+  )
+
+  # Identify logFC columns
+  lfc_cols <- grep("^logFC_", colnames(hm_df), value = TRUE)
+  if (!length(lfc_cols))
+    stop("No columns named like 'logFC_*' found in hm_df.")
+
+  if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+
+  out_list <- stats::setNames(vector("list", length(lfc_cols)),
+                              sub("^logFC_", "", lfc_cols))
+
+  for (lc in lfc_cols) {
+    strain <- sub("^logFC_", "", lc)
+    vals <- hm_df[[lc]]
+
+    # Keep windows based on requested direction
+    keep <- switch(
+      direction,
+      positive = vals >  min_value,
+      negative = vals < -min_value,
+      nonzero  = vals != 0
+    )
+
+    gr_keep <- base_gr[keep]
+    if (length(gr_keep) == 0L) {
+      if (isTRUE(write_empty_files)) {
+        bed_file <- file.path(out_dir, sprintf("%s_%s.bed", prefix, strain))
+        file.create(bed_file)
+      }
+      out_list[[strain]] <- data.frame()
+      next
+    }
+
+    if (mode == "window" && isTRUE(merge_windows)) {
+      # Merge adjacent/nearby windows: gap <= max_gap_bp
+      merged <- GenomicRanges::reduce(gr_keep, min.gapwidth = as.integer(max_gap_bp) + 1L)
+      # Drop tiny merged blocks if requested
+      if (min_width_bp > 0L) {
+        merged <- merged[IRanges::width(merged) >= as.integer(min_width_bp)]
+      }
+      gr_out <- merged
+    } else {
+      # REGION mode (or merge_windows=FALSE): keep original ranges as-is
+      gr_out <- gr_keep
+    }
+
+    if (length(gr_out) == 0L) {
+      if (isTRUE(write_empty_files)) {
+        bed_file <- file.path(out_dir, sprintf("%s_%s.bed", prefix, strain))
+        file.create(bed_file)
+      }
+      out_list[[strain]] <- data.frame()
+      next
+    }
+
+    # Build BED (3 columns). Use as.data.frame to avoid namespace issues.
+    df <- as.data.frame(gr_out)[, c("seqnames","start","end")]
+    if (isTRUE(zero_based)) df$start <- df$start - 1L
+    df$start[df$start < 0L] <- 0L
+    df$seqnames <- as.character(df$seqnames)
+    df$start    <- as.integer(df$start)
+    df$end      <- as.integer(df$end)
+
+    bed_file <- file.path(out_dir, sprintf("%s_%s.bed", prefix, strain))
+    utils::write.table(df, bed_file, sep = "\t", quote = FALSE,
+                       row.names = FALSE, col.names = FALSE)
+    out_list[[strain]] <- df
+  }
+
+  invisible(out_list)
+}
+
+```
+
+```{r, Run BED File Function}
+# Example 1: vInput heatmap, enriched regions per strain (merge abutting; min merged width 1500 bp)
+
+peaks <- heatmap_to_bed_peaks(
+  hm_df        = H3K36me3_Heatmap_GenomeWide_vInput,
+  out_dir      = "BED_out/H3K36me3_vInput",
+  prefix       = "H3K36me3_vInput",
+  mode         = "window",
+  direction    = "positive",
+  min_value    = 0,
+  merge_windows= TRUE,
+  max_gap_bp   = 1500,
+  min_width_bp = 1000,
+  zero_based   = TRUE,
+  write_empty_files = TRUE
+)
+
+# Example 1: vInput heatmap, enriched regions per strain across a pre-determined region set (i.e. all genes)
+peaks <- heatmap_to_bed_peaks(
+  hm_df        = H3K36me3_Heatmap_allgenes_vInput,  # any region-mode heatmap df
+  out_dir      = "BED_out/H3K27me3_promoters",
+  prefix       = "H3K27me3_promoters",
+  mode         = "region",      # <- keeps your given regions as-is
+  direction    = "positive",
+  min_value    = 0.8,
+  merge_windows= FALSE,         # ignored in region mode
+  zero_based   = TRUE
+)
+
 
 ```
