@@ -337,13 +337,13 @@ csaw_count_and_fit <- function(
 ```
 
 ###########################################################################################
-```{r, run count & fit function}
+```{r, run count & fit function, echo = FALSE}
 
 #This is where you change the parameters and run the function
 count_results <- csaw_count_and_fit(
   metadata_df = meta,
   region_list = regions,
-  mode = "window", #"region" or "window"
+  mode = "region", #"region" or "window"
   window_size = 300,
   design_mat = design.mat,
   param = param
@@ -881,7 +881,7 @@ csaw_analysis <- function(
 csaw_analysis(
   metadata_df = meta,
   design_mat  = design.mat,
-  mode        = "window",             # "window" or "region"
+  mode        = "region",             # "window" or "region"
   out_obj     = count_results,        # <- REQUIRED so we have counts for merging/coords
   reference_strain = "WT",
   fdr_cutoff  = 0.01,
@@ -889,6 +889,7 @@ csaw_analysis(
   write_csv_results = TRUE,
   write_csv_heatmap = TRUE,
   write_igv   = TRUE,
+  mask_region = TRUE,
   out_dir     = "CAF-1_Full_genome_Analysis", #output dir, name whatever you want
   merge_tol   = 300                   # only affects genomewide window mode
 )
@@ -1925,24 +1926,27 @@ View(out$data)
 # - WINDOW mode: optional merging of nearby windows (gap <= max_gap_bp) then min-width filter
 # - REGION mode: no window merging and no min-width filter (keeps your predefined regions)
 
+suppressPackageStartupMessages({
+  library(GenomicRanges)
+  library(IRanges)
+})
+
+# Make BED-like “peaks” from a *_Heatmap_* df
+# window mode  -> merge windows when gap <= max_gap_bp, then drop < min_width_bp
+# region mode  -> keep given ranges exactly (no merging/min-width filtering)
 heatmap_to_bed_peaks <- function(
   hm_df,
   out_dir,
   prefix            = "peaks",
   mode              = c("window","region"),
   direction         = c("positive","nonzero","negative"),
-  min_value         = 0,        # threshold on logFC for direction check
-  merge_windows     = TRUE,     # only used in mode="window"; ignored in "region"
-  max_gap_bp        = 0,        # merge windows with gaps <= this many bp (mode="window")
-  min_width_bp      = 0,        # drop merged blocks narrower than this (mode="window")
-  zero_based        = TRUE,     # BED = 0-based start by convention
-  write_empty_files = FALSE     # write empty BEDs for strains with no peaks
+  min_value         = 0,
+  merge_windows     = TRUE,     # only used when mode="window"
+  max_gap_bp        = 0,        # merge if inter-window gap <= this many bp
+  min_width_bp      = 0,        # drop merged blocks < this width (bp) in window mode
+  zero_based        = TRUE,     # BED start is 0-based
+  write_empty_files = FALSE
 ) {
-  if (!requireNamespace("GenomicRanges", quietly = TRUE) ||
-      !requireNamespace("IRanges", quietly = TRUE)) {
-    stop("Packages 'GenomicRanges' and 'IRanges' are required.")
-  }
-
   mode      <- match.arg(mode)
   direction <- match.arg(direction)
 
@@ -1953,24 +1957,15 @@ heatmap_to_bed_peaks <- function(
   if (is.null(rn) || anyNA(rn))
     stop("hm_df must have non-NA rownames like 'chr.start.end'.")
 
-  # Parse rownames: take last two dot fields as start/end (chr can contain dots)
+  # Parse rownames robustly: last two dot fields are start/end (chr can contain dots)
   m  <- regexec("^(.+)\\.([0-9]+)\\.([0-9]+)$", rn)
   mm <- regmatches(rn, m)
   bad <- vapply(mm, length, integer(1L)) != 4L
-  if (any(bad)) {
-    stop("Could not parse some rownames into chr.start.end. Example bad rowname: ",
-         rn[which(bad)[1L]])
-  }
+  if (any(bad)) stop("Bad rowname (chr.start.end) example: ", rn[which(bad)[1L]])
+
   chr   <- vapply(mm, `[`, "", 2L)
   start <- as.integer(vapply(mm, `[`, "", 3L))
   end   <- as.integer(vapply(mm, `[`, "", 4L))
-  if (any(!is.finite(start)) || any(!is.finite(end)))
-    stop("Non-finite starts/ends after parsing rownames.")
-
-  base_gr <- GenomicRanges::GRanges(
-    seqnames = chr,
-    ranges   = IRanges::IRanges(start = start, end = end)
-  )
 
   # Identify logFC columns
   lfc_cols <- grep("^logFC_", colnames(hm_df), value = TRUE)
@@ -1982,11 +1977,55 @@ heatmap_to_bed_peaks <- function(
   out_list <- stats::setNames(vector("list", length(lfc_cols)),
                               sub("^logFC_", "", lfc_cols))
 
+  # --- tiny helper: deterministic per-chromosome merging by gap ---
+  merge_by_gap <- function(chr_vec, start_vec, end_vec, max_gap, min_width) {
+    o <- order(chr_vec, start_vec, end_vec)
+    chr_o   <- chr_vec[o]
+    start_o <- start_vec[o]
+    end_o   <- end_vec[o]
+
+    res_chr <- character(0)
+    res_st  <- integer(0)
+    res_en  <- integer(0)
+
+    i <- 1L
+    n <- length(start_o)
+    while (i <= n) {
+      cur_chr <- chr_o[i]
+      cur_st  <- start_o[i]
+      cur_en  <- end_o[i]
+      i <- i + 1L
+
+      # extend while next interval is on same chr and gap <= max_gap
+      while (i <= n && chr_o[i] == cur_chr) {
+        gap <- start_o[i] - cur_en - 1L   # inclusive coordinates
+        if (gap <= max_gap) {
+          # merge -> extend end
+          if (end_o[i] > cur_en) cur_en <- end_o[i]
+          i <- i + 1L
+        } else {
+          break
+        }
+      }
+
+      # width filter if requested
+      if (min_width <= 0L || (cur_en - cur_st + 1L) >= min_width) {
+        res_chr <- c(res_chr, cur_chr)
+        res_st  <- c(res_st,  cur_st)
+        res_en  <- c(res_en,  cur_en)
+      }
+    }
+
+    if (!length(res_chr)) {
+      return(data.frame(seqnames=character(0), start=integer(0), end=integer(0)))
+    }
+    data.frame(seqnames=res_chr, start=res_st, end=res_en, row.names = NULL, stringsAsFactors = FALSE)
+  }
+
   for (lc in lfc_cols) {
     strain <- sub("^logFC_", "", lc)
-    vals <- hm_df[[lc]]
+    vals   <- hm_df[[lc]]
 
-    # Keep windows based on requested direction
     keep <- switch(
       direction,
       positive = vals >  min_value,
@@ -1994,9 +2033,8 @@ heatmap_to_bed_peaks <- function(
       nonzero  = vals != 0
     )
 
-    gr_keep <- base_gr[keep]
-    if (length(gr_keep) == 0L) {
-      if (isTRUE(write_empty_files)) {
+    if (!any(keep)) {
+      if (write_empty_files) {
         bed_file <- file.path(out_dir, sprintf("%s_%s.bed", prefix, strain))
         file.create(bed_file)
       }
@@ -2005,20 +2043,23 @@ heatmap_to_bed_peaks <- function(
     }
 
     if (mode == "window" && isTRUE(merge_windows)) {
-      # Merge adjacent/nearby windows: gap <= max_gap_bp
-      merged <- GenomicRanges::reduce(gr_keep, min.gapwidth = as.integer(max_gap_bp) + 1L)
-      # Drop tiny merged blocks if requested
-      if (min_width_bp > 0L) {
-        merged <- merged[IRanges::width(merged) >= as.integer(min_width_bp)]
-      }
-      gr_out <- merged
+      df_merged <- merge_by_gap(chr[keep], start[keep], end[keep],
+                                max_gap = as.integer(max_gap_bp),
+                                min_width = as.integer(min_width_bp))
     } else {
-      # REGION mode (or merge_windows=FALSE): keep original ranges as-is
-      gr_out <- gr_keep
+      # region mode or no merge: keep ranges as-is (no min-width filter)
+      df_merged <- data.frame(
+        seqnames = chr[keep],
+        start    = start[keep],
+        end      = end[keep],
+        row.names = NULL,
+        stringsAsFactors = FALSE
+      )
     }
 
-    if (length(gr_out) == 0L) {
-      if (isTRUE(write_empty_files)) {
+    # BED output (3 columns)
+    if (nrow(df_merged) == 0L) {
+      if (write_empty_files) {
         bed_file <- file.path(out_dir, sprintf("%s_%s.bed", prefix, strain))
         file.create(bed_file)
       }
@@ -2026,18 +2067,13 @@ heatmap_to_bed_peaks <- function(
       next
     }
 
-    # Build BED (3 columns). Use as.data.frame to avoid namespace issues.
-    df <- as.data.frame(gr_out)[, c("seqnames","start","end")]
-    if (isTRUE(zero_based)) df$start <- df$start - 1L
-    df$start[df$start < 0L] <- 0L
-    df$seqnames <- as.character(df$seqnames)
-    df$start    <- as.integer(df$start)
-    df$end      <- as.integer(df$end)
+    if (isTRUE(zero_based)) df_merged$start <- pmax(0L, df_merged$start - 1L)
 
     bed_file <- file.path(out_dir, sprintf("%s_%s.bed", prefix, strain))
-    utils::write.table(df, bed_file, sep = "\t", quote = FALSE,
+    utils::write.table(df_merged, bed_file, sep = "\t", quote = FALSE,
                        row.names = FALSE, col.names = FALSE)
-    out_list[[strain]] <- df
+
+    out_list[[strain]] <- df_merged
   }
 
   invisible(out_list)
@@ -2047,32 +2083,30 @@ heatmap_to_bed_peaks <- function(
 
 ```{r, Run BED File Function}
 # Example 1: vInput heatmap, enriched regions per strain (merge abutting; min merged width 1500 bp)
-
-peaks <- heatmap_to_bed_peaks(
-  hm_df        = H3K36me3_Heatmap_GenomeWide_vInput,
-  out_dir      = "BED_out/H3K36me3_vInput",
-  prefix       = "H3K36me3_vInput",
-  mode         = "window",
-  direction    = "positive",
-  min_value    = 0,
-  merge_windows= TRUE,
-  max_gap_bp   = 1500,
-  min_width_bp = 1000,
-  zero_based   = TRUE,
+peaks_win <- heatmap_to_bed_peaks(
+  hm_df         = H3K36me3_Heatmap_GenomeWide_vInput,
+  out_dir       = "csaw_beds/H3K36me3_vInput",
+  prefix        = "H3K36me3_vInput",
+  mode          = "window",
+  direction     = "positive",
+  min_value     = 0,
+  merge_windows = TRUE,
+  max_gap_bp    = 1500,
+  min_width_bp  = 1000,
+  zero_based    = TRUE,
   write_empty_files = TRUE
 )
 
-# Example 1: vInput heatmap, enriched regions per strain across a pre-determined region set (i.e. all genes)
-peaks <- heatmap_to_bed_peaks(
-  hm_df        = H3K36me3_Heatmap_allgenes_vInput,  # any region-mode heatmap df
-  out_dir      = "BED_out/H3K27me3_promoters",
-  prefix       = "H3K27me3_promoters",
-  mode         = "region",      # <- keeps your given regions as-is
-  direction    = "positive",
-  min_value    = 0.8,
-  merge_windows= FALSE,         # ignored in region mode
-  zero_based   = TRUE
+# Example 2: vInput heatmap, enriched regions per strain across a pre-determined region set (i.e. all genes)
+peaks_reg <- heatmap_to_bed_peaks(
+  hm_df         = H3K36me3_Heatmap_allgenes_vInput,
+  out_dir       = "csaw_beds/H3K36me3_vInput",
+  prefix        = "H3K36me3_allgenes_vInput",
+  mode          = "region",
+  direction     = "positive",
+  min_value     = 0.8,
+  merge_windows = TRUE,  # ignored in region mode
+  zero_based    = TRUE
 )
-
 
 ```

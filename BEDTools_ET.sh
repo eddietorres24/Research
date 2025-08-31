@@ -164,24 +164,19 @@ bedtools sort -i - | \
 bedtools merge -i - -d 1000 | \
 awk '{ if ($3 - $2 >= 1000) print }' > qa_ectopic.bed
 
-###splitting + and - genes
-# 0) sort once
-bedtools sort -i all_genes_gff.bed > genes.sorted.bed
 
-# 1) split by strand
+###splitting + and - genes
+# 0) sort once (required for -sorted speedups later if you want)
+bedtools sort -i all_genes_gff_names.bed > genes.sorted.bed
+
+# 1) split by strand (BED6 assumed: col6 is strand)
 awk 'BEGIN{OFS="\t"} $6=="+"' genes.sorted.bed > genes.plus.bed
 awk 'BEGIN{OFS="\t"} $6=="-"' genes.sorted.bed > genes.minus.bed
 
-# 2) add ±1.5 kb flanks (strand-aware)
-bedtools slop -s -l 1500 -r 1500 -g /home/ad45368/chrom_sizes.txt -i genes.plus.bed  > plus.flank.bed
-bedtools slop -s -l 1500 -r 1500 -g /home/ad45368/chrom_sizes.txt -i genes.minus.bed > minus.flank.bed
+# 2) drop genes whose *gene body* overlaps any opposite-strand gene body
+bedtools intersect -v -a genes.minus.bed -b genes.plus.bed > minus_genes.bed
+bedtools intersect -v -a genes.plus.bed  -b genes.minus.bed > plus_genes.bed
 
-# 3) drop genes whose flanked region overlaps any opposite-strand gene body
-bedtools intersect -v -a minus.flank.bed -b genes.plus.bed > minus.keep.flank.bed
-bedtools intersect -v -a plus.flank.bed  -b genes.minus.bed > plus.keep.flank.bed
-
-# 4) get CLEAN gene bodies to feed computeMatrix (scale-regions with flanks)
-cut -f4 minus.keep.flank.bed | sort -u > keep.minus
-cut -f4 plus.keep.flank.bed  | sort -u > keep.plus
-grep -F -w -f keep.minus genes.minus.bed > minus_genes.bed
-grep -F -w -f keep.plus  genes.plus.bed  > plus_genes.bed
+# (optional) sanity check: these should print nothing
+bedtools intersect -u -a minus_genes.bed -b genes.plus.bed | head
+bedtools intersect -u -a plus_genes.bed  -b genes.minus.bed | head

@@ -233,28 +233,32 @@ log_transform_bw "${BWDIR}/${accession}.${FSTRAND}.cpm.bw" "${BWDIR}/${accession
 log_transform_bw "${BWDIR}/${accession}.${RSTRAND}.cpm.bw" "${BWDIR}/${accession}.${RSTRAND}.log2p1.bw"
 
 ############################
-# NEW (A): Antisense-only BAM + bigWigs
+# NEW (A): Antisense-only BAM + bigWigs  (CORRECTED)
 ############################
-# Split exons by strand (no edit to col 9)
-awk '($3=="exon" && $7=="+")' "$GTF" > "$TMPDIR/exons.plus.gtf"
-awk '($3=="exon" && $7=="-")' "$GTF" > "$TMPDIR/exons.minus.gtf"
 
-# Antisense reads = reads overlapping features on the OPPOSITE strand
-bedtools intersect -S -abam "$BAM" -b "$TMPDIR/exons.plus.gtf"  > "$TMPDIR/${accession}.plus_antisense.bam"
-bedtools intersect -S -abam "$BAM" -b "$TMPDIR/exons.minus.gtf" > "$TMPDIR/${accession}.minus_antisense.bam"
+# Choose the correct bedtools strand operator for *antisense* relative to the gene.
+# reverse-stranded library (NEB dUTP): antisense == same strand as the gene  -> -s
+# forward-stranded library:            antisense == opposite strand          -> -S
+if [[ "$LIB_STRAND" == "reverse" ]]; then
+  ANTISENSE_FLAG="-s"
+else
+  ANTISENSE_FLAG="-S"
+fi
 
-# Merge, sort, index
-samtools merge -f "$BAMDIR/${accession}_antisense.unsorted.bam" \
-  "$TMPDIR/${accession}.plus_antisense.bam" \
-  "$TMPDIR/${accession}.minus_antisense.bam"
+# Exons only (no edits to column 9)
+EXONS_GTF="${TMPDIR}/exons.gtf"
+awk '$3=="exon"' "$GTF" > "$EXONS_GTF"
 
-samtools sort -o "$BAMDIR/${accession}_antisense.bam" "$BAMDIR/${accession}_antisense.unsorted.bam"
-rm -f "$BAMDIR/${accession}_antisense.unsorted.bam" \
-      "$TMPDIR/${accession}.plus_antisense.bam" \
-      "$TMPDIR/${accession}.minus_antisense.bam"
+# Extract antisense reads in one pass (no extra FLAG filtering)
+bedtools intersect $ANTISENSE_FLAG -abam "$BAM" -b "$EXONS_GTF" \
+  > "$BAMDIR/${accession}_antisense.unsorted.bam"
+
+samtools sort -o "$BAMDIR/${accession}_antisense.bam" \
+  "$BAMDIR/${accession}_antisense.unsorted.bam"
+rm -f "$BAMDIR/${accession}_antisense.unsorted.bam"
 samtools index "$BAMDIR/${accession}_antisense.bam"
 
-# Skip bigWig generation if antisense BAM has 0 mapped reads (prevents ZeroDivisionError)
+# Antisense CPM & log2(CPM+1) bigWigs (skip gracefully if empty)
 ANTI_BAM="$BAMDIR/${accession}_antisense.bam"
 ANTI_MAPPED=$(samtools view -c -F 4 "$ANTI_BAM" || echo 0)
 if [[ "$ANTI_MAPPED" -eq 0 ]]; then
