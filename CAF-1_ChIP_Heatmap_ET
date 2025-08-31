@@ -550,19 +550,18 @@ module load deepTools
 
 ###CRYPTIC TRANSCRIPTS
 
-# computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 \
-#   -S $OUTDIR3/SRR8269825/SRR8269825.antisense.log2p1.bw \
-#      $OUTDIR3/SRR10916163/SRR10916163.antisense.log2p1.bw \
-#      $OUTDIR3/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139.antisense.log2p1.bw \
-#      $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
-#   -R $BEDDIR2/minus_genes.bed $BEDDIR2/plus_genes.bed --skipZeros -o allGenes_antisense.gz
+computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 \
+  -S $OUTDIR3/SRR8269825/SRR8269825.antisense.log2p1.bw \
+     $OUTDIR3/SRR10916163/SRR10916163.antisense.log2p1.bw \
+     $OUTDIR3/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139.antisense.log2p1.bw \
+     $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
+  -R $BEDDIR2/minus_genes.bed $BEDDIR2/plus_genes.bed --skipZeros --missingDataAsZero -o allGenes_antisense.gz
 
 plotHeatmap -m allGenes_antisense.gz -out allGenes_antisense.pdf \
             --samplesLabel WT set-7 cac-1 cac-1_suz12 \
             --startLabel "TSS" \
             --endLabel "TES" \
             --sortRegions descend \
-            --missingDataAsZero \
             --colorMap "bwr" \
             --zMin 0 --zMax 3
 
