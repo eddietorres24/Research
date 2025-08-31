@@ -564,7 +564,6 @@ plotHeatmap -m minus_genes_antisense.gz -out minus_genes_antisense.pdf \
             --missingDataColor 1 \
             --colorMap "bwr" \
             --zMin 0 \
-            --zMax 2
 
 computeMatrix scale-regions -b 500 -a 500 --regionBodyLength 3000 \
   -S $OUTDIR3/SRR8269825/SRR8269825.reverse.cpm.bw \
@@ -581,7 +580,6 @@ plotHeatmap -m plus_genes_antisense.gz -out plus_genes_antisense.pdf \
             --missingDataColor 1 \
             --colorMap "bwr" \
             --zMin 0 \
-            --zMax 2
 
 
 
