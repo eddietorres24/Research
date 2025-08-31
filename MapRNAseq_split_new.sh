@@ -57,6 +57,17 @@ TMPDIR="${outdir}/tmp/${accession}"
 
 mkdir -p "$TRIMDIR" "$BAMDIR" "$COUNTDIR" "$BWDIR" "$BEDGRAPHDIR" "$BEDDIR" "$TMPDIR"
 
+# Unique STAR tmp dir (avoids collisions) + cleanup on exit
+OUTTMP="${TMPDIR}/STAR_${accession}_${SLURM_JOB_ID:-$$}"
+# If a stale dir with the old name exists, remove it once:
+[ -d "${TMPDIR}/STAR_${accession}" ] && rm -rf "${TMPDIR}/STAR_${accession}"
+# Ensure our tmp exists and is empty
+[ -d "$OUTTMP" ] && rm -rf "$OUTTMP"
+mkdir -p "$OUTTMP"
+
+# Clean even if the job fails or is cancelled
+trap 'rm -rf "$OUTTMP" "$TMPDIR" 2>/dev/null || true' EXIT
+
 ############################
 # FASTQ discovery (supports multiple dirs; mirrors /scratch -> /lustre2)
 ############################
@@ -180,7 +191,7 @@ STAR_COMMON=(
   --outSAMstrandField intronMotif
   --quantMode GeneCounts
   --limitBAMsortRAM 16000000000
-  --outTmpDir "${TMPDIR}/STAR_${accession}"
+  --outTmpDir "$OUTTMP"
 )
 
 if [[ "$MODE" == "PE" ]]; then
