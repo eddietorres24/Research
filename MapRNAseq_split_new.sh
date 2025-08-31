@@ -146,7 +146,7 @@ if [[ "$MODE" == "PE" && "$R1" == "$R2" ]]; then
 fi
 
 ############################
-# Trimming  (COMMENTED OUT ON PURPOSE)
+# Trimming
 ############################
 if [[ "$MODE" == "PE" ]]; then
   echo "[INFO] Trimming PE (SKIPPED)"
@@ -228,33 +228,41 @@ log_transform_bw "${BWDIR}/${accession}.${FSTRAND}.cpm.bw" "${BWDIR}/${accession
 log_transform_bw "${BWDIR}/${accession}.${RSTRAND}.cpm.bw" "${BWDIR}/${accession}.${RSTRAND}.log2p1.bw"
 
 ############################
-# NEW (A): Antisense-only BAM + bigWigs
+# NEW (A): Antisense-only BAM + bigWigs  (FIXED)
 ############################
-# Split exons by strand (no editing of column 9)
+# Split exons by strand (no edit to col 9)
 awk '($3=="exon" && $7=="+")' "$GTF" > "$TMPDIR/exons.plus.gtf"
 awk '($3=="exon" && $7=="-")' "$GTF" > "$TMPDIR/exons.minus.gtf"
 
-# Antisense to + genes = reads on genomic reverse (flag 16)
-bedtools intersect -s -wa -abam "$BAM" -b "$TMPDIR/exons.plus.gtf" \
-  | samtools view -b -f 16 - > "$TMPDIR/${accession}.plus_antisense.bam"
+# Antisense reads = reads overlapping features on the OPPOSITE strand
+# Use -S (opposite) and output BAM directly; no samtools FLAG filtering.
+bedtools intersect -S -abam "$BAM" -b "$TMPDIR/exons.plus.gtf"  > "$TMPDIR/${accession}.plus_antisense.bam"
+bedtools intersect -S -abam "$BAM" -b "$TMPDIR/exons.minus.gtf" > "$TMPDIR/${accession}.minus_antisense.bam"
 
-# Antisense to − genes = reads on genomic forward (NOT flag 16)
-bedtools intersect -s -wa -abam "$BAM" -b "$TMPDIR/exons.minus.gtf" \
-  | samtools view -b -F 16 - > "$TMPDIR/${accession}.minus_antisense.bam"
-
+# Merge, sort, index
 samtools merge -f "$BAMDIR/${accession}_antisense.unsorted.bam" \
   "$TMPDIR/${accession}.plus_antisense.bam" \
   "$TMPDIR/${accession}.minus_antisense.bam"
 
 samtools sort -o "$BAMDIR/${accession}_antisense.bam" "$BAMDIR/${accession}_antisense.unsorted.bam"
-rm -f "$BAMDIR/${accession}_antisense.unsorted.bam" "$TMPDIR/${accession}.plus_antisense.bam" "$TMPDIR/${accession}.minus_antisense.bam"
+rm -f "$BAMDIR/${accession}_antisense.unsorted.bam" \
+      "$TMPDIR/${accession}.plus_antisense.bam" \
+      "$TMPDIR/${accession}.minus_antisense.bam"
 samtools index "$BAMDIR/${accession}_antisense.bam"
 
-# Antisense CPM & log2(CPM+1) bigWigs
-bamCoverage -b "$BAMDIR/${accession}_antisense.bam" \
-  -o "${BWDIR}/${accession}.antisense.cpm.bw" \
-  --normalizeUsing CPM --binSize $BIN -p "$THREADS" --skipNonCoveredRegions
-log_transform_bw "${BWDIR}/${accession}.antisense.cpm.bw" "${BWDIR}/${accession}.antisense.log2p1.bw"
+# Skip bigWig generation gracefully if no mapped reads (prevents ZeroDivisionError)
+ANTI_BAM="$BAMDIR/${accession}_antisense.bam"
+ANTI_MAPPED=$(samtools view -c -F 4 "$ANTI_BAM" || echo 0)
+if [[ "$ANTI_MAPPED" -eq 0 ]]; then
+  echo "[WARN] $ANTI_BAM has 0 mapped reads; skipping antisense bigWig."
+else
+  bamCoverage -b "$ANTI_BAM" \
+    -o "${BWDIR}/${accession}.antisense.cpm.bw" \
+    --normalizeUsing CPM --binSize $BIN -p "$THREADS" --skipNonCoveredRegions
+
+  log_transform_bw "${BWDIR}/${accession}.antisense.cpm.bw" \
+                   "${BWDIR}/${accession}.antisense.log2p1.bw"
+fi
 
 ############################
 # NEW (C): 5′-end CPM bigWigs (forward/reverse)
