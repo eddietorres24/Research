@@ -170,23 +170,23 @@ fi
 ############################
 # STAR alignment
 ############################
-# OUTPFX="${BAMDIR}/${accession}_"
-# STAR_COMMON=(
-#   --runThreadN "$THREADS"
-#   --genomeDir "$STAR_INDEX"
-#   --outFileNamePrefix "$OUTPFX"
-#   --readFilesCommand zcat
-#   --outSAMtype BAM SortedByCoordinate
-#   --twopassMode Basic
-#   --outFilterType BySJout
-#   --alignIntronMax 10000
-#   --outSAMunmapped Within
-#   --outSAMattributes Standard
-#   --outSAMstrandField intronMotif
-#   --quantMode GeneCounts
-#   --limitBAMsortRAM 16000000000
-#   --outTmpDir "$OUTTMP"
-# )
+OUTPFX="${BAMDIR}/${accession}_"
+STAR_COMMON=(
+  --runThreadN "$THREADS"
+  --genomeDir "$STAR_INDEX"
+  --outFileNamePrefix "$OUTPFX"
+  --readFilesCommand zcat
+  --outSAMtype BAM SortedByCoordinate
+  --twopassMode Basic
+  --outFilterType BySJout
+  --alignIntronMax 10000
+  --outSAMunmapped Within
+  --outSAMattributes Standard
+  --outSAMstrandField intronMotif
+  --quantMode GeneCounts
+  --limitBAMsortRAM 16000000000
+  --outTmpDir "$OUTTMP"
+)
 #
 # if [[ "$MODE" == "PE" ]]; then
 #   STAR "${STAR_COMMON[@]}" --readFilesIn "$R1T" "$R2T"
