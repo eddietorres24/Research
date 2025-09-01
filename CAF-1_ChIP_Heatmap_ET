@@ -288,11 +288,11 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 2 \
     -R $BEDDIR2/H3K36me3_no_ash1_noK27.bed --skipZeros -o K36_matrix_PRC2_1.gz
 
     plotHeatmap -m K36_matrix_PRC2_1.gz -out H3K36me3_no_ash1_CAFmutants.pdf \
-                    --samplesLabel WT cac-1 cac-2 set-7 \
+                    --samplesLabel WT cac-1 cac-2 set-7 ash-1 \
                     --startLabel "TSS" \
                     --endLabel "TES" \
                     --sortRegions descend \
-                    --sortUsingSamples 1 2 3 \
+                    --sortUsingSamples 1 2 3 5 \
                     --missingDataColor 1 \
                     --colorMap "afmhot_r" \
                     --heatmapHeight 20 \
