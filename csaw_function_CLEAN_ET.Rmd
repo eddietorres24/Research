@@ -1401,6 +1401,14 @@ gr_wtonly  <- GRanges(WT_not_in_ash1$seqnames, IRanges(WT_not_in_ash1$start + 1,
 
 H3K36me3_no_ash1 <- regions$allgenes[countOverlaps(gr_regions, gr_wtonly) > 0, ]
 
+suppressPackageStartupMessages(library(GenomicRanges))
+
+gr_A <- GRanges(H3K36me3_no_ash1$seqnames, IRanges(H3K36me3_no_ash1$start + 1, H3K36me3_no_ash1$end))  # BED start +1
+gr_B <- GRanges(regions$K27genes$V1,       IRanges(regions$K27genes$V2,       regions$K27genes$V3))     # region coords (1-based)
+
+H3K36me3_no_ash1_NOTin_K27genes <- H3K36me3_no_ash1[countOverlaps(gr_A, gr_B) == 0, ]
+
+write.table(H3K36me3_no_ash1, file = "H3K36me3_no_ash1_noK27.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 ```
 
