@@ -194,8 +194,8 @@ fi
 #   STAR "${STAR_COMMON[@]}" --readFilesIn "$RUT"
 # fi
 #
-# BAM="${OUTPFX}Aligned.sortedByCoord.out.bam"
-# samtools index "$BAM"
+BAM="${OUTPFX}Aligned.sortedByCoord.out.bam"
+samtools index "$BAM"
 
 ############################
 # Stranded bigWigs (CPM + log2(CPM+1))
