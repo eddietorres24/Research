@@ -1380,7 +1380,7 @@ K36_not_lost_bed = subset(K27_genes, ! K27_genes$V10 %in% K36_lost_bed$V10)
 write.table(K36_lost_bed, file = "CAF-1_H3K36me3_lost_K27_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K36_not_lost_bed, file = "CAF-1_H3K36me3_not_lost_K27_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
-#Subset files from bed file function (later in script)
+#Subset files from bed file function (later in script). Here, I am pulling out all genes that dont have H3K36 in ash-1, and that arent in K27 regions
 gr_wt   <- GRanges(H3K36me3_allgenes_vInput_WT_BED$seqnames,
                    IRanges(H3K36me3_allgenes_vInput_WT_BED$start + 1,
                            H3K36me3_allgenes_vInput_WT_BED$end))
@@ -1399,16 +1399,18 @@ H3K36me3_no_ash1 <- regions$allgenes %>%
 gr_regions <- GRanges(regions$allgenes$V1, IRanges(regions$allgenes$V2, regions$allgenes$V3))
 gr_wtonly  <- GRanges(WT_not_in_ash1$seqnames, IRanges(WT_not_in_ash1$start + 1, WT_not_in_ash1$end))
 
+#No ash-1
 H3K36me3_no_ash1 <- regions$allgenes[countOverlaps(gr_regions, gr_wtonly) > 0, ]
 
 suppressPackageStartupMessages(library(GenomicRanges))
 
-gr_A <- GRanges(H3K36me3_no_ash1$seqnames, IRanges(H3K36me3_no_ash1$start + 1, H3K36me3_no_ash1$end))  # BED start +1
+gr_A <- GRanges(H3K36me3_no_ash1$V1, IRanges(H3K36me3_no_ash1$V2 + 1, H3K36me3_no_ash1$V3))  # BED start +1
 gr_B <- GRanges(regions$K27genes$V1,       IRanges(regions$K27genes$V2,       regions$K27genes$V3))     # region coords (1-based)
 
+#No ash-1, no K27
 H3K36me3_no_ash1_NOTin_K27genes <- H3K36me3_no_ash1[countOverlaps(gr_A, gr_B) == 0, ]
 
-write.table(H3K36me3_no_ash1, file = "H3K36me3_no_ash1_noK27.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(H3K36me3_no_ash1_NOTin_K27genes, file = "H3K36me3_no_ash1_noK27.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 ```
 
