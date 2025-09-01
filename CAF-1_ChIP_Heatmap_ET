@@ -552,27 +552,39 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 2 \
 
 ###CRYPTIC TRANSCRIPTS
 
-# computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 \
-#   -S $OUTDIR3/SRR8269825/SRR8269825.antisense.log2p1.bw \
-#      $OUTDIR3/SRR10916163/SRR10916163.antisense.log2p1.bw \
-#      $OUTDIR3/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139.antisense.log2p1.bw \
-#      $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
-#   -R $BEDDIR2/minus_genes.bed $BEDDIR2/plus_genes.bed --skipZeros --missingDataAsZero -o allGenes_antisense.gz
+computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 \
+  -S $OUTDIR3/SRR8269810/SRR8269810.antisense.log2p1.bw \
+     $OUTDIR3/SRR10916163/SRR10916163.antisense.log2p1.bw \
+     $OUTDIR3/SRR8444037/SRR8444037.antisense.log2p1.bw \
+     $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.antisense.log2p1.bw \
+     $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
+  -R $BEDDIR2/minus_genes.bed $BEDDIR2/plus_genes.bed --skipZeros --missingDataAsZero -o allGenes_antisense.gz
 
 computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 \
-  -S $OUTDIR3/SRR8269825/SRR8269825.antisense.log2p1.bw \
+  -S $OUTDIR3/SRR8269810/SRR8269810.antisense.log2p1.bw \
      $OUTDIR3/SRR10916163/SRR10916163.antisense.log2p1.bw \
-     $OUTDIR3/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139.antisense.log2p1.bw \
+     $OUTDIR3/SRR8444037/SRR8444037.antisense.log2p1.bw \
+     $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.antisense.log2p1.bw \
      $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
   -R $BEDDIR2/K27_genes_minus.bed $BEDDIR2/K27_genes_plus.bed --skipZeros --missingDataAsZero -o K27genes_antisense.gz
 
-plotHeatmap -m K27genes_antisense.gz -out K27genes_antisense.pdf \
-            --samplesLabel WT set-7 cac-1 cac-1_suz12 \
+plotHeatmap -m allGenes_antisense.gz -out K27genes_antisense.pdf \
+            --samplesLabel WT set-7 cac-1_old cac-1_new cac-1_suz12 \
             --startLabel "TSS" \
             --endLabel "TES" \
             --sortRegions descend \
             --colorMap "bwr" \
-            --zMin 0 --zMax 3
+            --heatmapHeight 20 \
+            --zMin 0 --zMax 2
+
+plotHeatmap -m allGenes_antisense.gz -out K27genes_antisense.pdf \
+            --samplesLabel WT set-7 cac-1_old cac-1_new cac-1_suz12 \
+            --startLabel "TSS" \
+            --endLabel "TES" \
+            --sortRegions descend \
+            --colorMap "bwr" \
+            --heatmapHeight 20 \
+            --zMin 0 --zMax 2
 
 # computeMatrix scale-regions -b 500 -a 500 --regionBodyLength 3000 \
 #   -S $OUTDIR3/SRR8269825/SRR8269825.forward.cpm.bw \
