@@ -101,6 +101,10 @@
 # bedtools intersect -a cac-3_ectopic_K4_genes.bed -b K27_genes_stringent.bed -wa > cac-3_ectopic_K4_genes_K27_regions.bed
 # bedtools intersect -a set-7_ectopic_K4_genes.bed -b K27_genes_stringent.bed -wa > set-7_ectopic_K4_genes_K27_regions.bed
 
+#K27 genes + & -
+bedtools intersect -a plus_genes.bed -b K27_genes_stringent.bed -wa > K27_genes_plus.bed
+bedtools intersect -a minus_genes.bed -b K27_genes_stringent.bed -wa > K27_genes_minus.bed
+
 #Combining all overlapping peaks & merging
 # CAF-1
 # bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \
