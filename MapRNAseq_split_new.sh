@@ -151,7 +151,7 @@ if [[ "$MODE" == "PE" && "$R1" == "$R2" ]]; then
 fi
 
 ############################
-# Trimming (SKIPPED)
+# Trimming
 ############################
 if [[ "$MODE" == "PE" ]]; then
   echo "[INFO] Trimming PE (SKIPPED)"
@@ -170,32 +170,32 @@ fi
 ############################
 # STAR alignment
 ############################
-OUTPFX="${BAMDIR}/${accession}_"
-STAR_COMMON=(
-  --runThreadN "$THREADS"
-  --genomeDir "$STAR_INDEX"
-  --outFileNamePrefix "$OUTPFX"
-  --readFilesCommand zcat
-  --outSAMtype BAM SortedByCoordinate
-  --twopassMode Basic
-  --outFilterType BySJout
-  --alignIntronMax 10000
-  --outSAMunmapped Within
-  --outSAMattributes Standard
-  --outSAMstrandField intronMotif
-  --quantMode GeneCounts
-  --limitBAMsortRAM 16000000000
-  --outTmpDir "$OUTTMP"
-)
-
-if [[ "$MODE" == "PE" ]]; then
-  STAR "${STAR_COMMON[@]}" --readFilesIn "$R1T" "$R2T"
-else
-  STAR "${STAR_COMMON[@]}" --readFilesIn "$RUT"
-fi
-
-BAM="${OUTPFX}Aligned.sortedByCoord.out.bam"
-samtools index "$BAM"
+# OUTPFX="${BAMDIR}/${accession}_"
+# STAR_COMMON=(
+#   --runThreadN "$THREADS"
+#   --genomeDir "$STAR_INDEX"
+#   --outFileNamePrefix "$OUTPFX"
+#   --readFilesCommand zcat
+#   --outSAMtype BAM SortedByCoordinate
+#   --twopassMode Basic
+#   --outFilterType BySJout
+#   --alignIntronMax 10000
+#   --outSAMunmapped Within
+#   --outSAMattributes Standard
+#   --outSAMstrandField intronMotif
+#   --quantMode GeneCounts
+#   --limitBAMsortRAM 16000000000
+#   --outTmpDir "$OUTTMP"
+# )
+#
+# if [[ "$MODE" == "PE" ]]; then
+#   STAR "${STAR_COMMON[@]}" --readFilesIn "$R1T" "$R2T"
+# else
+#   STAR "${STAR_COMMON[@]}" --readFilesIn "$RUT"
+# fi
+#
+# BAM="${OUTPFX}Aligned.sortedByCoord.out.bam"
+# samtools index "$BAM"
 
 ############################
 # Stranded bigWigs (CPM + log2(CPM+1))
@@ -233,41 +233,86 @@ log_transform_bw "${BWDIR}/${accession}.${FSTRAND}.cpm.bw" "${BWDIR}/${accession
 log_transform_bw "${BWDIR}/${accession}.${RSTRAND}.cpm.bw" "${BWDIR}/${accession}.${RSTRAND}.log2p1.bw"
 
 ############################
-# NEW (A): Antisense-only BAM + bigWigs  (CORRECTED)
+# NEW (A): Antisense-only BAM + bigWigs  (paired-end correct)
 ############################
 
-# Choose the correct bedtools strand operator for *antisense* relative to the gene.
-# reverse-stranded library (NEB dUTP): antisense == same strand as the gene  -> -s
-# forward-stranded library:            antisense == opposite strand          -> -S
-if [[ "$LIB_STRAND" == "reverse" ]]; then
-  ANTISENSE_FLAG="-s"
+# Split exons by strand (no edits to col 9)
+EXONS_PLUS="${TMPDIR}/exons.plus.gtf"
+EXONS_MINUS="${TMPDIR}/exons.minus.gtf"
+awk '$3=="exon" && $7=="+"' "$GTF" > "$EXONS_PLUS"
+awk '$3=="exon" && $7=="-"' "$GTF" > "$EXONS_MINUS"
+
+# Detect if BAM is paired-end
+IS_PAIRED=$(samtools view -c -f 1 "$BAM" || echo 0)
+
+if [[ "$IS_PAIRED" -gt 0 ]]; then
+  # ---- Paired-end, reverse-stranded (dUTP) assumed unless you set LIB_STRAND="forward" ----
+  # For reverse libraries:
+  #   antisense to + genes: R1 '+'  OR R2 '-'
+  #   antisense to - genes: R1 '-'  OR R2 '+'
+  # For forward libraries, swap the +/- in the four filters below.
+
+  if [[ "$LIB_STRAND" == "reverse" ]]; then
+    # Intersect once per strand
+    bedtools intersect -wa -abam "$BAM" -b "$EXONS_PLUS"  > "${TMPDIR}/${accession}.plus.all.bam"
+    bedtools intersect -wa -abam "$BAM" -b "$EXONS_MINUS" > "${TMPDIR}/${accession}.minus.all.bam"
+
+    # + genes: R1 forward (same as '+')  OR  R2 reverse (opposite of '+')
+    samtools view -b -f 64 -F 16  "${TMPDIR}/${accession}.plus.all.bam"  > "${TMPDIR}/${accession}.plus.R1_same.bam"
+    samtools view -b -f 128 -f 16 "${TMPDIR}/${accession}.plus.all.bam"  > "${TMPDIR}/${accession}.plus.R2_opp.bam"
+
+    # - genes: R1 reverse (same as '-')  OR  R2 forward (opposite of '-')
+    samtools view -b -f 64  -f 16 "${TMPDIR}/${accession}.minus.all.bam" > "${TMPDIR}/${accession}.minus.R1_same.bam"
+    samtools view -b -f 128 -F 16 "${TMPDIR}/${accession}.minus.all.bam" > "${TMPDIR}/${accession}.minus.R2_opp.bam"
+
+  else
+    # ---- Forward-stranded library: invert the four selections ----
+    bedtools intersect -wa -abam "$BAM" -b "$EXONS_PLUS"  > "${TMPDIR}/${accession}.plus.all.bam"
+    bedtools intersect -wa -abam "$BAM" -b "$EXONS_MINUS" > "${TMPDIR}/${accession}.minus.all.bam"
+
+    # + genes: R1 reverse (antisense) OR R2 forward (antisense)
+    samtools view -b -f 64 -f 16  "${TMPDIR}/${accession}.plus.all.bam"  > "${TMPDIR}/${accession}.plus.R1_same.bam"
+    samtools view -b -f 128 -F 16 "${TMPDIR}/${accession}.plus.all.bam"  > "${TMPDIR}/${accession}.plus.R2_opp.bam"
+
+    # - genes: R1 forward (antisense) OR R2 reverse (antisense)
+    samtools view -b -f 64  -F 16 "${TMPDIR}/${accession}.minus.all.bam" > "${TMPDIR}/${accession}.minus.R1_same.bam"
+    samtools view -b -f 128 -f 16 "${TMPDIR}/${accession}.minus.all.bam" > "${TMPDIR}/${accession}.minus.R2_opp.bam"
+  fi
+
+  # Merge antisense pieces
+  samtools merge -f "$BAMDIR/${accession}_antisense.unsorted.bam" \
+    "${TMPDIR}/${accession}.plus.R1_same.bam" \
+    "${TMPDIR}/${accession}.plus.R2_opp.bam" \
+    "${TMPDIR}/${accession}.minus.R1_same.bam" \
+    "${TMPDIR}/${accession}.minus.R2_opp.bam"
+
+  # Cleanup chunk BAMs
+  rm -f "${TMPDIR}/${accession}.plus."*.bam "${TMPDIR}/${accession}.minus."*.bam \
+        "${TMPDIR}/${accession}.plus.all.bam" "${TMPDIR}/${accession}.minus.all.bam"
+
 else
-  ANTISENSE_FLAG="-S"
+  # ---- Single-end fallback ----
+  # reverse-stranded: antisense == same strand as gene (-s)
+  # forward-stranded: antisense == opposite strand (-S)
+  ANTISENSE_FLAG="-s"; [[ "$LIB_STRAND" == "forward" ]] && ANTISENSE_FLAG="-S"
+
+  bedtools intersect $ANTISENSE_FLAG -abam "$BAM" -b "$GTF" \
+    > "$BAMDIR/${accession}_antisense.unsorted.bam"
 fi
 
-# Exons only (no edits to column 9)
-EXONS_GTF="${TMPDIR}/exons.gtf"
-awk '$3=="exon"' "$GTF" > "$EXONS_GTF"
-
-# Extract antisense reads in one pass (no extra FLAG filtering)
-bedtools intersect $ANTISENSE_FLAG -abam "$BAM" -b "$EXONS_GTF" \
-  > "$BAMDIR/${accession}_antisense.unsorted.bam"
-
-samtools sort -o "$BAMDIR/${accession}_antisense.bam" \
-  "$BAMDIR/${accession}_antisense.unsorted.bam"
+# Sort/index final antisense BAM
+samtools sort -o "$BAMDIR/${accession}_antisense.bam" "$BAMDIR/${accession}_antisense.unsorted.bam"
 rm -f "$BAMDIR/${accession}_antisense.unsorted.bam"
 samtools index "$BAMDIR/${accession}_antisense.bam"
 
-# Antisense CPM & log2(CPM+1) bigWigs (skip gracefully if empty)
+# Create CPM & log2(CPM+1) bigWigs if there are mapped reads
 ANTI_BAM="$BAMDIR/${accession}_antisense.bam"
 ANTI_MAPPED=$(samtools view -c -F 4 "$ANTI_BAM" || echo 0)
 if [[ "$ANTI_MAPPED" -eq 0 ]]; then
   echo "[WARN] $ANTI_BAM has 0 mapped reads; skipping antisense bigWig."
 else
-  bamCoverage -b "$ANTI_BAM" \
-    -o "${BWDIR}/${accession}.antisense.cpm.bw" \
+  bamCoverage -b "$ANTI_BAM" -o "${BWDIR}/${accession}.antisense.cpm.bw" \
     --normalizeUsing CPM --binSize $BIN -p "$THREADS" --skipNonCoveredRegions
-
   log_transform_bw "${BWDIR}/${accession}.antisense.cpm.bw" \
                    "${BWDIR}/${accession}.antisense.log2p1.bw"
 fi
