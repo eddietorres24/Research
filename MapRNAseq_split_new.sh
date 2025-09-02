@@ -187,13 +187,13 @@ STAR_COMMON=(
   --limitBAMsortRAM 16000000000
   --outTmpDir "$OUTTMP"
 )
-#
+
 if [[ "$MODE" == "PE" ]]; then
   STAR "${STAR_COMMON[@]}" --readFilesIn "$R1T" "$R2T"
 else
   STAR "${STAR_COMMON[@]}" --readFilesIn "$RUT"
 fi
-#
+
 BAM="${OUTPFX}Aligned.sortedByCoord.out.bam"
 samtools index "$BAM"
 
