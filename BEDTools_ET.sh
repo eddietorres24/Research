@@ -105,6 +105,13 @@
 bedtools intersect -a plus_genes.bed -b K27_genes_stringent.bed -wa > K27_genes_plus.bed
 bedtools intersect -a minus_genes.bed -b K27_genes_stringent.bed -wa > K27_genes_minus.bed
 
+bedtools intersect -a plus_genes.bed -b minus_genes.bed -wa > plus_overlap.bed
+bedtools intersect -a minus_genes.bed -b plus_genes.bed -wa > minus_overlap.bed
+
+bedtools intersect -a plus_genes.bed -b minus_genes.bed -wa -u > plus_overlap.bed
+bedtools intersect -a minus_genes.bed -b plus_genes.bed  -wa -u > minus_overlap.bed
+cat plus_overlap.bed minus_overlap.bed | sort -k1,1 -k2,2n -k3,3n -u > overlapping_genes.bed
+
 #Combining all overlapping peaks & merging
 # CAF-1
 # bedtools multiinter -header -i ${OUTDIR3}/2024_04_23_WT_peaks.bed \

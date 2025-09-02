@@ -568,24 +568,26 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 2 \
 #      $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
 #   -R $BEDDIR2/K27_genes_minus.bed $BEDDIR2/K27_genes_plus.bed --skipZeros --missingDataAsZero -o K27genes_antisense.gz
 
-# plotHeatmap -m allGenes_antisense.gz -out allgenes_antisense.pdf \
-#             --samplesLabel WT_old WT_new set-7 cac-1_old cac-1_new cac-1_suz12 \
-#             --startLabel "TSS" \
-#             --endLabel "TES" \
-#             --sortRegions descend \
-#             --colorMap "bwr" \
-#             --heatmapHeight 20 \
-#             --zMin 0 --zMax 2
+plotHeatmap -m allGenes_antisense.gz -out allgenes_antisense.pdf \
+            --samplesLabel WT_old WT_new set-7 cac-1_old cac-1_new cac-1_suz12 \
+            --startLabel "TSS" \
+            --endLabel "TES" \
+            --sortRegions descend \
+            --colorMap "bwr" \
+            --outFileSortedRegions allgene.bed \
+            --heatmapHeight 20 \
+            --zMin 0 --zMax 2
 
-# plotHeatmap -m K27genes_antisense.gz -out K27genes_antisense.pdf \
-#             --samplesLabel WT_new set-7 cac-1_new cac-1_suz12 \
-#             --startLabel "TSS" \
-#             --endLabel "TES" \
-#             --sortRegions descend \
-#             --colorMap "bwr" \
-#             --legendLocation none \
-#             --heatmapHeight 20 \
-#             --zMin 0 --zMax 4
+plotHeatmap -m K27genes_antisense.gz -out K27genes_antisense.pdf \
+            --samplesLabel WT_new set-7 cac-1_new cac-1_suz12 \
+            --startLabel "TSS" \
+            --endLabel "TES" \
+            --sortRegions descend \
+            --colorMap "bwr" \
+            --legendLocation none \
+            --outFileSortedRegions k27gene.bed \
+            --heatmapHeight 20 \
+            --zMin 0 --zMax 4
 
 #5' sites
 computeMatrix scale-regions -b 1000 -a 1000 --regionBodyLength 4000 \
