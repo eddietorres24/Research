@@ -584,24 +584,24 @@ module load deepTools
        $OUTDIR3/SRR5177521/SRR5177521.antisense.log2p1.bw \
     -R $BEDDIR2/K27_genes_minus.bed $BEDDIR2/K27_genes_plus.bed --skipZeros --missingDataAsZero -o K27genes_antisense_TES.gz
 
-# plotHeatmap -m allGenes_antisense.gz -out allgenes_dev_antisense.pdf \
-#             --samplesLabel WT cac-1 cac-1_suz12 3_dpf 6_dpf \
-#             --startLabel "TSS" \
-#             --endLabel "TES" \
-#             --sortRegions descend \
-#             --colorMap "bwr" \
-#             --heatmapHeight 20 \
-#             --zMin 0 --zMax 3
-#
-# plotHeatmap -m K27genes_antisense.gz -out K27genes_dev_antisense.pdf \
-#             --samplesLabel WT cac-1 cac-1_suz12 3_dpf 6_dpf \
-#             --startLabel "TSS" \
-#             --endLabel "TES" \
-#             --sortRegions descend \
-#             --colorMap "bwr" \
-#             --legendLocation none \
-#             --heatmapHeight 20 \
-#             --zMin 0 --zMax 4
+plotHeatmap -m allGenes_antisense.gz -out allgenes_dev_antisense.pdf \
+            --samplesLabel WT cac-1 cac-1_suz12 3_dpf 6_dpf \
+            --startLabel "TSS" \
+            --endLabel "TES" \
+            --sortRegions descend \
+            --colorMap "bwr" \
+            --heatmapHeight 20 \
+            --zMin 0 --zMax 3
+
+plotHeatmap -m K27genes_antisense.gz -out K27genes_dev_antisense.pdf \
+            --samplesLabel WT cac-1 cac-1_suz12 3_dpf 6_dpf \
+            --startLabel "TSS" \
+            --endLabel "TES" \
+            --sortRegions descend \
+            --colorMap "bwr" \
+            --legendLocation none \
+            --heatmapHeight 20 \
+            --zMin 0 --zMax 3
 
 plotHeatmap -m allGenes_antisense_TES.gz -out allgenes_dev_antisense_TES.pdf \
             --samplesLabel WT cac-1 cac-1_suz12 3_dpf 6_dpf \
@@ -620,7 +620,7 @@ plotHeatmap -m K27genes_antisense_TES.gz -out K27genes_dev_antisense_TES.pdf \
             --colorMap "bwr" \
             --legendLocation none \
             --heatmapHeight 20 \
-            --zMin 0 --zMax 4
+            --zMin 0 --zMax 3
 
 #5' sites
 # computeMatrix scale-regions -b 1000 -a 1000 --regionBodyLength 4000 \
