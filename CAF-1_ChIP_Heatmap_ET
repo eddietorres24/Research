@@ -552,23 +552,23 @@ module load deepTools
 
 ###CRYPTIC TRANSCRIPTS
 
-computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 \
-  -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.antisense.log2p1.bw \
-     $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.antisense.log2p1.bw \
-     $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
-     $OUTDIR3/SRR5177527/SRR5177527.antisense.log2p1.bw \
-     $OUTDIR3/SRR5177521/SRR5177521.antisense.log2p1.bw \
-  -R $BEDDIR2/minus_genes.bed $BEDDIR2/plus_genes.bed --skipZeros --missingDataAsZero -o allGenes_antisense.gz
+# computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 \
+#   -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.antisense.log2p1.bw \
+#      $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.antisense.log2p1.bw \
+#      $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
+#      $OUTDIR3/SRR5177527/SRR5177527.antisense.log2p1.bw \
+#      $OUTDIR3/SRR5177521/SRR5177521.antisense.log2p1.bw \
+#   -R $BEDDIR2/minus_genes.bed $BEDDIR2/plus_genes.bed --skipZeros --missingDataAsZero -o allGenes_antisense.gz
+#
+# computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 --scale 2 \
+#   -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.antisense.log2p1.bw \
+#      $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.antisense.log2p1.bw \
+#      $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
+#      $OUTDIR3/SRR5177527/SRR5177527.antisense.log2p1.bw \
+#      $OUTDIR3/SRR5177521/SRR5177521.antisense.log2p1.bw \
+#   -R $BEDDIR2/K27_genes_minus.bed $BEDDIR2/K27_genes_plus.bed --skipZeros --missingDataAsZero -o K27genes_antisense.gz
 
-computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 --scale 2 \
-  -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.antisense.log2p1.bw \
-     $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.antisense.log2p1.bw \
-     $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
-     $OUTDIR3/SRR5177527/SRR5177527.antisense.log2p1.bw \
-     $OUTDIR3/SRR5177521/SRR5177521.antisense.log2p1.bw \
-  -R $BEDDIR2/K27_genes_minus.bed $BEDDIR2/K27_genes_plus.bed --skipZeros --missingDataAsZero -o K27genes_antisense.gz
-
-  computeMatrix reference-point --referencePoint TSS -a 3000 -b 1500 \
+  computeMatrix reference-point --referencePoint TES -a 1500 -b 1500 \
     -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.antisense.log2p1.bw \
        $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.antisense.log2p1.bw \
        $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
@@ -576,7 +576,7 @@ computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 --scale 2 \
        $OUTDIR3/SRR5177521/SRR5177521.antisense.log2p1.bw \
     -R $BEDDIR2/minus_genes.bed $BEDDIR2/plus_genes.bed --skipZeros --missingDataAsZero -o allGenes_antisense_TES.gz
 
-  computeMatrix reference-point --referencePoint TSS -a 3000 -b 1500 --scale 2 \
+  computeMatrix reference-point --referencePoint TES -a 1500 -b 1500 --scale 2 \
     -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.antisense.log2p1.bw \
        $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.antisense.log2p1.bw \
        $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
@@ -584,24 +584,24 @@ computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 --scale 2 \
        $OUTDIR3/SRR5177521/SRR5177521.antisense.log2p1.bw \
     -R $BEDDIR2/K27_genes_minus.bed $BEDDIR2/K27_genes_plus.bed --skipZeros --missingDataAsZero -o K27genes_antisense_TES.gz
 
-plotHeatmap -m allGenes_antisense.gz -out allgenes_dev_antisense.pdf \
-            --samplesLabel WT cac-1 cac-1_suz12 3_dpf 6_dpf \
-            --startLabel "TSS" \
-            --endLabel "TES" \
-            --sortRegions descend \
-            --colorMap "bwr" \
-            --heatmapHeight 20 \
-            --zMin 0 --zMax 3
-
-plotHeatmap -m K27genes_antisense.gz -out K27genes_dev_antisense.pdf \
-            --samplesLabel WT cac-1 cac-1_suz12 3_dpf 6_dpf \
-            --startLabel "TSS" \
-            --endLabel "TES" \
-            --sortRegions descend \
-            --colorMap "bwr" \
-            --legendLocation none \
-            --heatmapHeight 20 \
-            --zMin 0 --zMax 4
+# plotHeatmap -m allGenes_antisense.gz -out allgenes_dev_antisense.pdf \
+#             --samplesLabel WT cac-1 cac-1_suz12 3_dpf 6_dpf \
+#             --startLabel "TSS" \
+#             --endLabel "TES" \
+#             --sortRegions descend \
+#             --colorMap "bwr" \
+#             --heatmapHeight 20 \
+#             --zMin 0 --zMax 3
+#
+# plotHeatmap -m K27genes_antisense.gz -out K27genes_dev_antisense.pdf \
+#             --samplesLabel WT cac-1 cac-1_suz12 3_dpf 6_dpf \
+#             --startLabel "TSS" \
+#             --endLabel "TES" \
+#             --sortRegions descend \
+#             --colorMap "bwr" \
+#             --legendLocation none \
+#             --heatmapHeight 20 \
+#             --zMin 0 --zMax 4
 
 plotHeatmap -m allGenes_antisense_TES.gz -out allgenes_dev_antisense_TES.pdf \
             --samplesLabel WT cac-1 cac-1_suz12 3_dpf 6_dpf \
