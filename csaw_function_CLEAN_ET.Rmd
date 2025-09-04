@@ -373,6 +373,7 @@ qc_csaw <- function(
 
   # --- deps ---
   require(edgeR)
+  require(limma)     # <-- add this
   require(ggplot2)
 
   # --- helpers ---
@@ -429,16 +430,18 @@ qc_csaw <- function(
               ylab = "Library size (millions)", main = paste("Library sizes -", label))
     })
 
-    # MDS plot
+    # MDS plot (force limma’s method for DGEList)
     mdsfile <- file.path(subdir, "MDS_plot.png")
     png_wrap(mdsfile, {
-      plotMDS(dge, main = paste("MDS plot -", label))
+      limma::plotMDS(dge, main = paste("MDS plot -", label))  # <-- changed
+      # if you *still* get grief from masking, this is a belt-and-suspenders option:
+      # limma::plotMDS(edgeR::cpm(dge, log=TRUE, prior.count=2), main = paste("MDS plot -", label))
     })
 
     # BCV plot
     bcvfile <- file.path(subdir, "BCV_plot.png")
     png_wrap(bcvfile, {
-      plotBCV(disp, main = paste("BCV plot -", label))
+      edgeR::plotBCV(disp, main = paste("BCV plot -", label))
     })
 
     # Mean–variance plot (custom, log2 CPM)
@@ -456,7 +459,7 @@ qc_csaw <- function(
     # QL dispersion plot
     qldfile <- file.path(subdir, "QL_dispersion_plot.png")
     png_wrap(qldfile, {
-      plotQLDisp(fit, main = paste("QL dispersion -", label))
+      edgeR::plotQLDisp(fit, main = paste("QL dispersion -", label))
     })
   }
 
@@ -483,9 +486,10 @@ qc_csaw(
   metadata_df = meta,
   out_obj = NULL, # autodiscover from global env, Use "count_results" if variables not in global
   mode = "region", # "region" or "window" depending on choice in count fxn.
-  out_dir = "K27_gene_&_prom_QC", #output directory, name whatever you want
-  which_sets = "both" # "genomewide", "regions", or "both"
+  out_dir = "QCTEST", #output directory, name whatever you want
+  which_sets = "regions" # "genomewide", "regions", or "both"
 )
+
 ```
 ###########################################################################################
 
@@ -884,8 +888,8 @@ csaw_analysis(
   mode        = "region",             # "window" or "region"
   out_obj     = count_results,        # <- REQUIRED so we have counts for merging/coords
   reference_strain = "WT",
-  fdr_cutoff  = 0.05,
-  pvalue_cutoff = 0.05, 
+  fdr_cutoff  = 0.1,
+  pvalue_cutoff = 0.1, 
   write_csv_results = TRUE,
   write_csv_heatmap = TRUE,
   write_igv   = TRUE,
@@ -1307,7 +1311,7 @@ make_csaw_heatmap_advanced(
   cluster_rows = FALSE,
   cluster_cols = FALSE,
   show_row_names = FALSE,
-  out_stem = "H3K36me3_K27genes_proms_vInput_heatmap"
+  out_stem = "TEST"
 )
 
 # define the rule set: one bucket for absent in cac1 OR cac2
@@ -1331,21 +1335,21 @@ res <- make_csaw_heatmap_advanced(
   debug_bucket = "absent_cac1_or_cac2"
 )
 
-# TEMPLATE: full call with all params set to their defaults and commented.
+####
 
 res <- make_csaw_heatmap_advanced(
   df = H3K36me3_Heatmap_K27promTSS_vWT,
-  select_cols = c("cac1","cac2","set7"),
+  select_cols = c("cac1","cac2","cac3","set7"),
   global_filter = NULL,              # <- keep ALL rows
-  cap_percentile = 0.98,
+  cap_percentile = 0.995,
   color_limits = c(-2, 2),
   colors = c("blue","white","red"),
   zero_white_band = 0.5,
   cluster_rows = FALSE,
   cluster_cols = FALSE,
-  global_order_by = c("cac1","cac2"),
+  global_order_by = c("cac1","cac2", "cac3"),
   out_dir = "csaw_heatmaps",
-  out_stem = "H3K36me3_promTSS_vWT",
+  out_stem = "TEST2",
   formats = c("pdf","png"),
   width_in = 6.5,
   base_height_in = 1.5,
@@ -1353,64 +1357,6 @@ res <- make_csaw_heatmap_advanced(
   dpi = 300,
   return_objects = TRUE
 )
-
-```
-
-```{r, Processing Dataframes}
-#Use these template commands for processing dataframes to create csvs, bed files, etc. for downstream analysis or use outisde of R
-
-#reassign gene names to data frame of interest using dplyr. This is useful if you are wanting to extract out a list of genes of interest (like genes that lose K27me3 in a mutant). 
-library(dplyr)
-
-H3K36me3_Results_K27promTSS_vWT <- H3K36me3_Results_K27promTSS_vWT %>%
-  left_join(
-    regions$K27promTSS %>% select(V1, V2, V3, V10), #you may have to change the column names 
-    by = c("seqnames" = "V1", "start" = "V2", "end" = "V3")
-  )
-
-#subset your original bed file for genes/regions of interest. For example, here, I will subset my promoter-TSS bed to only include genes that lose H3K36me3 in cac-1 or cac-2
-
-##isolate genes of interest
-CAF1_K36_lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.75)
-
-##subset the bed
-K36_lost_bed = subset(K27_genes, K27_genes$V10 %in% CAF1_K36_lost$V10)
-K36_not_lost_bed = subset(K27_genes, ! K27_genes$V10 %in% K36_lost_bed$V10)
-
-write.table(K36_lost_bed, file = "CAF-1_H3K36me3_lost_K27_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
-write.table(K36_not_lost_bed, file = "CAF-1_H3K36me3_not_lost_K27_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
-
-#Subset files from bed file function (later in script). Here, I am pulling out all genes that dont have H3K36 in ash-1, and that arent in K27 regions
-gr_wt   <- GRanges(H3K36me3_allgenes_vInput_WT_BED$seqnames,
-                   IRanges(H3K36me3_allgenes_vInput_WT_BED$start + 1,
-                           H3K36me3_allgenes_vInput_WT_BED$end))
-gr_ash1 <- GRanges(H3K36me3_allgenes_vInput_ash1_BED$seqnames,
-                   IRanges(H3K36me3_allgenes_vInput_ash1_BED$start + 1,
-                           H3K36me3_allgenes_vInput_ash1_BED$end))
-
-WT_not_in_ash1 <- H3K36me3_allgenes_vInput_WT_BED[countOverlaps(gr_wt, gr_ash1) == 0, ]
-
-H3K36me3_no_ash1 <- regions$allgenes %>%
-  left_join(
-    WT_not_in_ash1, #you may have to change the column names 
-    by = c("V1" = "seqnames", "V2" = "start", "V3" ="end")
-  )
-
-gr_regions <- GRanges(regions$allgenes$V1, IRanges(regions$allgenes$V2, regions$allgenes$V3))
-gr_wtonly  <- GRanges(WT_not_in_ash1$seqnames, IRanges(WT_not_in_ash1$start + 1, WT_not_in_ash1$end))
-
-#No ash-1
-H3K36me3_no_ash1 <- regions$allgenes[countOverlaps(gr_regions, gr_wtonly) > 0, ]
-
-suppressPackageStartupMessages(library(GenomicRanges))
-
-gr_A <- GRanges(H3K36me3_no_ash1$V1, IRanges(H3K36me3_no_ash1$V2 + 1, H3K36me3_no_ash1$V3))  # BED start +1
-gr_B <- GRanges(regions$K27genes$V1,       IRanges(regions$K27genes$V2,       regions$K27genes$V3))     # region coords (1-based)
-
-#No ash-1, no K27
-H3K36me3_no_ash1_NOTin_K27genes <- H3K36me3_no_ash1[countOverlaps(gr_A, gr_B) == 0, ]
-
-write.table(H3K36me3_no_ash1_NOTin_K27genes, file = "H3K36me3_no_ash1_noK27.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 ```
 
@@ -1960,31 +1906,40 @@ View(out$data)
 # - REGION mode: no window merging and no min-width filter (keeps your predefined regions)
 
 suppressPackageStartupMessages({
-  library(GenomicRanges)
-  library(IRanges)
+  requireNamespace("GenomicRanges", quietly = TRUE)
+  requireNamespace("IRanges",        quietly = TRUE)
 })
 
 heatmap_to_bed_peaks <- function(
   hm_df,
   out_dir,
-  prefix            = "peaks",
+  prefix,
   mode              = c("window","region"),
   direction         = c("positive","nonzero","negative"),
-  min_value         = 0,        # threshold on logFC for direction check
-  merge_windows     = TRUE,     # only used in mode="window"; ignored in "region"
-  max_gap_bp        = 0,        # merge windows when gaps between them <= this many bp
-  min_width_bp      = 0,        # drop merged blocks narrower than this (mode="window")
-  zero_based        = TRUE,     # BED = 0-based start by convention
-  write_empty_files = FALSE,    # write empty BEDs for strains with no peaks
-  create_dataframes = FALSE,    # <-- NEW: also create <prefix>_<strain>_BED objects
-  dataframes_env    = .GlobalEnv, # <-- NEW: where to create them
-  object_suffix     = "_BED"      # <-- NEW: appended to object name
-) {
-  if (!requireNamespace("GenomicRanges", quietly = TRUE) ||
-      !requireNamespace("IRanges", quietly = TRUE)) {
-    stop("Packages 'GenomicRanges' and 'IRanges' are required.")
-  }
+  min_value         = 0,
+  merge_windows     = TRUE,              # (window mode only)
+  max_gap_bp        = 0,                 # merge gaps <= this (window mode)
+  min_width_bp      = 0,                 # drop merged blocks < this (window mode)
+  zero_based        = TRUE,              # BED writing: 0-based starts
+  write_empty_files = FALSE,
+  create_dataframes = TRUE,              # create *_BED objects in .GlobalEnv
 
+  # ---- Restore original gene-matching logic ----
+  # The region set used to build hm_df (e.g., regions$K27promTSS), with coords & gene IDs.
+  source_regions_df        = NULL,       # REQUIRED if promote_to_full_genes=TRUE
+  source_key_cols          = c("V1","V2","V3"),  # chr,start,end in source_regions_df
+  source_gene_col          = "V10",      # gene ID in source_regions_df
+
+  # Promote to full genes by subsetting this "universe" (e.g., regions$allgenes) via gene IDs
+  promote_to_full_genes    = FALSE,
+  universe_df              = NULL,       # REQUIRED if promote_to_full_genes=TRUE
+  universe_gene_col        = "V10",      # gene ID column in universe_df
+  universe_label           = "genes",
+  universe_is_zero_based   = FALSE,      # how universe_df coords are stored
+
+  # Optional string to append in filenames (e.g., "vInput" or "vWT")
+  file_norm_tag            = NULL
+) {
   mode      <- match.arg(mode)
   direction <- match.arg(direction)
 
@@ -1995,7 +1950,7 @@ heatmap_to_bed_peaks <- function(
   if (is.null(rn) || anyNA(rn))
     stop("hm_df must have non-NA rownames like 'chr.start.end'.")
 
-  # Parse rownames: last two dot fields are start/end (chr can contain dots)
+  # Parse rownames robustly: take last two dot fields as start/end (chr can contain dots)
   m  <- regexec("^(.+)\\.([0-9]+)\\.([0-9]+)$", rn)
   mm <- regmatches(rn, m)
   bad <- vapply(mm, length, integer(1L)) != 4L
@@ -2006,36 +1961,64 @@ heatmap_to_bed_peaks <- function(
   chr   <- vapply(mm, `[`, "", 2L)
   start <- as.integer(vapply(mm, `[`, "", 3L))
   end   <- as.integer(vapply(mm, `[`, "", 4L))
-  if (any(!is.finite(start)) || any(!is.finite(end)))
-    stop("Non-finite starts/ends after parsing rownames.")
 
   base_gr <- GenomicRanges::GRanges(
     seqnames = chr,
     ranges   = IRanges::IRanges(start = start, end = end)
   )
 
-  # Identify logFC columns
+  # logFC columns per strain
   lfc_cols <- grep("^logFC_", colnames(hm_df), value = TRUE)
   if (!length(lfc_cols))
     stop("No columns named like 'logFC_*' found in hm_df.")
 
   if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
-  out_list <- stats::setNames(vector("list", length(lfc_cols)),
-                              sub("^logFC_", "", lfc_cols))
-
-  # helper to optionally create an in-memory data.frame per strain
-  .maybe_assign_df <- function(df, nm) {
-    if (isTRUE(create_dataframes)) {
-      assign(nm, df, envir = dataframes_env)
-    }
+  # Helper to build the file/variable stem
+  .stem <- function(strain, is_universe = FALSE) {
+    cut_tag <- if (!is.null(min_value) && !isTRUE(is.na(min_value)) && min_value != 0)
+      paste0("_log2FC_", as.character(min_value)) else ""
+    norm_tag <- if (!is.null(file_norm_tag) && nzchar(file_norm_tag))
+      paste0("_", file_norm_tag) else ""
+    suffix <- if (is_universe) paste0("_", universe_label) else ""
+    paste0(prefix, cut_tag, norm_tag, "_", strain, suffix)
   }
+
+  # Key string for hm_df rows
+  hm_key <- paste(chr, start, end, sep = ".")
+
+  # If we will promote to full genes, prepare a lookup from the ORIGINAL region set
+  if (isTRUE(promote_to_full_genes)) {
+    if (is.null(source_regions_df))
+      stop("promote_to_full_genes=TRUE requires source_regions_df (original region set).")
+    if (is.null(universe_df))
+      stop("promote_to_full_genes=TRUE requires universe_df (e.g., regions$allgenes).")
+
+    # Build key for the source region set to recover gene IDs by exact coord match
+    if (!all(source_key_cols %in% names(source_regions_df)))
+      stop("source_key_cols not all present in source_regions_df.")
+    if (!source_gene_col %in% names(source_regions_df))
+      stop("source_gene_col not found in source_regions_df.")
+
+    src_key <- paste(source_regions_df[[source_key_cols[1]]],
+                     source_regions_df[[source_key_cols[2]]],
+                     source_regions_df[[source_key_cols[3]]], sep = ".")
+    src_gene <- as.character(source_regions_df[[source_gene_col]])
+    # fast lookup: key -> gene
+    # A region can map to exactly one gene in your promoter/TSS set; if duplicated, keep first.
+    key2gene <- tapply(src_gene, src_key, function(x) x[1])
+  }
+
+  # Output containers
+  out_list_ranges <- stats::setNames(vector("list", length(lfc_cols)),
+                                     sub("^logFC_", "", lfc_cols))
+  out_list_genes  <- if (isTRUE(promote_to_full_genes))
+    stats::setNames(vector("list", length(lfc_cols)), sub("^logFC_", "", lfc_cols)) else NULL
 
   for (lc in lfc_cols) {
     strain <- sub("^logFC_", "", lc)
     vals <- hm_df[[lc]]
 
-    # Keep windows based on requested direction
     keep <- switch(
       direction,
       positive = vals >  min_value,
@@ -2045,63 +2028,105 @@ heatmap_to_bed_peaks <- function(
 
     gr_keep <- base_gr[keep]
     if (length(gr_keep) == 0L) {
-      empty_df <- data.frame(seqnames=character(), start=integer(), end=integer())
-      if (isTRUE(write_empty_files)) {
-        bed_file <- file.path(out_dir, sprintf("%s_%s.bed", prefix, strain))
+      # write empty 3-col BED if asked
+      if (write_empty_files) {
+        bed_file <- file.path(out_dir, paste0(.stem(strain), ".bed"))
         file.create(bed_file)
+        if (isTRUE(promote_to_full_genes)) {
+          bed_file_u <- file.path(out_dir, paste0(.stem(strain, is_universe = TRUE), ".bed"))
+          file.create(bed_file_u)
+        }
       }
-      out_list[[strain]] <- empty_df
-      .maybe_assign_df(empty_df, paste0(prefix, "_", strain, object_suffix))
+      out_list_ranges[[strain]] <- data.frame()
+      if (isTRUE(promote_to_full_genes)) out_list_genes[[strain]] <- data.frame()
       next
     }
 
+    # --- WINDOW vs REGION output (3-col BEDs) ---
     if (mode == "window" && isTRUE(merge_windows)) {
-      # Merge adjacent/nearby windows: gap <= max_gap_bp
       merged <- GenomicRanges::reduce(gr_keep, min.gapwidth = as.integer(max_gap_bp) + 1L)
-      # Drop tiny merged blocks if requested
       if (min_width_bp > 0L) {
         merged <- merged[IRanges::width(merged) >= as.integer(min_width_bp)]
       }
       gr_out <- merged
     } else {
-      # REGION mode (or merge_windows=FALSE): keep original ranges as-is
       gr_out <- gr_keep
     }
 
-    if (length(gr_out) == 0L) {
-      empty_df <- data.frame(seqnames=character(), start=integer(), end=integer())
-      if (isTRUE(write_empty_files)) {
-        bed_file <- file.path(out_dir, sprintf("%s_%s.bed", prefix, strain))
-        file.create(bed_file)
-      }
-      out_list[[strain]] <- empty_df
-      .maybe_assign_df(empty_df, paste0(prefix, "_", strain, object_suffix))
-      next
+    # Build 3-col BED df for ranges (write & assign)
+    df_ranges <- as.data.frame(gr_out)[, c("seqnames","start","end")]
+    if (isTRUE(zero_based)) df_ranges$start <- as.integer(df_ranges$start) - 1L
+    df_ranges$start[df_ranges$start < 0L] <- 0L
+    df_ranges$seqnames <- as.character(df_ranges$seqnames)
+    df_ranges$start    <- as.integer(df_ranges$start)
+    df_ranges$end      <- as.integer(df_ranges$end)
+
+    stem_ranges <- .stem(strain)
+    file_ranges <- file.path(out_dir, paste0(stem_ranges, ".bed"))
+    utils::write.table(df_ranges, file_ranges, sep = "\t", quote = FALSE,
+                       row.names = FALSE, col.names = FALSE)
+    out_list_ranges[[strain]] <- df_ranges
+    if (isTRUE(create_dataframes)) {
+      assign(paste0(stem_ranges, "_BED"), df_ranges, envir = .GlobalEnv)
     }
 
-    # Build BED (3 columns)
-    df <- as.data.frame(gr_out)[, c("seqnames","start","end")]
-    if (isTRUE(zero_based)) df$start <- df$start - 1L
-    df$start[df$start < 0L] <- 0L
-    df$seqnames <- as.character(df$seqnames)
-    df$start    <- as.integer(df$start)
-    df$end      <- as.integer(df$end)
+    # --- Promote to full genes (restore: source_regions_df -> gene IDs -> subset universe_df) ---
+    if (isTRUE(promote_to_full_genes)) {
+      # recover keys for kept windows/regions and map to gene IDs via original region set
+      kept_keys <- hm_key[keep]
+      # pull gene IDs for those keys (drop NAs)
+      kept_genes <- key2gene[kept_keys]
+      kept_genes <- unique(as.character(kept_genes[!is.na(kept_genes)]))
 
-    # write file
-    bed_file <- file.path(out_dir, sprintf("%s_%s.bed", prefix, strain))
-    utils::write.table(df, bed_file, sep = "\t", quote = FALSE,
-                       row.names = FALSE, col.names = FALSE)
+      if (!length(kept_genes)) {
+        # nothing to subset; write empty if requested
+        if (write_empty_files) {
+          bed_file_u <- file.path(out_dir, paste0(.stem(strain, is_universe = TRUE), ".bed"))
+          file.create(bed_file_u)
+        }
+        out_list_genes[[strain]] <- data.frame()
+        if (isTRUE(create_dataframes)) {
+          assign(paste0(.stem(strain, is_universe = TRUE), "_BED"), data.frame(), envir = .GlobalEnv)
+        }
+      } else {
+        if (!universe_gene_col %in% names(universe_df))
+          stop("universe_gene_col not found in universe_df.")
 
-    out_list[[strain]] <- df
-    .maybe_assign_df(df, paste0(prefix, "_", strain, object_suffix))
+        # exact subset by gene ID
+        df_genes <- universe_df[universe_df[[universe_gene_col]] %in% kept_genes, , drop = FALSE]
+
+        # Write genes bed (keep *universe* coords as stored; only adjust to 0-based if requested for file)
+        stem_genes <- .stem(strain, is_universe = TRUE)
+        file_genes <- file.path(out_dir, paste0(stem_genes, ".bed"))
+
+        # For writing: if universe is 1-based but we want BED 0-based, temporarily adjust a copy
+        dfw <- df_genes
+        if (isTRUE(zero_based) && !isTRUE(universe_is_zero_based)) {
+          # assume universe_df has V2 as start
+          if ("V2" %in% names(dfw)) {
+            dfw$V2 <- as.integer(dfw$V2) - 1L
+            dfw$V2[dfw$V2 < 0L] <- 0L
+          }
+        }
+        utils::write.table(dfw, file_genes, sep = "\t", quote = FALSE,
+                           row.names = FALSE, col.names = FALSE)
+
+        out_list_genes[[strain]] <- df_genes
+        if (isTRUE(create_dataframes)) {
+          assign(paste0(stem_genes, "_BED"), df_genes, envir = .GlobalEnv)
+        }
+      }
+    }
   }
 
-  invisible(out_list)
+  invisible(list(ranges = out_list_ranges, genes = out_list_genes))
 }
 
 ```
 
 ```{r, Run BED File Function}
+###You'll want to feed Heatmap dfs into this function
+
 # Example 1: vInput heatmap, enriched regions per strain (merge abutting; min merged width 1500 bp)
 peaks_win <- heatmap_to_bed_peaks(
   hm_df         = H3K36me3_Heatmap_GenomeWide_vInput,
@@ -2113,21 +2138,93 @@ peaks_win <- heatmap_to_bed_peaks(
   merge_windows = TRUE,
   max_gap_bp    = 1500,
   min_width_bp  = 1000,
-  zero_based    = TRUE,
+  zero_based    = FALSE,
   write_empty_files = TRUE
 )
 
 # Example 2: vInput heatmap, enriched regions per strain across a pre-determined region set (i.e. all genes)
-peaks_reg <- heatmap_to_bed_peaks(
-  hm_df         = H3K36me3_Heatmap_allgenes_vInput,
-  out_dir       = "csaw_beds/H3K36me3_vInput",
-  prefix        = "H3K36me3_allgenes_vInput",
+peaks <- heatmap_to_bed_peaks(
+  hm_df         = H3K27me3_CS_Heatmap_K27genes_vInput,  # masked heatmap over K27promTSS regions
+  out_dir       = "csaw_beds/H3K27me3_vInput",
+  prefix        = "H3K27me3_K27promTSS_vInput",
   mode          = "region",
   direction     = "positive",
-  min_value     = 0.5,
-  merge_windows = TRUE,  # ignored in region mode
+  min_value     = 1,                         
+  merge_windows = FALSE,                     # ignored in region mode anyway
   zero_based    = TRUE,
-  create_dataframes = TRUE
+  file_norm_tag = NULL,                      # OR "vInput"/"vWT" if you want it appended here
+  source_regions_df = regions$K27promTSS,    # needs to match your original region df with coords + gene IDs
+  source_key_cols   = c("V1","V2","V3"),
+  source_gene_col   = "V10",                 # may want to use V11, which has NCUs instead of names (change below)
+  promote_to_full_genes  = TRUE,
+  universe_df            = regions$K27genes,
+  universe_gene_col      = "V10",
+  universe_label         = "genes",
+  universe_is_zero_based = FALSE,          
+  create_dataframes      = TRUE
 )
+
+
+```
+
+```{r, Processing Dataframes}
+#Use these template commands for processing dataframes to create csvs, bed files, etc. for downstream analysis or use outisde of R. Note, these are not tied to any functions, just some useful lines of code to process the outputs of the analysis functions
+
+#reassign gene names to data frame of interest using dplyr. This is useful if you are wanting to extract out a list of genes of interest (like genes that lose K27me3 in a mutant). 
+library(dplyr)
+
+H3K36me3_Results_K27promTSS_vWT <- H3K36me3_Results_K27promTSS_vWT %>%
+  left_join(
+    regions$K27promTSS %>% select(V1, V2, V3, V10), #you may have to change the column names 
+    by = c("seqnames" = "V1", "start" = "V2", "end" = "V3")
+  )
+
+#subset your original bed file for genes/regions of interest. For example, here, I will subset my promoter-TSS bed to only include genes that lose H3K36me3 in cac-1 or cac-2
+
+##isolate genes of interest
+CAF1_K36_lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.75)
+
+##subset the bed
+K36_lost_bed = subset(K27_genes, K27_genes$V10 %in% CAF1_K36_lost$V10)
+K36_not_lost_bed = subset(K27_genes, ! K27_genes$V10 %in% K36_lost_bed$V10)
+
+write.table(K36_lost_bed, file = "CAF-1_H3K36me3_lost_K27_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K36_not_lost_bed, file = "CAF-1_H3K36me3_not_lost_K27_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+#Subset files from bed file function (later in script). Here, I am pulling out all genes that dont have H3K36 in ash-1, and that arent in K27 regions
+gr_wt   <- GRanges(H3K36me3_allgenes_vInput_WT_BED$seqnames,
+                   IRanges(H3K36me3_allgenes_vInput_WT_BED$start + 1,
+                           H3K36me3_allgenes_vInput_WT_BED$end))
+gr_ash1 <- GRanges(H3K36me3_allgenes_vInput_ash1_BED$seqnames,
+                   IRanges(H3K36me3_allgenes_vInput_ash1_BED$start + 1,
+                           H3K36me3_allgenes_vInput_ash1_BED$end))
+
+WT_not_in_ash1 <- H3K36me3_allgenes_vInput_WT_BED[countOverlaps(gr_wt, gr_ash1) == 0, ]
+
+H3K36me3_no_ash1 <- regions$allgenes %>%
+  left_join(
+    WT_not_in_ash1, #you may have to change the column names 
+    by = c("V1" = "seqnames", "V2" = "start", "V3" ="end")
+  )
+
+gr_regions <- GRanges(regions$allgenes$V1, IRanges(regions$allgenes$V2, regions$allgenes$V3))
+gr_wtonly  <- GRanges(WT_not_in_ash1$seqnames, IRanges(WT_not_in_ash1$start + 1, WT_not_in_ash1$end))
+
+#No ash-1
+H3K36me3_no_ash1 <- regions$allgenes[countOverlaps(gr_regions, gr_wtonly) > 0, ]
+
+suppressPackageStartupMessages(library(GenomicRanges))
+
+gr_A <- GRanges(H3K36me3_no_ash1$V1, IRanges(H3K36me3_no_ash1$V2 + 1, H3K36me3_no_ash1$V3))  # BED start +1
+gr_B <- GRanges(regions$K27genes$V1,       IRanges(regions$K27genes$V2,       regions$K27genes$V3))     # region coords (1-based)
+
+#No ash-1, no K27
+H3K36me3_no_ash1_NOTin_K27genes <- H3K36me3_no_ash1[countOverlaps(gr_A, gr_B) == 0, ]
+
+write.table(H3K36me3_no_ash1_NOTin_K27genes, file = "H3K36me3_no_ash1_noK27.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+write.table(CAC3_lost_only, file = "cac3_H3K27me3_promoter_LOST.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+write.table(CAF1_lost, file = "cac1-2_H3K27me3_promoter_LOST.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 ```

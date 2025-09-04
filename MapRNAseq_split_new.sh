@@ -63,7 +63,7 @@ OUTTMP="${TMPDIR}/STAR_${accession}_${SLURM_JOB_ID:-$$}"
 trap 'rm -rf "$OUTTMP" 2>/dev/null || true' EXIT
 
 ############################
-# FASTQ discovery (supports multiple dirs; mirrors /scratch -> /lustre2)
+# FASTQ discovery (supports multiple dirs)
 ############################
 echo "[DEBUG] accession=$accession"
 echo "[DEBUG] fastqPath=$fastqPath"
@@ -233,7 +233,7 @@ log_transform_bw "${BWDIR}/${accession}.${FSTRAND}.cpm.bw" "${BWDIR}/${accession
 log_transform_bw "${BWDIR}/${accession}.${RSTRAND}.cpm.bw" "${BWDIR}/${accession}.${RSTRAND}.log2p1.bw"
 
 ############################
-# NEW (A): Antisense-only BAM + bigWigs  (paired-end correct)
+# Antisense-only BAM + bigWigs  (paired-end correct)
 ############################
 
 # Split exons by strand (no edits to col 9)
@@ -318,7 +318,7 @@ else
 fi
 
 ############################
-# NEW (C): 5′-end CPM bigWigs (forward/reverse)
+# 5′-end CPM bigWigs (forward/reverse)
 ############################
 bamCoverage -b "$BAM" \
   -o "${BWDIR}/${accession}.forward.5prime.cpm.bw" \

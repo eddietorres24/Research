@@ -279,25 +279,25 @@ module load deepTools
 
 # computeMatrix scale-regions -a 250 -b 1000 --regionBodyLength 2000 --scale 1.5
 ## unclustered
-computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 2 \
- -S $P150DIR/150-93_ChIP_WT_H3K36me3_Rep4_S93.bin_25.smooth_75Bulk.bw \
-    $P150DIR/150-94_ChIP_cac-1_H3K36me3_Rep4_S94.bin_25.smooth_75Bulk.bw \
-    $P150DIR/150-116_ChIP_cac-2_H3K36me3_Rep4_S131.bin_25.smooth_75Bulk.bw \
-    $P150DIR/150-134_ChIP_set-7_H3K36me3_Rep4_S149.bin_25.smooth_75Bulk.bw \
-    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
-    -R $BEDDIR2/H3K36me3_no_ash1_noK27.bed --skipZeros -o K36_matrix_PRC2_1.gz
-
-    plotHeatmap -m K36_matrix_PRC2_1.gz -out H3K36me3_no_ash1_CAFmutants.pdf \
-                    --samplesLabel WT cac-1 cac-2 set-7 ash-1 \
-                    --startLabel "TSS" \
-                    --endLabel "TES" \
-                    --sortRegions descend \
-                    --sortUsingSamples 1 2 3 5 \
-                    --missingDataColor 1 \
-                    --colorMap "afmhot_r" \
-                    --heatmapHeight 20 \
-                    --zMin 0 \
-                    --zMax 18
+# computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 2 \
+#  -S $P150DIR/150-93_ChIP_WT_H3K36me3_Rep4_S93.bin_25.smooth_75Bulk.bw \
+#     $P150DIR/150-94_ChIP_cac-1_H3K36me3_Rep4_S94.bin_25.smooth_75Bulk.bw \
+#     $P150DIR/150-116_ChIP_cac-2_H3K36me3_Rep4_S131.bin_25.smooth_75Bulk.bw \
+#     $P150DIR/150-134_ChIP_set-7_H3K36me3_Rep4_S149.bin_25.smooth_75Bulk.bw \
+#     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
+#     -R $BEDDIR2/H3K36me3_no_ash1_noK27.bed --skipZeros -o K36_matrix_PRC2_1.gz
+#
+#     plotHeatmap -m K36_matrix_PRC2_1.gz -out H3K36me3_no_ash1_CAFmutants.pdf \
+#                     --samplesLabel WT cac-1 cac-2 set-7 ash-1 \
+#                     --startLabel "TSS" \
+#                     --endLabel "TES" \
+#                     --sortRegions descend \
+#                     --sortUsingSamples 1 2 3 5 \
+#                     --missingDataColor 1 \
+#                     --colorMap "afmhot_r" \
+#                     --heatmapHeight 20 \
+#                     --zMin 0 \
+#                     --zMax 18
 
 # $BEDDIR2/CAF-1_H3K36me3_lost_K27_genes.bed $BEDDIR2/CAF-1_H3K36me3_not_lost_K27_genes.bed
 
@@ -552,111 +552,144 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 2 \
 
 ###CRYPTIC TRANSCRIPTS
 
-# computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 \
-#   -S $OUTDIR3/SRR8269810/SRR8269810.antisense.log2p1.bw \
-#      $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.antisense.log2p1.bw \
-#      $OUTDIR3/SRR10916163/SRR10916163.antisense.log2p1.bw \
-#      $OUTDIR3/SRR8444037/SRR8444037.antisense.log2p1.bw \
-#      $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.antisense.log2p1.bw \
-#      $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
-#   -R $BEDDIR2/minus_genes.bed $BEDDIR2/plus_genes.bed --skipZeros --missingDataAsZero -o allGenes_antisense.gz
-#
-# computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 --scale 2 \
-#   -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.antisense.log2p1.bw \
-#      $OUTDIR3/SRR10916163/SRR10916163.antisense.log2p1.bw \
-#      $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.antisense.log2p1.bw \
-#      $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
-#   -R $BEDDIR2/K27_genes_minus.bed $BEDDIR2/K27_genes_plus.bed --skipZeros --missingDataAsZero -o K27genes_antisense.gz
+computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 \
+  -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.antisense.log2p1.bw \
+     $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.antisense.log2p1.bw \
+     $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
+     $OUTDIR3/SRR5177527/SRR5177527.antisense.log2p1.bw \
+     $OUTDIR3/SRR5177521/SRR5177521.antisense.log2p1.bw \
+  -R $BEDDIR2/minus_genes.bed $BEDDIR2/plus_genes.bed --skipZeros --missingDataAsZero -o allGenes_antisense.gz
 
-plotHeatmap -m allGenes_antisense.gz -out allgenes_antisense.pdf \
-            --samplesLabel WT_old WT_new set-7 cac-1_old cac-1_new cac-1_suz12 \
+computeMatrix scale-regions -b 1500 -a 1500 --regionBodyLength 4500 --scale 2 \
+  -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.antisense.log2p1.bw \
+     $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.antisense.log2p1.bw \
+     $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
+     $OUTDIR3/SRR5177527/SRR5177527.antisense.log2p1.bw \
+     $OUTDIR3/SRR5177521/SRR5177521.antisense.log2p1.bw \
+  -R $BEDDIR2/K27_genes_minus.bed $BEDDIR2/K27_genes_plus.bed --skipZeros --missingDataAsZero -o K27genes_antisense.gz
+
+  computeMatrix reference-point --referencePoint TSS -a 3000 -b 1500 \
+    -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.antisense.log2p1.bw \
+       $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.antisense.log2p1.bw \
+       $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
+       $OUTDIR3/SRR5177527/SRR5177527.antisense.log2p1.bw \
+       $OUTDIR3/SRR5177521/SRR5177521.antisense.log2p1.bw \
+    -R $BEDDIR2/minus_genes.bed $BEDDIR2/plus_genes.bed --skipZeros --missingDataAsZero -o allGenes_antisense_TES.gz
+
+  computeMatrix reference-point --referencePoint TSS -a 3000 -b 1500 --scale 2 \
+    -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.antisense.log2p1.bw \
+       $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.antisense.log2p1.bw \
+       $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.antisense.log2p1.bw \
+       $OUTDIR3/SRR5177527/SRR5177527.antisense.log2p1.bw \
+       $OUTDIR3/SRR5177521/SRR5177521.antisense.log2p1.bw \
+    -R $BEDDIR2/K27_genes_minus.bed $BEDDIR2/K27_genes_plus.bed --skipZeros --missingDataAsZero -o K27genes_antisense_TES.gz
+
+plotHeatmap -m allGenes_antisense.gz -out allgenes_dev_antisense.pdf \
+            --samplesLabel WT cac-1 cac-1_suz12 3_dpf 6_dpf \
             --startLabel "TSS" \
             --endLabel "TES" \
             --sortRegions descend \
             --colorMap "bwr" \
-            --outFileSortedRegions allgene.bed \
             --heatmapHeight 20 \
-            --zMin 0 --zMax 2
+            --zMin 0 --zMax 3
 
-plotHeatmap -m K27genes_antisense.gz -out K27genes_antisense.pdf \
-            --samplesLabel WT_new set-7 cac-1_new cac-1_suz12 \
+plotHeatmap -m K27genes_antisense.gz -out K27genes_dev_antisense.pdf \
+            --samplesLabel WT cac-1 cac-1_suz12 3_dpf 6_dpf \
             --startLabel "TSS" \
             --endLabel "TES" \
             --sortRegions descend \
             --colorMap "bwr" \
             --legendLocation none \
-            --outFileSortedRegions k27gene.bed \
+            --heatmapHeight 20 \
+            --zMin 0 --zMax 4
+
+plotHeatmap -m allGenes_antisense_TES.gz -out allgenes_dev_antisense_TES.pdf \
+            --samplesLabel WT cac-1 cac-1_suz12 3_dpf 6_dpf \
+            --startLabel "TSS" \
+            --endLabel "TES" \
+            --sortRegions descend \
+            --colorMap "bwr" \
+            --heatmapHeight 20 \
+            --zMin 0 --zMax 3
+
+plotHeatmap -m K27genes_antisense_TES.gz -out K27genes_dev_antisense_TES.pdf \
+            --samplesLabel WT cac-1 cac-1_suz12 3_dpf 6_dpf \
+            --startLabel "TSS" \
+            --endLabel "TES" \
+            --sortRegions descend \
+            --colorMap "bwr" \
+            --legendLocation none \
             --heatmapHeight 20 \
             --zMin 0 --zMax 4
 
 #5' sites
-computeMatrix scale-regions -b 1000 -a 1000 --regionBodyLength 4000 \
-  -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.forward.5prime.cpm.bw \
-     $OUTDIR3/SRR10916163/SRR10916163.forward.5prime.cpm.bw \
-     $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.forward.5prime.cpm.bw \
-     $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.forward.5prime.cpm.bw \
-  -R $BEDDIR2/plus_genes.bed --skipZeros --missingDataAsZero -o plus_body_5prime.gz
-
-computeMatrix scale-regions -b 1000 -a 1000 --regionBodyLength 4000 \
-  -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.reverse.5prime.cpm.bw \
-     $OUTDIR3/SRR10916163/SRR10916163.reverse.5prime.cpm.bw \
-     $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.reverse.5prime.cpm.bw \
-     $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.reverse.5prime.cpm.bw \
-  -R $BEDDIR2/minus_genes.bed --skipZeros --missingDataAsZero -o minus_body_5prime.gz
-
-computeMatrix scale-regions -b 1000 -a 1000 --regionBodyLength 4000 \
-  -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.forward.5prime.cpm.bw \
-     $OUTDIR3/SRR10916163/SRR10916163.forward.5prime.cpm.bw \
-     $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.forward.5prime.cpm.bw \
-     $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.forward.5prime.cpm.bw \
-  -R $BEDDIR2/K27_genes_plus.bed --skipZeros --missingDataAsZero -o K27_plus_body_5prime.gz
-
-computeMatrix scale-regions -b 1000 -a 1000 --regionBodyLength 4000 \
-  -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.reverse.5prime.cpm.bw \
-     $OUTDIR3/SRR10916163/SRR10916163.reverse.5prime.cpm.bw \
-     $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.reverse.5prime.cpm.bw \
-     $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.reverse.5prime.cpm.bw \
-  -R $BEDDIR2/K27_genes_minus.bed --skipZeros --missingDataAsZero -o K27_minus_body_5prime.gz
-
-    plotHeatmap -m plus_body_5prime.gz -out plus_5prime.pdf \
-                --samplesLabel WT_new set-7 cac-1_new cac-1_suz12 \
-                --startLabel "TSS" \
-                --endLabel "TES" \
-                --sortRegions descend \
-                --colorList "blue, red" \
-                --legendLocation none \
-                --heatmapHeight 20 \
-                --zMin 0
-
-    plotHeatmap -m minus_body_5prime.gz -out minus_5prime.pdf \
-                --samplesLabel WT_new set-7 cac-1_new cac-1_suz12 \
-                --startLabel "TSS" \
-                --endLabel "TES" \
-                --sortRegions descend \
-                --colorList "blue, red" \
-                --legendLocation none \
-                --heatmapHeight 20 \
-                --zMin 0
-
-    plotHeatmap -m K27_plus_body_5prime.gz -out K27_plus_5prime.pdf \
-                --samplesLabel WT_new set-7 cac-1_new cac-1_suz12 \
-                --startLabel "TSS" \
-                --endLabel "TES" \
-                --sortRegions descend \
-                --colorList "blue, red" \
-                --legendLocation none \
-                --heatmapHeight 20 \
-                --zMin 0
-
-    plotHeatmap -m K27_minus_body_5prime.gz -out K27_minus_5prime.pdf \
-                --samplesLabel WT_new set-7 cac-1_new cac-1_suz12 \
-                --startLabel "TSS" \
-                --endLabel "TES" \
-                --sortRegions descend \
-                --colorList "blue, red" \
-                --legendLocation none \
-                --heatmapHeight 20 \
-                --zMin 0
+# computeMatrix scale-regions -b 1000 -a 1000 --regionBodyLength 4000 \
+#   -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.forward.5prime.cpm.bw \
+#      $OUTDIR3/SRR10916163/SRR10916163.forward.5prime.cpm.bw \
+#      $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.forward.5prime.cpm.bw \
+#      $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.forward.5prime.cpm.bw \
+#   -R $BEDDIR2/plus_genes.bed --skipZeros --missingDataAsZero -o plus_body_5prime.gz
+#
+# computeMatrix scale-regions -b 1000 -a 1000 --regionBodyLength 4000 \
+#   -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.reverse.5prime.cpm.bw \
+#      $OUTDIR3/SRR10916163/SRR10916163.reverse.5prime.cpm.bw \
+#      $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.reverse.5prime.cpm.bw \
+#      $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.reverse.5prime.cpm.bw \
+#   -R $BEDDIR2/minus_genes.bed --skipZeros --missingDataAsZero -o minus_body_5prime.gz
+#
+# computeMatrix scale-regions -b 1000 -a 1000 --regionBodyLength 4000 \
+#   -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.forward.5prime.cpm.bw \
+#      $OUTDIR3/SRR10916163/SRR10916163.forward.5prime.cpm.bw \
+#      $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.forward.5prime.cpm.bw \
+#      $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.forward.5prime.cpm.bw \
+#   -R $BEDDIR2/K27_genes_plus.bed --skipZeros --missingDataAsZero -o K27_plus_body_5prime.gz
+#
+# computeMatrix scale-regions -b 1000 -a 1000 --regionBodyLength 4000 \
+#   -S $OUTDIR3/149-84_RNA_WT__Rep1_S84/149-84_RNA_WT__Rep1_S84.reverse.5prime.cpm.bw \
+#      $OUTDIR3/SRR10916163/SRR10916163.reverse.5prime.cpm.bw \
+#      $OUTDIR3/149-116_RNA_cac-1__Rep2_S140/149-116_RNA_cac-1__Rep2_S140.reverse.5prime.cpm.bw \
+#      $OUTDIR3/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121.reverse.5prime.cpm.bw \
+#   -R $BEDDIR2/K27_genes_minus.bed --skipZeros --missingDataAsZero -o K27_minus_body_5prime.gz
+#
+#     plotHeatmap -m plus_body_5prime.gz -out plus_5prime.pdf \
+#                 --samplesLabel WT_new set-7 cac-1_new cac-1_suz12 \
+#                 --startLabel "TSS" \
+#                 --endLabel "TES" \
+#                 --sortRegions descend \
+#                 --colorList "blue, red" \
+#                 --legendLocation none \
+#                 --heatmapHeight 20 \
+#                 --zMin 0
+#
+#     plotHeatmap -m minus_body_5prime.gz -out minus_5prime.pdf \
+#                 --samplesLabel WT_new set-7 cac-1_new cac-1_suz12 \
+#                 --startLabel "TSS" \
+#                 --endLabel "TES" \
+#                 --sortRegions descend \
+#                 --colorList "blue, red" \
+#                 --legendLocation none \
+#                 --heatmapHeight 20 \
+#                 --zMin 0
+#
+#     plotHeatmap -m K27_plus_body_5prime.gz -out K27_plus_5prime.pdf \
+#                 --samplesLabel WT_new set-7 cac-1_new cac-1_suz12 \
+#                 --startLabel "TSS" \
+#                 --endLabel "TES" \
+#                 --sortRegions descend \
+#                 --colorList "blue, red" \
+#                 --legendLocation none \
+#                 --heatmapHeight 20 \
+#                 --zMin 0
+#
+#     plotHeatmap -m K27_minus_body_5prime.gz -out K27_minus_5prime.pdf \
+#                 --samplesLabel WT_new set-7 cac-1_new cac-1_suz12 \
+#                 --startLabel "TSS" \
+#                 --endLabel "TES" \
+#                 --sortRegions descend \
+#                 --colorList "blue, red" \
+#                 --legendLocation none \
+#                 --heatmapHeight 20 \
+#                 --zMin 0
 
 
 # computeMatrix scale-regions -b 500 -a 500 --regionBodyLength 3000 \
