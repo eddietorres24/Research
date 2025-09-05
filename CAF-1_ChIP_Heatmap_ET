@@ -273,8 +273,8 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 1.5 \
                     --sortUsingSamples 1 \
                     --heatmapHeight 25 \
                     --colorMap "afmhot_r" \
-                    --zMin 0 --zMax 18
-
+                    --zMin 0
+                    
     # $P149DIR/149-102_ChIP_cac-3_H3K36me3_Rep3_S126.bin_25.smooth_75Bulk.bw \
 # H3K36me3_methylated_genes_WT_genes.bed
 
