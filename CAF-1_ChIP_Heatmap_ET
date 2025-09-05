@@ -421,7 +421,7 @@ plotHeatmap -m matrix_PRC2_2.gz -out CAF-1_H3K27me3_K27genes_cluster.pdf \
                                 --startLabel "TSS" \
                                 --endLabel "TES" \
                                 --missingDataColor 1 \
-                                --sortUsingSamples 1 2 3 \
+                                --sortUsingSamples 2 3 \
                                 --legendLocation none \
                                 --heatmapHeight 25 \
                                 --colorList 'white, g, darkgreen' \
