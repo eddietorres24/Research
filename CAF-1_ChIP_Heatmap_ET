@@ -422,10 +422,11 @@ plotHeatmap -m matrix_PRC2_2.gz -out CAF-1_H3K27me3_K27genes_cluster.pdf \
                                 --endLabel "TES" \
                                 --missingDataColor 1 \
                                 --sortUsingSamples 1 2 3 \
+                                --outFileSortedRegions K27_CAF1_cluster.bed \
                                 --legendLocation none \
                                 --heatmapHeight 25 \
                                 --colorList 'white, g, darkgreen' \
-                                --zMin 0 \
+                                --zMin 0 --zMax 45
 
 # $MISCDIR/ash1_H3K27me2me3_Rep2.bin_25.smooth_75Bulk.bw  \
 
