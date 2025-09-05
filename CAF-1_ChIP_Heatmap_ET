@@ -263,9 +263,9 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 1.5 \
     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
- -R $BEDDIR2/K27_genes_stringent.bed --missingDataAsZero --skipZeros -o K36_matrix_PRC2.gz
+ -R $BEDDIR2/H3K27me3_CAF1_lost.bed $BEDDIR2/H3K27me3_CAF1_retain.bed --missingDataAsZero --skipZeros -o K36_matrix_PRC2.gz
 
-    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_K27genes_K27subset_original.pdf \
+    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_K27genes_cluster.pdf \
                     --samplesLabel WT ash-1 cac-1 cac-2 set-7 \
                     --startLabel "TSS" \
                     --endLabel "TES" \
@@ -273,7 +273,7 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 1.5 \
                     --sortUsingSamples 1 \
                     --heatmapHeight 25 \
                     --colorMap "afmhot_r" \
-                    --zMin 0
+                    --zMin 0 --zMax 16
 
     # $P149DIR/149-102_ChIP_cac-3_H3K36me3_Rep3_S126.bin_25.smooth_75Bulk.bw \
 # H3K36me3_methylated_genes_WT_genes.bed
@@ -414,9 +414,9 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 \
          $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
          $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
          $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-      -R $BEDDIR2/K27_genes_stringent.bed --missingDataAsZero --skipZeros -o matrix_PRC2_2.gz
+      -R $BEDDIR2/H3K27me3_CAF1_lost.bed $BEDDIR2/H3K27me3_CAF1_retain.bed --missingDataAsZero --skipZeros -o matrix_PRC2_2.gz
 
-plotHeatmap -m matrix_PRC2_2.gz -out CAF-1_K27_K27genes_subset_original.pdf \
+plotHeatmap -m matrix_PRC2_2.gz -out CAF-1_H3K27me3_K27genes_cluster.pdf \
                                 --samplesLabel WT cac-1 cac-2 cac-3 set-7 \
                                 --startLabel "TSS" \
                                 --endLabel "TES" \
