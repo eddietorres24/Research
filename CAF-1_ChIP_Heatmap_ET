@@ -265,7 +265,7 @@ computeMatrix scale-regions -b 800 --regionBodyLength 2000 --scale 1.5 \
     $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
  -R $BEDDIR2/H3K27me3_K27promTSS_vInput_log2FC_1_WT_genes.bed --missingDataAsZero --skipZeros -o K36_matrix_PRC2.gz
 
-    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_K27genes_cac-1_loss_sorted.pdf \
+    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_K27genes_K27subset.pdf \
                     --samplesLabel WT ash-1 cac-1 cac-2 set-7 \
                     --startLabel "TSS" \
                     --endLabel "TES" \
