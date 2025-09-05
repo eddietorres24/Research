@@ -1316,21 +1316,24 @@ make_csaw_heatmap_advanced(
 
 # define the rule set: one bucket for absent in cac1 OR cac2
 buck <- list(
-  absent_cac1_or_cac2 = list(absent_any = c("cac1", "cac2"))
+  absent_all_cac1_or_cac2 = list(absent_all = c("cac1", "cac2")),
+  absent_any_cac1_or_cac2 = list(absent_any = c("cac1", "cac2")),
+  present_all_WT_cac1_or_cac2 = list(absent_all = c("WT", "cac1", "cac2")),
+  present_all_cac1_or_cac2 = list(absent_all = c("cac1", "cac2"))
 )
 
 res <- make_csaw_heatmap_advanced(
-  df = H3K36me3_Heatmap_K27genes_proms_vInput,
+  df = H3K27me3_CS_Heatmap_K27promTSS_vInput,
   select_cols = c("WT","cac1","cac2","cac3","set7"),
-  present_threshold = 0.1,
+  present_threshold = 1,
   use_buckets = TRUE,
   buckets = buck,
   bucket_order_by = list(absent_cac1_or_cac2 = "WT"),
   cluster_rows = FALSE,
   cluster_cols = FALSE,
   color_limits = c(0, NA),
-  colors = c("white","#A59D00"),
-  out_stem = "H3K36me3_bucket_absent_cac1_or_cac2_TEST",
+  colors = c("white","darkgreen"),
+  out_stem = "H3K27me3_TEST",
   debug_logic = TRUE,
   debug_bucket = "absent_cac1_or_cac2"
 )
