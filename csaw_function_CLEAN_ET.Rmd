@@ -2144,20 +2144,20 @@ peaks_win <- heatmap_to_bed_peaks(
 
 # Example 2: vInput heatmap, enriched regions per strain across a pre-determined region set (i.e. all genes)
 peaks <- heatmap_to_bed_peaks(
-  hm_df         = H3K27me3_CS_Heatmap_K27genes_vInput,  # masked heatmap over K27promTSS regions
-  out_dir       = "csaw_beds/H3K27me3_vInput",
-  prefix        = "H3K27me3_K27promTSS_vInput",
+  hm_df         = H3K36me3_Heatmap_K27genes_vInput,  # masked heatmap over K27promTSS regions
+  out_dir       = "csaw_beds/H3K36me3_vInput",
+  prefix        = "H3K36me3_methylated_genes",
   mode          = "region",
   direction     = "positive",
-  min_value     = 1,                         
+  min_value     = 0.1,                         
   merge_windows = FALSE,                     # ignored in region mode anyway
   zero_based    = TRUE,
   file_norm_tag = NULL,                      # OR "vInput"/"vWT" if you want it appended here
-  source_regions_df = regions$K27promTSS,    # needs to match your original region df with coords + gene IDs
+  source_regions_df = regions$K27genes, # needs to match your original region df with coords + gene IDs
   source_key_cols   = c("V1","V2","V3"),
-  source_gene_col   = "V10",                 # may want to use V11, which has NCUs instead of names (change below)
+  source_gene_col   = "V10",      # may want to use V11, which has NCUs instead of names (change below)
   promote_to_full_genes  = TRUE,
-  universe_df            = regions$K27genes,
+  universe_df            = regions$K27genes, #IMPORTANT: The df you want to subset
   universe_gene_col      = "V10",
   universe_label         = "genes",
   universe_is_zero_based = FALSE,          
