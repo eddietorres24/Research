@@ -888,8 +888,8 @@ csaw_analysis(
   mode        = "region",             # "window" or "region"
   out_obj     = count_results,        # <- REQUIRED so we have counts for merging/coords
   reference_strain = "WT",
-  fdr_cutoff  = 0.1,
-  pvalue_cutoff = 0.1, 
+  fdr_cutoff  = 0.05,
+  pvalue_cutoff = 0.05, 
   write_csv_results = TRUE,
   write_csv_heatmap = TRUE,
   write_igv   = TRUE,
