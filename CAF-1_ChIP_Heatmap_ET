@@ -269,6 +269,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
                     --samplesLabel WT ash-1 cac-1 cac-2 set-7 \
                     --startLabel "TSS" \
                     --sortRegions descend \
+                    --outFileSortedRegions CAF-1_K36_order.bed \
                     --sortUsingSamples 1 \
                     --heatmapHeight 25 \
                     --colorMap "afmhot_r" \
