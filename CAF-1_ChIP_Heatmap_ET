@@ -473,45 +473,42 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 
 # #K27ac
 # #clustered
-#                   computeMatrix scale-regions -a 500 -b 2500 --regionBodyLength 2500 --scale 1.5 \
-#                      -S $P149DIR/149-79_ChIP_WT_H3K27ac_Rep2_S79.bin_25.smooth_75Bulk.bw \
-#                         $MISCDIR/WT_H3K27ac.bin_25.smooth_75Bulk.bw \
-#                         $MISCDIR/ash-1_H3K27ac.bin_25.smooth_75Bulk.bw \
-#                         $P149DIR/149-80_ChIP_cac-1_H3K27ac_Rep2_S80.bin_25.smooth_75Bulk.bw \
-#                         $P149DIR/149-81_ChIP_cac-2_H3K27ac_Rep2_S81.bin_25.smooth_75Bulk.bw \
-#                         $P149DIR/149-82_ChIP_cac-3_H3K27ac_Rep2_S82.bin_25.smooth_75Bulk.bw \
-#                         $P149DIR/149-83_ChIP_set-7_H3K27ac_Rep2_S83.bin_25.smooth_75Bulk.bw \
-#                         -R $BEDDIR2/K27_cluster_stringent.bed --skipZeros -o matrix_PRC2_K27ac.gz
-#
-#                         plotHeatmap -m matrix_PRC2_K27ac.gz -out CAF-1_ash1_K27ac_K27_genes_CAF-1_clustered.pdf \
-#                                         --samplesLabel WT WT_ash-1 ash-1 cac-1 cac-2 cac-3 set-7 \
-#                                         --startLabel "TSS" \
-#                                         --endLabel "TES" \
-#                                         --sortRegions descend \
-#                                         --sortUsingSamples 1 2 \
-#                                         --missingDataColor 1 \
-#                                         --colorList "white, lavender, mediumslateblue" \
-#                                         --zMin 0 \
+                  computeMatrix scale-regions -a 500 -b 1000 --regionBodyLength 2500 --scale 1.5 \
+                     -S $P149DIR/149-79_ChIP_WT_H3K27ac_Rep2_S79.bin_25.smooth_75Bulk.bw \
+                        $MISCDIR/WT_H3K27ac.bin_25.smooth_75Bulk.bw \
+                        $MISCDIR/ash-1_H3K27ac.bin_25.smooth_75Bulk.bw \
+                        $P149DIR/149-80_ChIP_cac-1_H3K27ac_Rep2_S80.bin_25.smooth_75Bulk.bw \
+                        $P149DIR/149-81_ChIP_cac-2_H3K27ac_Rep2_S81.bin_25.smooth_75Bulk.bw \
+                        $P149DIR/149-82_ChIP_cac-3_H3K27ac_Rep2_S82.bin_25.smooth_75Bulk.bw \
+                        $P149DIR/149-83_ChIP_set-7_H3K27ac_Rep2_S83.bin_25.smooth_75Bulk.bw \
+                        -R $BEDDIR2/CAF-1_K36_order.bed --skipZeros --missingDataAsZero -o matrix_PRC2_K27ac.gz
+
+                        plotHeatmap -m matrix_PRC2_K27ac.gz -out CAF-1_K27ac_K27_genes_K36enriched_order.pdf \
+                                        --samplesLabel WT WT_ash-1 ash-1 cac-1 cac-2 cac-3 set-7 \
+                                        --startLabel "TSS" \
+                                        --endLabel "TES" \
+                                        --sortRegions no \
+                                        --colorList "white, lavender, mediumslateblue" \
+                                        --zMin 0 \
 
 #Pan Kac
 #clustered
-                  # computeMatrix scale-regions -a 500 -b 2500 --regionBodyLength 2500 --scale 1.5 \
-                  #    -S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
-                  #       $MISCDIR/ash-1_H3K27ac.bin_25.smooth_75Bulk.bw \
-                  #       $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
-                  #       $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
-                  #       $P150DIR/150-138_ChIP_cac-3_Kac_Rep2_S153.bin_25.smooth_75Bulk.bw \
-                  #       $P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw \
-                  #       -R $BEDDIR2/K27genes_CAF-1_clustered.bed --skipZeros -o matrix_PRC2_Kac.gz
-                  #
-                  #       plotHeatmap -m matrix_PRC2_Kac.gz -out CAF-1_Kac_K27_genes_CAF-1_clustered.pdf \
-                  #                       --samplesLabel WT ash-1 cac-1 cac-2 cac-3 set-7 \
-                  #                       --startLabel "TSS" \
-                  #                       --endLabel "TES" \
-                  #                       --sortRegions no \
-                  #                       --missingDataColor 1 \
-                  #                       --colorList "white, lavender, mediumslateblue" \
-                  #                       --zMin 0 \
+                  computeMatrix scale-regions -a 500 -b 1000 --regionBodyLength 2500 --scale 1.5 \
+                     -S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
+                        $MISCDIR/ash-1_H3K27ac.bin_25.smooth_75Bulk.bw \
+                        $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
+                        $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
+                        $P150DIR/150-138_ChIP_cac-3_Kac_Rep2_S153.bin_25.smooth_75Bulk.bw \
+                        $P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw \
+                        -R $BEDDIR2/CAF-1_K36_order.bed --skipZeros --missingDataAsZero -o matrix_PRC2_Kac.gz
+
+                        plotHeatmap -m matrix_PRC2_Kac.gz -out CAF-1_Kac_K27_genes_K36enriched_order.pdf \
+                                        --samplesLabel WT ash-1 cac-1 cac-2 cac-3 set-7 \
+                                        --startLabel "TSS" \
+                                        --endLabel "TES" \
+                                        --sortRegions no \
+                                        --colorList "white, lavender, mediumslateblue" \
+                                        --zMin 0 \
 
 
 
