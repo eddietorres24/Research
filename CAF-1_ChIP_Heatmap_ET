@@ -473,7 +473,7 @@ module load deepTools
 
 # #K27ac
 # #clustered
-                  computeMatrix scale-regions -a 500 -b 1000 --regionBodyLength 2500 --scale 1.5 \
+                  computeMatrix reference-point --referencePoint TSS -a 1500 -b 800 --scale 1.5 \
                      -S $P149DIR/149-79_ChIP_WT_H3K27ac_Rep2_S79.bin_25.smooth_75Bulk.bw \
                         $MISCDIR/ash-1_H3K27ac.bin_25.smooth_75Bulk.bw \
                         $P149DIR/149-80_ChIP_cac-1_H3K27ac_Rep2_S80.bin_25.smooth_75Bulk.bw \
@@ -488,11 +488,11 @@ module load deepTools
                                         --endLabel "TES" \
                                         --sortRegions no \
                                         --colorList "white, lavender, mediumslateblue" \
-                                        --zMin 0 \
+                                        --zMin 0 --zMax 8
 
 #Pan Kac
 #clustered
-                  computeMatrix scale-regions -a 500 -b 1000 --regionBodyLength 2500 --scale 1.5 \
+                  computeMatrix reference-point --referencePoint TSS -a 1500 -b 800 --scale 1.5 \
                      -S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
                         $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
                         $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
@@ -506,7 +506,7 @@ module load deepTools
                                         --endLabel "TES" \
                                         --sortRegions no \
                                         --colorList "white, lavender, mediumslateblue" \
-                                        --zMin 0 \
+                                        --zMin 0 --zMax 10
 
 
 
