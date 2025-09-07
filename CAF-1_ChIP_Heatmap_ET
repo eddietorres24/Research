@@ -257,23 +257,23 @@ module load deepTools
 
 #H3K36me3
 #clustered
-computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
- -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
-    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
-    $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
-    $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
-    $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
- -R $BEDDIR2/H3K27me3_CAF1_lost.bed $BEDDIR2/H3K27me3_CAF1_retain.bed --missingDataAsZero --skipZeros -o K36_matrix_PRC2.gz
-
-    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_K27genes_cluster.pdf \
-                    --samplesLabel WT ash-1 cac-1 cac-2 set-7 \
-                    --startLabel "TSS" \
-                    --sortRegions descend \
-                    --outFileSortedRegions CAF-1_K36_order.bed \
-                    --sortUsingSamples 1 \
-                    --heatmapHeight 25 \
-                    --colorMap "afmhot_r" \
-                    --zMin 0
+# computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+#  -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
+#     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
+#     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
+#     $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
+#     $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
+#  -R $BEDDIR2/H3K27me3_CAF1_lost.bed $BEDDIR2/H3K27me3_CAF1_retain.bed --missingDataAsZero --skipZeros -o K36_matrix_PRC2.gz
+#
+#     plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_K27genes_cluster.pdf \
+#                     --samplesLabel WT ash-1 cac-1 cac-2 set-7 \
+#                     --startLabel "TSS" \
+#                     --sortRegions descend \
+#                     --outFileSortedRegions CAF-1_K36_order.bed \
+#                     --sortUsingSamples 1 \
+#                     --heatmapHeight 25 \
+#                     --colorMap "afmhot_r" \
+#                     --zMin 0
 
     # $P149DIR/149-102_ChIP_cac-3_H3K36me3_Rep3_S126.bin_25.smooth_75Bulk.bw \
 # H3K36me3_methylated_genes_WT_genes.bed
