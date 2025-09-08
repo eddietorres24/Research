@@ -31,6 +31,8 @@ P146DIR="/scratch/evt82290/MappingOutputs/Run146/bigWig"
 P148DIR="/scratch/evt82290/MappingOutputs/Run148/bigWig"
 P149DIR="/scratch/evt82290/MappingOutputs/Run149/bigWig"
 P150DIR="/scratch/evt82290/MappingOutputs/Run150/bigWig"
+P151DIR="/scratch/evt82290/MappingOutputs/Run151/bigWig"
+P152DIR="/scratch/evt82290/MappingOutputs/Run152/bigWig"
 MISCDIR="/scratch/evt82290/MappingOutputs/misc_data/bigWig"
 RNADIR="/scratch/evt82290/RNAseq/misc_mutants/bigWig"
 ATACDIR="/scratch/evt82290/MappingOutputs/ATAC/BigWigs"
@@ -65,7 +67,6 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
                     --zMin 0
 
 ###ASH-1 methylated
-
 computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
  -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
@@ -85,7 +86,6 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
                     --zMin 0
 
 ###SET-2 methylated
-
 computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
  -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
