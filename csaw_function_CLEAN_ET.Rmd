@@ -2147,20 +2147,20 @@ peaks_win <- heatmap_to_bed_peaks(
 
 # Example 2: vInput heatmap, enriched regions per strain across a pre-determined region set (i.e. all genes)
 peaks <- heatmap_to_bed_peaks(
-  hm_df         = H3K27me3_CS_Heatmap_K27promTSS_vWT,  # masked heatmap over K27promTSS regions
-  out_dir       = "csaw_beds/H3K27me3_vWT",
-  prefix        = "H3K27me3_lost_genes",
+  hm_df         = H3K36me3_Heatmap_allgenes_vInput,
+  out_dir       = "csaw_beds/H3K36me3_vInput",
+  prefix        = "H3K36me3_enriched_genes",
   mode          = "region",
-  direction     = "negative",
+  direction     = "positive",
   min_value     = 2,                         
   merge_windows = FALSE,                     # ignored in region mode anyway
   zero_based    = TRUE,
   file_norm_tag = NULL,                      # OR "vInput"/"vWT" if you want it appended here
-  source_regions_df = regions$K27promTSS, # needs to match your original region df with coords + gene IDs
+  source_regions_df = regions$allgenes, # needs to match your original region df with coords + gene IDs
   source_key_cols   = c("V1","V2","V3"),
   source_gene_col   = "V10",      # may want to use V11, which has NCUs instead of names (change below)
   promote_to_full_genes  = TRUE,
-  universe_df            = regions$K27genes, #IMPORTANT: The df you want to subset
+  universe_df            = regions$allgenes, #IMPORTANT: The df you want to subset
   universe_gene_col      = "V10",
   universe_label         = "genes",
   universe_is_zero_based = FALSE,          
@@ -2211,7 +2211,7 @@ H3K36me3_no_ash1 = subset(H3K36me3_lost_genes_log2FC_1_ash1_genes_BED, H3K36me3_
 H3K36me3_no_ash1_nonK27 = subset(H3K36me3_no_ash1, ! H3K36me3_no_ash1$V10 %in% K27_enriched$V10 )
 
 #Not ash-1 methylated
-H3K36me3_set2_meth <- subset(regions$allgenes, ! regions$allgenes$V10 %in% H3K36me3_no_ash1$V10 & ! regions$allgenes$V10 %in% K27_enriched$V10)
+H3K36me3_set2_meth <- subset(H3K36me3_methylated_genes_log2FC_0.1_WT_genes_BED, ! regions$allgenes$V10 %in% H3K36me3_no_ash1$V10 & ! regions$allgenes$V10 %in% K27_enriched$V10)
 
 #write files
 write.table(H3K36me3_no_ash1_nonK27, file = "ash1_meth_nonK27.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
