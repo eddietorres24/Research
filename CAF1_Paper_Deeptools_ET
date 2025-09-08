@@ -1,0 +1,105 @@
+#!/bin/bash
+#SBATCH --job-name=CAF1_Paper_Heatmap
+#SBATCH --partition=batch
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=evt82290@uga.edu
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=50gb
+#SBATCH --time=6:00:00
+#SBATCH --output=../Heatmap/logs/CAFHeatmap.%j.out
+#SBATCH --error=../Heatmap/logs/CAFHeatmap.%j.err
+
+#output directories
+OUTDIR1="/scratch/evt82290/Heatmaps/qa-suz12"
+OUTDIR2="/scratch/evt82290/RNAseq/CAF-1_Heatmap/bigWig"
+OUTDIR3="/scratch/evt82290/MappingOutputs/RNAseq_split/bigWig"
+
+#bigWig directories
+P126DIR="/scratch/evt82290/MappingOutputs/Run126/bigWig"
+P129DIR="/scratch/evt82290/MappingOutputs/Run129/bigWig"
+P131DIR="/scratch/evt82290/MappingOutputs/Run131/bigWig"
+P133DIR="/scratch/evt82290/MappingOutputs/Run133/bigWig"
+P136DIR="/scratch/evt82290/MappingOutputs/Run136/bigWig"
+P137DIR="/scratch/evt82290/MappingOutputs/Run137/bigWig"
+P138DIR="/scratch/evt82290/MappingOutputs/Run138/bigWig"
+P139DIR="/scratch/evt82290/MappingOutputs/Run139/bigWig"
+P141DIR="/scratch/evt82290/MappingOutputs/Run141/bigWig"
+P144DIR="/scratch/evt82290/MappingOutputs/Run144/bigWig"
+P145DIR="/scratch/evt82290/MappingOutputs/Run145/bigWig"
+P146DIR="/scratch/evt82290/MappingOutputs/Run146/bigWig"
+P148DIR="/scratch/evt82290/MappingOutputs/Run148/bigWig"
+P149DIR="/scratch/evt82290/MappingOutputs/Run149/bigWig"
+P150DIR="/scratch/evt82290/MappingOutputs/Run150/bigWig"
+MISCDIR="/scratch/evt82290/MappingOutputs/misc_data/bigWig"
+RNADIR="/scratch/evt82290/RNAseq/misc_mutants/bigWig"
+ATACDIR="/scratch/evt82290/MappingOutputs/ATAC/BigWigs"
+
+#bed file directories
+QABED="/home/evt82290/Research/bed_files/qa-suz12"
+BEDDIR="/scratch/evt82290/RNAseqIGV/bedgraph"
+BEDDIR2="/home/evt82290/Research/bed_files"
+
+#load deeptools
+module load deepTools
+
+#H3K36me3
+
+###K27 genes
+computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+ -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
+    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
+ -R $BEDDIR2/H3K27me3_methylated_TSS_Promoters_FINAL.bed --missingDataAsZero --skipZeros -o K36_matrix_PRC2.gz
+
+    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_K27genes.pdf \
+                    --samplesLabel WT ash-1 cac-1 cac-2 set-7 \
+                    --startLabel "TSS" \
+                    --sortRegions descend \
+                    --outFileSortedRegions CAF-1_K36_order_K27genes.bed \
+                    --sortUsingSamples 1 2 3 \
+                    --heatmapHeight 25 \
+                    --colorMap "afmhot_r" \
+                    --zMin 0
+
+###ASH-1 methylated
+
+computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+ -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
+    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
+ -R $BEDDIR2/ash1_meth_nonK27.bed --missingDataAsZero --skipZeros -o K36_matrix_PRC2.gz
+
+    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_ash1_methylated_nonK27_genes.pdf \
+                    --samplesLabel WT ash-1 cac-1 cac-2 set-7 \
+                    --startLabel "TSS" \
+                    --sortRegions descend \
+                    --outFileSortedRegions \
+                    --sortUsingSamples 1 2 3 \
+                    --heatmapHeight 25 \
+                    --colorMap "afmhot_r" \
+                    --zMin 0
+
+###SET-2 methylated
+
+computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+ -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
+    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
+ -R $BEDDIR2/set2_meth_only.bed --missingDataAsZero --skipZeros -o K36_matrix_PRC2.gz
+
+    plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_set_methylated_only_genes.pdf \
+                    --samplesLabel WT ash-1 cac-1 cac-2 set-7 \
+                    --startLabel "TSS" \
+                    --sortRegions descend \
+                    --outFileSortedRegions \
+                    --sortUsingSamples 1 2 3 \
+                    --heatmapHeight 25 \
+                    --colorMap "afmhot_r" \
+                    --zMin 0
