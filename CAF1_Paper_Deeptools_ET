@@ -125,7 +125,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-  -R $BEDDIR2/K27losstest.bed $BEDDIR2/K27retaintest.bed --skipZeros -o K27_test.gz
+  -R $BEDDIR2/K27losstest.bed $BEDDIR2/K27retaintest.bed --missingDataAsZero --skipZeros -o K27_test.gz
 
 plotHeatmap -m K27_test.gz -out K27_cluster_test.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \
