@@ -103,38 +103,38 @@ module load deepTools
 #                     --zMin 0 --zMax 12
 
 #TEST
-computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
- -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
-    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
-    $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
-    $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
-    $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
- -R $BEDDIR2/K36losstest.bed $BEDDIR2/K36retaintest.bed --missingDataAsZero --skipZeros -o K36_test.gz
-
-    plotHeatmap -m K36_test.gz -out K36_cluster_test.pdf \
-                    --samplesLabel WT ash-1 cac-1 cac-2 set-7 \
-                    --startLabel "TSS" \
-                    --sortRegions descend \
-                    --sortUsingSamples 1 3 4 \
-                    --heatmapHeight 25 \
-                    --colorMap "afmhot_r" \
-                    --zMin 0 --zMax 12
-
-computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
--S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
-  -R $BEDDIR2/K27losstest.bed $BEDDIR2/K27retaintest.bed --missingDataAsZero --skipZeros -o K27_test.gz
-
-plotHeatmap -m K27_test.gz -out K27_cluster_test.pdf \
-                    --samplesLabel WT cac-1 cac-2 set-7 \
-                    --startLabel "TSS" \
-                    --sortRegions descend \
-                    --sortUsingSamples 1 2 3 \
-                    --heatmapHeight 25 \
-                    --colorList 'white,g,darkgreen' \
-                    --zMin 0 --zMax 50
+# computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+#  -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
+#     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
+#     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
+#     $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
+#     $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
+#  -R $BEDDIR2/K36losstest.bed $BEDDIR2/K36retaintest.bed --missingDataAsZero --skipZeros -o K36_test.gz
+#
+#     plotHeatmap -m K36_test.gz -out K36_cluster_test.pdf \
+#                     --samplesLabel WT ash-1 cac-1 cac-2 set-7 \
+#                     --startLabel "TSS" \
+#                     --sortRegions descend \
+#                     --sortUsingSamples 1 3 4 \
+#                     --heatmapHeight 25 \
+#                     --colorMap "afmhot_r" \
+#                     --zMin 0 --zMax 12
+#
+# computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+# -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-83_ChIP_set-7_H3K27me3_CS_Rep2_S82.bin_25.smooth_75Bulk.bw \
+#   -R $BEDDIR2/K27losstest.bed $BEDDIR2/K27retaintest.bed --missingDataAsZero --skipZeros -o K27_test.gz
+#
+# plotHeatmap -m K27_test.gz -out K27_cluster_test.pdf \
+#                     --samplesLabel WT cac-1 cac-2 set-7 \
+#                     --startLabel "TSS" \
+#                     --sortRegions descend \
+#                     --sortUsingSamples 1 2 3 \
+#                     --heatmapHeight 25 \
+#                     --colorList 'white,g,darkgreen' \
+#                     --zMin 0 --zMax 50
 
 ###cluster of K27 & K36 lost genes
 computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
@@ -151,5 +151,4 @@ plotHeatmap -m cluster_test.gz -out K27_K36_cluster_test.pdf \
                     --sortRegions descend \
                     --sortUsingSamples 1 2 3 4 \
                     --heatmapHeight 25 \
-                    --colorList 'white,g,darkgreen' 'white,g,darkgreen' 'lightyellow, lemonchiffon, navajowhite, goldenrod, orange, darkorange, peru, sienna, saddlebrown, brown, black' 'lightyellow, lemonchiffon, navajowhite, goldenrod, orange, darkorange, peru, sienna, saddlebrown, brown, black' \
-                    --zMin 0 0 0 0 --zMax 50 50 12 12
+                    --colorList 'white,g,darkgreen' 'white,g,darkgreen' 'lightyellow, orange, black' 'lightyellow, orange, black'
