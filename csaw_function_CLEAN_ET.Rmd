@@ -2249,16 +2249,29 @@ H3K27me3_noCAF1 = subset(K27_enriched, K27_enriched$V10 %in% H3K27me3_lost_genes
 write.table(H3K27me3_inCAF1, file = "H3K27me3_CAF1_retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(H3K27me3_noCAF1, file = "H3K27me3_CAF1_lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
 
-#i want to subset genes that lose K27 or K36 in cac-1 or cac-2
-K27lost = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac1 < -0.58 | H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac2 < -0.58)
+####i want to subset genes that lose K27 or K36 in cac-1 or cac-2
+K27lost = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac1 < -1 | H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac2 < -1)
 #K27lost = subset(K27lost, K27lost$FDR_cac1 < 0.05 | K27lost$FDR_cac2 < 0.05)
-K27lost = subset(H3K27me3_TSS_Promoters, H3K27me3_TSS_Promoters$V10 %in% K27lost$V10 )
+K27lost = subset(H3K27me3_TSS_Promoters, H3K27me3_TSS_Promoters$V10 %in% K27lost$V10)
 
-K36lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.58 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.58)
+K36lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -1 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -1)
 #K36lost = subset(K36lost, K36lost$FDR_cac1 < 0.05 | K36lost$FDR_cac2 < 0.05)
 K36lost = subset(H3K27me3_TSS_Promoters, H3K27me3_TSS_Promoters$V10 %in% K36lost$V10)
 
+retainK27 = subset(H3K27me3_TSS_Promoters, ! H3K27me3_TSS_Promoters$V10 %in% K27lost$V10)
+retainK36 = subset(H3K27me3_TSS_Promoters, ! H3K27me3_TSS_Promoters$V10 %in% K36lost$V10)
+
 write.table(K27lost, file = "K27losstest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K36lost, file = "K36losstest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
+
+write.table(retainK27, file = "K27retaintest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(retainK36, file = "K36retaintest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
+
+#####
+K27_K36lost = subset(K27lost, K27lost$V10 %in% K36lost$V10)
+K27lost_only = subset(K27lost, ! K27lost$V10 %in% K36lost$V10)
+K36lost_only = subset(K36lost, ! K36lost$V10 %in% K27_K36lost$V10)
+
+write.table(K27lost, file = "K27losstest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 ```
