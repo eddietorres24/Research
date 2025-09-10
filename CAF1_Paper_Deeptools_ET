@@ -149,6 +149,7 @@ plotHeatmap -m cluster_test.gz -out K27_K36_K27cluster_test.pdf \
                     --sortRegions descend \
                     --sortUsingSamples 1 2 \
                     --heatmapHeight 25 \
+                    --legendLocation none \
                     --colorList 'white,g,darkgreen' \
                     --zMin 0 --zMax 50
 
@@ -164,5 +165,6 @@ plotHeatmap -m cluster_test.gz -out K27_K36_K36cluster_test.pdf \
                     --sortRegions descend \
                     --sortUsingSamples 1 2 \
                     --heatmapHeight 25 \
+                    --legendLocation none \
                     --colorMap "afmhot_r" \
                     --zMin 0 --zMax 12
