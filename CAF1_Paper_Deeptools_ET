@@ -152,3 +152,4 @@ plotHeatmap -m cluster_test.gz -out K27_K36_cluster_test.pdf \
                     --sortUsingSamples 1 2 3 4 \
                     --heatmapHeight 25 \
                     --colorList 'white,g,darkgreen' 'white,g,darkgreen' 'lightyellow, orange, black' 'lightyellow, orange, black'
+                    --zMin 0 0 0 0 --zMax 50 50 12 12
