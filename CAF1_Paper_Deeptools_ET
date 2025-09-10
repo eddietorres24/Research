@@ -189,7 +189,7 @@ plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K27me3_CAF-1_K4_clustered_.pd
   --zMin 0 \
 
 ###Kac
-computeMatrix reference-point --referencePoint TSS -b 800 -a 15000 \
+computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 -S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
    $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
    $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
@@ -204,4 +204,4 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out H3K27me3_CAF-1_Kac_clustered.p
   --sortUsingSamples 1 2 3 \
   --whatToShow "heatmap and colorbar" \
   --colorList 'white, lavender, mediumslateblue' \
-  --zMin 0 \
+  --zMin 0 --zMax 8\
