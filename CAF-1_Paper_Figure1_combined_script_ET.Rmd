@@ -402,7 +402,6 @@ cac1_DEG_05 <- read.csv("./cac1_new_05.csv", header= TRUE, row.names = 1)
 cac2_DEG_05 <- read.csv("./cac2_05.csv", header= TRUE, row.names = 1)
 cac3_DEG_05 <- read.csv("./cac3_05.csv", header= TRUE, row.names = 1)
 set7_DEG_05 <- read.csv("./set7_05.csv", header= TRUE, row.names = 1)
-
 cac1_DEG_01 <- read.csv("./cac1_new_01.csv", header= TRUE, row.names = 1)
 cac2_DEG_01 <- read.csv("./cac2_01.csv", header= TRUE, row.names = 1)
 cac3_DEG_01 <- read.csv("./cac3_01.csv", header= TRUE, row.names = 1)
@@ -429,10 +428,10 @@ cac3_DOWN <- subset(cac3_DEG_05, cac3_DEG_05$log2FoldChange < -1)
 set7_UP <- subset(set7_DEG_05, set7_DEG_05$log2FoldChange > 1)
 set7_DOWN <- subset(set7_DEG_05, set7_DEG_05$log2FoldChange < -1)
 
-cac1_UP_01 <- subset(cac1_DEG_01, cac1_DEG_01$log2FoldChange > 1)
-cac1_DOWN_01 <- subset(cac1_DEG_01, cac1_DEG_01$log2FoldChange < -1)
-cac2_UP_01 <- subset(cac2_DEG_01, cac2_DEG_01$log2FoldChange > 1)
-cac2_DOWN_01 <- subset(cac2_DEG_01, cac2_DEG_01$log2FoldChange < -1)
+cac1_UP_01 <- subset(cac1_DEG_01, cac1_DEG_01$log2FoldChange > 1.5)
+cac1_DOWN_01 <- subset(cac1_DEG_01, cac1_DEG_01$log2FoldChange < -1.5)
+cac2_UP_01 <- subset(cac2_DEG_01, cac2_DEG_01$log2FoldChange > 1.5)
+cac2_DOWN_01 <- subset(cac2_DEG_01, cac2_DEG_01$log2FoldChange < -1.5)
 cac3_UP_01 <- subset(cac3_DEG_01, cac3_DEG_01$log2FoldChange > 1)
 cac3_DOWN_01 <- subset(cac3_DEG_01, cac3_DEG_01$log2FoldChange < -1)
 set7_UP_01 <- subset(set7_DEG_01, set7_DEG_01$log2FoldChange > 1)
@@ -534,8 +533,8 @@ write.csv(as.data.frame(cac1or2or3_DOWN), file = "cac1or2or3_DOWN.csv")
 #I also want to separate DE K27 genes from the rest of the genes. This is really only necessary for upregulated genes, as there are very few (if any) K27 marked genes that are actually downregulated in these mutants. I will make bed files out of these csvs to use in plotheatmap
 Prc2targets <- read.table("../bed_files/K27_genes_stringent.bed", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t")
 
-cac1_up_K27 <- subset(cac1_up_genes_05, cac1_up_genes_05$VALUE %in% Prc2targets$V11)
-cac2_up_K27 <- subset(cac2_up_genes_05, cac2_up_genes_05$VALUE %in% Prc2targets$V11)
+cac1_up_K27 <- subset(cac1_up_genes_01, cac1_up_genes_01$VALUE %in% Prc2targets$V11)
+cac2_up_K27 <- subset(cac2_up_genes_01, cac2_up_genes_01$VALUE %in% Prc2targets$V11)
 cac3_up_K27 <- subset(cac3_up_genes_05, cac3_up_genes_05$VALUE %in% Prc2targets$V11)
 set7_up_K27 <- subset(set7_up_genes_05, set7_up_genes_05$VALUE %in% Prc2targets$V11)
 cac1_up_nonK27 <- subset(cac1_up_genes_05, ! (cac1_up_genes_05$VALUE %in% Prc2targets$V11))
@@ -818,7 +817,7 @@ ggsave("./set7_volcano_plot_FINAL.pdf", plot=set7_volcano_plot, width = 12, heig
 ```{r Make Venn Diagrams, echo=FALSE}
 #Venn Diagram w/ All Upregulated genes in CAF-1 mutants
 venn.diagram(
-  x = list(cac1_UP$NCU, cac2_UP$NCU, cac3_UP$NCU),
+  x = list(cac1UP$NCU, cac2_UP$NCU, cac3_UP$NCU),
   category.names = c("cac1", "cac2 ", "cac3"),
   filename = 'CAF-1_UP_venn_diagramm.png',
   col=c("#8da0cb", "#66c2a5", "#fc8d62"),
@@ -885,6 +884,36 @@ cac1_2_set7_eulerplot <- plot(cac1_2_set7_fit)
 
 #Save file
 ggsave(filename = "cac1-2_set7_euler_All_UP.pdf", plot = cac1_2_set7_eulerplot, width = 4, height = 4, dpi = 600)
+```
+
+```{r, venn test}
+#combining RNA
+library(dplyr)
+
+# Stack then keep the first occurrence of each Attributes
+cacUPcombine <- bind_rows(
+  mutate(cac1UP, .source = "cac1UP"),
+  mutate(cac2UP, .source = "cac2UP")
+) %>%
+  # if you want cac1UP to win on collisions, keep this order
+  distinct(NCU, .keep_all = TRUE) %>%
+  select(-.source)
+
+#Venn Diagram w/ All Upregulated genes in CAF-1 mutants
+venn.diagram(
+  x = list(cacUPcombine$NCU, K27lost$V10, K36lost$V10),
+  category.names = c("Upregulated", "K27 lost ", "K36 lost"),
+  filename = 'CAF-1_UP_venn_diagramm.png',
+  col=c("#8da0cb", "#66c2a5", "#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+#Make euler plot inputing values gathered from venn.diagram(). This will provide a proportional venn-diagram
+CAF1_up_fit = euler(c("A" = 232, "B" = 26, "C" = 0, "A&B" = 132, "A&C" = 2, "B&C" = 6, "A&B&C" = 24))
+CAF1_up_eulerplot <- plot(CAF1_up_fit)
+
+#Save file
+ggsave(filename = "CAF-1_Up_K27_K36_loss.pdf", plot = CAF1_up_eulerplot, width = 4, height = 4, dpi = 600)
 ```
 
 #Lastly, I want to make an IGV track for visualizing DE data with ChIP data

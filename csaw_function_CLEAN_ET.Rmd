@@ -1369,256 +1369,266 @@ res <- make_csaw_heatmap_advanced(
 #read in log2FC Expression data saved from DESeq for whatever strains you want
 cac1RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1_new_ALL.csv", row.names = 1)
 cac2RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac2_ALL.csv", row.names = 1)
-set7RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/set7_05.csv", row.names = 1)
+set7RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/set7_ALL.csv", row.names = 1)
 
 #Plot heatmap with ChIP & RNA-seq log2FC
 
 suppressPackageStartupMessages({
   library(ComplexHeatmap)
   library(circlize)
+  library(grid)
 })
 
-make_chip_rna_heatmap <- function(
-  chip_results_df,
-  chip_heatmap_res,                         # list from make_csaw_heatmap_advanced()
-  rna_list,                                 # named list of RNA dfs; rownames are NCU IDs
-  chip_cols      = c("logFC_cac1","logFC_cac2","logFC_set7"),
-  rna_colname    = "log2FoldChange",
-
-  # visual scales (ChIP)
+make_chip_rna_heatmap_simple <- function(
+  chip_df,
+  rna_list,                                 # named list of RNA dfs; rownames are gene IDs
+  clusters_df = NULL,                       # optional; cols: gene, cluster
+  gene_col    = "V10",
+  chip_cols   = NULL,                       # NULL -> auto: logFC_<strain> for strains in rna_list
+  rna_colname = "log2FoldChange",
+  cluster_levels = NULL,                    # optional; if NULL and clusters_df provided, use its levels/order
+  sort_strains   = NULL,                    # e.g. c("cac1","cac2"); if NULL, no sorting (or all RNA cols if clusters present)
   chip_limits    = c(-2, 2),
-  chip_zero_band = 0.5,                     # white band around 0 for ChIP (visual only)
-  chip_colors    = c("#3B4CC0", "white", "#B40426"),
-
-  # visual scales (RNA)
-  rna_limits     = c(-4, 4),
-  rna_zero_band  = NULL,                    # e.g. 0.5 to mirror ChIP
-  rna_colors     = c("blue", "white", "red"),
-
-  # scaling
-  row_scale      = c("none", "zscore_chip", "zscore_rna", "zscore_both"),
-
-  # sorting
-  sort_by        = c("none","chip","rna"),
-  sort_strains   = NULL,                    # e.g. c("cac1","set7"); NULL = all columns in chosen block
-
-  # data filter
-  drop_na        = TRUE,                    # drop rows with any NA in either block
-
-  # clamp & legends
-  clamp_chip     = TRUE,
-  clamp_rna      = TRUE,
-  chip_legend_at     = NULL,
-  chip_legend_labels = NULL,
-  rna_legend_at      = NULL,
-  rna_legend_labels  = NULL,
-
-  # ---- OUTPUT & SIZE CONTROL ----
-  out_dir        = NULL,                    # if non-NULL, save files here
+  rna_limits     = c(-10, 10),
+  chip_zero_band = 0.5,
+  rna_zero_band  = 2,
+  chip_colors    = c("#3B4CC0","white","#B40426"),
+  rna_colors     = c("blue","white","red"),
+  row_gaps_mm    = 0,
+  out_dir        = NULL,
   file_prefix    = "chip_rna_heatmap",
-  save_formats   = c("pdf","png"),          # any of "pdf","png"
-  width_in       = 6.5,                     # figure width in inches
-  height_in      = NULL,                    # figure height in inches; if NULL -> auto by row count
-  base_height_in = 1.5,                     # base height (in) added regardless of rows (used if height_in is NULL)
-  per_row_height_in = 0.006,                # added height per row (in) if height_in is NULL
-  dpi            = 300                      # PNG resolution; px = inches * dpi
-) {
-  `%||%` <- function(a, b) if (!is.null(a)) a else b
+  save_formats   = c("pdf","png"),
+  width_in       = 8,
+  height_in      = NULL,
+  base_height_in = 1.5,
+  per_row_height_in = 0.006,
+  dpi            = 300
+){
+  stopifnot(gene_col %in% names(chip_df))
+  stopifnot(is.list(rna_list), length(rna_list) >= 1)
+  strains <- names(rna_list)
+  stopifnot(all(nzchar(strains)))
 
-  row_scale <- match.arg(row_scale)
-  sort_by   <- match.arg(sort_by)
-
-  stopifnot(is.list(chip_heatmap_res), !is.null(chip_heatmap_res$matrix))
-  chip_mat_full <- chip_heatmap_res$matrix
-
-  # Map ChIP rows -> gene IDs via "seq.start.end"
-  chip_key <- with(chip_results_df, paste(seqnames, start, end, sep = "."))
-  gene_map <- setNames(chip_results_df$V10, chip_key)
-  if (!all(rownames(chip_mat_full) %in% names(gene_map))) {
-    missing_keys <- setdiff(rownames(chip_mat_full), names(gene_map))
-    stop("Some heatmap rows not in chip_results_df key (seq.start.end). Examples: ",
-         paste(head(missing_keys, 5), collapse = ", "))
+  # ---- HARD INTERSECTION: chip ∩ all RNA (∩ clusters if provided) ----
+  genes_chip <- as.character(chip_df[[gene_col]])
+  common <- Reduce(intersect, c(list(genes_chip), lapply(rna_list, rownames)))
+  if (!is.null(clusters_df)) {
+    stopifnot(all(c("gene","cluster") %in% names(clusters_df)))
+    common <- intersect(common, as.character(clusters_df$gene))
   }
-  genes_in_order <- gene_map[ rownames(chip_mat_full) ]
+  chip_df <- chip_df[match(common, genes_chip), , drop = FALSE]
+  rna_list <- lapply(rna_list, function(df) df[common, , drop = FALSE])
+  if (!is.null(clusters_df)) clusters_df <- clusters_df[clusters_df$gene %in% common, , drop = FALSE]
+  genes <- common
 
-  # Keep requested ChIP columns
-  keep_chip <- intersect(chip_cols, colnames(chip_mat_full))
-  if (length(keep_chip) == 0) stop("None of chip_cols present in the ChIP heatmap matrix.")
-  chip_sub <- chip_mat_full[, keep_chip, drop = FALSE]
-
-  # Build RNA matrix in identical row order
-  pull_rna <- function(df, genes, col = rna_colname) {
-    rn <- trimws(rownames(df))
-    if (is.null(rn)) stop("RNA data frame is missing rownames (NCU IDs).")
-    v <- df[genes, col, drop = TRUE]
-    suppressWarnings(as.numeric(v))
+  # ---- build matrices ----
+  if (is.null(chip_cols)) {
+    guess <- paste0("logFC_", strains)
+    chip_cols <- intersect(guess, names(chip_df))
   }
-  rna_mat <- do.call(cbind, lapply(names(rna_list), function(nm) {
-    pull_rna(rna_list[[nm]], genes_in_order, rna_colname)
-  }))
-  colnames(rna_mat) <- paste0("RNA_", names(rna_list))
-  rownames(rna_mat) <- rownames(chip_sub)
+  stopifnot(length(chip_cols) >= 1, all(chip_cols %in% names(chip_df)))
+  chipMat <- as.matrix(chip_df[, chip_cols, drop = FALSE])
+  rownames(chipMat) <- genes
+  storage.mode(chipMat) <- "numeric"
 
-  # Drop rows with any NA across either block (e.g., rRNA/tRNA lacking RNA)
-  if (isTRUE(drop_na)) {
-    keep <- rowSums(is.na(chip_sub)) == 0 & rowSums(is.na(rna_mat)) == 0
-    chip_sub       <- chip_sub[keep, , drop = FALSE]
-    rna_mat        <- rna_mat [keep, , drop = FALSE]
-    genes_in_order <- genes_in_order[keep]
-  }
+  pull_rna <- function(df, g, col) suppressWarnings(as.numeric(df[g, col, drop = TRUE]))
+  rnaMat <- do.call(cbind, lapply(strains, function(s) pull_rna(rna_list[[s]], genes, rna_colname)))
+  colnames(rnaMat) <- paste0("RNA_", strains)
+  rownames(rnaMat) <- genes
 
-  # Row-wise z-scoring (post-alignment, pre-sorting, pre-clamping)
-  zrow <- function(m) {
-    if (ncol(m) == 1) return(m * 0)  # single column z-score -> flat zero
-    mc <- m - rowMeans(m, na.rm = TRUE)
-    s  <- apply(mc, 1, function(x) sd(x, na.rm = TRUE))
-    s[s == 0 | is.na(s)] <- 1
-    mc / s
-  }
-  if (row_scale %in% c("zscore_chip","zscore_both")) chip_sub <- zrow(chip_sub)
-  if (row_scale %in% c("zscore_rna","zscore_both"))  rna_mat  <- zrow(rna_mat)
-
-  # Optional sorting
-  if (sort_by != "none") {
-    if (sort_by == "chip") {
-      cols_to_use <- if (is.null(sort_strains)) colnames(chip_sub) else {
-        wanted <- paste0("logFC_", sort_strains)
-        intersect(wanted, colnames(chip_sub))
-      }
-      mat_for_order <- chip_sub
-    } else { # sort_by == "rna"
-      cols_to_use <- if (is.null(sort_strains)) colnames(rna_mat) else {
-        wanted <- paste0("RNA_", sort_strains)
-        intersect(wanted, colnames(rna_mat))
-      }
-      mat_for_order <- rna_mat
-    }
-    if (length(cols_to_use) > 0) {
-      score <- if (length(cols_to_use) == 1) {
-        as.numeric(mat_for_order[, cols_to_use])
+  # ---- clustering & ordering ----
+  cl_split <- NULL
+  if (!is.null(clusters_df)) {
+    if (is.null(cluster_levels)) {
+      # keep the order appearing in clusters_df if levels already set; else unique order
+      if (is.factor(clusters_df$cluster)) {
+        cluster_levels <- levels(clusters_df$cluster)
       } else {
-        rowMeans(mat_for_order[, cols_to_use, drop = FALSE], na.rm = TRUE)
+        cluster_levels <- unique(as.character(clusters_df$cluster))
       }
-      ord <- order(score, decreasing = TRUE, na.last = TRUE)
-      chip_sub       <- chip_sub[ord, , drop = FALSE]
-      rna_mat        <- rna_mat [ord, , drop = FALSE]
-      genes_in_order <- genes_in_order[ord]
+    }
+    clusters_df$cluster <- factor(as.character(clusters_df$cluster), levels = cluster_levels)
+    cl_map <- setNames(as.character(clusters_df$cluster), clusters_df$gene)
+    cl_vec <- cl_map[genes]
+    cl_split <- factor(cl_vec, levels = cluster_levels)
+
+    # sort within each cluster by mean over sort_strains (or all RNA cols if not provided)
+    sort_cols <- if (is.null(sort_strains)) colnames(rnaMat) else paste0("RNA_", intersect(sort_strains, strains))
+    score <- rowMeans(rnaMat[, sort_cols, drop = FALSE], na.rm = TRUE)
+    idx <- unlist(lapply(levels(cl_split), function(cl){
+      w <- which(cl_split == cl)
+      if (!length(w)) integer(0) else w[order(score[w], decreasing = TRUE, na.last = TRUE)]
+    }), use.names = FALSE)
+    chipMat  <- chipMat[idx, , drop = FALSE]
+    rnaMat   <- rnaMat [idx, , drop = FALSE]
+    cl_split <- cl_split[idx]
+  } else {
+    # no clusters: optional global sort by mean of sort_strains
+    if (!is.null(sort_strains)) {
+      sort_cols <- paste0("RNA_", intersect(sort_strains, strains))
+      if (length(sort_cols) > 0) {
+        score <- rowMeans(rnaMat[, sort_cols, drop = FALSE], na.rm = TRUE)
+        ord <- order(score, decreasing = TRUE, na.last = TRUE)
+        chipMat <- chipMat[ord, , drop = FALSE]
+        rnaMat  <- rnaMat [ord, , drop = FALSE]
+      }
     }
   }
 
-  # Clamp to limits so legend and colors match exactly
-  if (isTRUE(clamp_chip)) chip_sub <- pmin(pmax(chip_sub, chip_limits[1]), chip_limits[2])
-  if (isTRUE(clamp_rna))  rna_mat  <- pmin(pmax(rna_mat,  rna_limits[1]), rna_limits[2])
-
-  # Color mapping with optional flat white band around 0
-  make_diverging_fun <- function(lims, band, cols) {
-    if (is.null(cols) || length(cols) < 3) cols <- c("#3B4CC0","white","#B40426")
+  # ---- colors, clamping, gaps ----
+  col_fun <- function(lims, band, cols){
     if (!is.null(band) && lims[1] < 0 && lims[2] > 0) {
-      band <- abs(as.numeric(band))[1]
-      brks <- c(lims[1], -band, 0, band, lims[2])
-      pal  <- c(cols[1], "white", "white", "white", tail(cols, 1))
-      circlize::colorRamp2(brks, pal)
+      b <- abs(band)[1]
+      circlize::colorRamp2(c(lims[1], -b, 0, b, lims[2]),
+                           c(cols[1],"white","white","white",cols[3]))
     } else if (lims[1] < 0 && lims[2] > 0) {
-      circlize::colorRamp2(c(lims[1], 0, lims[2]),
-                           c(cols[1], "white", tail(cols, 1)))
+      circlize::colorRamp2(c(lims[1], 0, lims[2]), c(cols[1],"white",cols[3]))
     } else {
-      circlize::colorRamp2(c(lims[1], lims[2]),
-                           c(cols[1], tail(cols, 1)))
+      circlize::colorRamp2(c(lims[1], lims[2]), c(cols[1], cols[3]))
     }
   }
-  col_fun_chip <- make_diverging_fun(chip_limits, chip_zero_band, chip_colors)
-  col_fun_rna  <- make_diverging_fun(rna_limits,  rna_zero_band,  rna_colors)
+  col_chip <- col_fun(chip_limits, chip_zero_band, chip_colors)
+  col_rna  <- col_fun(rna_limits,  rna_zero_band,  rna_colors)
 
-  # Legend ticks default to limits
-  if (is.null(chip_legend_at)) chip_legend_at <- pretty(chip_limits, n = 5)
-  if (is.null(rna_legend_at))  rna_legend_at  <- pretty(rna_limits,  n = 5)
+  chipMat <- pmin(pmax(chipMat, chip_limits[1]), chip_limits[2])
+  rnaMat  <- pmin(pmax(rnaMat,  rna_limits[1]),  rna_limits[2])
 
-  # Build heatmaps
+  # row gaps only when clusters are used
+  row_gaps <- if (!is.null(cl_split)) {
+    k <- sum(table(cl_split) > 0)
+    if (k > 1 && row_gaps_mm > 0) unit(rep(row_gaps_mm, k - 1), "mm") else unit(0, "mm")
+  } else unit(0, "mm")
+
   ht_chip <- Heatmap(
-    chip_sub,
-    name = if (row_scale %in% c("zscore_chip","zscore_both")) "ChIP (z)" else "ChIP log2FC",
-    col = col_fun_chip,
-    cluster_rows = FALSE,
-    cluster_columns = FALSE,
-    show_row_names = FALSE,
-    heatmap_legend_param = list(at = chip_legend_at, labels = chip_legend_labels %||% chip_legend_at)
+    chipMat, name = "ChIP log2FC", col = col_chip,
+    cluster_rows = FALSE, cluster_columns = FALSE, show_row_names = FALSE,
+    row_split = cl_split, row_gap = row_gaps
   )
   ht_rna <- Heatmap(
-    rna_mat,
-    name = if (row_scale %in% c("zscore_rna","zscore_both")) "RNA (z)" else "RNA log2FC",
-    col = col_fun_rna,
-    na_col = "white",
-    cluster_rows = FALSE,
-    cluster_columns = FALSE,
-    show_row_names = FALSE,
-    heatmap_legend_param = list(at = rna_legend_at, labels = rna_legend_labels %||% rna_legend_at)
+    rnaMat,  name = "RNA log2FC",  col = col_rna, na_col = "white",
+    cluster_rows = FALSE, cluster_columns = FALSE, show_row_names = FALSE,
+    row_split = cl_split, row_gap = row_gaps
   )
 
   ht_all <- ht_chip + ht_rna
 
-  # Determine output height
-  n_rows <- nrow(chip_sub)
-  eff_height_in <- if (is.null(height_in)) base_height_in + n_rows * per_row_height_in else height_in
-  png_width_px  <- as.integer(round(width_in * dpi))
-  png_height_px <- as.integer(round(eff_height_in * dpi))
+  n_rows <- nrow(chipMat)
+  eff_h  <- if (is.null(height_in)) base_height_in + n_rows * per_row_height_in else height_in
 
-  # Save to files if requested
   if (!is.null(out_dir)) {
     dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
     fmts <- tolower(save_formats)
-
     if ("pdf" %in% fmts) {
-      pdf_file <- file.path(out_dir, paste0(file_prefix, ".pdf"))
-      grDevices::pdf(pdf_file, width = width_in, height = eff_height_in, useDingbats = FALSE)
-      draw(ht_all, heatmap_legend_side = "right")
-      grDevices::dev.off()
+      pdf(file.path(out_dir, paste0(file_prefix, ".pdf")), width = width_in, height = eff_h, useDingbats = FALSE)
+      draw(ht_all, heatmap_legend_side = "right"); dev.off()
     }
-
     if ("png" %in% fmts) {
-      png_file <- file.path(out_dir, paste0(file_prefix, ".png"))
-      grDevices::png(png_file, width = png_width_px, height = png_height_px, res = dpi)
-      draw(ht_all, heatmap_legend_side = "right")
-      grDevices::dev.off()
+      png(file.path(out_dir, paste0(file_prefix, ".png")), width = width_in, height = eff_h, units = "in", res = dpi)
+      draw(ht_all, heatmap_legend_side = "right"); dev.off()
     }
   }
 
-  # Also draw interactively (uses current device size)
   draw(ht_all, heatmap_legend_side = "right")
-
-  invisible(list(
-    chip_matrix = chip_sub,
-    rna_matrix  = rna_mat,
-    genes       = genes_in_order,
-    size_used   = list(width_in = width_in, height_in = eff_height_in, dpi = dpi)
-  ))
+  invisible(list(chip_matrix = chipMat, rna_matrix = rnaMat, clusters = cl_split, genes_plotted = rownames(chipMat)))
 }
 
 # ---------------------- Example usage ----------------------
-out <- make_chip_rna_heatmap(
-  chip_results_df  = H3K36me3_Results_K27promTSS_vWT,
-  chip_heatmap_res = res,
-  rna_list = list(cac1 = cac1RNA, cac2 = cac2RNA, set7 = set7RNA),
-  chip_cols      = c("logFC_cac1","logFC_cac2","logFC_set7"),
-  chip_limits    = c(-2, 2),
-  chip_zero_band = 0.5,
-  rna_limits     = c(-10, 10),
+genes <- H3K36me3_Results_K27promTSS_vWT$V10  # or the gene list you want
+
+rna_df <- data.frame(
+  RNA_cac1 = cac1RNA[genes, "log2FoldChange"],
+  RNA_cac2 = cac2RNA[genes, "log2FoldChange"],
+  row.names = genes
+)
+
+out <- make_chip_rna_heatmap_simple(
+  chip_df   = H3K36me3_Results_K27promTSS_vWT,
+  rna_list  = list(cac1 = cac1RNA, cac2 = cac2RNA, set7 = set7RNA),
+  clusters_df = clusters_df,
+  gene_col  = "V10",
+  chip_cols = c("logFC_cac1","logFC_cac2","logFC_set7"),
+  sort_strains = c("cac1","cac2","set7"),
+  chip_limits = c(-2,2),
+  rna_limits  = c(-6,6),
+  chip_zero_band = 1,
   rna_zero_band  = 2,
-  sort_by      = "rna",
-  drop_na     = TRUE,
-  sort_strains = c("cac1","cac2"),
-  clamp_rna      = FALSE,                        
-  rna_legend_at  = NULL,
-  out_dir        = "csaw_heatmaps",
-  file_prefix    = "H3K36me3_vWT_vs_RNA_vWT_RNAsorted",
+  row_gaps_mm = 0,
+  out_dir = "csaw_heatmaps",
+  file_prefix = "H3K36me3_vs_RNA_clustered",
   save_formats = c("pdf","png"),
-  width_in     = 8,
-  height_in    = 7,
-  dpi          = 300
+  width_in = 8,
+  dpi = 300,
+  cluster_levels = ord  
+)
+
+out <- make_chip_rna_heatmap_simple(
+  chip_df   = H3K36me3_Results_K27promTSS_vWT,
+  rna_list  = list(cac1 = cac1RNA, cac2 = cac2RNA),
+  clusters_df = NULL,
+  gene_col  = "V10",
+  chip_cols = c("logFC_cac1","logFC_cac2"),
+  sort_strains = c("cac1","cac2"),
+  chip_limits = c(-2,2),
+  rna_limits  = c(-6,6),
+  chip_zero_band = 1,
+  rna_zero_band  = 1,
+  row_gaps_mm = 0,
+  out_dir = "csaw_heatmaps",
+  file_prefix = "H3K36me3_vs_RNA_CAF_sorted",
+  save_formats = c("pdf","png"),
+  width_in = 8,
+  dpi = 300
 )
 
 #View RNA matrix being plotted (in correct order)
-rna_df <- data.frame(GeneID = out$genes, out$rna_matrix)
-View(rna_df)
+# 1) Get the plotted RNA matrix (in order)
+rna_mat <- out$rna_matrix
+
+# 2) Turn it into a data frame with gene + cluster + row index
+rna_plotted <- cbind(
+  gene    = rownames(rna_mat),
+  as.data.frame(rna_mat),
+  cluster = as.character(out$clusters)
+)
+rna_plotted$order_idx <- seq_len(nrow(rna_plotted))
+rna_plotted <- rna_plotted[, c("order_idx","gene","cluster", setdiff(names(rna_plotted), c("order_idx","gene","cluster")))]
+
+
+#RNA clustering
+# Align by shared genes (rownames assumed to be gene IDs)
+common <- Reduce(intersect, list(rownames(cac1RNA), rownames(cac2RNA), rownames(set7RNA)))
+c1  <- cac1RNA[common, , drop = FALSE]
+c2  <- cac2RNA[common, , drop = FALSE]
+s7  <- set7RNA[common, , drop = FALSE]
+
+up_cac1 <- !is.na(c1$log2FoldChange) & c1$log2FoldChange > 2
+up_cac2 <- !is.na(c2$log2FoldChange) & c2$log2FoldChange > 2
+up_set7 <- !is.na(s7$log2FoldChange) & s7$log2FoldChange > 2
+
+cluster <- ifelse(up_cac1 & up_cac2 & up_set7, "cluster1_all_up",
+           ifelse(up_cac1 | up_cac2, "cluster2_cac1_cac2_up",
+           ifelse(!(up_cac1 | up_cac2) & up_set7, "cluster3_set7_up_only",
+                  "cluster4_other")))
+
+# Result table (handy for joins/plots)
+clusters_df <- data.frame(
+  gene = common,
+  cluster = cluster,
+  lfc_cac1 = c1$log2FoldChange,
+  lfc_cac2 = c2$log2FoldChange,
+  lfc_set7 = s7$log2FoldChange,
+  row.names = NULL
+)
+
+clusters_df <- subset(clusters_df, clusters_df$gene %in% H3K27me3_TSS_Promoters$V10)
+
+# order  (FIX the name to _cac1_cac2_)
+ord <- c("cluster1_all_up", "cluster2_cac1_cac2_up", "cluster3_set7_up_only", "cluster4_other")
+
+# set factor levels to ord (NOT to `cluster`)
+clusters_df$cluster <- factor(clusters_df$cluster, levels = ord)
+
+
 
 ```
 
@@ -1856,15 +1866,26 @@ chip_scatter_flex <- function(
 ```
 
 ```{r, use scatter plot function}
+#you have to make sure to assing gene names to df being used
+bed_key <- regions$K27promTSS %>%
+  select(V1, V2, V3, V10) %>%
+  distinct(V1, V2, V3, .keep_all = TRUE)   # guard against duplicate coords
+
+H3K27me3_CS_Results_K27promTSS_vWT <- H3K27me3_CS_Results_K27promTSS_vWT %>%
+  left_join(bed_key, by = c("seqnames" = "V1", "start" = "V2", "end" = "V3"))
+
+
 #Example Use (ChIP vs RNA)
 out <- chip_scatter_flex(
   mode        = "chip_vs_rna",
   chip_df_x   = H3K36me3_Results_K27promTSS_vWT,  # X = H3K36me3
   strain_x    = "cac1",
   rna_df      = cac1RNA,                          # RNA for cac1
+  up_thresh      =  1.5,
+  down_thresh    = -1.5,
   chip_x_label = "H3K36me3",                      # label in axes/title
   out_dir     = "scatter_outputs",
-  file_prefix = "H3K36me3_vs_RNA_cac1",
+  file_prefix = "H3K36me3_K27promTSS_vs_RNA_cac1",
   width_in    = 12, height_in = 9, dpi = 600
 )
 out$gg
@@ -2147,20 +2168,20 @@ peaks_win <- heatmap_to_bed_peaks(
 
 # Example 2: vInput heatmap, enriched regions per strain across a pre-determined region set (i.e. all genes)
 peaks <- heatmap_to_bed_peaks(
-  hm_df         = H3K36me3_Heatmap_allgenes_vInput,
-  out_dir       = "csaw_beds/H3K36me3_vInput",
-  prefix        = "H3K36me3_enriched_genes",
+  hm_df         = H3K36me3_Heatmap_K27promTSS_vWT,
+  out_dir       = "csaw_beds/H3K36me3_vWT",
+  prefix        = "H3K36me3_lost_K27genes",
   mode          = "region",
-  direction     = "positive",
-  min_value     = 2,                         
+  direction     = "negative",
+  min_value     = 0.75,                         
   merge_windows = FALSE,                     # ignored in region mode anyway
   zero_based    = TRUE,
   file_norm_tag = NULL,                      # OR "vInput"/"vWT" if you want it appended here
-  source_regions_df = regions$allgenes, # needs to match your original region df with coords + gene IDs
+  source_regions_df = regions$K27promTSS, # needs to match your original region df with coords + gene IDs
   source_key_cols   = c("V1","V2","V3"),
   source_gene_col   = "V10",      # may want to use V11, which has NCUs instead of names (change below)
   promote_to_full_genes  = TRUE,
-  universe_df            = regions$allgenes, #IMPORTANT: The df you want to subset
+  universe_df            = regions$K27genes, #IMPORTANT: The df you want to subset
   universe_gene_col      = "V10",
   universe_label         = "genes",
   universe_is_zero_based = FALSE,          
@@ -2211,7 +2232,7 @@ H3K36me3_no_ash1 = subset(H3K36me3_lost_genes_log2FC_1_ash1_genes_BED, H3K36me3_
 H3K36me3_no_ash1_nonK27 = subset(H3K36me3_no_ash1, ! H3K36me3_no_ash1$V10 %in% K27_enriched$V10 )
 
 #Not ash-1 methylated
-H3K36me3_set2_meth <- subset(H3K36me3_methylated_genes_log2FC_0.1_WT_genes_BED, ! regions$allgenes$V10 %in% H3K36me3_no_ash1$V10 & ! regions$allgenes$V10 %in% K27_enriched$V10)
+H3K36me3_set2_meth <- subset(H3K36me3_enriched_genes_log2FC_0.5_WT_genes_BED, ! H3K36me3_enriched_genes_log2FC_0.5_WT_genes_BED$V10 %in% H3K36me3_no_ash1$V10 & ! H3K36me3_enriched_genes_log2FC_0.5_WT_genes_BED$V10 %in% K27_enriched$V10)
 
 #write files
 write.table(H3K36me3_no_ash1_nonK27, file = "ash1_meth_nonK27.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
@@ -2228,5 +2249,16 @@ H3K27me3_noCAF1 = subset(K27_enriched, K27_enriched$V10 %in% H3K27me3_lost_genes
 write.table(H3K27me3_inCAF1, file = "H3K27me3_CAF1_retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(H3K27me3_noCAF1, file = "H3K27me3_CAF1_lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
 
+#i want to subset genes that lose K27 or K36 in cac-1 or cac-2
+K27lost = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac1 < -0.58 | H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac2 < -0.58)
+#K27lost = subset(K27lost, K27lost$FDR_cac1 < 0.05 | K27lost$FDR_cac2 < 0.05)
+K27lost = subset(H3K27me3_TSS_Promoters, H3K27me3_TSS_Promoters$V10 %in% K27lost$V10 )
+
+K36lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.58 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.58)
+#K36lost = subset(K36lost, K36lost$FDR_cac1 < 0.05 | K36lost$FDR_cac2 < 0.05)
+K36lost = subset(H3K27me3_TSS_Promoters, H3K27me3_TSS_Promoters$V10 %in% K36lost$V10)
+
+write.table(K27lost, file = "K27losstest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K36lost, file = "K36losstest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
 
 ```
