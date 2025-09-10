@@ -143,7 +143,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 -R $BEDDIR2/CAF1_K27_K36_lost.bed $BEDDIR2/CAF1_K27_lost_only.bed $BEDDIR2/CAF1_K36_lost_only.bed $BEDDIR2/CAF1_K36_K27_retain.bed \
    --missingDataAsZero --skipZeros -o cluster_test.gz
 
-plotHeatmap -m cluster_test.gz -out K27_K36_cluster_test.pdf \
+plotHeatmap -m cluster_test.gz -out K27_K36_K27cluster_test.pdf \
                     --samplesLabel WT cac-1 \
                     --startLabel "TSS" \
                     --sortRegions descend \
@@ -158,7 +158,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 -R $BEDDIR2/CAF1_K27_K36_lost.bed $BEDDIR2/CAF1_K27_lost_only.bed $BEDDIR2/CAF1_K36_lost_only.bed $BEDDIR2/CAF1_K36_K27_retain.bed \
    --missingDataAsZero --skipZeros -o cluster_test.gz
 
-plotHeatmap -m cluster_test.gz -out K27_K36_cluster_test.pdf \
+plotHeatmap -m cluster_test.gz -out K27_K36_K36cluster_test.pdf \
                     --samplesLabel WT cac-1 \
                     --startLabel "TSS" \
                     --sortRegions descend \
