@@ -143,7 +143,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 -R $BEDDIR2/Kac_order.bed \
    --missingDataAsZero --skipZeros -o cluster_test.gz
 
-plotHeatmap -m cluster_test.gz -out K27_genes_CAF-1_K27_clustered.pdf \
+plotHeatmap -m cluster_test.gz -out K27_genes_CAF-1_K27_clustered_Kacorder.pdf \
                     --samplesLabel WT cac-1 \
                     --startLabel "TSS" \
                     --sortRegions descend \
@@ -161,7 +161,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 -R $BEDDIR2/Kac_order.bed \
    --missingDataAsZero --skipZeros -o cluster_test.gz
 
-plotHeatmap -m cluster_test.gz -out K27_genes_CAF-1_K36_clustered.pdf \
+plotHeatmap -m cluster_test.gz -out K27_genes_CAF-1_K36_clustered_Kacorder.pdf \
                     --samplesLabel WT cac-1 \
                     --startLabel "TSS" \
                     --sortRegions descend \
@@ -183,7 +183,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 -R $BEDDIR2/Kac_order.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_K4_clustered.gz
 
-plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K27me3_CAF-1_K4_clustered_.pdf \
+plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K27me3_CAF-1_K4_clustered_Kacorder.pdf \
   --samplesLabel WT cac-1 cac-2 set-7 \
   --startLabel "TSS" \
   --sortRegions descend \
@@ -203,7 +203,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 -R $BEDDIR2/Kac_order.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
 
-plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out H3K27me3_CAF-1_Kac_clustered.pdf \
+plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out H3K27me3_CAF-1_Kac_clustered_Kacorder.pdf \
   --samplesLabel WT cac-1 cac-2 set-7 \
   --startLabel "TSS" \
   --sortRegions descend \
