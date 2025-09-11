@@ -148,7 +148,7 @@ plotHeatmap -m cluster_test.gz -out K27_genes_CAF-1_K27_clustered.pdf \
                     --startLabel "TSS" \
                     --sortRegions descend \
                     --sortUsingSamples 1 2 \
-                    --heatmapHeight 32 \
+                    --heatmapHeight 24 \
                     --legendLocation none \
                     --colorList 'white,g,darkgreen' \
                     --zMin 0 --zMax 50
@@ -164,7 +164,7 @@ plotHeatmap -m cluster_test.gz -out K27_genes_CAF-1_K36_clustered.pdf \
                     --startLabel "TSS" \
                     --sortRegions descend \
                     --sortUsingSamples 1 2 \
-                    --heatmapHeight 32 \
+                    --heatmapHeight 24 \
                     --legendLocation none \
                     --colorMap "afmhot_r" \
                     --zMin 0 --zMax 12
@@ -184,7 +184,7 @@ plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K27me3_CAF-1_K4_clustered_.pd
   --startLabel "TSS" \
   --sortRegions descend \
   --sortUsingSamples 1 2 3 \
-  --heatmapHeight 20 \
+  --heatmapHeight 24 \
   --whatToShow "heatmap and colorbar" \
   --colorList 'white,magenta' \
   --zMin 0 \
@@ -203,7 +203,7 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out H3K27me3_CAF-1_Kac_clustered.p
   --startLabel "TSS" \
   --sortRegions descend \
   --sortUsingSamples 1 2 3 \
-  --heatmapHeight 20 \
+  --heatmapHeight 24 \
   --whatToShow "heatmap and colorbar" \
   --colorList 'white, lavender, mediumslateblue' \
   --zMin 0 --zMax 8\
