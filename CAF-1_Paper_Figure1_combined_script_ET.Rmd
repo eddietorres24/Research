@@ -909,11 +909,11 @@ venn.diagram(
   output=TRUE)
 
 #Make euler plot inputing values gathered from venn.diagram(). This will provide a proportional venn-diagram
-CAF1_up_fit = euler(c("A" = 232, "B" = 26, "C" = 0, "A&B" = 132, "A&C" = 2, "B&C" = 6, "A&B&C" = 24))
+CAF1_up_fit = euler(c("A" = 236, "B" = 22, "C" = 2, "A&B" = 115, "A&C" = 9, "B&C" = 8, "A&B&C" = 30))
 CAF1_up_eulerplot <- plot(CAF1_up_fit)
 
 #Save file
-ggsave(filename = "CAF-1_Up_K27_K36_loss.pdf", plot = CAF1_up_eulerplot, width = 4, height = 4, dpi = 600)
+ggsave(filename = "CAF-1_Up_K27_K36_loss.png", plot = CAF1_up_eulerplot, width = 4, height = 4, dpi = 600)
 ```
 
 #Lastly, I want to make an IGV track for visualizing DE data with ChIP data

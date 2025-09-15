@@ -75,4 +75,9 @@ $B149DIR/149-66_RNA_cac-1_cac-2___S66/149-66_RNA_cac-1_cac-2___S66_Aligned.sorte
 $B149DIR/149-67_RNA_cac-1_cac-2___S67/149-67_RNA_cac-1_cac-2___S67_Aligned.sortedByCoord.out.bam \
 $B149DIR/149-96_RNA_cac-1-suz-12__Rep1_S96/149-96_RNA_cac-1-suz-12__Rep1_S96_Aligned.sortedByCoord.out.bam \
 $B149DIR/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121_Aligned.sortedByCoord.out.bam \
-$B149DIR/149-98_RNA_cac-1-suz-12__Rep3_S122/149-98_RNA_cac-1-suz-12__Rep3_S122_Aligned.sortedByCoord.out.bam
+$B149DIR/149-98_RNA_cac-1-suz-12__Rep3_S122/149-98_RNA_cac-1-suz-12__Rep3_S122_Aligned.sortedByCoord.out.bam \
+$BAMDIR/SRR7690267/SRR7690267_Aligned.sortedByCoord.out.bam \
+$BAMDIR/SRR7690268/SRR7690268_Aligned.sortedByCoord.out.bam \
+SRR9027658
+SRR9027759
+SRR9027689

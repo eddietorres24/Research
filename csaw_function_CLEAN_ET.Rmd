@@ -51,6 +51,13 @@ param <- readParam(discard = matLocus, pe="none", max.frag=1500, minq=20 )
 #reading in regions of interest
 regions <- list(K27genes_proms = read.table("../bed_files/K27_genes_prom_100pct_overlap.bed"), K27genes = read.table("../bed_files/K27_genes_stringent.bed"), K27proms = read.table("../bed_files/K27_promoters.bed"), K27promTSS = read.table("../bed_files/K27_prom_TSS.bed"), allgenes = read.table("../bed_files/all_genes_forR.bed")) 
 
+new = read.table("../bed_files/H3K27me3_methylated_TSS_Promoters_FINAL.bed")
+
+regions$K27promTSS = subset(regions$K27promTSS, regions$K27promTSS$V10 %in% new$V10)
+regions$K27proms = subset(regions$K27proms, regions$K27proms$V10 %in% new$V10)
+regions$K27genes_proms = subset(regions$K27genes_proms, regions$K27genes_proms$V10 %in% new$V10)
+regions$K27genes= subset(regions$K27genes, regions$K27genes$V10 %in% new$V10)
+
 ###IMPORTANT: the tables you  read into your list should not have a header (i.e., the column names should be V1, V2, ... VX). If your columns have other names, the count function may not recognize it properly. even if the files you read in have headers, i believe you can adjust the way read.table reads it into a df object. check column names in the "regions" object before continuing
 
 #with "list" you can read multiple beds into the function
@@ -496,12 +503,14 @@ qc_csaw(
 ```{r, csaw analysis fucntion}
 #This function is going to now analyze the data that you have read in, and calculate the signal over background, normalized to input or WT (or another strain for interest). It will make a couple dataframes for each normalization, for each modifcation analyzed: one with all results (log2FC, FDR, etc.), and one with only log2FC values for heatmap generation. There is also options built in to write analyzed data & statistics to a csv, as well as make an igv track for browser visualization.
 
-# - WINDOW mode:
-#     * vInput: keep windows where >=1 strain is (FDR<=cut &/or P<=cut) AND logFC>0,
+# - WINDOW mode filters:
+#     * vInput: keep windows where at least 1 strain is (FDR<=cut &/or P<=cut) AND logFC>0,
 #               then zero per-strain logFC where that strain FAILS (or logFC<=0)
-#     * vRef  : keep windows where >=1 strain is (FDR<=cut &/or P<=cut) (+ or -),
+#     * vRef  : keep windows where at least 1 strain is (FDR<=cut &/or P<=cut) (+ or -),
 #               then zero per-strain logFC where that strain FAILS.
-# - REGION mode:
+#     * this is useful for "de-novo" enrichment dsicovery (i.e. like a peak-caller)
+#
+# - REGION mode filters:
 #     * No masking by default; if mask_region=TRUE, zero per-strain logFC by FDR/P-val
 # ---- Run csaw contrasts across ALL mods & ALL region sets ----
 
@@ -518,7 +527,12 @@ csaw_analysis <- function(
   write_csv_heatmap = FALSE,
   write_igv = FALSE,
   out_dir = "csaw_results",
-  merge_tol = 300
+  merge_tol = 300,
+  # ---- NEW knobs for gene_id attach ----
+  add_gene_id = TRUE,
+  regions_lookup = NULL,            # named list, e.g. list(K27promTSS = regions$K27promTSS)
+  regions_gene_col = NULL,          # force a particular column name in lookup (e.g., "V10"); NULL=auto
+  verbose_gene_map = TRUE
 ) {
   require(edgeR)
   require(limma)
@@ -564,6 +578,109 @@ csaw_analysis <- function(
   # store vInput row keys and masked vInput heatmaps per (mod, region_tag)
   keep_coords_env <- new.env(parent = emptyenv())
   vin_heatmap_env <- new.env(parent = emptyenv())
+
+  # ---------- NEW: gene_id helpers (REGION mode only) ----------
+  .guess_gene_id_from_gr <- function(gr) {
+    if (is.null(gr)) return(NULL)
+    mc <- S4Vectors::mcols(gr)
+    if (is.null(mc) || ncol(mc) == 0) return(NULL)
+    candidates <- c("gene_id","gene","V10","V11","Gene","GeneID","gene_name","Name","name","symbol")
+    candidates <- intersect(candidates, colnames(mc))
+    if (!length(candidates)) return(NULL)
+    if (!is.null(regions_gene_col) && regions_gene_col %in% candidates) {
+      vals <- as.character(mc[[regions_gene_col]])
+      return(vals)
+    }
+    for (cn in candidates) {
+      vals <- as.character(mc[[cn]])
+      if (any(!is.na(vals) & nzchar(vals))) return(vals)
+    }
+    NULL
+  }
+
+  .attach_gene_id_from_df <- function(final_df, df_lookup, region_tag = NA_character_) {
+    if (is.null(df_lookup)) return(final_df)
+    # figure out columns for chr/start/end
+    if (is.null(colnames(df_lookup))) {
+      # assume BED-like: first three columns are chr, start, end
+      chr_col <- 1; start_col <- 2; end_col <- 3
+    } else {
+      # prefer typical column names; else fallback to first three
+      cn <- colnames(df_lookup)
+      chr_col   <- which(cn %in% c("seqnames","chr","chrom","Chromosome","V1"))[1] %||% 1
+      start_col <- which(cn %in% c("start","Start","V2"))[1] %||% 2
+      end_col   <- which(cn %in% c("end","End","V3"))[1] %||% 3
+    }
+    # choose gene column
+    if (!is.null(regions_gene_col) && regions_gene_col %in% colnames(df_lookup)) {
+      gcol <- regions_gene_col
+    } else {
+      candidates <- c("gene_id","gene","V10","V11","Gene","GeneID","gene_name","Name","name","symbol")
+      gcol <- intersect(candidates, colnames(df_lookup))
+      gcol <- if (length(gcol)) gcol[1] else NULL
+    }
+    if (is.null(gcol)) return(final_df)
+
+    look <- data.frame(
+      seqnames = as.character(df_lookup[[chr_col]]),
+      start    = as.numeric(df_lookup[[start_col]]),
+      end      = as.numeric(df_lookup[[end_col]]),
+      gene_id  = as.character(df_lookup[[gcol]]),
+      stringsAsFactors = FALSE
+    )
+    key_lookup <- paste(look$seqnames, look$start, look$end, sep=".")
+    key_final  <- paste(final_df$seqnames, final_df$start, final_df$end, sep=".")
+    final_df$gene_id <- look$gene_id[ match(key_final, key_lookup) ]
+
+    if (isTRUE(verbose_gene_map)) {
+      hit <- sum(!is.na(final_df$gene_id))
+      message(sprintf("    [gene_id] %s: attached %d/%d matches via regions lookup",
+                      as.character(region_tag), hit, nrow(final_df)))
+    }
+    final_df
+  }
+
+  .attach_gene_id_any <- function(final_df, gr_lookup, region_tag) {
+    if (!add_gene_id) return(final_df)
+    # 1) Try GRanges mcols
+    vals <- .guess_gene_id_from_gr(gr_lookup)
+    if (!is.null(vals)) {
+      df <- data.frame(
+        seqnames = as.character(GenomicRanges::seqnames(gr_lookup)),
+        start    = GenomicRanges::start(gr_lookup),
+        end      = GenomicRanges::end(gr_lookup),
+        gene_id  = as.character(vals),
+        stringsAsFactors = FALSE
+      )
+      key_lookup <- paste(df$seqnames, df$start, df$end, sep=".")
+      key_final  <- paste(final_df$seqnames, final_df$start, final_df$end, sep=".")
+      final_df$gene_id <- df$gene_id[ match(key_final, key_lookup) ]
+      if (isTRUE(verbose_gene_map)) {
+        hit <- sum(!is.na(final_df$gene_id))
+        message(sprintf("    [gene_id] %s: attached %d/%d matches from GRanges mcols",
+                        as.character(region_tag), hit, nrow(final_df)))
+      }
+      if (any(!is.na(final_df$gene_id))) return(final_df)
+      # else fall through to lookup table
+    }
+
+    # 2) Try explicit regions_lookup list
+    if (!is.null(regions_lookup) && !is.null(regions_lookup[[region_tag]])) {
+      return(.attach_gene_id_from_df(final_df, regions_lookup[[region_tag]], region_tag))
+    }
+
+    # 3) Try global 'regions' list if present
+    regions_global <- get0("regions", envir = .GlobalEnv, inherits = TRUE)
+    if (is.list(regions_global) && !is.null(regions_global[[region_tag]])) {
+      return(.attach_gene_id_from_df(final_df, regions_global[[region_tag]], region_tag))
+    }
+
+    if (isTRUE(verbose_gene_map)) {
+      message(sprintf("    [gene_id] %s: no suitable gene source found; leaving gene_id empty.", as.character(region_tag)))
+    }
+    final_df
+  }
+  # ---------- end helpers ----------
 
   run_norm <- function(mod, fit, counts, region_tag, norm_type, gr_for_region = NULL) {
     res_list <- list()
@@ -637,6 +754,11 @@ csaw_analysis <- function(
         p.adjust(S4Vectors::mcols(gr)[["PValue"]], method = "BH")
     }
 
+    # ---- NEW: attach gene_id for REGION mode by (chr,start,end) ----
+    if (identical(mode, "region") && isTRUE(add_gene_id)) {
+      final_df <- .attach_gene_id_any(final_df, gr_for_region, region_tag)
+    }
+
     # HEATMAP (masked/filtered)
     logfc_cols <- grep("^logFC_", colnames(final_df), value = TRUE)
     logfc_cols <- order_cols_wt_first(logfc_cols, wt = reference_strain)
@@ -660,7 +782,7 @@ csaw_analysis <- function(
 
         key <- paste(mod, region_tag, sep = "::")
         keep_coords_env[[key]] <- rownames(heatmap_df)
-        vin_heatmap_env[[key]] <- heatmap_df  # <-- store masked vInput for vWT derivation
+        vin_heatmap_env[[key]] <- heatmap_df  # store masked vInput for vWT derivation
 
       } else {
         # vWT derived from vInput: (strain - WT) row-wise using masked vInput values
@@ -669,7 +791,6 @@ csaw_analysis <- function(
 
         if (is.null(vin)) {
           warning("No stored vInput heatmap for ", key, "; falling back to contrast-based masking.")
-          # fallback (old behavior): mask by FDR/P, restrict rows if we have coords
           kept_coords <- keep_coords_env[[key]]
           keep_rows <- if (is.null(kept_coords)) rep(TRUE, nrow(heatmap_df)) else (rownames(heatmap_df) %in% kept_coords)
           for (st in sub("^logFC_", "", logfc_cols)) {
@@ -683,7 +804,6 @@ csaw_analysis <- function(
           }
           heatmap_df <- heatmap_df[keep_rows, , drop = FALSE]
         } else {
-          # ensure WT column present
           wt_col <- paste0("logFC_", reference_strain)
           if (!(wt_col %in% colnames(vin))) {
             warning("WT column (", wt_col, ") not found in vInput heatmap for ", key, "; cannot compute vWT from vInput.")
@@ -705,7 +825,7 @@ csaw_analysis <- function(
       }
 
     } else {
-      # REGION MODE: unchanged behavior; optional masking only
+      # REGION MODE: optional masking only (heatmap df stays numeric-only; no gene_id here)
       if (isTRUE(mask_region)) {
         for (st in sub("^logFC_", "", logfc_cols)) {
           lcol <- paste0("logFC_",  st)
@@ -721,7 +841,6 @@ csaw_analysis <- function(
 
     list(results = final_df, heatmap = heatmap_df)
   }
-  # ---------- end helpers ----------
 
   all_mods <- setdiff(unique(metadata_df$Antibody), "input")
 
@@ -825,7 +944,7 @@ csaw_analysis <- function(
       }
     }
 
-    # genomewide filtered to regions (if present)
+    # genomewide filtered to regions (if present) — remains WINDOW logic (no gene_id attach)
     if (!is.null(out_obj$regions) && length(out_obj$regions)) {
       for (nm in names(out_obj$regions)) {
         rg <- out_obj$regions[[nm]]
@@ -905,321 +1024,233 @@ csaw_analysis(
 #This function will be used to generate desired heatmaps using the generated dfs from the analysis function
 
 # --- Heatmap helper for csaw *_Heatmap_* data frames ---
-suppressPackageStartupMessages({
-  library(ComplexHeatmap)
-  library(circlize)
-  library(dplyr)
-  library(stringr)
-  library(grid)
-})
+make_csaw_heatmap_clusterby <- function(
+  df,
+  plot_cols        = NULL,
+  cluster_by       = c("cac1","cac2"),
+  collapse_mutants = FALSE,
+  fold_cutoff      = 1,                 # set NULL to derive from zero_white_band
+  sort_reference   = c("WT"),
+  sort_decreasing  = TRUE,
 
-`%||%` <- function(a, b) if (!is.null(a)) a else b
-
-make_csaw_heatmap_advanced <- function(
-  df,                                  # data.frame with columns like logFC_*
-  debug_logic = FALSE,
-  debug_bucket = NULL,
-  select_cols = NULL,                  # NULL = all; integer indices or strain names (e.g., c("WT","cac1"))
-  present_threshold = NULL,            # NULL = none; numeric -> values < threshold set to 0 (affects plotting & "presence")
-  clip_negatives_to_zero = FALSE,      # after thresholding: set negatives to 0
-  global_filter = list(type = "any_ge", cols = "all", value = 0),  # drop rows failing this rule post-threshold
-                                      # types: "any_ge","any_gt","all_ge","all_gt"
-  use_buckets = FALSE,                 # TRUE = rule-based clusters (mutually exclusive, in order)
-  buckets = NULL,                      # named list of rules, e.g. list(no_caf=list(present="WT", absent_all=c("cac1","cac2","cac3")))
-                                      # rule keys: present, absent, present_all, present_any, absent_all, absent_any
-  bucket_order_by = NULL,              # named list: for each bucket name, a strain or vector => rowMeans
-  global_order_by = NULL,              # when buckets=FALSE: strain name or vector for rowMeans; NULL = no ordering
-  cap_percentile = 0.995,              # winsorize upper tail to this percentile over selected columns; NULL = disable
-  color_limits = NULL,                 # c(min,max); supports NA endpoints, e.g. c(0, NA) or c(NA, 2); NULL = auto from data
-  colors = NULL,                       # NULL = auto; else vector or function for circlize::colorRamp2
-  zero_white_band = NULL,
-  show_row_names = FALSE,
-  show_col_names = TRUE,
-  cluster_rows = FALSE,                # ignored when use_buckets=TRUE (ordering determines row order)
-  cluster_cols = FALSE,
-  row_distance = "euclidean",
-  row_linkage  = "complete",
-  col_distance = "euclidean",
-  col_linkage  = "complete",
-  row_order = NULL,                    # enforce a predetermined rownames order (overrides buckets/ordering)
-  out_dir = "csaw_heatmaps",
-  out_stem = "csaw_heatmap",
-  formats = c("pdf","png"),
-  width_in = 6.5,                      # figure width (inches)
-  base_height_in = 1.5,                # base height added regardless of rows
-  per_row_height_in = 0.006,           # added height per row (inches)
-  dpi = 300,
-  return_objects = TRUE                # returns list(matrix, row_order, bucket_labels, heatmap)
-) {
+  cap_percentile   = 0.995,
+  clip_negatives_to_zero = FALSE,
+  color_limits     = NULL,
+  colors           = NULL,
+  zero_white_band  = NULL,
+  show_row_names   = FALSE,
+  show_col_names   = TRUE,
+  cluster_cols     = FALSE,
+  row_slice_gap_mm = 0,   # 0 = no gaps between clusters
+  col_slice_gap_mm = 1,   # only used if you ever use column_split
+  out_dir   = "csaw_heatmaps",
+  out_stem  = "csaw_heatmap_clusterby",
+  formats   = c("pdf","png"),
+  width_in  = 6.5,
+  base_height_in = 1.5,
+  per_row_height_in = 0.006,
+  dpi       = 300,
+  return_objects = TRUE
+){
   stopifnot(is.data.frame(df))
-
-  # keep only logFC_* columns
   lfccols <- grep("^logFC_", names(df), value = TRUE)
-  if (length(lfccols) == 0) stop("No columns named like 'logFC_*' found.")
-  M <- as.matrix(df[, lfccols, drop = FALSE])
-  rownames(M) <- if (!is.null(rownames(df))) rownames(df) else paste0("row", seq_len(nrow(df)))
+  if (!length(lfccols)) stop("No 'logFC_*' columns found.")
+  M_all <- as.matrix(df[, lfccols, drop = FALSE])
+  rownames(M_all) <- if (!is.null(rownames(df))) rownames(df) else paste0("row", seq_len(nrow(df)))
+  strains_all <- sub("^logFC_", "", colnames(M_all))
 
-  # column selection
-  strains_all <- sub("^logFC_", "", colnames(M))
-  if (is.null(select_cols)) {
-    keep_idx <- seq_along(strains_all)
-  } else if (is.numeric(select_cols)) {
-    keep_idx <- select_cols
-  } else {
-    want <- sub("^logFC_", "", select_cols)
-    keep_idx <- match(want, strains_all)
-    if (anyNA(keep_idx)) stop("Some selected strain names not found: ", paste(want[is.na(keep_idx)], collapse = ", "))
-  }
-  M <- M[, keep_idx, drop = FALSE]
-  strains <- sub("^logFC_", "", colnames(M))
-
-  # threshold: values below threshold -> 0 (also defines "presence")
-  if (!is.null(present_threshold)) {
-    M[M < present_threshold] <- 0
-  }
-  # optional: clip negatives to zero
-  if (clip_negatives_to_zero) {
-    M[M < 0] <- 0
+  # validate cluster_by
+  if (!all(cluster_by %in% strains_all)) {
+    miss <- setdiff(cluster_by, strains_all)
+    stop("cluster_by strains not found in df: ", paste(miss, collapse = ", "))
   }
 
-  # global row filter
-  if (!is.null(global_filter)) {
-    rule <- global_filter
-    cols_sel <- if (is.null(rule$cols) || identical(rule$cols, "all")) {
-      seq_len(ncol(M))
+  # pick plot columns
+  if (is.null(plot_cols)) plot_cols <- strains_all
+  if (!all(plot_cols %in% strains_all)) {
+    miss <- setdiff(plot_cols, strains_all)
+    stop("plot_cols strains not found in df: ", paste(miss, collapse = ", "))
+  }
+  M <- M_all[, paste0("logFC_", plot_cols), drop = FALSE]
+  colnames(M) <- plot_cols
+
+  # derive cutoff from zero_white_band if requested
+  cut <- if (is.null(fold_cutoff)) {
+    if (!is.null(zero_white_band)) {
+      if (length(zero_white_band) == 1) abs(zero_white_band) else max(abs(zero_white_band))
     } else {
-      if (is.numeric(rule$cols)) rule$cols else match(rule$cols, strains)
+      1
     }
-    if (anyNA(cols_sel)) stop("global_filter$cols contains unknown columns.")
-    subM <- M[, cols_sel, drop = FALSE]
-    val  <- as.numeric(rule$value %||% 0)
-    keep <- switch(rule$type,
-                   any_ge = rowSums(subM >= val, na.rm = TRUE) > 0,
-                   any_gt = rowSums(subM >  val, na.rm = TRUE) > 0,
-                   all_ge = rowSums(subM >= val, na.rm = TRUE) == ncol(subM),
-                   all_gt = rowSums(subM >  val, na.rm = TRUE) == ncol(subM),
-                   stop("Unknown global_filter$type: ", rule$type))
-    M <- M[keep, , drop = FALSE]
+  } else {
+    as.numeric(fold_cutoff)
   }
-  if (nrow(M) == 0) stop("No rows left after filtering.")
 
-  # winsorize upper cap
+  # cap & clip for plotting only
   if (!is.null(cap_percentile)) {
     cap <- as.numeric(stats::quantile(M, probs = cap_percentile, na.rm = TRUE))
     M[M > cap] <- cap
   }
+  if (clip_negatives_to_zero) M[M < 0] <- 0
 
-  # presence/absence matrices for bucket rules (after threshold/clip)
-  present_mat <- M > 0
-  absent_mat  <- M == 0     # exact-zero definition for "absent_*" rules
+  # Build an 'orig' matrix only for strains that actually exist
+  want_for_orig <- unique(c(plot_cols, cluster_by, sort_reference))
+  have_for_orig <- intersect(want_for_orig, strains_all)  # drop missing (e.g., WT in vWT frames)
+  if (!length(have_for_orig)) stop("No usable columns found for internal logic.")
+  orig <- M_all[, paste0("logFC_", have_for_orig), drop = FALSE]
+  colnames(orig) <- have_for_orig
 
-  .debug <- list()
-
-  # helper: map strain names → indices
-  .col_idx <- function(cols) {
-    if (is.null(cols) || length(cols) == 0) integer(0)
-    if (is.numeric(cols)) return(cols)
-    idx <- match(cols, strains)
-    if (anyNA(idx)) stop("Unknown strains in rule: ", paste(cols[is.na(idx)], collapse = ", "))
-    idx
+  # Ensure cluster_by present in 'orig'
+  if (!all(cluster_by %in% colnames(orig))) {
+    stop("cluster_by strains are not present in df columns: ",
+         paste(setdiff(cluster_by, colnames(orig)), collapse = ", "))
   }
 
-  # bucket assignment (exclusive, sequential)
-  bucket_for_row <- rep(NA_character_, nrow(M))
-  bucket_levels  <- character(0)
+  # state map using 'cut'
+  state_for <- function(strains) {
+    vals <- orig[, strains, drop = FALSE]
+    d <- matrix(0L, nrow(vals), ncol(vals), dimnames = dimnames(vals))
+    d[vals <= -abs(cut)] <- -1L  # loss
+    d[vals >=  abs(cut)] <-  1L  # gain
+    d
+  }
+  state_cluster <- state_for(cluster_by)
 
-  if (isTRUE(use_buckets)) {
-    if (is.null(buckets) || length(buckets) == 0) stop("use_buckets=TRUE but 'buckets' is empty.")
-    for (bk in names(buckets)) {
-      rule <- buckets[[bk]]
-      pr  <- .col_idx(rule$present)
-      ab  <- .col_idx(rule$absent)
-      pra <- .col_idx(rule$present_all)
-      pry <- .col_idx(rule$present_any)
-      aba <- .col_idx(rule$absent_all)
-      aby <- .col_idx(rule$absent_any)
-
-      # Optional debug (pre-order)
-      if (isTRUE(debug_logic) && (!is.null(debug_bucket) && identical(bk, debug_bucket))) {
-        .debug$strains   <- strains
-        .debug$rule_cols <- list(
-          present      = pr,
-          absent       = ab,
-          present_all  = pra,
-          present_any  = pry,
-          absent_all   = aba,
-          absent_any   = aby
-        )
-        .debug$clauses <- list(
-          present_all  = if (length(pra)) rowSums(present_mat[, pra, drop = FALSE], na.rm = TRUE) == length(pra) else rep(TRUE, nrow(M)),
-          present_any  = if (length(pry)) rowSums(present_mat[, pry, drop = FALSE], na.rm = TRUE) >= 1           else rep(TRUE, nrow(M)),
-          absent_all   = if (length(aba)) rowSums(absent_mat[,  aba, drop = FALSE], na.rm = TRUE) == length(aba) else rep(TRUE, nrow(M)),
-          absent_any   = if (length(aby)) rowSums(absent_mat[,  aby, drop = FALSE], na.rm = TRUE) >= 1           else rep(TRUE, nrow(M)),
-          present_list = if (length(pr))  rowSums(present_mat[, pr,  drop = FALSE], na.rm = TRUE) == length(pr)  else rep(TRUE, nrow(M)),
-          absent_list  = if (length(ab))  rowSums(absent_mat[,  ab,  drop = FALSE], na.rm = TRUE) == length(ab)  else rep(TRUE, nrow(M))
-        )
-      }
-
-      # ---- FIX: combine ONLY the rule keys actually provided ----
-      conds <- list()
-      if (!is.null(rule$present)      && length(pr))  conds$present_list <- rowSums(present_mat[, pr,  drop = FALSE], na.rm = TRUE) == length(pr)
-      if (!is.null(rule$absent)       && length(ab))  conds$absent_list  <- rowSums(absent_mat[,  ab,  drop = FALSE], na.rm = TRUE) == length(ab)
-      if (!is.null(rule$present_all)  && length(pra)) conds$present_all  <- rowSums(present_mat[, pra, drop = FALSE], na.rm = TRUE) == length(pra)
-      if (!is.null(rule$present_any)  && length(pry)) conds$present_any  <- rowSums(present_mat[, pry, drop = FALSE], na.rm = TRUE) >= 1
-      if (!is.null(rule$absent_all)   && length(aba)) conds$absent_all   <- rowSums(absent_mat[,  aba, drop = FALSE], na.rm = TRUE) == length(aba)
-      if (!is.null(rule$absent_any)   && length(aby)) conds$absent_any   <- rowSums(absent_mat[,  aby, drop = FALSE], na.rm = TRUE) >= 1
-
-      ok <- if (length(conds)) Reduce("&", conds) else rep(TRUE, nrow(M))
-      # -----------------------------------------------------------
-
-      if (isTRUE(debug_logic) && (!is.null(debug_bucket) && identical(bk, debug_bucket))) {
-        .debug$conds_names <- names(conds)
-        .debug$ok <- ok
-      }
-
-      assignable <- which(ok & is.na(bucket_for_row))
-      if (length(assignable)) bucket_for_row[assignable] <- bk
-      bucket_levels <- c(bucket_levels, bk)
+  # clusters
+  cluster_labels <- character(nrow(M))
+  if (!collapse_mutants) {
+    if (length(cluster_by) != 2L) {
+      stop("separate mode requires exactly two 'cluster_by' strains. Given: ", paste(cluster_by, collapse = ", "))
     }
-    bucket_for_row[is.na(bucket_for_row)] <- "unassigned"
-    bucket_levels <- unique(c(bucket_levels, "unassigned"))
+    a <- cluster_by[1]; b <- cluster_by[2]
+    sA <- state_cluster[, a]; sB <- state_cluster[, b]
+
+    lab <- rep("other", nrow(M))
+    lab[sA == -1L & sB == -1L] <- sprintf("loss in both (%s & %s)", a, b)
+    lab[sA == -1L & sB ==  0L] <- sprintf("loss in %s only", a)
+    lab[sA ==  0L & sB == -1L] <- sprintf("loss in %s only", b)
+    lab[sA ==  0L & sB ==  0L] <- sprintf("kept in both (%s & %s)", a, b)
+
+    lvl <- c(sprintf("loss in both (%s & %s)", a, b),
+             sprintf("loss in %s only", a),
+             sprintf("loss in %s only", b),
+             sprintf("kept in both (%s & %s)", a, b),
+             "other")
+    cluster_labels <- factor(lab, levels = lvl, ordered = TRUE)
   } else {
-    bucket_for_row[] <- "all"
-    bucket_levels <- "all"
+    targets <- setdiff(cluster_by, "WT"); if (!length(targets)) targets <- cluster_by
+    st <- state_cluster[, targets, drop = FALSE]
+    loss_any <- apply(st == -1L, 1, any, na.rm = TRUE)
+    keep_all <- apply(st ==  0L, 1, all, na.rm = TRUE)
+    gain_any <- apply(st ==  1L, 1, any, na.rm = TRUE)
+
+    lab <- rep("other", nrow(M))
+    lab[loss_any] <- sprintf("loss in any (%s)", paste(targets, collapse = " | "))
+    lab[!loss_any & keep_all] <- sprintf("kept in all (%s)", paste(targets, collapse = " & "))
+    lab[!loss_any & !keep_all & gain_any] <- sprintf("gain in any (%s)", paste(targets, collapse = " | "))
+
+    lvl <- c(sprintf("loss in any (%s)", paste(targets, collapse = " | ")),
+             sprintf("kept in all (%s)", paste(targets, collapse = " & ")),
+             sprintf("gain in any (%s)", paste(targets, collapse = " | ")),
+             "other")
+    cluster_labels <- factor(lab, levels = lvl, ordered = TRUE)
   }
 
-  # row ordering
-  ord_rows <- integer(0)
-  bucket_lab <- character(0)
+  # ordering inside each cluster
+  cluster_levels <- levels(cluster_labels)
 
-  if (!is.null(row_order)) {
-    present_rows <- rownames(M)
-    rr <- intersect(row_order, present_rows)
-    if (!length(rr)) stop("Provided row_order has no overlap with data.")
-    M <- M[rr, , drop = FALSE]
-    bucket_for_row <- bucket_for_row[match(rr, present_rows)]
-    ord_rows <- seq_len(nrow(M))
-    bucket_lab <- bucket_for_row
-  } else if (isTRUE(use_buckets)) {
-    for (bk in bucket_levels) {
-      idx <- which(bucket_for_row == bk)
-      if (!length(idx)) next
-      sub <- M[idx, , drop = FALSE]
-      sorter <- bucket_order_by[[bk]] %||% NULL
-      if (is.null(sorter)) {
-        # default: order by means of "present" columns in this bucket, else global rowMeans
-        rule <- buckets[[bk]]
-        pres_cols <- .col_idx(c(rule$present, rule$present_all, rule$present_any))
-        score <- if (length(pres_cols) == 0) rowMeans(sub, na.rm = TRUE)
-                 else rowMeans(sub[, unique(pres_cols), drop = FALSE], na.rm = TRUE)
-      } else {
-        sidx <- .col_idx(sorter)
-        score <- if (length(sidx) == 1) sub[, sidx] else rowMeans(sub[, sidx, drop = FALSE], na.rm = TRUE)
-      }
-      o <- order(score, decreasing = TRUE, na.last = TRUE)
-      ord_rows <- c(ord_rows, idx[o])
-      bucket_lab <- c(bucket_lab, rep(bk, length(o)))
+  # predefine exclusions for separate mode
+  excl_by_cluster <- list()
+  if (!collapse_mutants && length(cluster_by) == 2L) {
+    a <- cluster_by[1]; b <- cluster_by[2]
+    excl_by_cluster[[sprintf("loss in both (%s & %s)", a, b)]] <- c(a, b)
+    excl_by_cluster[[sprintf("loss in %s only", a)]]           <- c(a)
+    excl_by_cluster[[sprintf("loss in %s only", b)]]           <- c(b)
+    excl_by_cluster[[sprintf("kept in both (%s & %s)", a, b)]] <- character(0)
+    excl_by_cluster[["other"]]                                  <- character(0)
+  }
+
+  # helpers
+  get_vals <- function(rows, use_cols) {
+    if (!length(use_cols)) return(matrix(numeric(0), nrow = length(rows)))
+    use_cols <- intersect(use_cols, colnames(orig))
+    if (!length(use_cols)) return(matrix(numeric(0), nrow = length(rows)))
+    orig[rows, use_cols, drop = FALSE]
+  }
+
+  ord <- integer(0)
+  split_for_ht <- cluster_labels
+
+  for (cl in cluster_levels) {
+    idx <- which(cluster_labels == cl)
+    if (!length(idx)) next
+
+    cols_for_sort <- cluster_by
+
+    if (!collapse_mutants && length(cluster_by) == 2L) {
+      to_exclude <- unique(excl_by_cluster[[cl]] %||% character(0))
+      cols_for_sort <- setdiff(cols_for_sort, to_exclude)
     }
-  } else {
-    if (!is.null(global_order_by)) {
-      sidx <- .col_idx(global_order_by)
-      score <- if (length(sidx) == 1) M[, sidx] else rowMeans(M[, sidx, drop = FALSE], na.rm = TRUE)
-      ord_rows <- order(score, decreasing = TRUE, na.last = TRUE)
+
+    scores <- rep(NA_real_, length(idx))
+
+    if (!collapse_mutants) {
+      # simple mean across allowed cluster_by columns; if none, try sort_reference; else mean of cluster_by
+      if (length(cols_for_sort)) {
+        scores <- rowMeans(get_vals(idx, cols_for_sort), na.rm = TRUE)
+      }
+      if (all(is.na(scores))) {
+        ref_cols <- intersect(sort_reference, colnames(orig))
+        if (length(ref_cols)) scores <- rowMeans(get_vals(idx, ref_cols), na.rm = TRUE)
+        if (all(is.na(scores))) scores <- rowMeans(get_vals(idx, cluster_by), na.rm = TRUE)
+      }
     } else {
-      ord_rows <- seq_len(nrow(M))
+      # collapse mode: per-row, drop lost targets from scoring
+      targets <- setdiff(cluster_by, "WT"); if (!length(targets)) targets <- cluster_by
+      st_rows <- state_cluster[idx, , drop = FALSE]
+      for (i in seq_along(idx)) {
+        keep_cols <- cols_for_sort
+        lost_here <- names(which(st_rows[i, targets, drop = FALSE] == -1L))
+        keep_cols <- setdiff(keep_cols, lost_here)
+        if (!length(keep_cols)) {
+          ref_cols <- intersect(sort_reference, colnames(orig))
+          keep_cols <- if (length(ref_cols)) ref_cols else cluster_by
+        }
+        scores[i] <- mean(orig[idx[i], intersect(keep_cols, colnames(orig))], na.rm = TRUE)
+      }
     }
-    bucket_lab <- rep("all", length(ord_rows))
+
+    o <- order(scores, decreasing = sort_decreasing, na.last = TRUE)
+    ord <- c(ord, idx[o])
   }
 
-  M <- M[ord_rows, , drop = FALSE]
-  bucket_lab <- factor(bucket_lab, levels = bucket_levels)
+  M <- M[ord, , drop = FALSE]
+  split_for_ht <- split_for_ht[ord]
 
-  # post-order debug recompute (so you can compare on the displayed matrix)
-  if (isTRUE(debug_logic) && !is.null(debug_bucket) && debug_bucket %in% names(buckets)) {
-    rule <- buckets[[debug_bucket]]
-    pr  <- .col_idx(rule$present)
-    ab  <- .col_idx(rule$absent)
-    pra <- .col_idx(rule$present_all)
-    pry <- .col_idx(rule$present_any)
-    aba <- .col_idx(rule$absent_all)
-    aby <- .col_idx(rule$absent_any)
-
-    present_mat_post <- M > 0
-    absent_mat_post  <- M == 0
-
-    .debug$clauses_post <- list(
-      present_all  = if (length(pra)) rowSums(present_mat_post[, pra, drop = FALSE], na.rm = TRUE) == length(pra) else rep(TRUE, nrow(M)),
-      present_any  = if (length(pry)) rowSums(present_mat_post[, pry, drop = FALSE], na.rm = TRUE) >= 1           else rep(TRUE, nrow(M)),
-      absent_all   = if (length(aba)) rowSums(absent_mat_post[,  aba, drop = FALSE], na.rm = TRUE) == length(aba) else rep(TRUE, nrow(M)),
-      absent_any   = if (length(aby)) rowSums(absent_mat_post[,  aby, drop = FALSE], na.rm = TRUE) >= 1           else rep(TRUE, nrow(M)),
-      present_list = if (length(pr))  rowSums(present_mat_post[, pr,  drop = FALSE], na.rm = TRUE) == length(pr)  else rep(TRUE, nrow(M)),
-      absent_list  = if (length(ab))  rowSums(absent_mat_post[,  ab,  drop = FALSE], na.rm = TRUE) == length(ab)  else rep(TRUE, nrow(M))
-    )
-  }
-
-  # color limits (support NA endpoints)
-  if (is.null(color_limits)) {
-    minv <- min(M, na.rm = TRUE)
-    maxv <- max(M, na.rm = TRUE)
-    lims <- c(minv, maxv)
+  # colors
+  lims <- if (is.null(color_limits)) {
+    c(min(M, na.rm = TRUE), max(M, na.rm = TRUE))
   } else {
-    lims <- as.numeric(color_limits)
-    if (length(lims) != 2) stop("color_limits must be length-2.")
-    if (any(is.na(lims))) {
-      minv <- min(M, na.rm = TRUE)
-      maxv <- max(M, na.rm = TRUE)
-      if (is.na(lims[1])) lims[1] <- minv
-      if (is.na(lims[2])) lims[2] <- maxv
+    out <- as.numeric(color_limits)
+    if (any(is.na(out))) {
+      if (is.na(out[1])) out[1] <- min(M, na.rm = TRUE)
+      if (is.na(out[2])) out[2] <- max(M, na.rm = TRUE)
     }
+    out
   }
 
-  # color function
-    # color function
-  # Helper to pick endpoint colors from your 'colors' argument
-  .neg_pos_colors <- function(lims, colors) {
-    if (is.null(colors)) {
-      # your defaults
-      if (lims[1] < 0 && lims[2] > 0) {
-        list(neg = "#3B4CC0", mid = "white", pos = "#B40426")
-      } else {
-        list(low = "white", high = "#006400")
-      }
-    } else if (is.function(colors)) {
-      return(colors)  # user-provided colorRamp2
-    } else {
-      if (length(colors) == 2) {
-        list(low = colors[1], high = colors[2])
-      } else if (length(colors) >= 3 && lims[1] < 0 && lims[2] > 0) {
-        list(neg = colors[1], mid = colors[2], pos = colors[length(colors)])
-      } else {
-        # 3+ colors but not a diverging scale crossing 0
-        list(vec = colors)
-      }
-    }
-  }
-
-  cols_spec <- .neg_pos_colors(lims, colors)
-
-  if (is.function(cols_spec)) {
-    col_fun <- cols_spec
+  # build color function (supports optional white band around 0)
+  if (is.function(colors)) {
+    col_fun <- colors
   } else if (!is.null(zero_white_band) && lims[1] < 0 && lims[2] > 0) {
-    # --- NEW: white band around zero ---
-    band <- if (length(zero_white_band) == 1) {
-      c(-abs(zero_white_band), abs(zero_white_band))
-    } else {
-      sort(as.numeric(zero_white_band))[1:2]
-    }
-    neg_col <- if (!is.null(cols_spec$neg)) cols_spec$neg else if (!is.null(cols_spec$low)) cols_spec$low else "blue"
-    pos_col <- if (!is.null(cols_spec$pos)) cols_spec$pos else if (!is.null(cols_spec$high)) cols_spec$high else "red"
-    mid_col <- if (!is.null(cols_spec$mid)) cols_spec$mid else "white"
-
-    # breaks: min → band_lo → 0 → band_hi → max
+    band <- if (length(zero_white_band) == 1) c(-abs(zero_white_band), abs(zero_white_band))
+            else sort(as.numeric(zero_white_band))[1:2]
+    neg_col <- if (is.null(colors)) "#3B4CC0" else colors[[1]]
+    pos_col <- if (is.null(colors)) "#B40426" else tail(colors, 1)
+    mid_col <- "white"
     brks <- c(lims[1], band[1], 0, band[2], lims[2])
-    # colors: blue gradient to band_lo, then white stays flat until band_hi, then gradient to red
     cols <- c(neg_col, mid_col, mid_col, mid_col, pos_col)
     col_fun <- circlize::colorRamp2(brks, cols)
   } else {
-    # Original behaviors
     if (is.null(colors)) {
       if (lims[1] < 0 && lims[2] > 0) {
         col_fun <- circlize::colorRamp2(c(lims[1], 0, lims[2]),
@@ -1228,137 +1259,87 @@ make_csaw_heatmap_advanced <- function(
         col_fun <- circlize::colorRamp2(c(lims[1], lims[2]),
                                         c("white", "#006400"))
       }
-    } else if (is.vector(colors) && !is.null(cols_spec$vec)) {
-      # arbitrary multi-stop palette
-      col_fun <- circlize::colorRamp2(seq(lims[1], lims[2], length.out = length(colors)),
-                                      colors)
-    } else if (is.vector(colors) && length(colors) == 2) {
-      col_fun <- circlize::colorRamp2(c(lims[1], lims[2]), colors)
-    } else if (is.vector(colors) && length(colors) >= 3 && lims[1] < 0 && lims[2] > 0) {
-      col_fun <- circlize::colorRamp2(c(lims[1], 0, lims[2]),
-                                      c(cols_spec$neg, cols_spec$mid, cols_spec$pos))
     } else {
-      col_fun <- circlize::colorRamp2(seq(lims[1], lims[2], length.out = length(colors)), colors)
+      if (length(colors) == 2) {
+        col_fun <- circlize::colorRamp2(c(lims[1], lims[2]), colors)
+      } else if (length(colors) >= 3 && lims[1] < 0 && lims[2] > 0) {
+        col_fun <- circlize::colorRamp2(c(lims[1], 0, lims[2]),
+                                        c(colors[1], colors[2], tail(colors, 1)))
+      } else {
+        col_fun <- circlize::colorRamp2(seq(lims[1], lims[2], length.out = length(colors)), colors)
+      }
     }
   }
 
-  # row split if using buckets
-  row_split <- if (isTRUE(use_buckets)) bucket_lab else NULL
-
-  # build Heatmap
   ht <- Heatmap(
     M,
     name = "signal",
     col = col_fun,
-    cluster_rows = if (isTRUE(use_buckets)) FALSE else cluster_rows,
+    cluster_rows = FALSE,
     cluster_columns = cluster_cols,
-    clustering_distance_rows = row_distance,
-    clustering_method_rows   = row_linkage,
-    clustering_distance_columns = col_distance,
-    clustering_method_columns   = col_linkage,
     show_row_names = show_row_names,
     show_column_names = show_col_names,
-    row_split = row_split,
+    row_split = split_for_ht,
+    row_gap    = unit(row_slice_gap_mm, "mm"),
+    column_gap = unit(col_slice_gap_mm, "mm"),
     use_raster = TRUE, raster_quality = 4
   )
 
-  # export
   if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
   height_in <- base_height_in + nrow(M) * per_row_height_in
   out_files <- character(0)
-
   if ("png" %in% tolower(formats)) {
-    png_file <- file.path(out_dir, paste0(out_stem, ".png"))
-    png(png_file, width = width_in, height = height_in, units = "in", res = dpi)
+    f <- file.path(out_dir, paste0(out_stem, ".png"))
+    png(f, width = width_in, height = height_in, units = "in", res = dpi)
     draw(ht, heatmap_legend_side = "right", annotation_legend_side = "right")
-    dev.off()
-    out_files <- c(out_files, png_file)
+    dev.off(); out_files <- c(out_files, f)
   }
   if ("pdf" %in% tolower(formats)) {
-    pdf_file <- file.path(out_dir, paste0(out_stem, ".pdf"))
-    pdf(pdf_file, width = width_in, height = height_in, useDingbats = FALSE)
+    f <- file.path(out_dir, paste0(out_stem, ".pdf"))
+    pdf(f, width = width_in, height = height_in, useDingbats = FALSE)
     draw(ht, heatmap_legend_side = "right", annotation_legend_side = "right")
-    dev.off()
-    out_files <- c(out_files, pdf_file)
+    dev.off(); out_files <- c(out_files, f)
   }
   message("Saved: ", paste(out_files, collapse = " | "))
 
-  if (return_objects) {
-    invisible(list(
-      matrix = M,
-      row_order = rownames(M),
-      bucket_labels = if (isTRUE(use_buckets)) as.character(row_split) else NULL,
-      heatmap = ht,
-      debug = .debug  # may be empty list if debug_logic=FALSE
-    ))
-  } else {
-    invisible(NULL)
-  }
+  if (return_objects) invisible(list(
+    matrix = M,
+    row_order = rownames(M),
+    split_labels = as.character(split_for_ht),
+    heatmap = ht
+  ))
 }
 
 ```
 
 ```{r, Run Heatmap Function}
 #Use without clustering
-make_csaw_heatmap_advanced(
-  df = H3K36me3_Heatmap_K27genes_proms_vInput,
-  select_cols = NULL,                   # NULL = use all strains
-  present_threshold = 0.1,                # everything <1 → 0
-  clip_negatives_to_zero = FALSE,        # keep negatives
-  color_limits = c(0, NA),               # start at 0, auto-max
-  colors = c("white", "#A59D00"),            # white → red scale
-  global_order_by = c("WT","cac1"),
-  cluster_rows = FALSE,
+make_csaw_heatmap_clusterby(
+  df           = H3K27me3_CS_Heatmap_K27promTSS_vWT,
+  plot_cols    = c("cac1","cac2","ash1"),
+  cluster_by   = c("cac1","cac2"),
+  collapse_mutants = FALSE,
+  fold_cutoff  = NULL,          # derive from the band below
+  zero_white_band = 1,          # => loss ≤ -1, gain ≥ +1; keep in between
+  sort_reference = "WT",        # safely ignored if WT col not present
+  color_limits = c(-3, 3),
   cluster_cols = FALSE,
-  show_row_names = FALSE,
-  out_stem = "TEST"
+  sort_decreasing = FALSE,
+  row_slice_gap_mm = 0,
+  out_stem = "H3K27me3_vWT_sep_cac1_cac2"
 )
 
-# define the rule set: one bucket for absent in cac1 OR cac2
-buck <- list(
-  absent_all_cac1_or_cac2 = list(absent_all = c("cac1", "cac2")),
-  absent_any_cac1_or_cac2 = list(absent_any = c("cac1", "cac2")),
-  present_all_WT_cac1_or_cac2 = list(absent_all = c("WT", "cac1", "cac2")),
-  present_all_cac1_or_cac2 = list(absent_all = c("cac1", "cac2"))
-)
-
-res <- make_csaw_heatmap_advanced(
-  df = H3K27me3_CS_Heatmap_K27promTSS_vInput,
-  select_cols = c("WT","cac1","cac2","cac3","set7"),
-  present_threshold = 1,
-  use_buckets = TRUE,
-  buckets = buck,
-  bucket_order_by = list(absent_cac1_or_cac2 = "WT"),
-  cluster_rows = FALSE,
-  cluster_cols = FALSE,
+make_csaw_heatmap_clusterby(
+  df           = H3K27me3_CS_Heatmap_K27promTSS_vInput,
+  plot_cols    = c("WT","cac1","cac2","ash1"),
+  cluster_by   = c("WT","cac1","cac2"),  # WT included but collapse ignores it when deciding loss/keep/gain
+  collapse_mutants = TRUE,               # yields: loss in any (cac1|cac2), kept in all, gain in any
+  fold_cutoff  = 1,
+  sort_reference = "WT",                 # nice fallback for 'loss in any' rows where both mutants are lost
+  clip_negatives_to_zero = FALSE,        # set TRUE if you want strictly non-negative plotting
+  colors       = c("white","#006400"),
   color_limits = c(0, NA),
-  colors = c("white","darkgreen"),
-  out_stem = "H3K27me3_TEST",
-  debug_logic = TRUE,
-  debug_bucket = "absent_cac1_or_cac2"
-)
-
-####
-
-res <- make_csaw_heatmap_advanced(
-  df = H3K36me3_Heatmap_K27promTSS_vWT,
-  select_cols = c("cac1","cac2","cac3","set7"),
-  global_filter = NULL,              # <- keep ALL rows
-  cap_percentile = 0.995,
-  color_limits = c(-2, 2),
-  colors = c("blue","white","red"),
-  zero_white_band = 0.5,
-  cluster_rows = FALSE,
-  cluster_cols = FALSE,
-  global_order_by = c("cac1","cac2", "cac3"),
-  out_dir = "csaw_heatmaps",
-  out_stem = "TEST2",
-  formats = c("pdf","png"),
-  width_in = 6.5,
-  base_height_in = 1.5,
-  per_row_height_in = 0.006,
-  dpi = 300,
-  return_objects = TRUE
+  out_stem = "H3K27me3_vInput_collapse_mutants"
 )
 
 ```
@@ -1381,20 +1362,40 @@ suppressPackageStartupMessages({
 
 make_chip_rna_heatmap_simple <- function(
   chip_df,
-  rna_list,                                 # named list of RNA dfs; rownames are gene IDs
-  clusters_df = NULL,                       # optional; cols: gene, cluster
-  gene_col    = "V10",
-  chip_cols   = NULL,                       # NULL -> auto: logFC_<strain> for strains in rna_list
-  rna_colname = "log2FoldChange",
-  cluster_levels = NULL,                    # optional; if NULL and clusters_df provided, use its levels/order
-  sort_strains   = NULL,                    # e.g. c("cac1","cac2"); if NULL, no sorting (or all RNA cols if clusters present)
+  rna_list,                                 # named list of RNA dfs; rownames = gene IDs
+  gene_col        = "gene_id",
+  chip_cols       = NULL,                   # displayed ChIP cols (names like "logFC_cac1"); NULL -> guess from rna_list
+  rna_colname     = "log2FoldChange",
+
+  # --- AUTO CLUSTERING (ChIP-based; optional; ignored if manual_clusters is given) ---
+  cluster_by       = NULL,                  # strains to define auto clusters (e.g., c("cac1","cac2"))
+  collapse_mutants = FALSE,                 # TRUE -> loss/keep/gain in ANY/ALL (ignoring WT)
+  fold_cutoff      = NULL,                  # NULL -> derive from chip_zero_band; else numeric
+  sort_reference   = c("WT"),               # fallback for auto mode
+  # --- GLOBAL SORTING (applies to both auto and manual unless overridden per cluster) ---
+  sort_on          = c("chip","rna"),       # what to sort by
+  sort_strains     = NULL,                  # which strains to average for sorting (e.g., c("cac1","cac2"))
+  sort_decreasing  = TRUE,                  # direction
+
+  # --- MANUAL CLUSTERS (gene_id-based; list order = heatmap order) ---
+  # Each entry can be: character vector of gene IDs, a data.frame with a gene column,
+  # or a GRanges with mcols holding gene IDs.
+  manual_clusters        = NULL,
+  manual_labels          = NULL,            # optional pretty labels; defaults to names(manual_clusters) or cluster_#
+  manual_keep_unassigned = TRUE,            # include "other" for genes not present in any manual cluster
+  manual_sort            = NULL,            # named list of per-cluster sort overrides:
+                                            # e.g., list(K36lost = list(on="chip", strains=c("cac1","cac2"), decreasing=FALSE),
+                                            #            K27lostonly = list(on="rna",  strains="set7"))
+  # appearance
   chip_limits    = c(-2, 2),
   rna_limits     = c(-10, 10),
-  chip_zero_band = 0.5,
+  chip_zero_band = 1,                       # also used as cutoff if fold_cutoff=NULL
   rna_zero_band  = 2,
   chip_colors    = c("#3B4CC0","white","#B40426"),
   rna_colors     = c("blue","white","red"),
-  row_gaps_mm    = 0,
+  row_gaps_mm    = 0,                       # 0 => no gaps between clusters
+
+  # export
   out_dir        = NULL,
   file_prefix    = "chip_rna_heatmap",
   save_formats   = c("pdf","png"),
@@ -1402,87 +1403,237 @@ make_chip_rna_heatmap_simple <- function(
   height_in      = NULL,
   base_height_in = 1.5,
   per_row_height_in = 0.006,
-  dpi            = 300
-){
-  stopifnot(gene_col %in% names(chip_df))
-  stopifnot(is.list(rna_list), length(rna_list) >= 1)
-  strains <- names(rna_list)
-  stopifnot(all(nzchar(strains)))
+  dpi            = 300,
 
-  # ---- HARD INTERSECTION: chip ∩ all RNA (∩ clusters if provided) ----
+  # misc
+  verbose        = TRUE
+){
+  sort_on <- match.arg(sort_on)
+  stopifnot(is.list(rna_list), length(rna_list) >= 1)
+  strains_rna <- names(rna_list); stopifnot(all(nzchar(strains_rna)))
+  stopifnot(gene_col %in% names(chip_df))
+
+  # ---------------- Intersection by gene_id ----------------
   genes_chip <- as.character(chip_df[[gene_col]])
   common <- Reduce(intersect, c(list(genes_chip), lapply(rna_list, rownames)))
-  if (!is.null(clusters_df)) {
-    stopifnot(all(c("gene","cluster") %in% names(clusters_df)))
-    common <- intersect(common, as.character(clusters_df$gene))
-  }
-  chip_df <- chip_df[match(common, genes_chip), , drop = FALSE]
-  rna_list <- lapply(rna_list, function(df) df[common, , drop = FALSE])
-  if (!is.null(clusters_df)) clusters_df <- clusters_df[clusters_df$gene %in% common, , drop = FALSE]
+  chip_df  <- chip_df[match(common, genes_chip), , drop = FALSE]
+  rna_list <- lapply(rna_list, function(x) x[common, , drop = FALSE])
   genes <- common
+  if (verbose) message("Plottable genes: ", length(genes))
 
-  # ---- build matrices ----
+  # ---------------- ChIP matrix (for plotting) ----------------
+  all_chip_strains <- sub("^logFC_", "", grep("^logFC_", names(chip_df), value = TRUE))
   if (is.null(chip_cols)) {
-    guess <- paste0("logFC_", strains)
+    guess <- paste0("logFC_", unique(c(strains_rna, cluster_by)))
     chip_cols <- intersect(guess, names(chip_df))
   }
   stopifnot(length(chip_cols) >= 1, all(chip_cols %in% names(chip_df)))
   chipMat <- as.matrix(chip_df[, chip_cols, drop = FALSE])
   rownames(chipMat) <- genes
+  colnames(chipMat) <- sub("^logFC_", "", colnames(chipMat))  # -> strains like "cac1","cac2","set7"
   storage.mode(chipMat) <- "numeric"
 
+  # ---------------- RNA matrix (for plotting) ----------------
   pull_rna <- function(df, g, col) suppressWarnings(as.numeric(df[g, col, drop = TRUE]))
-  rnaMat <- do.call(cbind, lapply(strains, function(s) pull_rna(rna_list[[s]], genes, rna_colname)))
-  colnames(rnaMat) <- paste0("RNA_", strains)
+  rnaMat <- do.call(cbind, lapply(strains_rna, function(s) pull_rna(rna_list[[s]], genes, rna_colname)))
+  colnames(rnaMat) <- paste0("RNA_", strains_rna)             # -> "RNA_cac1","RNA_cac2","RNA_set7"
   rownames(rnaMat) <- genes
 
-  # ---- clustering & ordering ----
-  cl_split <- NULL
-  if (!is.null(clusters_df)) {
-    if (is.null(cluster_levels)) {
-      # keep the order appearing in clusters_df if levels already set; else unique order
-      if (is.factor(clusters_df$cluster)) {
-        cluster_levels <- levels(clusters_df$cluster)
-      } else {
-        cluster_levels <- unique(as.character(clusters_df$cluster))
-      }
-    }
-    clusters_df$cluster <- factor(as.character(clusters_df$cluster), levels = cluster_levels)
-    cl_map <- setNames(as.character(clusters_df$cluster), clusters_df$gene)
-    cl_vec <- cl_map[genes]
-    cl_split <- factor(cl_vec, levels = cluster_levels)
+  # =================== CLUSTER ASSIGNMENT ===================
 
-    # sort within each cluster by mean over sort_strains (or all RNA cols if not provided)
-    sort_cols <- if (is.null(sort_strains)) colnames(rnaMat) else paste0("RNA_", intersect(sort_strains, strains))
-    score <- rowMeans(rnaMat[, sort_cols, drop = FALSE], na.rm = TRUE)
-    idx <- unlist(lapply(levels(cl_split), function(cl){
-      w <- which(cl_split == cl)
-      if (!length(w)) integer(0) else w[order(score[w], decreasing = TRUE, na.last = TRUE)]
-    }), use.names = FALSE)
-    chipMat  <- chipMat[idx, , drop = FALSE]
-    rnaMat   <- rnaMat [idx, , drop = FALSE]
-    cl_split <- cl_split[idx]
-  } else {
-    # no clusters: optional global sort by mean of sort_strains
-    if (!is.null(sort_strains)) {
-      sort_cols <- paste0("RNA_", intersect(sort_strains, strains))
-      if (length(sort_cols) > 0) {
-        score <- rowMeans(rnaMat[, sort_cols, drop = FALSE], na.rm = TRUE)
-        ord <- order(score, decreasing = TRUE, na.last = TRUE)
-        chipMat <- chipMat[ord, , drop = FALSE]
-        rnaMat  <- rnaMat [ord, , drop = FALSE]
-      }
+  # Helpers to extract gene IDs from various object types for *manual* clustering
+  .genes_from_obj <- function(x) {
+    # 1) character vector (already gene IDs)
+    if (is.character(x)) return(unique(as.character(x)))
+    # 2) data.frame: look for gene_col or common synonyms
+    if (is.data.frame(x)) {
+      cn <- colnames(x)
+      cand <- c(gene_col, "gene_id","gene","Gene","GeneID","gene_name","Name","symbol","V10","V11")
+      gcol <- cand[cand %in% cn][1]
+      if (!length(gcol)) stop("manual_clusters df has no gene column (looked for: ", paste(cand, collapse=", "), ")")
+      return(unique(as.character(x[[gcol]])))
+    }
+    # 3) GRanges: gene in mcols
+    if (methods::is(x, "GRanges")) {
+      mc <- S4Vectors::mcols(x)
+      cn <- colnames(mc)
+      cand <- c(gene_col, "gene_id","gene","Gene","GeneID","gene_name","Name","symbol","V10","V11")
+      gcol <- cand[cand %in% cn][1]
+      if (!length(gcol)) stop("manual_clusters GRanges has no gene column in mcols (looked for: ", paste(cand, collapse=", "), ")")
+      return(unique(as.character(mc[[gcol]])))
+    }
+    stop("Unsupported manual_clusters element of class: ", paste(class(x), collapse="/"))
+  }
+
+  # Build an 'orig' matrix from chip_df for AUTO clustering (independent of what we plot)
+  want_strains <- unique(c(sub("^logFC_", "", chip_cols), cluster_by, sort_reference))
+  have_strains <- intersect(want_strains, all_chip_strains)
+  orig <- as.matrix(chip_df[, paste0("logFC_", have_strains), drop = FALSE])
+  colnames(orig) <- have_strains
+  rownames(orig) <- genes
+
+  # cutoff for auto mode
+  cut <- if (is.null(fold_cutoff)) {
+    if (!is.null(chip_zero_band)) {
+      if (length(chip_zero_band) == 1) abs(chip_zero_band) else max(abs(chip_zero_band))
+    } else 1
+  } else as.numeric(fold_cutoff)
+
+  # ---- Sorting helpers (global + per-cluster override) ----
+  .score_by <- function(idx, on = sort_on, strains = sort_strains, dec = sort_decreasing) {
+    if (on == "chip") {
+      cols <- if (is.null(strains)) colnames(chipMat) else intersect(strains, colnames(chipMat))
+      if (!length(cols)) cols <- colnames(chipMat)
+      sc <- rowMeans(chipMat[idx, cols, drop = FALSE], na.rm = TRUE)
+    } else {
+      want <- if (is.null(strains)) colnames(rnaMat) else paste0("RNA_", strains)
+      cols <- intersect(want, colnames(rnaMat))
+      if (!length(cols)) cols <- colnames(rnaMat)
+      sc <- rowMeans(rnaMat[idx, cols, drop = FALSE], na.rm = TRUE)
+    }
+    order(sc, decreasing = dec, na.last = TRUE)
+  }
+
+  .score_by_manual <- function(idx, cl_label) {
+    if (!is.null(manual_sort) && !is.null(manual_sort[[cl_label]])) {
+      spec <- manual_sort[[cl_label]]
+      on  <- spec$on  %||% sort_on
+      st  <- spec$strains %||% sort_strains
+      dec <- if (!is.null(spec$decreasing)) isTRUE(spec$decreasing) else sort_decreasing
+      return(.score_by(idx, on = on, strains = st, dec = dec))
+    } else {
+      return(.score_by(idx, on = sort_on, strains = sort_strains, dec = sort_decreasing))
     }
   }
 
-  # ---- colors, clamping, gaps ----
+  `%||%` <- function(a,b) if (!is.null(a)) a else b
+  use_manual <- !is.null(manual_clusters) && length(manual_clusters) > 0
+
+  if (use_manual) {
+    # -------- MANUAL (gene_id-based) --------
+    if (is.null(names(manual_clusters))) {
+      names(manual_clusters) <- paste0("cluster_", seq_along(manual_clusters))
+    }
+    labels <- if (!is.null(manual_labels)) {
+      stopifnot(length(manual_labels) == length(manual_clusters)); manual_labels
+    } else {
+      names(manual_clusters)
+    }
+
+    cl_vec <- rep(NA_character_, length(genes))
+    # precedence = list order
+    for (i in seq_along(manual_clusters)) {
+      gset <- .genes_from_obj(manual_clusters[[i]])
+      hit <- which(is.na(cl_vec) & genes %in% gset)
+      if (length(hit)) cl_vec[hit] <- labels[i]
+      if (verbose) message(sprintf("Manual cluster '%s': matched %d rows", labels[i], length(hit)))
+    }
+
+    if (isTRUE(manual_keep_unassigned)) {
+      cl_vec[is.na(cl_vec)] <- "other"
+      cluster_levels <- c(labels, "other")
+    } else {
+      keep <- !is.na(cl_vec)
+      chipMat <- chipMat[keep, , drop = FALSE]
+      rnaMat  <- rnaMat [keep, , drop = FALSE]
+      orig    <- orig   [keep, , drop = FALSE]
+      genes   <- genes  [keep]
+      cl_vec  <- cl_vec [keep]
+      if (verbose) message("Dropped unassigned rows: ", sum(!keep))
+      cluster_levels <- labels
+    }
+    cl_split <- factor(cl_vec, levels = cluster_levels, ordered = TRUE)
+
+    # Per-cluster sorting with per-cluster overrides
+    ord <- integer(0)
+    for (cl in levels(cl_split)) {
+      idx <- which(cl_split == cl)
+      if (!length(idx)) next
+      o <- .score_by_manual(idx, cl)
+      ord <- c(ord, idx[o])
+    }
+
+    chipMat  <- chipMat[ord, , drop = FALSE]
+    rnaMat   <- rnaMat [ord, , drop = FALSE]
+    cl_split <- cl_split[ord]
+
+  } else {
+    # -------- AUTO (ChIP-based state machine) --------
+    if (is.null(cluster_by) || !length(cluster_by)) {
+      stop("Auto mode requires 'cluster_by' (e.g., c('cac1','cac2')).")
+    }
+    state_for <- function(strains) {
+      vals <- orig[, strains, drop = FALSE]
+      d <- matrix(0L, nrow(vals), ncol(vals), dimnames = dimnames(vals))
+      d[vals <= -abs(cut)] <- -1L  # loss
+      d[vals >=  abs(cut)] <-  1L  # gain
+      d
+    }
+    state_cluster <- state_for(cluster_by)
+
+    if (!collapse_mutants) {
+      if (length(cluster_by) != 2L) stop("separate mode requires exactly two cluster_by strains.")
+      a <- cluster_by[1]; b <- cluster_by[2]
+      sA <- state_cluster[, a]; sB <- state_cluster[, b]
+      lab <- rep("other", length(genes))
+      lab[sA == -1L & sB == -1L] <- sprintf("loss in both (%s & %s)", a, b)
+      lab[sA == -1L & sB ==  0L] <- sprintf("loss in %s only", a)
+      lab[sA ==  0L & sB == -1L] <- sprintf("loss in %s only", b)
+      lab[sA ==  0L & sB ==  0L] <- sprintf("kept in both (%s & %s)", a, b)
+      cluster_levels <- c(sprintf("loss in both (%s & %s)", a, b),
+                          sprintf("loss in %s only", a),
+                          sprintf("loss in %s only", b),
+                          sprintf("kept in both (%s & %s)", a, b),
+                          "other")
+      cl_split <- factor(lab, levels = cluster_levels, ordered = TRUE)
+
+      ord <- integer(0)
+      for (cl in levels(cl_split)) {
+        idx <- which(cl_split == cl); if (!length(idx)) next
+        o <- .score_by(idx)  # global sorting controls
+        ord <- c(ord, idx[o])
+      }
+      chipMat  <- chipMat[ord, , drop = FALSE]
+      rnaMat   <- rnaMat [ord, , drop = FALSE]
+      cl_split <- cl_split[ord]
+
+    } else {
+      targets <- setdiff(cluster_by, "WT"); if (!length(targets)) targets <- cluster_by
+      st <- state_cluster[, targets, drop = FALSE]
+      loss_any <- apply(st == -1L, 1, any, na.rm = TRUE)
+      keep_all <- apply(st ==  0L, 1, all, na.rm = TRUE)
+      gain_any <- apply(st ==  1L, 1, any, na.rm = TRUE)
+
+      lab <- rep("other", length(genes))
+      lab[loss_any] <- sprintf("loss in any (%s)", paste(targets, collapse = " | "))
+      lab[!loss_any & keep_all] <- sprintf("kept in all (%s)", paste(targets, collapse = " & "))
+      lab[!loss_any & !keep_all & gain_any] <- sprintf("gain in any (%s)", paste(targets, collapse = " | "))
+      cluster_levels <- c(sprintf("loss in any (%s)", paste(targets, collapse = " | ")),
+                          sprintf("kept in all (%s)", paste(targets, collapse = " & ")),
+                          sprintf("gain in any (%s)", paste(targets, collapse = " | ")),
+                          "other")
+      cl_split <- factor(lab, levels = cluster_levels, ordered = TRUE)
+
+      ord <- integer(0)
+      for (cl in levels(cl_split)) {
+        idx <- which(cl_split == cl); if (!length(idx)) next
+        o <- .score_by(idx)  # global sorting controls
+        ord <- c(ord, idx[o])
+      }
+      chipMat  <- chipMat[ord, , drop = FALSE]
+      rnaMat   <- rnaMat [ord, , drop = FALSE]
+      cl_split <- cl_split[ord]
+    }
+  }
+
+  # ---------------- Colors & clamping ----------------
   col_fun <- function(lims, band, cols){
     if (!is.null(band) && lims[1] < 0 && lims[2] > 0) {
       b <- abs(band)[1]
       circlize::colorRamp2(c(lims[1], -b, 0, b, lims[2]),
-                           c(cols[1],"white","white","white",cols[3]))
+                           c(cols[1], "white", "white", "white", cols[3]))
     } else if (lims[1] < 0 && lims[2] > 0) {
-      circlize::colorRamp2(c(lims[1], 0, lims[2]), c(cols[1],"white",cols[3]))
+      circlize::colorRamp2(c(lims[1], 0, lims[2]), c(cols[1], "white", cols[3]))
     } else {
       circlize::colorRamp2(c(lims[1], lims[2]), c(cols[1], cols[3]))
     }
@@ -1493,25 +1644,21 @@ make_chip_rna_heatmap_simple <- function(
   chipMat <- pmin(pmax(chipMat, chip_limits[1]), chip_limits[2])
   rnaMat  <- pmin(pmax(rnaMat,  rna_limits[1]),  rna_limits[2])
 
-  # row gaps only when clusters are used
-  row_gaps <- if (!is.null(cl_split)) {
-    k <- sum(table(cl_split) > 0)
-    if (k > 1 && row_gaps_mm > 0) unit(rep(row_gaps_mm, k - 1), "mm") else unit(0, "mm")
-  } else unit(0, "mm")
-
+  # ---------------- Heatmaps (no gaps by default) ----------------
   ht_chip <- Heatmap(
     chipMat, name = "ChIP log2FC", col = col_chip,
     cluster_rows = FALSE, cluster_columns = FALSE, show_row_names = FALSE,
-    row_split = cl_split, row_gap = row_gaps
+    row_split = cl_split, row_gap = unit(row_gaps_mm, "mm")
   )
   ht_rna <- Heatmap(
     rnaMat,  name = "RNA log2FC",  col = col_rna, na_col = "white",
     cluster_rows = FALSE, cluster_columns = FALSE, show_row_names = FALSE,
-    row_split = cl_split, row_gap = row_gaps
+    row_split = cl_split, row_gap = unit(row_gaps_mm, "mm")
   )
 
   ht_all <- ht_chip + ht_rna
 
+  # ---------------- Export / draw ----------------
   n_rows <- nrow(chipMat)
   eff_h  <- if (is.null(height_in)) base_height_in + n_rows * per_row_height_in else height_in
 
@@ -1529,39 +1676,75 @@ make_chip_rna_heatmap_simple <- function(
   }
 
   draw(ht_all, heatmap_legend_side = "right")
-  invisible(list(chip_matrix = chipMat, rna_matrix = rnaMat, clusters = cl_split, genes_plotted = rownames(chipMat)))
+  invisible(list(
+    chip_matrix   = chipMat,
+    rna_matrix    = rnaMat,
+    clusters      = cl_split,
+    genes_plotted = rownames(chipMat)
+  ))
 }
 
-# ---------------------- Example usage ----------------------
-genes <- H3K36me3_Results_K27promTSS_vWT$V10  # or the gene list you want
+```
 
-rna_df <- data.frame(
-  RNA_cac1 = cac1RNA[genes, "log2FoldChange"],
-  RNA_cac2 = cac2RNA[genes, "log2FoldChange"],
-  row.names = genes
+```{r, use ChIP-RNA heatmap function}
+
+#manual clustering
+out <- make_chip_rna_heatmap_simple(
+  chip_df   = H3K36me3_Results_K27promTSS_vWT,
+  rna_list  = list(cac1 = cac1RNA, cac2 = cac2RNA, set7 = set7RNA),
+  gene_col  = "gene_id",
+  chip_cols = c("logFC_cac1","logFC_cac2","logFC_set7"),
+  manual_clusters = list(
+    K36_lost       = K36lost,        # data.frame / GRanges / or character vector of gene_ids
+    K27_lost_only  = K27lost_only,
+    K27_K36retain  = K27_K36retain
+  ),
+  manual_labels = c("K36 lost","K27 lost only","K27+K36 retain"),
+  sort_on         = "chip",
+  sort_strains    = c("cac1","cac2"),
+  sort_decreasing = FALSE,           # negatives at the top
+  manual_sort = list(
+    "K36 lost"        = list(on = "rna", strains = c("cac1","cac2"), decreasing = TRUE),
+    "K27 lost only"   = list(on = "rna",  strains = c("cac1","cac2"), decreasing = TRUE),
+    "K27+K36 retain"  = list(on = "rna", strains = c("cac1","cac2","set7"), decreasing = TRUE)
+  ),
+  chip_limits = c(-2,2),
+  rna_limits  = c(-6,6),
+  chip_zero_band = 1,
+  rna_zero_band  = 1.5,
+  row_gaps_mm = 0,
+  out_dir = "csaw_heatmaps",
+  file_prefix = "H3K36me3_vs_RNA_manualClusters",
+  save_formats = c("pdf","png"),
+  width_in = 8,
+  dpi = 300
 )
+
 
 out <- make_chip_rna_heatmap_simple(
   chip_df   = H3K36me3_Results_K27promTSS_vWT,
   rna_list  = list(cac1 = cac1RNA, cac2 = cac2RNA, set7 = set7RNA),
-  clusters_df = clusters_df,
-  gene_col  = "V10",
+  gene_col  = "gene_id",
   chip_cols = c("logFC_cac1","logFC_cac2","logFC_set7"),
-  sort_strains = c("cac1","cac2","set7"),
+  cluster_by       = c("cac1","cac2"),
+  collapse_mutants = FALSE,
+  fold_cutoff      = NULL,          # <- uses chip_zero_band below
+  chip_zero_band   = 1,             # |log2FC| < 1 treated as "kept"
+  sort_reference   = "WT",          # ignored if absent
+  sort_decreasing  = FALSE,         # most negative at the top
   chip_limits = c(-2,2),
   rna_limits  = c(-6,6),
-  chip_zero_band = 1,
-  rna_zero_band  = 2,
+  rna_zero_band = 1.5,
   row_gaps_mm = 0,
   out_dir = "csaw_heatmaps",
-  file_prefix = "H3K36me3_vs_RNA_clustered",
+  file_prefix = "H3K36me3_vs_RNA_cac1cac2_sep",
   save_formats = c("pdf","png"),
   width_in = 8,
-  dpi = 300,
-  cluster_levels = ord  
+  dpi = 300
 )
 
-out <- make_chip_rna_heatmap_simple(
+
+out <- make_chip_rna_heatmap(
   chip_df   = H3K36me3_Results_K27promTSS_vWT,
   rna_list  = list(cac1 = cac1RNA, cac2 = cac2RNA),
   clusters_df = NULL,
@@ -1580,57 +1763,21 @@ out <- make_chip_rna_heatmap_simple(
   dpi = 300
 )
 
-#View RNA matrix being plotted (in correct order)
-# 1) Get the plotted RNA matrix (in order)
-rna_mat <- out$rna_matrix
-
-# 2) Turn it into a data frame with gene + cluster + row index
-rna_plotted <- cbind(
-  gene    = rownames(rna_mat),
-  as.data.frame(rna_mat),
-  cluster = as.character(out$clusters)
+###Tool to see what your row order is
+hm_rows <- cbind(
+  data.frame(
+    order_idx = seq_len(nrow(out$chip_matrix)),
+    gene      = rownames(out$chip_matrix),
+    cluster   = as.character(out$clusters),
+    stringsAsFactors = FALSE
+  ),
+  as.data.frame(out$chip_matrix),   # the ChIP values used for the heatmap
+  as.data.frame(out$rna_matrix)     # the RNA values used for the heatmap
 )
-rna_plotted$order_idx <- seq_len(nrow(rna_plotted))
-rna_plotted <- rna_plotted[, c("order_idx","gene","cluster", setdiff(names(rna_plotted), c("order_idx","gene","cluster")))]
-
-
-#RNA clustering
-# Align by shared genes (rownames assumed to be gene IDs)
-common <- Reduce(intersect, list(rownames(cac1RNA), rownames(cac2RNA), rownames(set7RNA)))
-c1  <- cac1RNA[common, , drop = FALSE]
-c2  <- cac2RNA[common, , drop = FALSE]
-s7  <- set7RNA[common, , drop = FALSE]
-
-up_cac1 <- !is.na(c1$log2FoldChange) & c1$log2FoldChange > 2
-up_cac2 <- !is.na(c2$log2FoldChange) & c2$log2FoldChange > 2
-up_set7 <- !is.na(s7$log2FoldChange) & s7$log2FoldChange > 2
-
-cluster <- ifelse(up_cac1 & up_cac2 & up_set7, "cluster1_all_up",
-           ifelse(up_cac1 | up_cac2, "cluster2_cac1_cac2_up",
-           ifelse(!(up_cac1 | up_cac2) & up_set7, "cluster3_set7_up_only",
-                  "cluster4_other")))
-
-# Result table (handy for joins/plots)
-clusters_df <- data.frame(
-  gene = common,
-  cluster = cluster,
-  lfc_cac1 = c1$log2FoldChange,
-  lfc_cac2 = c2$log2FoldChange,
-  lfc_set7 = s7$log2FoldChange,
-  row.names = NULL
-)
-
-clusters_df <- subset(clusters_df, clusters_df$gene %in% H3K27me3_TSS_Promoters$V10)
-
-# order  (FIX the name to _cac1_cac2_)
-ord <- c("cluster1_all_up", "cluster2_cac1_cac2_up", "cluster3_set7_up_only", "cluster4_other")
-
-# set factor levels to ord (NOT to `cluster`)
-clusters_df$cluster <- factor(clusters_df$cluster, levels = ord)
-
-
+View(hm_rows)
 
 ```
+
 
 ```{r, ChIP vs. RNA scatter plot code}
 #Use this to make scatterplots of ChIP-seq signal over genes vs. their RNA-seq expression values or another modifcation
@@ -1866,26 +2013,18 @@ chip_scatter_flex <- function(
 ```
 
 ```{r, use scatter plot function}
-#you have to make sure to assing gene names to df being used
-bed_key <- regions$K27promTSS %>%
-  select(V1, V2, V3, V10) %>%
-  distinct(V1, V2, V3, .keep_all = TRUE)   # guard against duplicate coords
-
-H3K27me3_CS_Results_K27promTSS_vWT <- H3K27me3_CS_Results_K27promTSS_vWT %>%
-  left_join(bed_key, by = c("seqnames" = "V1", "start" = "V2", "end" = "V3"))
-
 
 #Example Use (ChIP vs RNA)
 out <- chip_scatter_flex(
   mode        = "chip_vs_rna",
-  chip_df_x   = H3K36me3_Results_K27promTSS_vWT,  # X = H3K36me3
+  chip_df_x   = Kac_Results_K27promTSS_vWT,  # X = H3K36me3
   strain_x    = "cac1",
   rna_df      = cac1RNA,                          # RNA for cac1
   up_thresh      =  1.5,
   down_thresh    = -1.5,
-  chip_x_label = "H3K36me3",                      # label in axes/title
+  chip_x_label = "Kac",                      # label in axes/title
   out_dir     = "scatter_outputs",
-  file_prefix = "H3K36me3_K27promTSS_vs_RNA_cac1",
+  file_prefix = "Kac_K27promTSS_vs_RNA_cac1",
   width_in    = 12, height_in = 9, dpi = 600
 )
 out$gg
@@ -1894,17 +2033,17 @@ out$gg
 #Example Use (ChIP vs ChIP)
 out <- chip_scatter_flex(
   mode        = "chip_vs_chip",
-  chip_df_x   = H3K27me3_CS_Results_K27promTSS_vWT,  # X = H3K27me3
+  chip_df_x   = H3K36me3_Results_K27genes_proms_vWT,  # X = H3K27me3
   strain_x    = "cac1",
-  chip_df_y   = H3K36me3_Results_K27promTSS_vWT,  # Y = H3K36me3
+  chip_df_y   = Kac_Results_K27genes_proms_vWT,  # Y = H3K36me3
   strain_y    = "cac1",
-  chip_x_label = "H3K27me3",
-  chip_y_label = "H3K36me3",
+  chip_x_label = "H3K36me3",
+  chip_y_label = "Kac",
   chip_diff_thresh = 1,   # needs ≥1 log2 unit advantage to be called dominant
-  chip_colors_map  = c(x_dom = "darkgreen", y_dom = "#A59D00", similar = "gray70"),
-  chip_legend_title = "Skew (K27 vs K36)",
+  chip_colors_map  = c(x_dom = "#a65628", y_dom = "#cab2d6", similar = "gray70"),
+  chip_legend_title = "Skew (K36 vs Kac)",
   out_dir     = "scatter_outputs",
-  file_prefix = "H3K27me3_vs_H3K36me3_cac1_skew",
+  file_prefix = "H3K27me3_vs_Kac_cac1_promoters_genes",
   width_in    = 12, height_in = 9, dpi = 600
 )
 out$gg
@@ -2252,14 +2391,14 @@ write.table(H3K27me3_noCAF1, file = "H3K27me3_CAF1_lost.bed", sep = "\t", quote 
 ####i want to subset genes that lose K27 or K36 in cac-1 or cac-2
 K27lost = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac1 < -1 | H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac2 < -1)
 #K27lost = subset(K27lost, K27lost$FDR_cac1 < 0.05 | K27lost$FDR_cac2 < 0.05)
-K27lost = subset(H3K27me3_TSS_Promoters, H3K27me3_TSS_Promoters$V10 %in% K27lost$V10)
+K27lost = subset(regions$K27genes, regions$K27genes$V10 %in% K27lost$gene_id)
 
 K36lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -1 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -1)
 #K36lost = subset(K36lost, K36lost$FDR_cac1 < 0.05 | K36lost$FDR_cac2 < 0.05)
-K36lost = subset(H3K27me3_TSS_Promoters, H3K27me3_TSS_Promoters$V10 %in% K36lost$V10)
+K36lost = subset(regions$K27genes, regions$K27genes$V10 %in% K36lost$gene_id)
 
-retainK27 = subset(H3K27me3_TSS_Promoters, ! H3K27me3_TSS_Promoters$V10 %in% K27lost$V10)
-retainK36 = subset(H3K27me3_TSS_Promoters, ! H3K27me3_TSS_Promoters$V10 %in% K36lost$V10)
+retainK27 = subset(regions$K27genes, ! regions$K27genes$V10 %in% K27lost$V10)
+retainK36 = subset(regions$K27genes, ! regions$K27genes$V10 %in% K36lost$V10)
 
 write.table(K27lost, file = "K27losstest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K36lost, file = "K36losstest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
@@ -2268,10 +2407,12 @@ write.table(retainK27, file = "K27retaintest.bed", sep = "\t", quote = FALSE, ro
 write.table(retainK36, file = "K36retaintest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
 
 #####
-K27_K36lost = subset(K27lost, K27lost$V10 %in% K36lost$V10)
 K27lost_only = subset(K27lost, ! K27lost$V10 %in% K36lost$V10)
-K36lost_only = subset(K36lost, ! K36lost$V10 %in% K27_K36lost$V10)
+K27_K36retain = subset(regions$K27genes, ! regions$K27genes$V10 %in% K36lost$V10 & ! regions$K27genes$V10 %in% K27lost$V10)
 
-write.table(K27lost, file = "K27losstest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K27_K36lost, file = "CAF1_K27_K36_lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K27lost_only, file = "CAF1_K27_lost_only.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K36lost_only, file = "CAF1_K36_lost_only.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K27_K36retain, file = "CAF1_K36_K27_retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 ```
