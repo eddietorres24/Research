@@ -19,7 +19,7 @@ CACHEDIR="$OUTDIR/sra_cache"                        # per-job SRA cache
 
 # Prep
 mkdir -p "$OUTDIR" "$CACHEDIR" "$OUTDIR/logs"
-module load sratoolkit >/dev/null 2>&1 || true
+module load SRA-Toolkit/
 
 echo "Start: $(date)"
 echo "Accession list: $ACC_FILE"
