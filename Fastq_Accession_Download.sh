@@ -13,7 +13,7 @@
 set -euo pipefail
 
 # Inputs/outputs
-ACC_FILE="$SLURM_SUBMIT_DIR/JGI_RNA.txt"            # one SRR per line
+ACC_FILE="/scratch/evt82290/FastqAccessions/JGI_RNA.txt"            # one SRR per line
 OUTDIR="/scratch/evt82290/SRA/FastqFiles"           # where FASTQs go
 CACHEDIR="$OUTDIR/sra_cache"                        # per-job SRA cache
 
