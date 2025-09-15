@@ -10,39 +10,45 @@
 #SBATCH --output=/scratch/evt82290/SRA/FastqFiles/logs/fqdump.%j.out
 #SBATCH --error=/scratch/evt82290/SRA/FastqFiles/logs/fqdump.%j.err
 
-# Reads SRR accessions (one per line) from JGI_RNA.txt in the submit directory,
-# dumps paired FASTQs to OUTDIR, then gzips them.
+set -euo pipefail
 
-cd "$SLURM_SUBMIT_DIR"
+# Inputs/outputs
+ACC_FILE="$SLURM_SUBMIT_DIR/JGI_RNA.txt"            # one SRR per line
+OUTDIR="/scratch/evt82290/SRA/FastqFiles"           # where FASTQs go
+CACHEDIR="$OUTDIR/sra_cache"                        # per-job SRA cache
 
-ACC_FILE="$SLURM_SUBMIT_DIR/JGI_RNA.txt"          # accession list file (one SRR per line)
-OUTDIR="/scratch/evt82290/SRA/FastqFiles"         # destination for FASTQs
-CACHEDIR="$OUTDIR/sra_cache"                      # local SRA cache for this job
-
+# Prep
 mkdir -p "$OUTDIR" "$CACHEDIR" "$OUTDIR/logs"
-
-# Load SRA Toolkit if your cluster uses modules (non-fatal if not present)
 module load sratoolkit >/dev/null 2>&1 || true
 
-echo "Starting: $(date)"
-echo "Using accession list: $ACC_FILE"
-echo "Output directory: $OUTDIR"
-echo "Cache directory: $CACHEDIR"
+echo "Start: $(date)"
+echo "Accession list: $ACC_FILE"
+echo "OUTDIR: $OUTDIR"
+echo "CACHE:  $CACHEDIR"
 
-# Iterate accessions
-# - Skips blank lines and lines starting with '#'
-while IFS=$'\r' read -r acc || [ -n "$acc" ]; do
+# Iterate accessions; skip blank lines and comments
+while IFS= read -r acc; do
   [[ -z "$acc" || "$acc" =~ ^# ]] && continue
+  echo "==> $acc"
 
-  echo "==> Processing $acc"
-
-  # 1) Prefetch to cache (writes .sra/.sralite or a directory under $CACHEDIR)
+  # 1) Prefetch to cache
   if ! prefetch -O "$CACHEDIR" "$acc"; then
-    echo "[WARN] prefetch failed for $acc — skipping"
+    echo "[WARN] prefetch failed: $acc"
     continue
   fi
 
-  # Resolve the cached object path (covers .sralite or directory)
-  obj=( "$CACHEDIR"/"$acc"* )
-  if [[ ! -e "${obj[0]}" ]]; then
-    echo "[WARN] No cached object found for $acc in
+  # 2) Dump FASTQ to OUTDIR (use wildcard to match .sralite or directory)
+  if fasterq-dump --split-files -e "$SLURM_CPUS_PER_TASK" -O "$OUTDIR" "$CACHEDIR/${acc}"*; then
+    # 3) Compress
+    if command -v pigz >/dev/null 2>&1; then
+      pigz -p "$SLURM_CPUS_PER_TASK" -f "$OUTDIR/${acc}"_*.fastq
+    else
+      gzip -f "$OUTDIR/${acc}"_*.fastq
+    fi
+    echo "<== done: $acc"
+  else
+    echo "[WARN] fasterq-dump failed: $acc"
+  fi
+done < "$ACC_FILE"
+
+echo "All done: $(date)"
