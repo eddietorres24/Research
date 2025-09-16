@@ -39,8 +39,7 @@ knitr::opts_knit$set(root.dir = "workingdir")
 #Bring in table with un-normalized transcription counts; check.names is important if you have dashes in the gene names 
 #row.names=1 command sets geneIDs as the row name
 countdataInteractors <- read.table("./text_files/readcounts_FINAL.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
-countdataInteractors_ash1 <- read.table("./text_files/readcounts_ash1.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
-countdataInteractors <- cbind(countdataInteractors,countdataInteractors_ash1[,6:7])
+
 #################################################
 #Section 1: calculate tpm using the scater package
 #################################################

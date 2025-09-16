@@ -221,6 +221,8 @@ else
 
     echo "${accesion} running as Read1 file only"
 
+module load Trim_Galore
+
        trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $read1
 
        #map with STAR
