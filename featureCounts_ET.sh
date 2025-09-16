@@ -78,6 +78,6 @@ $B149DIR/149-97_RNA_cac-1-suz-12__Rep2_S121/149-97_RNA_cac-1-suz-12__Rep2_S121_A
 $B149DIR/149-98_RNA_cac-1-suz-12__Rep3_S122/149-98_RNA_cac-1-suz-12__Rep3_S122_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR7690267/SRR7690267_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR7690268/SRR7690268_Aligned.sortedByCoord.out.bam \
-SRR9027658
-SRR9027759
-SRR9027689
+$BAMDIR/SRR9027658/SRR9027658_Aligned.sortedByCoord.out.bam \
+$BAMDIR/SRR9027759/SRR9027759_Aligned.sortedByCoord.out.bam \
+$BAMDIR/SRR9027689/SRR9027689_Aligned.sortedByCoord.out.bam

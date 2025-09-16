@@ -1906,7 +1906,7 @@ out <- make_chip_rna_heatmap_simple(
     K36 = H3K36me3_Results_K27promTSS_vInput
   ),
   chip_cols_list = list(
-    K27 = c("logFC_WT","logFC_cac1","logFC_cac2","logFC_set7"),
+    K27 = c("logFC_WT","logFC_cac1","logFC_cac2","logFC_ash1"),
     K36 = c("logFC_WT","logFC_cac1","logFC_cac2","logFC_set7")
   ),
   rna_matrix = rna_z,
