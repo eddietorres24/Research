@@ -232,5 +232,5 @@ plotHeatmap -m cluster_test.gz -out K27_genes_CAF-1_allmods_clustered_K27order.p
                     --heatmapHeight 24 \
                     --whatToShow "heatmap and colorbar" \
                     --legendLocation none \
-                    --colorList 'white,g,darkgreen' 'white,g,darkgreen' 'white, peru, saddlebrown' 'white, peru, saddlebrown' 'white,magenta' 'white,magenta' 'white,magenta' 'white,magenta' 'white, lavender, mediumslateblue' 'white, lavender, mediumslateblue' 'white, lavender, mediumslateblue' 'white, lavender, mediumslateblue' \
+                    --colorList 'white,g,darkgreen' 'white,g,darkgreen' 'yellow, orange, brown' 'yellow, orange, brown' 'white,magenta' 'white,magenta' 'white,magenta' 'white,magenta' 'white, lavender, mediumslateblue' 'white, lavender, mediumslateblue' 'white, lavender, mediumslateblue' 'white, lavender, mediumslateblue' \
                     --zMin 0 --zMax 50 50 12 12 5 5 5 5 8 8 8 8
