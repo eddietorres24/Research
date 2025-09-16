@@ -38,7 +38,7 @@ featureCounts -T $THREADS \
 -g gene_name \
 -s 0 --primary \
 -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
--o $OUTDIR/readcounts_newseq.txt \
+-o $OUTDIR/readcounts_All_CAF1paper.txt \
 $BAMDIR/SRR8444037/SRR8444037_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR8444038/SRR8444038_Aligned.sortedByCoord.out.bam \
 $BAMDIR/SRR8444043/SRR8444043_Aligned.sortedByCoord.out.bam \
