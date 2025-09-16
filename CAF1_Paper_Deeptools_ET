@@ -145,9 +145,10 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
    --missingDataAsZero --skipZeros -o cluster_test.gz
 
 plotHeatmap -m cluster_test.gz -out K27_genes_CAF-1_K27_clustered_K27order.pdf \
-                    --samplesLabel WT cac-1 \
+                    --samplesLabel WT cac-1 ash-1 \
                     --startLabel "TSS" \
                     --sortRegions descend \
+                    --sortUsingSamples 1 2 \
                     --heatmapHeight 24 \
                     --outFileSortedRegions K27_order.bed \
                     --legendLocation none \
