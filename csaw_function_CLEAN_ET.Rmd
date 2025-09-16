@@ -2625,19 +2625,17 @@ K36lost = subset(regions$K27genes, regions$K27genes$gene_id %in% K36lost$gene_id
 retainK27 = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K27lost$gene_id)
 retainK36 = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K36lost$gene_id)
 
-write.table(K27lost, file = "K27losstest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
-write.table(K36lost, file = "K36losstest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
+write.table(K27lost, file = "CAF-1_K27lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K36lost, file = "CAF-1_K36lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
 
-write.table(retainK27, file = "K27retaintest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
-write.table(retainK36, file = "K36retaintest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
+write.table(retainK27, file = "CAF-1_K27retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(retainK36, file = "CAF-1_K36retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
 
 #####
 K27lost_only = subset(K27lost, ! K27lost$gene_id %in% K36lost$gene_id)
 K27_K36retain = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K36lost$gene_id & ! regions$K27genes$gene_id %in% K27lost$gene_id)
 
-write.table(K27_K36lost, file = "CAF1_K27_K36_lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K27lost_only, file = "CAF1_K27_lost_only.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
-write.table(K36lost_only, file = "CAF1_K36_lost_only.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K27_K36retain, file = "CAF1_K36_K27_retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 ```
