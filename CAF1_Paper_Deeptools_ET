@@ -228,7 +228,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 plotHeatmap -m cluster_test.gz -out K27_genes_CAF-1_allmods_clustered_K27order.pdf \
                     --samplesLabel WT cac-1 WT cac-1 WT cac-1 cac-2 set-7 WT cac-1 cac-2 set-7 \
                     --startLabel "TSS" \
-                    --sortRegions none \
+                    --sortRegions no \
                     --heatmapHeight 24 \
                     --whatToShow "heatmap and colorbar" \
                     --legendLocation none \
