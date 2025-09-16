@@ -140,6 +140,7 @@ plotHeatmap -m K27_test.gz -out K27_cluster_test.pdf \
 computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+   $MISCDIR/ash1_H3K27me2me3_Rep2.bin_25.smooth_75Bulk.bw \
 -R $BEDDIR2/CAF-1_K36lost.bed $BEDDIR2/CAF1_K27_lost_only.bed $BEDDIR2/CAF1_K36_K27_retain.bed \
    --missingDataAsZero --skipZeros -o cluster_test.gz
 
