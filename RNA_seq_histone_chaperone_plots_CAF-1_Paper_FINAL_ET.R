@@ -324,5 +324,17 @@ heatmap <- pheatmap(K27_not_lost, color = colorRampPalette(rev(brewer.pal(n = 7,
 #to plot with ggplot, you need to extract [[4]] from the heatmap object
 heatmap_plot <- heatmap[[4]]
 
+#replicate scaling for other heatmaps
+library(pheatmap)   # for the internal helper
+
+rna_cols <- c("WT","set-7","cac-1","cac-2","cac-3","naf-1","naf-2","asf-1","ATRX")
+M <- as.matrix(GenesWithChanges[, rna_cols, drop = FALSE])
+
+# identical to pheatmap(scale="row")
+rna_z <- pheatmap:::scale_rows(M)
+
+# (optional) clip for display like pheatmap often does
+rna_z <- pmin(pmax(rna_z, -3), 3)
+
 ggsave(filename = "./CAF-1_K27_Paper_Final.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
 #dev.off()

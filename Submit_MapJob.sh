@@ -32,7 +32,7 @@ fi
 fastqPath="/scratch/evt82290/SRA/FastqFiles"
 # fastqPath="/scratch/evt82290/FastqFiles/misc_RNA"
 # outdir="/scratch/evt82290/RNAseq/cac_aberrant_transcripts"
-outdir="/scratch/evt82290/MappingOutputs/RNAseq_split"
+outdir="/scratch/evt82290/MappingOutputs/RNAseq"
 # scratch/evt82290/FastqFiles/2025_Run150_ET
 # /scratch/evt82290/FastqFiles/2025_Run149_ET/RNA
 

@@ -1351,6 +1351,13 @@ make_csaw_heatmap_clusterby(
 cac1RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1_new_ALL.csv", row.names = 1)
 cac2RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac2_ALL.csv", row.names = 1)
 set7RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/set7_ALL.csv", row.names = 1)
+#ash1RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/set7_ALL.csv", row.names = 1)
+
+#RNA coloring function for colorbrwer RdBu heatmap
+rng <- c(-3, 3)
+pal  <- colorRampPalette(rev(brewer.pal(7, "RdBu")))(100)  # includes white in the middle
+vals <- seq(rng[1], rng[2], length.out = length(pal))
+rna_col_fun <- colorRamp2(vals, pal)
 
 #Plot heatmap with ChIP & RNA-seq log2FC
 
@@ -1361,167 +1368,233 @@ suppressPackageStartupMessages({
 })
 
 make_chip_rna_heatmap_simple <- function(
-  chip_df,
-  rna_list,                                 # named list of RNA dfs; rownames = gene IDs
-  gene_col        = "gene_id",
-  chip_cols       = NULL,                   # displayed ChIP cols (names like "logFC_cac1"); NULL -> guess from rna_list
-  rna_colname     = "log2FoldChange",
+  # --- ChIP inputs ---
+  chip_df         = NULL,                 # (legacy) single ChIP df
+  chip_cols       = NULL,                 # cols for single df
+  chip_list       = NULL,                 # named list of ChIP dfs, e.g. list(K27=df1, K36=df2)
+  chip_cols_list  = NULL,                 # named list of col vectors per chip key
 
-  # --- AUTO CLUSTERING (ChIP-based; optional; ignored if manual_clusters is given) ---
-  cluster_by       = NULL,                  # strains to define auto clusters (e.g., c("cac1","cac2"))
-  collapse_mutants = FALSE,                 # TRUE -> loss/keep/gain in ANY/ALL (ignoring WT)
-  fold_cutoff      = NULL,                  # NULL -> derive from chip_zero_band; else numeric
-  sort_reference   = c("WT"),               # fallback for auto mode
-  # --- GLOBAL SORTING (applies to both auto and manual unless overridden per cluster) ---
-  sort_on          = c("chip","rna"),       # what to sort by
-  sort_strains     = NULL,                  # which strains to average for sorting (e.g., c("cac1","cac2"))
-  sort_decreasing  = TRUE,                  # direction
+  # --- RNA inputs (choose one path) ---
+  rna_list        = NULL,                 # named list of RNA dfs; rownames = gene IDs
+  rna_matrix      = NULL,                 # NEW: matrix/df with rownames = gene IDs, cols = strains (e.g., z-scores)
+  rna_select      = NULL,                 # NEW: character vector of column names to plot from rna_matrix
+  rna_colname     = "log2FoldChange",     # used only if rna_list is provided
+  rna_missing_fill = 0,                   # NEW: value to use when a gene is missing in RNA (default 0)
+
+  # --- IDs / columns ---
+  gene_col        = "gene_id",
+
+  # --- AUTO CLUSTERING (ignored if manual_clusters provided) ---
+  cluster_by       = NULL,
+  collapse_mutants = FALSE,
+  fold_cutoff      = NULL,
+  sort_reference   = c("WT"),
+  cluster_on_chip  = NULL,
+
+  # --- GLOBAL SORTING (applies unless overridden per cluster) ---
+  sort_on          = c("chip","rna"),
+  sort_strains     = NULL,
+  sort_chip        = NULL,
+  sort_decreasing  = TRUE,
 
   # --- MANUAL CLUSTERS (gene_id-based; list order = heatmap order) ---
-  # Each entry can be: character vector of gene IDs, a data.frame with a gene column,
-  # or a GRanges with mcols holding gene IDs.
   manual_clusters        = NULL,
-  manual_labels          = NULL,            # optional pretty labels; defaults to names(manual_clusters) or cluster_#
-  manual_keep_unassigned = TRUE,            # include "other" for genes not present in any manual cluster
-  manual_sort            = NULL,            # named list of per-cluster sort overrides:
-                                            # e.g., list(K36lost = list(on="chip", strains=c("cac1","cac2"), decreasing=FALSE),
-                                            #            K27lostonly = list(on="rna",  strains="set7"))
-  # appearance
-  chip_limits    = c(-2, 2),
-  rna_limits     = c(-10, 10),
-  chip_zero_band = 1,                       # also used as cutoff if fold_cutoff=NULL
-  rna_zero_band  = 2,
-  chip_colors    = c("#3B4CC0","white","#B40426"),
-  rna_colors     = c("blue","white","red"),
-  row_gaps_mm    = 0,                       # 0 => no gaps between clusters
+  manual_labels          = NULL,
+  manual_keep_unassigned = TRUE,
+  manual_sort            = NULL,           # e.g. list("K36 lost"=list(on="chip", chip="K36", strains=c("cac1","cac2"), decreasing=FALSE))
 
-  # export
+  # --- visuals (defaults for ALL ChIP panels unless overridden per-chip) ---
+  chip_limits    = NULL,
+  chip_zero_band = NULL,
+  chip_colors    = c("#3B4CC0","white","#B40426"),
+  chip_limits_list    = NULL,              # key -> c(min,max)
+  chip_zero_band_list = NULL,              # key -> numeric or NULL
+  chip_colors_list    = NULL,              # key -> vector or colorRamp2()
+
+  # RNA visuals
+  rna_limits     = NULL,               # z-score-friendly default
+  rna_zero_band  = NULL,
+  rna_colors     = c("blue","white","red"),
+
+  row_gaps_mm    = 0,
+
+  # --- export ---
   out_dir        = NULL,
   file_prefix    = "chip_rna_heatmap",
   save_formats   = c("pdf","png"),
-  width_in       = 8,
+  width_in       = 10,
   height_in      = NULL,
   base_height_in = 1.5,
   per_row_height_in = 0.006,
   dpi            = 300,
-
-  # misc
+  write_plotted_rows = FALSE,
   verbose        = TRUE
 ){
+  `%||%` <- function(a,b) if (!is.null(a)) a else b
   sort_on <- match.arg(sort_on)
-  stopifnot(is.list(rna_list), length(rna_list) >= 1)
-  strains_rna <- names(rna_list); stopifnot(all(nzchar(strains_rna)))
-  stopifnot(gene_col %in% names(chip_df))
 
-  # ---------------- Intersection by gene_id ----------------
-  genes_chip <- as.character(chip_df[[gene_col]])
-  common <- Reduce(intersect, c(list(genes_chip), lapply(rna_list, rownames)))
-  chip_df  <- chip_df[match(common, genes_chip), , drop = FALSE]
-  rna_list <- lapply(rna_list, function(x) x[common, , drop = FALSE])
-  genes <- common
-  if (verbose) message("Plottable genes: ", length(genes))
-
-  # ---------------- ChIP matrix (for plotting) ----------------
-  all_chip_strains <- sub("^logFC_", "", grep("^logFC_", names(chip_df), value = TRUE))
-  if (is.null(chip_cols)) {
-    guess <- paste0("logFC_", unique(c(strains_rna, cluster_by)))
-    chip_cols <- intersect(guess, names(chip_df))
+  if (is.null(rna_list) && is.null(rna_matrix)) {
+    stop("Provide either rna_list or rna_matrix.")
   }
-  stopifnot(length(chip_cols) >= 1, all(chip_cols %in% names(chip_df)))
-  chipMat <- as.matrix(chip_df[, chip_cols, drop = FALSE])
-  rownames(chipMat) <- genes
-  colnames(chipMat) <- sub("^logFC_", "", colnames(chipMat))  # -> strains like "cac1","cac2","set7"
-  storage.mode(chipMat) <- "numeric"
 
-  # ---------------- RNA matrix (for plotting) ----------------
-  pull_rna <- function(df, g, col) suppressWarnings(as.numeric(df[g, col, drop = TRUE]))
-  rnaMat <- do.call(cbind, lapply(strains_rna, function(s) pull_rna(rna_list[[s]], genes, rna_colname)))
-  colnames(rnaMat) <- paste0("RNA_", strains_rna)             # -> "RNA_cac1","RNA_cac2","RNA_set7"
-  rownames(rnaMat) <- genes
+  # ---- normalize ChIP inputs to a named list ----
+  .as_named_list <- function(x) {
+    if (is.null(x)) return(NULL)
+    if (is.list(x) && !is.data.frame(x)) {
+      if (is.null(names(x)) || any(names(x) == "")) stop("chip_list must be a *named* list.")
+      return(x)
+    }
+    list(ChIP = x)
+  }
+  chip_list <- .as_named_list(chip_list %||% chip_df)
+  if (is.null(chip_list)) stop("Provide chip_df or chip_list.")
 
-  # =================== CLUSTER ASSIGNMENT ===================
+  # ---- intersect genes across *chips only* by gene_id ----
+  .genes_in_df <- function(df) as.character(df[[gene_col]])
+  chip_common <- Reduce(intersect, lapply(chip_list, .genes_in_df))
+  if (length(chip_common) == 0) stop("No overlapping gene IDs across chip inputs using gene_col='", gene_col, "'.")
 
-  # Helpers to extract gene IDs from various object types for *manual* clustering
+  # subset each chip df to chip_common (preserve order)
+  chip_list <- lapply(chip_list, function(df) df[match(chip_common, df[[gene_col]]), , drop = FALSE])
+
+  # ---- build CHIP matrices for each dataset ----
+  # we need strain guesses to pick logFC_* columns
+  # get RNA strain names (unprefixed) from whichever RNA path will be used
+  rna_strain_names <- {
+    if (!is.null(rna_matrix)) {
+      if (is.null(colnames(rna_matrix))) stop("rna_matrix must have column names (strain names).")
+      if (!is.null(rna_select)) {
+        intersect(rna_select, colnames(rna_matrix))
+      } else {
+        colnames(rna_matrix)
+      }
+    } else {
+      names(rna_list)
+    }
+  }
+
+  manual_strains <- unique(unlist(lapply(manual_sort %||% list(), function(x) x$strains)))
+  guess_base <- unique(c(rna_strain_names %||% character(0),
+                         cluster_by %||% character(0),
+                         sort_strains %||% character(0),
+                         manual_strains %||% character(0)))
+
+  chipMats_score <- list()  # colnames = raw strains ("cac1","cac-1","set-7", etc.)
+  chipMats_disp  <- list()  # colnames = "<chipkey>_<strain>" for plotting
+  for (ck in names(chip_list)) {
+    df <- chip_list[[ck]]
+    if (!is.null(chip_cols_list) && !is.null(chip_cols_list[[ck]])) {
+      cols <- chip_cols_list[[ck]]
+    } else if (!is.null(chip_cols) && length(chip_list) == 1) {
+      cols <- chip_cols
+    } else {
+      cols <- intersect(paste0("logFC_", guess_base), names(df))
+      if (!length(cols)) cols <- grep("^logFC_", names(df), value = TRUE)
+    }
+    if (!length(cols)) stop("No ChIP logFC columns found for chip key '", ck, "'.")
+    m <- as.matrix(df[, cols, drop = FALSE])
+    rownames(m) <- chip_common
+    raw <- sub("^logFC_", "", colnames(m))
+    colnames(m) <- raw
+    chipMats_score[[ck]] <- m
+    mdisp <- m; colnames(mdisp) <- paste0(ck, "_", raw)
+    chipMats_disp[[ck]] <- mdisp
+  }
+
+  # ---- build RNA matrix (either from list or matrix), aligned to chip_common, fill missing with rna_missing_fill ----
+  if (!is.null(rna_matrix)) {
+    # select columns
+    sel <- if (is.null(rna_select)) colnames(rna_matrix) else intersect(rna_select, colnames(rna_matrix))
+    if (!length(sel)) stop("None of rna_select matched columns of rna_matrix.")
+    R <- as.matrix(rna_matrix[, sel, drop = FALSE])
+    # align rows to chip_common with fill
+    rnaMat <- matrix(rna_missing_fill, nrow = length(chip_common), ncol = ncol(R),
+                     dimnames = list(chip_common, paste0("RNA_", colnames(R))))
+    row_idx <- match(rownames(R), chip_common)
+    keep <- which(!is.na(row_idx))
+    if (length(keep)) rnaMat[row_idx[keep], seq_along(sel)] <- R[keep, , drop = FALSE]
+  } else {
+    # rna_list path
+    if (!is.list(rna_list) || !length(names(rna_list))) stop("rna_list must be a *named* list of data.frames.")
+    strains_rna <- names(rna_list)
+    pull_rna <- function(df, genes, col) {
+      # robust match + fill
+      v <- rep(NA_real_, length(genes)); names(v) <- genes
+      m <- match(genes, rownames(df))
+      hit <- which(!is.na(m))
+      if (length(hit)) v[hit] <- suppressWarnings(as.numeric(df[m[hit], col, drop = TRUE]))
+      v
+    }
+    R <- do.call(cbind, lapply(strains_rna, function(s) pull_rna(rna_list[[s]], chip_common, rna_colname)))
+    R[is.na(R)] <- rna_missing_fill
+    colnames(R) <- paste0("RNA_", strains_rna)
+    rownames(R) <- chip_common
+    rnaMat <- R
+  }
+
+  # =================== CLUSTER ASSIGNMENT (same as before) ===================
   .genes_from_obj <- function(x) {
-    # 1) character vector (already gene IDs)
     if (is.character(x)) return(unique(as.character(x)))
-    # 2) data.frame: look for gene_col or common synonyms
     if (is.data.frame(x)) {
-      cn <- colnames(x)
-      cand <- c(gene_col, "gene_id","gene","Gene","GeneID","gene_name","Name","symbol","V10","V11")
-      gcol <- cand[cand %in% cn][1]
-      if (!length(gcol)) stop("manual_clusters df has no gene column (looked for: ", paste(cand, collapse=", "), ")")
+      cn <- colnames(x); cand <- c(gene_col,"gene_id","gene","Gene","GeneID","gene_name","Name","symbol","V10","V11")
+      gcol <- cand[cand %in% cn][1]; if (!length(gcol)) stop("manual_clusters df has no gene column.")
       return(unique(as.character(x[[gcol]])))
     }
-    # 3) GRanges: gene in mcols
     if (methods::is(x, "GRanges")) {
-      mc <- S4Vectors::mcols(x)
-      cn <- colnames(mc)
-      cand <- c(gene_col, "gene_id","gene","Gene","GeneID","gene_name","Name","symbol","V10","V11")
-      gcol <- cand[cand %in% cn][1]
-      if (!length(gcol)) stop("manual_clusters GRanges has no gene column in mcols (looked for: ", paste(cand, collapse=", "), ")")
+      mc <- S4Vectors::mcols(x); cn <- colnames(mc)
+      cand <- c(gene_col,"gene_id","gene","Gene","GeneID","gene_name","Name","symbol","V10","V11")
+      gcol <- cand[cand %in% cn][1]; if (!length(gcol)) stop("manual_clusters GRanges has no gene column.")
       return(unique(as.character(mc[[gcol]])))
     }
-    stop("Unsupported manual_clusters element of class: ", paste(class(x), collapse="/"))
+    stop("Unsupported manual_clusters element class: ", paste(class(x), collapse="/"))
   }
 
-  # Build an 'orig' matrix from chip_df for AUTO clustering (independent of what we plot)
-  want_strains <- unique(c(sub("^logFC_", "", chip_cols), cluster_by, sort_reference))
-  have_strains <- intersect(want_strains, all_chip_strains)
-  orig <- as.matrix(chip_df[, paste0("logFC_", have_strains), drop = FALSE])
-  colnames(orig) <- have_strains
-  rownames(orig) <- genes
+  auto_chip_key <- cluster_on_chip %||% names(chipMats_score)[1]
+  orig <- chipMats_score[[auto_chip_key]]
+  if (is.null(orig)) stop("Auto clustering chip key '", auto_chip_key, "' not found.")
 
-  # cutoff for auto mode
   cut <- if (is.null(fold_cutoff)) {
-    if (!is.null(chip_zero_band)) {
-      if (length(chip_zero_band) == 1) abs(chip_zero_band) else max(abs(chip_zero_band))
-    } else 1
+    if (!is.null(chip_zero_band)) { if (length(chip_zero_band) == 1) abs(chip_zero_band) else max(abs(chip_zero_band)) }
+    else 1
   } else as.numeric(fold_cutoff)
 
-  # ---- Sorting helpers (global + per-cluster override) ----
-  .score_by <- function(idx, on = sort_on, strains = sort_strains, dec = sort_decreasing) {
+  .order_by <- function(idx, on = sort_on, strains = sort_strains, dec = sort_decreasing, chip_key = sort_chip) {
     if (on == "chip") {
-      cols <- if (is.null(strains)) colnames(chipMat) else intersect(strains, colnames(chipMat))
-      if (!length(cols)) cols <- colnames(chipMat)
-      sc <- rowMeans(chipMat[idx, cols, drop = FALSE], na.rm = TRUE)
+      key <- chip_key %||% names(chipMats_score)[1]
+      M   <- chipMats_score[[key]]
+      if (is.null(M)) stop("sort_chip key '", key, "' not found.")
+      cols <- if (is.null(strains)) colnames(M) else intersect(strains, colnames(M))
+      if (!length(cols)) cols <- colnames(M)
+      sc <- rowMeans(M[idx, cols, drop = FALSE], na.rm = TRUE)
     } else {
       want <- if (is.null(strains)) colnames(rnaMat) else paste0("RNA_", strains)
-      cols <- intersect(want, colnames(rnaMat))
-      if (!length(cols)) cols <- colnames(rnaMat)
+      cols <- intersect(want, colnames(rnaMat)); if (!length(cols)) cols <- colnames(rnaMat)
       sc <- rowMeans(rnaMat[idx, cols, drop = FALSE], na.rm = TRUE)
     }
     order(sc, decreasing = dec, na.last = TRUE)
   }
 
-  .score_by_manual <- function(idx, cl_label) {
+  .order_by_manual <- function(idx, cl_label) {
     if (!is.null(manual_sort) && !is.null(manual_sort[[cl_label]])) {
       spec <- manual_sort[[cl_label]]
-      on  <- spec$on  %||% sort_on
-      st  <- spec$strains %||% sort_strains
-      dec <- if (!is.null(spec$decreasing)) isTRUE(spec$decreasing) else sort_decreasing
-      return(.score_by(idx, on = on, strains = st, dec = dec))
+      on   <- spec$on  %||% sort_on
+      st   <- spec$strains %||% sort_strains
+      dec  <- if (!is.null(spec$decreasing)) isTRUE(spec$decreasing) else sort_decreasing
+      ck   <- spec$chip %||% sort_chip
+      return(.order_by(idx, on = on, strains = st, dec = dec, chip_key = ck))
     } else {
-      return(.score_by(idx, on = sort_on, strains = sort_strains, dec = sort_decreasing))
+      return(.order_by(idx, on = sort_on, strains = sort_strains, dec = sort_decreasing, chip_key = sort_chip))
     }
   }
 
-  `%||%` <- function(a,b) if (!is.null(a)) a else b
   use_manual <- !is.null(manual_clusters) && length(manual_clusters) > 0
+  genes <- chip_common
 
   if (use_manual) {
-    # -------- MANUAL (gene_id-based) --------
-    if (is.null(names(manual_clusters))) {
-      names(manual_clusters) <- paste0("cluster_", seq_along(manual_clusters))
-    }
-    labels <- if (!is.null(manual_labels)) {
-      stopifnot(length(manual_labels) == length(manual_clusters)); manual_labels
-    } else {
-      names(manual_clusters)
-    }
+    if (is.null(names(manual_clusters))) names(manual_clusters) <- paste0("cluster_", seq_along(manual_clusters))
+    labels <- manual_labels %||% names(manual_clusters)
 
     cl_vec <- rep(NA_character_, length(genes))
-    # precedence = list order
     for (i in seq_along(manual_clusters)) {
       gset <- .genes_from_obj(manual_clusters[[i]])
       hit <- which(is.na(cl_vec) & genes %in% gset)
@@ -1534,47 +1607,42 @@ make_chip_rna_heatmap_simple <- function(
       cluster_levels <- c(labels, "other")
     } else {
       keep <- !is.na(cl_vec)
-      chipMat <- chipMat[keep, , drop = FALSE]
-      rnaMat  <- rnaMat [keep, , drop = FALSE]
-      orig    <- orig   [keep, , drop = FALSE]
-      genes   <- genes  [keep]
-      cl_vec  <- cl_vec [keep]
+      genes <- genes[keep]; cl_vec <- cl_vec[keep]
+      chipMats_score <- lapply(chipMats_score, function(m) m[keep, , drop = FALSE])
+      chipMats_disp  <- lapply(chipMats_disp,  function(m) m[keep, , drop = FALSE])
+      rnaMat <- rnaMat[keep, , drop = FALSE]
       if (verbose) message("Dropped unassigned rows: ", sum(!keep))
       cluster_levels <- labels
     }
     cl_split <- factor(cl_vec, levels = cluster_levels, ordered = TRUE)
 
-    # Per-cluster sorting with per-cluster overrides
     ord <- integer(0)
     for (cl in levels(cl_split)) {
-      idx <- which(cl_split == cl)
-      if (!length(idx)) next
-      o <- .score_by_manual(idx, cl)
-      ord <- c(ord, idx[o])
+      idx <- which(cl_split == cl); if (!length(idx)) next
+      ord <- c(ord, idx[.order_by_manual(idx, cl)])
     }
-
-    chipMat  <- chipMat[ord, , drop = FALSE]
-    rnaMat   <- rnaMat [ord, , drop = FALSE]
+    chipMats_score <- lapply(chipMats_score, function(m) m[ord, , drop = FALSE])
+    chipMats_disp  <- lapply(chipMats_disp,  function(m) m[ord, , drop = FALSE])
+    rnaMat   <- rnaMat[ord, , drop = FALSE]
     cl_split <- cl_split[ord]
 
   } else {
-    # -------- AUTO (ChIP-based state machine) --------
-    if (is.null(cluster_by) || !length(cluster_by)) {
-      stop("Auto mode requires 'cluster_by' (e.g., c('cac1','cac2')).")
-    }
-    state_for <- function(strains) {
-      vals <- orig[, strains, drop = FALSE]
+    if (is.null(cluster_by) || length(cluster_by) == 0) stop("Auto mode requires cluster_by.")
+    state_for <- function(M, strains) {
+      vals <- M[, strains, drop = FALSE]
       d <- matrix(0L, nrow(vals), ncol(vals), dimnames = dimnames(vals))
-      d[vals <= -abs(cut)] <- -1L  # loss
-      d[vals >=  abs(cut)] <-  1L  # gain
+      d[vals <= -abs(cut)] <- -1L
+      d[vals >=  abs(cut)] <-  1L
       d
     }
-    state_cluster <- state_for(cluster_by)
+    Mkey <- chipMats_score[[auto_chip_key]]
+    if (is.null(Mkey)) stop("Auto clustering chip key not found: ", auto_chip_key)
+    state <- state_for(Mkey, cluster_by)
 
     if (!collapse_mutants) {
       if (length(cluster_by) != 2L) stop("separate mode requires exactly two cluster_by strains.")
       a <- cluster_by[1]; b <- cluster_by[2]
-      sA <- state_cluster[, a]; sB <- state_cluster[, b]
+      sA <- state[, a]; sB <- state[, b]
       lab <- rep("other", length(genes))
       lab[sA == -1L & sB == -1L] <- sprintf("loss in both (%s & %s)", a, b)
       lab[sA == -1L & sB ==  0L] <- sprintf("loss in %s only", a)
@@ -1585,85 +1653,138 @@ make_chip_rna_heatmap_simple <- function(
                           sprintf("loss in %s only", b),
                           sprintf("kept in both (%s & %s)", a, b),
                           "other")
-      cl_split <- factor(lab, levels = cluster_levels, ordered = TRUE)
-
-      ord <- integer(0)
-      for (cl in levels(cl_split)) {
-        idx <- which(cl_split == cl); if (!length(idx)) next
-        o <- .score_by(idx)  # global sorting controls
-        ord <- c(ord, idx[o])
-      }
-      chipMat  <- chipMat[ord, , drop = FALSE]
-      rnaMat   <- rnaMat [ord, , drop = FALSE]
-      cl_split <- cl_split[ord]
-
     } else {
       targets <- setdiff(cluster_by, "WT"); if (!length(targets)) targets <- cluster_by
-      st <- state_cluster[, targets, drop = FALSE]
-      loss_any <- apply(st == -1L, 1, any, na.rm = TRUE)
-      keep_all <- apply(st ==  0L, 1, all, na.rm = TRUE)
-      gain_any <- apply(st ==  1L, 1, any, na.rm = TRUE)
-
+      loss_any <- apply(state[, targets, drop = FALSE] == -1L, 1, any, na.rm = TRUE)
+      keep_all <- apply(state[, targets, drop = FALSE] ==  0L, 1, all, na.rm = TRUE)
+      gain_any <- apply(state[, targets, drop = FALSE] ==  1L, 1, any, na.rm = TRUE)
       lab <- rep("other", length(genes))
-      lab[loss_any] <- sprintf("loss in any (%s)", paste(targets, collapse = " | "))
-      lab[!loss_any & keep_all] <- sprintf("kept in all (%s)", paste(targets, collapse = " & "))
-      lab[!loss_any & !keep_all & gain_any] <- sprintf("gain in any (%s)", paste(targets, collapse = " | "))
-      cluster_levels <- c(sprintf("loss in any (%s)", paste(targets, collapse = " | ")),
-                          sprintf("kept in all (%s)", paste(targets, collapse = " & ")),
-                          sprintf("gain in any (%s)", paste(targets, collapse = " | ")),
+      lab[loss_any] <- sprintf("loss in any (%s)", paste(targets, collapse=" | "))
+      lab[!loss_any & keep_all] <- sprintf("kept in all (%s)", paste(targets, collapse=" & "))
+      lab[!loss_any & !keep_all & gain_any] <- sprintf("gain in any (%s)", paste(targets, collapse=" | "))
+      cluster_levels <- c(sprintf("loss in any (%s)", paste(targets, collapse=" | ")),
+                          sprintf("kept in all (%s)", paste(targets, collapse=" & ")),
+                          sprintf("gain in any (%s)", paste(targets, collapse=" | ")),
                           "other")
-      cl_split <- factor(lab, levels = cluster_levels, ordered = TRUE)
-
-      ord <- integer(0)
-      for (cl in levels(cl_split)) {
-        idx <- which(cl_split == cl); if (!length(idx)) next
-        o <- .score_by(idx)  # global sorting controls
-        ord <- c(ord, idx[o])
-      }
-      chipMat  <- chipMat[ord, , drop = FALSE]
-      rnaMat   <- rnaMat [ord, , drop = FALSE]
-      cl_split <- cl_split[ord]
     }
+    cl_split <- factor(lab, levels = cluster_levels, ordered = TRUE)
+
+    ord <- integer(0)
+    for (cl in levels(cl_split)) {
+      idx <- which(cl_split == cl); if (!length(idx)) next
+      ord <- c(ord, idx[.order_by(idx, on = sort_on, strains = sort_strains, dec = sort_decreasing, chip_key = sort_chip)])
+    }
+    chipMats_score <- lapply(chipMats_score, function(m) m[ord, , drop = FALSE])
+    chipMats_disp  <- lapply(chipMats_disp,  function(m) m[ord, , drop = FALSE])
+    rnaMat   <- rnaMat[ord, , drop = FALSE]
+    cl_split <- cl_split[ord]
   }
 
-  # ---------------- Colors & clamping ----------------
-  col_fun <- function(lims, band, cols){
-    if (!is.null(band) && lims[1] < 0 && lims[2] > 0) {
+  # ---- color helpers ----
+  .calc_limits <- function(M, lims) {
+    if (is.null(lims)) return(range(M, na.rm = TRUE))
+    L <- as.numeric(lims); if (length(L) != 2) stop("limits must be length-2.")
+    if (is.na(L[1])) L[1] <- min(M, na.rm = TRUE)
+    if (is.na(L[2])) L[2] <- max(M, na.rm = TRUE)
+    L
+  }
+  .mk_col_fun <- function(lims, band, cols){
+    # cols may be a vector (e.g., c("white","#00441B")) or a colorRamp2 function
+    if (is.function(cols)) return(cols)
+
+    # helper to pick endpoint colors
+    low_col  <- cols[1]
+    high_col <- cols[length(cols)]
+
+    if (!is.null(band)) {
       b <- abs(band)[1]
-      circlize::colorRamp2(c(lims[1], -b, 0, b, lims[2]),
-                           c(cols[1], "white", "white", "white", cols[3]))
-    } else if (lims[1] < 0 && lims[2] > 0) {
-      circlize::colorRamp2(c(lims[1], 0, lims[2]), c(cols[1], "white", cols[3]))
+
+      if (lims[1] < 0 && lims[2] > 0) {
+        # Diverging: insert a white band around 0 of width 2*b
+        circlize::colorRamp2(
+          c(lims[1], -b, 0, b, lims[2]),
+          c(low_col, "white", "white", "white", high_col)
+        )
+      } else {
+        # Non-diverging (e.g., 0..X): enforce a flat white floor up to 'b'
+        # Clamp band to [lims[1], lims[2]]
+        bb <- max(lims[1], min(b, lims[2]))
+        if (bb <= lims[1]) {
+          # band at/below lower limit -> plain sequential
+          circlize::colorRamp2(c(lims[1], lims[2]), c(low_col, high_col))
+        } else if (bb >= lims[2]) {
+          # everything in the band -> all white (degenerate but defined)
+          circlize::colorRamp2(c(lims[1], lims[2]), c("white","white"))
+        } else {
+          # [lims[1], bb] stays white; gradient from bb -> lims[2]
+          circlize::colorRamp2(c(lims[1], bb, lims[2]),
+                               c("white", "white", high_col))
+        }
+      }
     } else {
-      circlize::colorRamp2(c(lims[1], lims[2]), c(cols[1], cols[3]))
+      # No band at all → standard behavior
+      if (lims[1] < 0 && lims[2] > 0 && length(cols) >= 3) {
+        circlize::colorRamp2(c(lims[1], 0, lims[2]),
+                             c(cols[1], cols[2], high_col))
+      } else {
+        circlize::colorRamp2(c(lims[1], lims[2]), c(low_col, high_col))
+      }
     }
   }
-  col_chip <- col_fun(chip_limits, chip_zero_band, chip_colors)
-  col_rna  <- col_fun(rna_limits,  rna_zero_band,  rna_colors)
 
-  chipMat <- pmin(pmax(chipMat, chip_limits[1]), chip_limits[2])
-  rnaMat  <- pmin(pmax(rnaMat,  rna_limits[1]),  rna_limits[2])
 
-  # ---------------- Heatmaps (no gaps by default) ----------------
-  ht_chip <- Heatmap(
-    chipMat, name = "ChIP log2FC", col = col_chip,
-    cluster_rows = FALSE, cluster_columns = FALSE, show_row_names = FALSE,
-    row_split = cl_split, row_gap = unit(row_gaps_mm, "mm")
-  )
+  # ---- build Heatmaps: per-chip ----
+  chip_hts <- list()
+  for (ck in names(chipMats_disp)) {
+    Mraw  <- chipMats_disp[[ck]]
+    lims  <- .calc_limits(Mraw, (chip_limits_list %||% list())[[ck]] %||% chip_limits)
+    band  <- (chip_zero_band_list %||% list())[[ck]] %||% chip_zero_band
+    cols  <- (chip_colors_list    %||% list())[[ck]] %||% chip_colors
+    colf  <- .mk_col_fun(lims, band, cols)
+
+    Mshow <- pmin(pmax(Mraw, lims[1]), lims[2])
+    chip_hts[[ck]] <- Heatmap(
+      Mshow, name = paste0(ck, " ChIP log2FC"), col = colf,
+      cluster_rows = FALSE, cluster_columns = FALSE, show_row_names = FALSE,
+      row_split = cl_split, row_gap = unit(row_gaps_mm, "mm")
+    )
+  }
+
+  # RNA panel (z-scores or whatever you feed)
+  rlims <- .calc_limits(rnaMat, rna_limits)
+  rcolf <- .mk_col_fun(rlims, rna_zero_band, rna_colors)
+  rna_show <- pmin(pmax(rnaMat, rlims[1]), rlims[2])
   ht_rna <- Heatmap(
-    rnaMat,  name = "RNA log2FC",  col = col_rna, na_col = "white",
+    rna_show,  name = "RNA (scores)",  col = rcolf, na_col = "white",
     cluster_rows = FALSE, cluster_columns = FALSE, show_row_names = FALSE,
     row_split = cl_split, row_gap = unit(row_gaps_mm, "mm")
   )
 
-  ht_all <- ht_chip + ht_rna
+  # concatenate: all ChIP panels then RNA
+  ht_all <- Reduce(`+`, c(chip_hts, list(ht_rna)))
 
-  # ---------------- Export / draw ----------------
-  n_rows <- nrow(chipMat)
+  # ---- plotted rows table ----
+  plotted_rows <- {
+    chip_df_all <- do.call(cbind, chipMats_disp)
+    data.frame(
+      order_idx = seq_len(nrow(chip_df_all)),
+      gene      = rownames(chip_df_all),
+      cluster   = as.character(cl_split),
+      chip_df_all,
+      rnaMat,
+      check.names = FALSE
+    )
+  }
+
+  # ---- draw / save ----
+  n_rows <- nrow(plotted_rows)
   eff_h  <- if (is.null(height_in)) base_height_in + n_rows * per_row_height_in else height_in
 
   if (!is.null(out_dir)) {
     dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+    if (isTRUE(write_plotted_rows)) {
+      write.csv(plotted_rows, file.path(out_dir, paste0(file_prefix, "_plotted_rows.csv")), row.names = FALSE)
+    }
     fmts <- tolower(save_formats)
     if ("pdf" %in% fmts) {
       pdf(file.path(out_dir, paste0(file_prefix, ".pdf")), width = width_in, height = eff_h, useDingbats = FALSE)
@@ -1677,10 +1798,12 @@ make_chip_rna_heatmap_simple <- function(
 
   draw(ht_all, heatmap_legend_side = "right")
   invisible(list(
-    chip_matrix   = chipMat,
-    rna_matrix    = rnaMat,
-    clusters      = cl_split,
-    genes_plotted = rownames(chipMat)
+    chip_matrices     = chipMats_disp,      # plotted (prefixed)
+    chip_matrices_raw = chipMats_score,     # raw (for scoring)
+    rna_matrix        = rnaMat,
+    clusters          = cl_split,
+    genes_plotted     = rownames(rnaMat),
+    plotted_rows      = plotted_rows
   ))
 }
 
@@ -1689,24 +1812,32 @@ make_chip_rna_heatmap_simple <- function(
 ```{r, use ChIP-RNA heatmap function}
 
 #manual clustering
+##vWT
 out <- make_chip_rna_heatmap_simple(
-  chip_df   = H3K36me3_Results_K27promTSS_vWT,
+  chip_list = list(
+    K27 = H3K27me3_CS_Results_K27promTSS_vWT,
+    K36 = H3K36me3_Results_K27promTSS_vWT
+  ),
+  chip_cols_list = list(
+    K27 = c("logFC_cac1","logFC_cac2","logFC_set7"),
+    K36 = c("logFC_cac1","logFC_cac2","logFC_set7")
+  ),
   rna_list  = list(cac1 = cac1RNA, cac2 = cac2RNA, set7 = set7RNA),
   gene_col  = "gene_id",
-  chip_cols = c("logFC_cac1","logFC_cac2","logFC_set7"),
   manual_clusters = list(
-    K36_lost       = K36lost,        # data.frame / GRanges / or character vector of gene_ids
+    K36_lost       = K36lost,
     K27_lost_only  = K27lost_only,
     K27_K36retain  = K27_K36retain
   ),
-  manual_labels = c("K36 lost","K27 lost only","K27+K36 retain"),
+  manual_labels = c("K36 lost","K27 lost only","K27&K36 retain"),
   sort_on         = "chip",
+  sort_chip       = "K36",
   sort_strains    = c("cac1","cac2"),
-  sort_decreasing = FALSE,           # negatives at the top
+  sort_decreasing = FALSE,  # negatives on top
   manual_sort = list(
-    "K36 lost"        = list(on = "rna", strains = c("cac1","cac2"), decreasing = TRUE),
-    "K27 lost only"   = list(on = "rna",  strains = c("cac1","cac2"), decreasing = TRUE),
-    "K27+K36 retain"  = list(on = "rna", strains = c("cac1","cac2","set7"), decreasing = TRUE)
+    "K36 lost"        = list(on="chip", chip="K36", strains=c("cac1","cac2"), decreasing=FALSE),
+    "K27 lost only"   = list(on="chip", chip="K27", strains=c("cac1","cac2"), decreasing=FALSE),
+    "K27&K36 retain"  = list(on="rna", strains=c("cac1","cac2","set7"), decreasing=TRUE)
   ),
   chip_limits = c(-2,2),
   rna_limits  = c(-6,6),
@@ -1714,13 +1845,120 @@ out <- make_chip_rna_heatmap_simple(
   rna_zero_band  = 1.5,
   row_gaps_mm = 0,
   out_dir = "csaw_heatmaps",
-  file_prefix = "H3K36me3_vs_RNA_manualClusters",
+  file_prefix = "K27_K36_vWT_RNA_multiPanel",
   save_formats = c("pdf","png"),
-  width_in = 8,
-  dpi = 300
+  width_in = 12,
+  dpi = 300,
+  write_plotted_rows = TRUE
+)
+
+##vInput
+out <- make_chip_rna_heatmap_simple(
+  chip_list = list(
+    K27 = H3K27me3_CS_Results_K27promTSS_vInput,
+    K36 = H3K36me3_Results_K27promTSS_vInput
+  ),
+  chip_cols_list = list(
+    K27 = c("logFC_cac1","logFC_cac2","logFC_set7"),
+    K36 = c("logFC_cac1","logFC_cac2","logFC_set7")
+  ),
+  rna_list  = list(cac1 = cac1RNA, cac2 = cac2RNA, set7 = set7RNA),
+  gene_col  = "gene_id",
+  manual_clusters = list(
+    K36_lost       = K36lost,
+    K27_lost_only  = K27lost_only,
+    K27_K36retain  = K27_K36retain
+  ),
+  manual_labels = c("K36 lost","K27 lost only","K27+K36 retain"),
+  manual_sort = list(
+    "K36 lost"       = list(on="chip", chip="K27", strains=c("cac1","cac2"), decreasing=TRUE),
+    "K27 lost only"  = list(on="chip", chip="K27", strains=c("cac1","cac2"), decreasing=TRUE),
+    "K27+K36 retain" = list(on="chip", chip="K27", strains=c("cac1","cac2"), decreasing=TRUE)
+  ),
+  chip_colors_list = list(
+    K27 = c("white","#00441B"),
+    K36 = c("white","#a65628")
+  ),
+  chip_limits_list = list(
+    K27 = c(0, 5),
+    K36 = c(0, 2)
+  ),
+  chip_zero_band = 1,
+  rna_limits = c(-6,6),
+  rna_zero_band = 1.5,
+  rna_colors = c("blue","white","red"),
+  row_gaps_mm = 0,
+  out_dir = "csaw_heatmaps",
+  file_prefix = "K27_K36_RNA_multicolor",
+  save_formats = c("pdf","png"),
+  width_in = 12,
+  dpi = 300,
+  write_plotted_rows = TRUE
+)
+
+#Using z-score table for RNA-seq
+# z-score table like your GenesWithChanges (rows = gene IDs, cols = strains)
+rna_cols <- c("cac-1","cac-2","set-7")  # (match column names in your z-score df)
+
+out <- make_chip_rna_heatmap_simple(
+  chip_list = list(
+    K27 = H3K27me3_CS_Results_K27promTSS_vInput,
+    K36 = H3K36me3_Results_K27promTSS_vInput
+  ),
+  chip_cols_list = list(
+    K27 = c("logFC_WT","logFC_cac1","logFC_cac2","logFC_set7"),
+    K36 = c("logFC_WT","logFC_cac1","logFC_cac2","logFC_set7")
+  ),
+  rna_matrix = rna_z,
+  rna_select = rna_cols,          # choose which columns to show
+  rna_missing_fill = 0,           # missing genes -> 0
+  gene_col  = "gene_id",
+  manual_clusters = list(
+    K36_lost       = K36lost,       # new name = df name (if not renamed with labels)
+    K27_lost_only  = K27lost_only,
+    K27_K36retain  = K27_K36retain
+  ),
+  manual_labels = c("K36 lost","K27 lost only","K27&K36 retain"),
+  manual_sort = list(
+    "K36 lost"       = list(on="chip", chip="K27", strains=c("cac1","cac2"), decreasing=TRUE),
+    "K27 lost only"  = list(on="chip", chip="K27", strains=c("cac1","cac2"), decreasing=TRUE),
+    "K27&K36 retain" = list(on="chip", chip="K27", strains=c("cac1","cac2"), decreasing=TRUE)
+  ),
+  chip_colors_list = list(
+    K27 = c("white","#00441B"),
+    K36 = c("white","#a65628")
+  ),
+  chip_limits_list = list(
+    K27 = c(0, 5),
+    K36 = c(0, 2)
+  ),
+  chip_zero_band = 1,
+  rna_colors = rna_col_fun,
+  row_gaps_mm = 0,
+  out_dir = "csaw_heatmaps",
+  file_prefix = "K27_K36_zRNA",
+  save_formats = c("pdf","png"),
+  width_in = 12,
+  dpi = 300,
+  write_plotted_rows = TRUE
 )
 
 
+manual_sort = list(
+    "K36 lost"       = list(on="chip", chip="K36", strains=c("cac1","cac2"), decreasing=FALSE),
+    "K27 lost only"  = list(on="chip", chip="K27", strains=c("cac1","cac2"), decreasing=FALSE),
+    "K27&K36 retain" = list(on="chip",  strains=c("cac1","cac2","set7"), decreasing=FALSE)
+  ),
+  chip_colors_list = list(
+    K27 = c("darkblue","darkred"),
+    K36 = c("darkblue","darkred")
+  ),
+  chip_limits_list = list(
+    K27 = c(-2, 2),
+    K36 = c(-2, 2)
+  ),
+
+#auto-clustering
 out <- make_chip_rna_heatmap_simple(
   chip_df   = H3K36me3_Results_K27promTSS_vWT,
   rna_list  = list(cac1 = cac1RNA, cac2 = cac2RNA, set7 = set7RNA),
@@ -1762,19 +2000,6 @@ out <- make_chip_rna_heatmap(
   width_in = 8,
   dpi = 300
 )
-
-###Tool to see what your row order is
-hm_rows <- cbind(
-  data.frame(
-    order_idx = seq_len(nrow(out$chip_matrix)),
-    gene      = rownames(out$chip_matrix),
-    cluster   = as.character(out$clusters),
-    stringsAsFactors = FALSE
-  ),
-  as.data.frame(out$chip_matrix),   # the ChIP values used for the heatmap
-  as.data.frame(out$rna_matrix)     # the RNA values used for the heatmap
-)
-View(hm_rows)
 
 ```
 
@@ -2379,26 +2604,26 @@ write.table(H3K36me3_no_ash1_nonK27, file = "ash1_meth_nonK27.bed", sep = "\t", 
 write.table(H3K36me3_set2_meth, file = "set2_meth_only.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 #K27 enrichment
-K27_enriched = subset(H3K27me3_promTSS_enriched_log2FC_2_WT_genes_BED, H3K27me3_promTSS_enriched_log2FC_2_WT_genes_BED$V10 %in% H3K27me3_prom_enriched_log2FC_2_WT_genes_BED$V10)
+K27_enriched = subset(H3K27me3_promTSS_enriched_log2FC_2_WT_genes_BED, H3K27me3_promTSS_enriched_log2FC_2_WT_genes_BED$gene_id %in% H3K27me3_prom_enriched_log2FC_2_WT_genes_BED$gene_id)
 
-H3K27me3_inCAF1 = subset(K27_enriched, ! K27_enriched$V10 %in% H3K27me3_lost_genes_log2FC_2_cac1_genes_BED$V10 | ! K27_enriched$V10 %in% H3K27me3_lost_genes_log2FC_2_cac2_genes_BED$V10)
+H3K27me3_inCAF1 = subset(K27_enriched, ! K27_enriched$gene_id %in% H3K27me3_lost_genes_log2FC_2_cac1_genes_BED$gene_id | ! K27_enriched$gene_id %in% H3K27me3_lost_genes_log2FC_2_cac2_genes_BED$gene_id)
 
-H3K27me3_noCAF1 = subset(K27_enriched, K27_enriched$V10 %in% H3K27me3_lost_genes_log2FC_2_cac1_genes_BED$V10 | K27_enriched$V10 %in% H3K27me3_lost_genes_log2FC_2_cac2_genes_BED$V10)
+H3K27me3_noCAF1 = subset(K27_enriched, K27_enriched$gene_id %in% H3K27me3_lost_genes_log2FC_2_cac1_genes_BED$gene_id | K27_enriched$gene_id %in% H3K27me3_lost_genes_log2FC_2_cac2_genes_BED$gene_id)
  
 write.table(H3K27me3_inCAF1, file = "H3K27me3_CAF1_retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(H3K27me3_noCAF1, file = "H3K27me3_CAF1_lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
 
 ####i want to subset genes that lose K27 or K36 in cac-1 or cac-2
-K27lost = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac1 < -1 | H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac2 < -1)
+K27lost = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac2 < -0.75)
 #K27lost = subset(K27lost, K27lost$FDR_cac1 < 0.05 | K27lost$FDR_cac2 < 0.05)
-K27lost = subset(regions$K27genes, regions$K27genes$V10 %in% K27lost$gene_id)
+K27lost = subset(regions$K27genes, regions$K27genes$gene_id %in% K27lost$gene_id)
 
-K36lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -1 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -1)
+K36lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.75)
 #K36lost = subset(K36lost, K36lost$FDR_cac1 < 0.05 | K36lost$FDR_cac2 < 0.05)
-K36lost = subset(regions$K27genes, regions$K27genes$V10 %in% K36lost$gene_id)
+K36lost = subset(regions$K27genes, regions$K27genes$gene_id %in% K36lost$gene_id)
 
-retainK27 = subset(regions$K27genes, ! regions$K27genes$V10 %in% K27lost$V10)
-retainK36 = subset(regions$K27genes, ! regions$K27genes$V10 %in% K36lost$V10)
+retainK27 = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K27lost$gene_id)
+retainK36 = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K36lost$gene_id)
 
 write.table(K27lost, file = "K27losstest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K36lost, file = "K36losstest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
@@ -2407,8 +2632,8 @@ write.table(retainK27, file = "K27retaintest.bed", sep = "\t", quote = FALSE, ro
 write.table(retainK36, file = "K36retaintest.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
 
 #####
-K27lost_only = subset(K27lost, ! K27lost$V10 %in% K36lost$V10)
-K27_K36retain = subset(regions$K27genes, ! regions$K27genes$V10 %in% K36lost$V10 & ! regions$K27genes$V10 %in% K27lost$V10)
+K27lost_only = subset(K27lost, ! K27lost$gene_id %in% K36lost$gene_id)
+K27_K36retain = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K36lost$gene_id & ! regions$K27genes$gene_id %in% K27lost$gene_id)
 
 write.table(K27_K36lost, file = "CAF1_K27_K36_lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K27lost_only, file = "CAF1_K27_lost_only.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)

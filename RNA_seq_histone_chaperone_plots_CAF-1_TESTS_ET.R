@@ -152,7 +152,7 @@ meltedNotInCac <- melt(K27_lost, value.name = 'Count',
 meltedInCac <- melt(K27_not_lost, value.name = 'Count',
                                     varnames=c('GeneID', 'Sample'))
 
-meltedAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
+meltedAverageAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
 altorder = rev(c("WT","set7","cac1","cac2","cac1cac2","cac3","naf1","naf2","asf1","ATRX"))
