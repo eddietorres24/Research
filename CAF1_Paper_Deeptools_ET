@@ -324,7 +324,6 @@ plotHeatmap -m matrix_Kac.mat.gz \
 # 4) K4 (GENE BODIES via scale-regions) using K27 row order
 ########################################
 computeMatrix scale-regions \
-  --regionBodyLength 2000 \
   -S \
     "$P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw" \
     "$P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw" \
