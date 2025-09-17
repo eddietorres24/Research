@@ -245,7 +245,10 @@ module load deepTools
 
 set -euo pipefail
 
-  module load ImageMagick
+if command -v module >/dev/null 2>&1; then
+  module load ImageMagick || true
+fi
+
 
 ########################################
 # 1) K27 (TSS-centered) -> defines row order
@@ -356,4 +359,9 @@ else
     K27_genes_CAF-1_K27_clustered_K27order.pdf \
     K27_genes_CAF-1_K36_clustered_K27order.pdf \
     H3K27me3_CAF-1_Kac_clustered_K27order.pdf \
-    H3K27me3_CAF-1_K4_clustered_K2
+    H3K27me3_CAF-1_K4_clustered_K27order.pdf \
+    +append -compress zip -quality 95 -alpha off -background white \
+    CAF1_all_panels_K27_K36_Kac_K4.pdf
+fi
+
+echo "Done. Final combined file: CAF1_all_panels_K27_K36_Kac_K4.pdf"
