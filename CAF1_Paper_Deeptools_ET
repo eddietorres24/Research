@@ -270,7 +270,7 @@ plotHeatmap -m matrix_TSS.mat.gz -out Figure4_TSS.pdf \
   --legendLocation none \
   --heatmapHeight 24 \
   --dpi 300 \
-  --colorMap Greens Greens afmhot_r afmhot_r YlOrBr YlOrBr YlOrBr YlOrBr \
+  --colorMap Greens Greens afmhot_r afmhot_r Purples Purples Purples Purples \
   --zMin 0 0 0 0 0 0 0 0 \
   --zMax 50 50 12 12 8 8 8 8
 
@@ -278,11 +278,7 @@ plotHeatmap -m matrix_TSS.mat.gz -out Figure4_TSS.pdf \
 # 2) Gene-body panel for K4 (scale-regions)
 ############################
 computeMatrix scale-regions \
-  --beforeRegionStartLength 800 \
-  --regionBodyLength 2000 \
-  --afterRegionStartLength 1500 \
-  -S \
-    "$P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw" \
+ -S "$P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw" \
     "$P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw" \
     "$P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw" \
     "$P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw" \
@@ -298,7 +294,7 @@ plotHeatmap -m matrix_K4_scale.mat.gz -out Figure4_K4.pdf \
   --legendLocation none \
   --heatmapHeight 24 \
   --dpi 300 \
-  --colorMap Purples Purples Purples Purples \
+  --colorList 'white,magenta' \
   --zMin 0 0 0 0 --zMax 5 5 5 5
 
 module load ImageMagick
