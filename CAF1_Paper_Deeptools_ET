@@ -351,24 +351,22 @@ plotHeatmap -m matrix_K4_scale.mat.gz \
 
 set -euo pipefail
 
-# (Optional) modules
-command -v module >/dev/null 2>&1 && { module load texlive 2>/dev/null || true; }
-ml Ghostscript
-
+# panel PDFs you already made
 P1="K27_genes_CAF-1_K27_clustered_K27order.pdf"
 P2="K27_genes_CAF-1_K36_clustered_K27order.pdf"
 P3="H3K27me3_CAF-1_Kac_clustered_K27order.pdf"
 P4="H3K27me3_CAF-1_K4_clustered_K27order.pdf"
 
-# Big, wide page; allow autoscale; no margins; no clipping.
-pdfjam \
-  --paper '{60in,14in}' \
-  --nup 4x1 \
-  --noautoscale false \
-  --margin '0cm' \
-  --delta '0 0' \
-  --no-clip \
-  "$P1" "$P2" "$P3" "$P4" \
-  --outfile CAF1_all_panels_wide.pdf
+# 1) Make LEFT half (K27 | K36) on a roomy page
+pdfjam --paper '{28in,12in}' --nup 2x1 --margin '0cm' --delta '0 0' \
+       "$P1" "$P2" --outfile _left.pdf
+
+# 2) Make RIGHT half (Kac | K4) on a roomy page
+pdfjam --paper '{28in,12in}' --nup 2x1 --margin '0cm' --delta '0 0' \
+       "$P3" "$P4" --outfile _right.pdf
+
+# 3) Join halves side-by-side onto a wide page (autoscale ON; no clipping)
+pdfjam --paper '{56in,12in}' --nup 2x1 --margin '0cm' --delta '0 0' \
+       _left.pdf _right.pdf --outfile CAF1_all_panels_wide.pdf
 
 echo "Done: CAF1_all_panels_wide.pdf"
