@@ -82,16 +82,6 @@
 # $BAMDIR/SRR9027759/SRR9027759_Aligned.sortedByCoord.out.bam \
 # $BAMDIR/SRR9027689/SRR9027689_Aligned.sortedByCoord.out.bam
 
-#!/bin/bash
-#SBATCH --job-name=fc_mixed
-#SBATCH --partition=batch
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=24G
-#SBATCH --time=12:00:00
-#SBATCH --output=fc_mixed.%j.out
-#SBATCH --mail-type=FAIL
-#SBATCH --mail-user=evt82290@uga.edu
-
 set -euo pipefail
 
 module load samtools
