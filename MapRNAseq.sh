@@ -226,6 +226,7 @@ module load Trim_Galore
        trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $read1
 
        #map with STAR
+       module load STAR
          STAR --runMode alignReads \
          --runThreadN $THREADS \
          --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
