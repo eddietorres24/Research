@@ -230,8 +230,8 @@ module load Trim_Galore
          STAR --runMode alignReads \
          --runThreadN $THREADS \
          --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
-         --outFileNamePrefix ${accession} \
-         --readFilesIn ${accession}_trimmed.fq.gz  \
+         --outFileNamePrefix ${bam} \
+         --readFilesIn $trimmed/${accession}_trimmed.fq.gz  \
          --readFilesCommand zcat \
          --alignIntronMax 10000 \
          --outSAMtype BAM SortedByCoordinate \
