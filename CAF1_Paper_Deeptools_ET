@@ -346,23 +346,34 @@ plotHeatmap -m matrix_K4_scale.mat.gz \
 ########################################
 # 5) Stitch all panels horizontally with ImageMagick
 ########################################
-if command -v magick >/dev/null 2>&1; then
-  magick -density 300 \
-    K27_genes_CAF-1_K27_clustered_K27order.pdf \
-    K27_genes_CAF-1_K36_clustered_K27order.pdf \
-    H3K27me3_CAF-1_Kac_clustered_K27order.pdf \
-    H3K27me3_CAF-1_K4_clustered_K27order.pdf \
-    +append -fuzz 2% -trim +repage \
-    -compress zip -quality 95 -alpha off -background white \
-    CAF1_all_panels_trimmed.pdf
-else
-  convert -density 300 \
-    K27_genes_CAF-1_K27_clustered_K27order.pdf \
-    K27_genes_CAF-1_K36_clustered_K27order.pdf \
-    H3K27me3_CAF-1_Kac_clustered_K27order.pdf \
-    H3K27me3_CAF-1_K4_clustered_K27order.pdf \
-    +append -compress zip -quality 95 -alpha off -background white \
-    CAF1_all_panels_K27_K36_Kac_K4.pdf
-fi
+#!/usr/bin/env bash
+# Merge four deeptools PDFs side-by-side (vectors preserved for Illustrator).
 
-echo "Done. Final combined file: CAF1_all_panels_K27_K36_Kac_K4.pdf"
+set -euo pipefail
+
+# If your cluster uses modules:
+command -v module >/dev/null 2>&1 && { module load texlive || true; module load poppler || true; }
+
+# Panel PDFs from your existing plotHeatmap steps:
+P1="K27_genes_CAF-1_K27_clustered_K27order.pdf"
+P2="K27_genes_CAF-1_K36_clustered_K27order.pdf"
+P3="H3K27me3_CAF-1_Kac_clustered_K27order.pdf"
+P4="H3K27me3_CAF-1_K4_clustered_K27order.pdf"
+
+# 1) Auto-trim margins WITHOUT rasterizing (updates crop box, keeps vectors)
+pdfcrop "$P1" k27_c.pdf
+pdfcrop "$P2" k36_c.pdf
+pdfcrop "$P3" kac_c.pdf
+pdfcrop "$P4" k4_c.pdf
+
+# 2) Tile 4×1 onto one landscape page; vectors/text remain editable
+pdfjam --nup 4x1 --landscape --noautoscale false --delta '0 0' \
+       k27_c.pdf k36_c.pdf kac_c.pdf k4_c.pdf \
+       --outfile CAF1_all_panels_K27_K36_Kac_K4.pdf
+
+# (Optional) set an exact page size (still vector):
+# pdfjam --paper '{17in,5.5in}' --landscape --nup 4x1 --noautoscale false --delta '0 0' \
+#        k27_c.pdf k36_c.pdf kac_c.pdf k4_c.pdf \
+#        --outfile CAF1_all_panels_K27_K36_Kac_K4.pdf
+
+echo "Done: CAF1_all_panels_K27_K36_Kac_K4.pdf (fully editable in Illustrator)"
