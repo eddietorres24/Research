@@ -248,7 +248,6 @@ module load Trim_Galore
          module load Subread
 
          featureCounts -T $THREADS \
-         -p \
          -t CDS \
          -g gene_name \
          -s 0 --primary \
