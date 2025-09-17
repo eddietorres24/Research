@@ -351,26 +351,54 @@ plotHeatmap -m matrix_K4_scale.mat.gz \
 
 set -euo pipefail
 
-# (Optional) modules
-command -v module >/dev/null 2>&1 && { module load texlive 2>/dev/null || true; }
-ml Ghostscript
-
-# panel PDFs you already made
+# Your panel PDFs
 P1="K27_genes_CAF-1_K27_clustered_K27order.pdf"
 P2="K27_genes_CAF-1_K36_clustered_K27order.pdf"
 P3="H3K27me3_CAF-1_Kac_clustered_K27order.pdf"
 P4="H3K27me3_CAF-1_K4_clustered_K27order.pdf"
 
-# 1) Make LEFT half (K27 | K36) on a roomy page
-pdfjam --paper '{28in,12in}' --nup 2x1 --margin '0cm' --delta '0 0' \
-       "$P1" "$P2" --outfile _left.pdf
+# If your cluster uses modules, try to load texlive so pdflatex is available
+if command -v module >/dev/null 2>&1; then
+  module load texlive 2>/dev/null || true
+fi
+command -v pdflatex >/dev/null 2>&1 || { echo "pdflatex not found"; exit 1; }
 
-# 2) Make RIGHT half (Kac | K4) on a roomy page
-pdfjam --paper '{28in,12in}' --nup 2x1 --margin '0cm' --delta '0 0' \
-       "$P3" "$P4" --outfile _right.pdf
+# Page size (W x H). Make it as wide as you want; these are generous.
+PAGE_W="60in"
+PAGE_H="14in"
 
-# 3) Join halves side-by-side onto a wide page (autoscale ON; no clipping)
-pdfjam --paper '{56in,12in}' --nup 2x1 --margin '0cm' --delta '0 0' \
-       _left.pdf _right.pdf --outfile CAF1_all_panels_wide.pdf
+cat > combine_wide.tex <<'TEX'
+\documentclass{article}
+\usepackage{pdfpages}
+\usepackage[paperwidth=@@W@@,paperheight=@@H@@,margin=0in]{geometry}
+\pagestyle{empty}
+\begin{document}
+% Place the four PDFs in one row. No clipping; will scale only if needed,
+% but page is huge so they should render at native size.
+\includepdfmerge[
+  nup=4x1,
+  delta=0 0,
+  frame=false,
+  fitpaper=true,
+  turn=false,
+  pagecommand={}
+]{@@P1@@,1, @@P2@@,1, @@P3@@,1, @@P4@@,1}
+\end{document}
+TEX
 
+# Fill in variables
+sed -i "s|@@W@@|$PAGE_W|g" combine_wide.tex
+sed -i "s|@@H@@|$PAGE_H|g" combine_wide.tex
+sed -i "s|@@P1@@|$P1|g"   combine_wide.tex
+sed -i "s|@@P2@@|$P2|g"   combine_wide.tex
+sed -i "s|@@P3@@|$P3|g"   combine_wide.tex
+sed -i "s|@@P4@@|$P4|g"   combine_wide.tex
+
+# Compile (vectors preserved; Illustrator-friendly)
+pdflatex -interaction=nonstopmode combine_wide.tex >/dev/null
+
+mv combine_wide.pdf CAF1_all_panels_wide.pdf
 echo "Done: CAF1_all_panels_wide.pdf"
+
+# Optional cleanup
+rm -f combine_wide.aux combine_wide.log combine_wide.tex
