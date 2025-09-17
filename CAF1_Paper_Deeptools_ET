@@ -369,7 +369,7 @@ P4="H3K27me3_CAF-1_K4_clustered_K27order.pdf"
 
 # Tile side-by-side; BIG paper to avoid downscaling; vectors remain editable
 # (Increase paper size if you want bigger panels, e.g. {36in,9in})
-pdfjam --paper '{28in,48in}' --landscape \
+pdfjam --paper '{48in,96in}' --landscape \
        --nup 4x1 --noautoscale true --delta '0 0' \
        "$P1" "$P2" "$P3" "$P4" \
        --outfile CAF1_all_panels_K27_K36_Kac_K4.pdf
