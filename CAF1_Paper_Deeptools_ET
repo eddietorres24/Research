@@ -273,8 +273,8 @@ plotHeatmap -m matrix_K27.mat.gz \
   --heatmapHeight 24 \
   --outFileSortedRegions "$BEDDIR2/K27_order.bed" \
   --legendLocation none \
-  --colorList 'white,g,darkgreen' 'white,g,darkgreen' 'white,g,darkgreen' \
-  --zMin 0 0 0 --zMax 50 50 50
+  --colorList 'white,g,darkgreen' \
+  --zMin 0 --zMax 50
 
 ########################################
 # 2) K36 (TSS-centered) using K27 row order
@@ -294,9 +294,8 @@ plotHeatmap -m matrix_K36.mat.gz \
   --sortRegions no \
   --heatmapHeight 24 \
   --legendLocation none \
-  --colorMap afmhot_r afmhot_r \
-  --zMin 0 0 --zMax 12 12
-
+  --colorMap "afmhot_r" \
+  --zMin 0 --zMax 12
 
 ########################################
 # 3) Kac (TSS-centered) using K27 row order
@@ -319,10 +318,7 @@ plotHeatmap -m matrix_Kac.mat.gz \
   --heatmapHeight 24 \
   --legendLocation none \
   --colorList 'white, lavender, mediumslateblue' \
-            'white, lavender, mediumslateblue' \
-            'white, lavender, mediumslateblue' \
-            'white, lavender, mediumslateblue' \
-  --zMin 0 0 0 0 --zMax 8 8 8 8
+  --zMin 0 --zMax 8
 
 ########################################
 # 4) K4 (GENE BODIES via scale-regions) using K27 row order
@@ -344,9 +340,8 @@ plotHeatmap -m matrix_K4_scale.mat.gz \
   --sortRegions no \
   --heatmapHeight 24 \
   --legendLocation none \
-  --colorList 'white,magenta' 'white,magenta' 'white,magenta' 'white,magenta' \
-  --zMin 0 0 0 0 --zMax 5 5 5 5  
-
+  --colorList 'white, magenta' \
+  --zMin 0
 
 ########################################
 # 5) Stitch all panels horizontally with ImageMagick
