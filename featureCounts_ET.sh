@@ -84,8 +84,8 @@
 
 set -euo pipefail
 
-module load samtools
-module load subread     # sometimes named "Subread"; use `module spider subread` if needed
+module load SAMtools
+module load Subread 
 module load R
 
 cd "$SLURM_SUBMIT_DIR"
