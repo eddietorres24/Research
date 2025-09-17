@@ -347,31 +347,27 @@ plotHeatmap -m matrix_K4_scale.mat.gz \
 # 5) Stitch all panels horizontally with ImageMagick
 ########################################
 #!/usr/bin/env bash
-# Merge four deeptools PDFs side-by-side (vectors preserved for Illustrator).
-#!/usr/bin/env bash
+# Merge four deeptools PDFs side-by-side (vectors preserved for Illustrator)
+
 set -euo pipefail
 
-# Try to load ghostscript & texlive if using environment modules
-if command -v module >/dev/null 2>&1; then
-  module load Ghostscript 2>/dev/null || module load ghostscript 2>/dev/null || true
-  module load texlive     2>/dev/null || true
-fi
+# (Optional) modules
+command -v module >/dev/null 2>&1 && { module load texlive 2>/dev/null || true; }
 
-# Quick sanity check
-command -v pdfjam >/dev/null 2>&1 || { echo "pdfjam not found"; exit 1; }
-command -v gs >/dev/null 2>&1 || echo "Warning: ghostscript (gs) not found; pdfjam should still work for tiling."
-
-# Your four panel PDFs from plotHeatmap:
 P1="K27_genes_CAF-1_K27_clustered_K27order.pdf"
 P2="K27_genes_CAF-1_K36_clustered_K27order.pdf"
 P3="H3K27me3_CAF-1_Kac_clustered_K27order.pdf"
 P4="H3K27me3_CAF-1_K4_clustered_K27order.pdf"
 
-# Tile side-by-side; BIG paper to avoid downscaling; vectors remain editable
-# (Increase paper size if you want bigger panels, e.g. {36in,9in})
-pdfjam --paper '{48in,96in}' --landscape \
-       --nup 4x1 --noautoscale true --delta '0 0' \
-       "$P1" "$P2" "$P3" "$P4" \
-       --outfile CAF1_all_panels_K27_K36_Kac_K4.pdf
+# Big, wide page; allow autoscale; no margins; no clipping.
+pdfjam \
+  --paper '{60in,14in}' \
+  --nup 4x1 \
+  --noautoscale false \
+  --margin '0cm' \
+  --delta '0 0' \
+  --no-clip \
+  "$P1" "$P2" "$P3" "$P4" \
+  --outfile CAF1_all_panels_wide.pdf
 
-echo "Done: CAF1_all_panels_K27_K36_Kac_K4.pdf (same-sized panels, vector-editable)"
+echo "Done: CAF1_all_panels_wide.pdf"
