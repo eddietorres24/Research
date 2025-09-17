@@ -67,7 +67,6 @@ colnames(allDataTPM) <- names[,1]
 
 ```{r select data from mutants you want to plot and calculate mean TPM, echo=FALSE}
 #Make new matrix
-Ordered_KO_data <- cbind(allDataTPM[,22:25],allDataTPM[,26:28],allDataTPM[,29:31],allDataTPM[,4:6],allDataTPM[,7:9],allDataTPM[,10:12],allDataTPM[,16:18],allDataTPM[,13:15],allDataTPM[,19:21])
 Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,22:25], na.rm = TRUE),
                                  rowMeans(allDataTPM[,26:28], na.rm = TRUE),
                                  rowMeans(allDataTPM[,29:31], na.rm = TRUE),
@@ -253,7 +252,7 @@ colnames(cts_numeric) <- names[,1]
 ```{r group samples, echo=FALSE}
 #grouping samples by strain for DESeq analysis
 ##Note, I am leaving old cac-1 strain in analysis since the counts are in the file, but will not be utilizing the data for figures. I will be using the "cac-1_new" data instead
-cac1 <- rowMeans(cts_numeric[, 1:3], na.rm = TRUE)
+cac1 <- rowMeans(cts_numeric[, 29:31], na.rm = TRUE)
 cac2 <- rowMeans(cts_numeric[, 4:6], na.rm = TRUE)
 cac3 <- rowMeans(cts_numeric[, 7:9], na.rm = TRUE)
 naf1 <- rowMeans(cts_numeric[, 10:12], na.rm = TRUE)
@@ -262,7 +261,6 @@ naf2 <- rowMeans(cts_numeric[, 16:18], na.rm = TRUE)
 ATRX <- rowMeans(cts_numeric[, 19:21], na.rm = TRUE)
 WT <- rowMeans(cts_numeric[, 22:25], na.rm = TRUE)
 set7 <- rowMeans(cts_numeric[, 26:28], na.rm = TRUE)
-cac1_new <- rowMeans(cts_numeric[, 29:31], na.rm = TRUE)
 cac1_cac2 <- rowMeans(cts_numeric[, 32:34], na.rm = TRUE)
 cac1_suz12 <- rowMeans(cts_numeric[, 35:37], na.rm = TRUE)
 ```
@@ -319,23 +317,23 @@ naf2_05 <- results(dds2, alpha=alpha, contrast=c("condition", "naf2", "WT"))
 asf1_05 <- results(dds2, alpha=alpha, contrast=c("condition", "asf1", "WT"))
 atrx_05 <- results(dds2, alpha=alpha, contrast=c("condition", "atrx", "WT"))
 set7_05 <- results(dds2, alpha=alpha, contrast=c("condition", "set7", "WT"))
-cac1_new_05 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_new", "WT"))
 cac1_cac2_05 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_cac2", "WT"))
 cac1_suz12_05 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_suz12", "WT"))
+ash1_05 <- results(dds2, alpha=alpha, contrast=c("condition", "ash1", "WT"))
 
-#Taking into account adjusted p-value and log2FC cutoff of 1
+#Taking into account adjusted p-value and log2FC cutoff of 1.5
 #(log2FoldChange > 1 | log2FoldChange < -1)
-cac1_05 <- subset(cac1_05, padj < 0.05)
-cac2_05 <- subset(cac2_05, padj < 0.05)
-cac3_05 <- subset(cac3_05, padj < 0.05)
-naf1_05 <- subset(naf1_05, padj < 0.05)
-naf2_05 <- subset(naf2_05, padj < 0.05)
-asf1_05 <- subset(asf1_05, padj < 0.05)
-atrx_05 <- subset(atrx_05, padj < 0.05)
-set7_05 <- subset(set7_05, padj < 0.05)
-cac1_new_05 <- subset(cac1_new_05, padj < 0.05)
-cac1_cac2_05 <- subset(cac1_cac2_05, padj < 0.05)
-cac1_suz12_05 <- subset(cac1_suz12_05, padj < 0.05)
+cac1_05 <- subset(cac1_05, padj < 0.05 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+cac2_05 <- subset(cac2_05, padj < 0.05 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+cac3_05 <- subset(cac3_05, padj < 0.05 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+naf1_05 <- subset(naf1_05, padj < 0.05 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+naf2_05 <- subset(naf2_05, padj < 0.05 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+asf1_05 <- subset(asf1_05, padj < 0.05 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+atrx_05 <- subset(atrx_05, padj < 0.05 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+set7_05 <- subset(set7_05, padj < 0.05 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+cac1_cac2_05 <- subset(cac1_cac2_05, padj < 0.05 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+cac1_suz12_05 <- subset(cac1_suz12_05, padj < 0.05 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+ash1_05 <- subset(ash1_05, padj < 0.05 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
 
 #writing csv files
 write.csv(as.data.frame(cac1_05), file = "cac1_05.csv")
@@ -346,9 +344,9 @@ write.csv(as.data.frame(naf2_05), file = "naf2_05.csv")
 write.csv(as.data.frame(asf1_05), file = "asf1_05.csv")
 write.csv(as.data.frame(atrx_05), file = "atrx_05.csv")
 write.csv(as.data.frame(set7_05), file = "set7_05.csv")
-write.csv(as.data.frame(cac1_new_05), file = "cac1_new_05.csv")
 write.csv(as.data.frame(cac1_cac2_05), file = "cac1_cac2_05.csv")
 write.csv(as.data.frame(cac1_suz12_05), file = "cac1_suz12_05.csv")
+write.csv(as.data.frame(ash1_05), file = "ash1_05.csv")
 
 ##I want a 0.01 cutoff as well to perform more stringent analysis, will make a new set of csv's
 alpha = 0.01
@@ -362,22 +360,22 @@ naf2_01 <- results(dds2, alpha=alpha, contrast=c("condition", "naf2", "WT"))
 asf1_01 <- results(dds2, alpha=alpha, contrast=c("condition", "asf1", "WT"))
 atrx_01 <- results(dds2, alpha=alpha, contrast=c("condition", "atrx", "WT"))
 set7_01 <- results(dds2, alpha=alpha, contrast=c("condition", "set7", "WT"))
-cac1_new_01 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_new", "WT"))
 cac1_cac2_01 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_cac2", "WT"))
 cac1_suz12_01 <- results(dds2, alpha=alpha, contrast=c("condition", "cac1_suz12", "WT"))
+ash1_01 <- results(dds2, alpha=alpha, contrast=c("condition", "asf1", "WT"))
 
 #Taking into account adjusted p-value
-cac1_01 <- subset(cac1_01, padj < 0.01)
-cac2_01 <- subset(cac2_01, padj < 0.01)
-cac3_01 <- subset(cac3_01, padj < 0.01)
-naf1_01 <- subset(naf1_01, padj < 0.01)
-naf2_01 <- subset(naf2_01, padj < 0.01)
-asf1_01 <- subset(asf1_01, padj < 0.01)
-atrx_01 <- subset(atrx_01, padj < 0.01)
-set7_01 <- subset(set7_01, padj < 0.01)
-cac1_new_01 <- subset(cac1_new_01, padj < 0.01)
-cac1_cac2_01 <- subset(cac1_cac2_01, padj < 0.01)
-cac1_suz12_01 <- subset(cac1_suz12_01, padj < 0.01)
+cac1_01 <- subset(cac1_01, padj < 0.01 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+cac2_01 <- subset(cac2_01, padj < 0.01 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+cac3_01 <- subset(cac3_01, padj < 0.01 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+naf1_01 <- subset(naf1_01, padj < 0.01 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+naf2_01 <- subset(naf2_01, padj < 0.01 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+asf1_01 <- subset(asf1_01, padj < 0.01 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+atrx_01 <- subset(atrx_01, padj < 0.01 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+set7_01 <- subset(set7_01, padj < 0.01 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+cac1_cac2_01 <- subset(cac1_cac2_01, padj < 0.01 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+cac1_suz12_01 <- subset(cac1_suz12_01, padj < 0.01 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
+ash1_01 <- subset(ash1_01, padj < 0.01 & (log2FoldChange > 1.5 | log2FoldChange < -1.5 ))
 
 #writing csv files
 write.csv(as.data.frame(cac1_01), file = "cac1_01.csv")
@@ -388,9 +386,9 @@ write.csv(as.data.frame(naf2_01), file = "naf2_01.csv")
 write.csv(as.data.frame(asf1_01), file = "asf1_01.csv")
 write.csv(as.data.frame(atrx_01), file = "atrx_01.csv")
 write.csv(as.data.frame(set7_01), file = "set7_01.csv")
-write.csv(as.data.frame(cac1_new_01), file = "cac1_new_01.csv")
 write.csv(as.data.frame(cac1_cac2_01), file = "cac1_cac2_01.csv")
 write.csv(as.data.frame(cac1_suz12_01), file = "cac1_suz12_01.csv")
+write.csv(as.data.frame(asf1_01), file = "ash1_01.csv")
 ```
 
 #I now want to subset DEG's across strains based one which strain they are up- or downregulated in.
@@ -398,11 +396,11 @@ write.csv(as.data.frame(cac1_suz12_01), file = "cac1_suz12_01.csv")
 ```{r making a bunch of csv files for further analysis, echo=FALSE}
 #Reading in the csv's w/ DEGs back in. This makes it easier to subset dfs later
 ##Reading in both 0.05 and 0.01 cutoff csv's
-cac1_DEG_05 <- read.csv("./cac1_new_05.csv", header= TRUE, row.names = 1)
+cac1_DEG_05 <- read.csv("./cac1_05.csv", header= TRUE, row.names = 1)
 cac2_DEG_05 <- read.csv("./cac2_05.csv", header= TRUE, row.names = 1)
 cac3_DEG_05 <- read.csv("./cac3_05.csv", header= TRUE, row.names = 1)
 set7_DEG_05 <- read.csv("./set7_05.csv", header= TRUE, row.names = 1)
-cac1_DEG_01 <- read.csv("./cac1_new_01.csv", header= TRUE, row.names = 1)
+cac1_DEG_01 <- read.csv("./cac1_01.csv", header= TRUE, row.names = 1)
 cac2_DEG_01 <- read.csv("./cac2_01.csv", header= TRUE, row.names = 1)
 cac3_DEG_01 <- read.csv("./cac3_01.csv", header= TRUE, row.names = 1)
 set7_DEG_01 <- read.csv("./set7_01.csv", header= TRUE, row.names = 1)
@@ -896,7 +894,7 @@ cacUPcombine <- bind_rows(
   mutate(cac2UP, .source = "cac2UP")
 ) %>%
   # if you want cac1UP to win on collisions, keep this order
-  distinct(NCU, .keep_all = TRUE) %>%
+  distinct(V10, .keep_all = TRUE) %>%
   select(-.source)
 
 #Venn Diagram w/ All Upregulated genes in CAF-1 mutants
@@ -946,7 +944,7 @@ ngenes = read.csv("../csv_files/neurospora_genes_edit.csv")
 #Make IGV Track
 ##Note: only genes with DE in one or more strains will display data in the track
 combine <- transform(merge(ngenes, l2fc, by = "VALUE"))
-track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", "asf1_05.csv", "atrx_05.csv", "cac1_05.csv", "cac2_05.csv", "cac3_05.csv", "naf1_05.csv", "naf2_05.csv", "set7_05.csv", "cac1_new_05.csv", "cac1_cac2_05.csv", "cac1_suz12_05.csv")
+track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", "asf1_05.csv", "atrx_05.csv", "cac1_05.csv", "cac2_05.csv", "cac3_05.csv", "naf1_05.csv", "naf2_05.csv", "set7_05.csv", "cac1_05.csv", "cac1_cac2_05.csv", "cac1_suz12_05.csv")
 
 #write track to file
 write.table(track, file="newseq.igv", sep="\t", row.names = FALSE, quote = FALSE)

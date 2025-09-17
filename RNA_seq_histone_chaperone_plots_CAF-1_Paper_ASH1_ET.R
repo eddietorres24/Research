@@ -71,19 +71,31 @@ write.table(samplesname, file="samplenames.txt", sep="\t")
 
 #create a list of column names that you want to plot; !!!!You must include the column name for gene ID
 
+#use to find correct columns
+srrWT  <- c("SRR8269825","SRR8269775","SRR8269782","SRR8269810")
+srrcac1  <- c("149-115_RNA_cac-1__Rep1_S139","149-116_RNA_cac-1__Rep2_S140","149-117_RNA_cac-1__Rep3_S141")
+srrcac2  <- c("SRR7970629","SRR7970630","SRR7970631")
+srrset7  <- c("SRR10916163","SRR10916164","SRR10916165")
+srrash1  <- c("SRR7690267","SRR7690268")
+
+cn  <- colnames(allDataTPM)
+bn  <- basename(cn)
+ids <- sub("_Aligned\\.sortedByCoord\\.out\\.bam$", "", bn)
+
+idx <- which(ids %in% srrash1)   # <- column numbers you want
+idx
+bn[idx]                        # readable column names (optional)
+# subset if needed:
+sub <- allDataTPM[, idx, drop = FALSE]
+
 #move the subset of genes you want to plot into a new matrix
 sampleNames <- colnames(allDataTPM)
 write.table(sampleNames, file="names.txt")
-Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,22:25], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,26:28], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,29:31], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,4:6], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,7:9], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,10:12], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,16:18], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,13:15], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,1:2], na.rm = TRUE))
-averageRowIDs=c("WT","set-7","cac-1","cac-2","ash-1"")
+Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,c(6,8,13,19)], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,c(34,36,39)], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,c(7,10,23)], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,c(1,2)], na.rm = TRUE))
+averageRowIDs=c("WT","cac-1","set-7","ash-1")
 colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 
 ####################################################################
@@ -93,7 +105,7 @@ colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 
 #read in geneIDs of PRC2 target genes
 #reading in csvs w/ upregulated genes in CAF-1 mutants
-Prc2targets <- read.table("./bed_files/K27_genes_stringent.bed", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
+Prc2targets <- read.table("./bed_files/H3K27me3_methylated_genes_FINAL.bed", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
 
 ###SUBSET DATA FOR ALL KO SAMPLES
 Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,10])
@@ -144,7 +156,7 @@ meltedAverageAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
 #meltedData <- melt(tpm, value.name = "Count",
 #varnames=c('GeneID', 'Sample'))
 
-altorder = rev(c("WT","set7","cac1","cac2","cac3","naf1","naf2","asf1","ATRX"))
+altorder = rev(c("WT","cac1","set7","ash1"))
 
 meltedAveragePRC2targetData$Sample <- factor(meltedAveragePRC2targetData$Sample)
 
@@ -153,7 +165,7 @@ meltedAverageAllData$Sample <- factor(meltedAverageAllData$Sample)
 # Plot box & whisker chart
 library(ggplot2)
 xlabels = averageRowIDs
-colors = c( "#4575b4","#fee090","#fee090", "#fee090", "#fee090","#4575b4", "#4575b4", "#4575b4", "#4575b4")
+colors = c( "#4575b4","#fee090","#fee090", "#fee090", "#fee090")
 
 box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
   labs(y="Expression Level (Transcripts per Million)", x="Strain") +
@@ -239,17 +251,13 @@ write.csv(wilcox_df, "Wilcoxon_summary_stats.csv", row.names = TRUE)
 library(grDevices)
 
 # Define factor order and formatted x-axis labels
-label_order <- c("WT", "set-7", "cac-1", "cac-2", "cac-3", "naf-1", "naf-2", "asf-1", "ATRX")
+label_order <- c("WT", "cac-1", "cac-2", "set-7", "ash-1")
 formatted_labels <- c(
   "WT",
-  expression(italic("\u0394set-7")),
   expression(italic("\u0394cac-1")),
   expression(italic("\u0394cac-2")),
-  expression(italic("\u0394cac-3")),
-  expression(italic("\u0394naf-1")),
-  expression(italic("\u0394naf-2")),
-  expression(italic("\u0394asf-1")),
-  expression(italic("\u0394ATRX"))
+  expression(italic("\u0394set-7")),
+  expression(italic("\u0394ash-1"))
 )
 
 # Group and summarize
@@ -324,10 +332,11 @@ heatmap <- pheatmap(K27_not_lost, color = colorRampPalette(rev(brewer.pal(n = 7,
 #to plot with ggplot, you need to extract [[4]] from the heatmap object
 heatmap_plot <- heatmap[[4]]
 
+###############################################
 #replicate scaling for other heatmaps
 library(pheatmap)   # for the internal helper
 
-rna_cols <- c("WT","set-7","cac-1","cac-2","cac-3","naf-1","naf-2","asf-1","ATRX")
+rna_cols <- c("WT","cac-1","set-7","ash-1")
 M <- as.matrix(GenesWithChanges[, rna_cols, drop = FALSE])
 
 # identical to pheatmap(scale="row")
@@ -335,6 +344,7 @@ rna_z <- pheatmap:::scale_rows(M)
 
 # (optional) clip for display like pheatmap often does
 rna_z <- pmin(pmax(rna_z, -3), 3)
+###############################################
 
 ggsave(filename = "./CAF-1_K27_Paper_Final.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
 #dev.off()
