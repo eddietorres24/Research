@@ -238,10 +238,7 @@ module load Trim_Galore
          --outSAMunmapped Within \
          --outSAMattributes Standard \
          --outBAMsortingBinsN 100 \
-         --outSAMunmapped Within \
-         --outSAMattributes Standard \
          --limitBAMsortRAM 19990000000
-
 
          #create index
          module load SAMtools
