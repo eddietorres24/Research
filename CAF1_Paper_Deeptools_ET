@@ -250,98 +250,103 @@ if command -v module >/dev/null 2>&1; then
 fi
 
 
+#######################################
+#1) K27 (TSS-centered) -> defines row order
+#######################################
+computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+  -S \
+    "$P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw" \
+    "$P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw" \
+  -R \
+    "$BEDDIR2/CAF-1_K36lost.bed" \
+    "$BEDDIR2/CAF1_K27_lost_only.bed" \
+    "$BEDDIR2/CAF1_K36_K27_retain.bed" \
+  --missingDataAsZero --skipZeros \
+  -o matrix_K27.mat.gz
+
+plotHeatmap -m matrix_K27.mat.gz \
+  -out K27_genes_CAF-1_K27_clustered_K27order.pdf \
+  --samplesLabel WT cac-1 \
+  --startLabel "TSS" \
+  --sortRegions descend \
+  --sortUsingSamples 1 2 \
+  --heatmapHeight 24 \
+  --outFileSortedRegions "$BEDDIR2/K27_order.bed" \
+  --legendLocation none \
+  --colorList 'white,g,darkgreen' 'white,g,darkgreen' 'white,g,darkgreen' \
+  --zMin 0 0 0 --zMax 50 50 50
+
 ########################################
-# 1) K27 (TSS-centered) -> defines row order
+# 2) K36 (TSS-centered) using K27 row order
 ########################################
-# computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
-#   -S \
-#     "$P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw" \
-#     "$P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw" \
-#   -R \
-#     "$BEDDIR2/CAF-1_K36lost.bed" \
-#     "$BEDDIR2/CAF1_K27_lost_only.bed" \
-#     "$BEDDIR2/CAF1_K36_K27_retain.bed" \
-#   --missingDataAsZero --skipZeros \
-#   -o matrix_K27.mat.gz
-#
-# plotHeatmap -m matrix_K27.mat.gz \
-#   -out K27_genes_CAF-1_K27_clustered_K27order.pdf \
-#   --samplesLabel WT cac-1 \
-#   --startLabel "TSS" \
-#   --sortRegions descend \
-#   --sortUsingSamples 1 2 \
-#   --heatmapHeight 24 \
-#   --outFileSortedRegions "$BEDDIR2/K27_order.bed" \
-#   --legendLocation none \
-#   --colorList 'white,g,darkgreen' \
-#   --zMin 0 --zMax 50
-#
-# ########################################
-# # 2) K36 (TSS-centered) using K27 row order
-# ########################################
-# computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
-#   -S \
-#     "$P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw" \
-#     "$P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw" \
-#   -R "$BEDDIR2/K27_order.bed" \
-#   --missingDataAsZero --skipZeros \
-#   -o matrix_K36.mat.gz
-#
-# plotHeatmap -m matrix_K36.mat.gz \
-#   -out K27_genes_CAF-1_K36_clustered_K27order.pdf \
-#   --samplesLabel WT cac-1 \
-#   --startLabel "TSS" \
-#   --sortRegions no \
-#   --heatmapHeight 24 \
-#   --legendLocation none \
-#   --colorMap "afmhot_r" \
-#   --zMin 0 --zMax 12
-#
-# ########################################
-# # 3) Kac (TSS-centered) using K27 row order
-# ########################################
-# computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
-#   -S \
-#     "$P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw" \
-#     "$P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw" \
-#     "$P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw" \
-#     "$P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw" \
-#   -R "$BEDDIR2/K27_order.bed" \
-#   --missingDataAsZero --skipZeros \
-#   -o matrix_Kac.mat.gz
-#
-# plotHeatmap -m matrix_Kac.mat.gz \
-#   -out H3K27me3_CAF-1_Kac_clustered_K27order.pdf \
-#   --samplesLabel WT cac-1 cac-2 set-7 \
-#   --startLabel "TSS" \
-#   --sortRegions no \
-#   --heatmapHeight 24 \
-#   --legendLocation none \
-#   --colorList 'white, lavender, mediumslateblue' \
-#   --zMin 0 --zMax 8
-#
-# ########################################
-# # 4) K4 (GENE BODIES via scale-regions) using K27 row order
-# ########################################
-# computeMatrix scale-regions \
-#   -S \
-#     "$P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw" \
-#     "$P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw" \
-#     "$P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw" \
-#     "$P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw" \
-#   -R "$BEDDIR2/K27_order.bed" \
-#   --missingDataAsZero --skipZeros \
-#   -o matrix_K4_scale.mat.gz
-#
-# plotHeatmap -m matrix_K4_scale.mat.gz \
-#   -out H3K27me3_CAF-1_K4_clustered_K27order.pdf \
-#   --samplesLabel WT cac-1 cac-2 set-7 \
-#   --startLabel "TSS" --endLabel "TES" \
-#   --sortRegions no \
-#   --heatmapHeight 24 \
-#   --legendLocation none \
-#   --colorList 'white, magenta' \
-#   --zMin 0
+computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+  -S \
+    "$P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw" \
+    "$P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw" \
+  -R "$BEDDIR2/K27_order.bed" \
+  --missingDataAsZero --skipZeros \
+  -o matrix_K36.mat.gz
+
+plotHeatmap -m matrix_K36.mat.gz \
+  -out K27_genes_CAF-1_K36_clustered_K27order.pdf \
+  --samplesLabel WT cac-1 \
+  --startLabel "TSS" \
+  --sortRegions no \
+  --heatmapHeight 24 \
+  --legendLocation none \
+  --colorMap afmhot_r afmhot_r \
+  --zMin 0 0 --zMax 12 12
+
+
+########################################
+# 3) Kac (TSS-centered) using K27 row order
+########################################
+computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+  -S \
+    "$P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw" \
+    "$P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw" \
+    "$P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw" \
+    "$P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw" \
+  -R "$BEDDIR2/K27_order.bed" \
+  --missingDataAsZero --skipZeros \
+  -o matrix_Kac.mat.gz
+
+plotHeatmap -m matrix_Kac.mat.gz \
+  -out H3K27me3_CAF-1_Kac_clustered_K27order.pdf \
+  --samplesLabel WT cac-1 cac-2 set-7 \
+  --startLabel "TSS" \
+  --sortRegions no \
+  --heatmapHeight 24 \
+  --legendLocation none \
+  --colorList 'white, lavender, mediumslateblue' \
+            'white, lavender, mediumslateblue' \
+            'white, lavender, mediumslateblue' \
+            'white, lavender, mediumslateblue' \
+  --zMin 0 0 0 0 --zMax 8 8 8 8
+
+########################################
+# 4) K4 (GENE BODIES via scale-regions) using K27 row order
+########################################
+computeMatrix scale-regions \
+  -S \
+    "$P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw" \
+    "$P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw" \
+    "$P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw" \
+    "$P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw" \
+  -R "$BEDDIR2/K27_order.bed" \
+  --missingDataAsZero --skipZeros \
+  -o matrix_K4_scale.mat.gz
+
+plotHeatmap -m matrix_K4_scale.mat.gz \
+  -out H3K27me3_CAF-1_K4_clustered_K27order.pdf \
+  --samplesLabel WT cac-1 cac-2 set-7 \
+  --startLabel "TSS" --endLabel "TES" \
+  --sortRegions no \
+  --heatmapHeight 24 \
+  --legendLocation none \
+  --colorList 'white,magenta' 'white,magenta' 'white,magenta' 'white,magenta' \
+  --zMin 0 0 0 0 --zMax 5 5 5 5  
+
 
 ########################################
 # 5) Stitch all panels horizontally with ImageMagick
