@@ -352,8 +352,9 @@ if command -v magick >/dev/null 2>&1; then
     K27_genes_CAF-1_K36_clustered_K27order.pdf \
     H3K27me3_CAF-1_Kac_clustered_K27order.pdf \
     H3K27me3_CAF-1_K4_clustered_K27order.pdf \
-    +append -compress zip -quality 95 -alpha off -background white \
-    CAF1_all_panels_K27_K36_Kac_K4.pdf
+    +append -fuzz 2% -trim +repage \
+    -compress zip -quality 95 -alpha off -background white \
+    CAF1_all_panels_trimmed.pdf
 else
   convert -density 300 \
     K27_genes_CAF-1_K27_clustered_K27order.pdf \
