@@ -17,7 +17,7 @@ cd $SLURM_SUBMIT_DIR
 THREADS=2
 
 #Make & Assign Directories
-BAMDIR="/scratch/evt82290/MappingOutputs/RNAseq/CAF-1_Heatmap/bamFiles"
+BAMDIR="/scratch/evt82290/MappingOutputs/RNAseq/bamFiles"
 B149DIR="/scratch/evt82290/MappingOutputs/Run149/RNA/bamFiles"
 OUTDIR="/scratch/evt82290/MappingOutputs/RNAseq/counts"
 
