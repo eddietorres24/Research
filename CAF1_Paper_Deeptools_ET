@@ -207,30 +207,110 @@ module load deepTools
 #   --outFileSortedRegions Kac_order.bed \
 #   --colorList 'white, lavender, mediumslateblue' \
 #   --zMin 0 --zMax 8
+#
+# ##All_combined
+# computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+# -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
+#    $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+#    $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
+#    $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
+#    $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
+#    $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
+#    $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
+#    $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
+#    $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
+#    $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
+#    $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
+#    $P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw \
+# -R $BEDDIR2/K27_order.bed \
+#    --missingDataAsZero --skipZeros -o cluster_test.gz
+#
+# plotHeatmap -m cluster_test.gz -out K27_genes_CAF-1_allmods_clustered_K27order.pdf \
+#                     --samplesLabel WT cac-1 WT cac-1 WT cac-1 cac-2 set-7 WT cac-1 cac-2 set-7 \
+#                     --startLabel "TSS" \
+#                     --sortRegions no \
+#                     --heatmapHeight 24 \
+#                     --whatToShow "heatmap and colorbar" \
+#                     --legendLocation none \
+#                     --colorList 'white,g,darkgreen' 'white,g,darkgreen' 'yellow, orange, brown' 'yellow, orange, brown' 'white,magenta' 'white,magenta' 'white,magenta' 'white,magenta' 'white, lavender, mediumslateblue' 'white, lavender, mediumslateblue' 'white, lavender, mediumslateblue' 'white, lavender, mediumslateblue' \
+#                     --zMin 0 --zMax 50 50 12 12 5 5 5 5 8 8 8 8
 
-##All_combined
+#ChatGPT method
+#!/usr/bin/env bash
+# One-shot: make TSS panel (K27, K36 with afmhot_r, Kac), make gene-body panel (K4),
+# then stitch horizontally into a single PDF in the order: K27 | K36 | Kac | K4.
+
+set -euo pipefail
+
+############################
+# 1) TSS-centered panel
+############################
 computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
--S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
-   $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
-   $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
-   $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
-   $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
-   $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
-   $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
-   $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
-   $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
-   $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
-   $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
-   $P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw \
--R $BEDDIR2/K27_order.bed \
-   --missingDataAsZero --skipZeros -o cluster_test.gz
+  -S \
+    "$P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw" \
+    "$P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw" \
+    "$P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw" \
+    "$P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw" \
+    "$P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw" \
+    "$P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw" \
+    "$P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw" \
+    "$P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw" \
+  -R "$BEDDIR2/K27_order.bed" \
+  --missingDataAsZero --skipZeros \
+  -o matrix_TSS.mat.gz
 
-plotHeatmap -m cluster_test.gz -out K27_genes_CAF-1_allmods_clustered_K27order.pdf \
-                    --samplesLabel WT cac-1 WT cac-1 WT cac-1 cac-2 set-7 WT cac-1 cac-2 set-7 \
-                    --startLabel "TSS" \
-                    --sortRegions no \
-                    --heatmapHeight 24 \
-                    --whatToShow "heatmap and colorbar" \
-                    --legendLocation none \
-                    --colorList 'white,g,darkgreen' 'white,g,darkgreen' 'yellow, orange, brown' 'yellow, orange, brown' 'white,magenta' 'white,magenta' 'white,magenta' 'white,magenta' 'white, lavender, mediumslateblue' 'white, lavender, mediumslateblue' 'white, lavender, mediumslateblue' 'white, lavender, mediumslateblue' \
-                    --zMin 0 --zMax 50 50 12 12 5 5 5 5 8 8 8 8
+plotHeatmap -m matrix_TSS.mat.gz -out Figure4_TSS.pdf \
+  --samplesLabel \
+    "K27 WT" "K27 cac-1" \
+    "K36 WT" "K36 cac-1" \
+    "Kac WT" "Kac cac-1" "Kac cac-2" "Kac set-7" \
+  --sortRegions no \
+  --startLabel "TSS" \
+  --whatToShow "heatmap and colorbar" \
+  --legendLocation none \
+  --heatmapHeight 24 \
+  --dpi 300 \
+  --colorMap Greens Greens afmhot_r afmhot_r YlOrBr YlOrBr YlOrBr YlOrBr \
+  --zMin 0 0 0 0 0 0 0 0 \
+  --zMax 50 50 12 12 8 8 8 8
+
+############################
+# 2) Gene-body panel for K4 (scale-regions)
+############################
+computeMatrix scale-regions \
+  --beforeRegionStartLength 800 \
+  --regionBodyLength 2000 \
+  --afterRegionStartLength 1500 \
+  -S \
+    "$P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw" \
+    "$P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw" \
+    "$P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw" \
+    "$P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw" \
+  -R "$BEDDIR2/K27_order.bed" \
+  --missingDataAsZero --skipZeros \
+  -o matrix_K4_scale.mat.gz
+
+plotHeatmap -m matrix_K4_scale.mat.gz -out Figure4_K4.pdf \
+  --samplesLabel "K4 WT" "K4 cac-1" "K4 cac-2" "K4 set-7" \
+  --sortRegions no \
+  --startLabel "TSS" --endLabel "TES" \
+  --whatToShow "heatmap and colorbar" \
+  --legendLocation none \
+  --heatmapHeight 24 \
+  --dpi 300 \
+  --colorMap Purples Purples Purples Purples \
+  --zMin 0 0 0 0 --zMax 5 5 5 5
+
+module load ImageMagick
+############################
+# 3) Stitch side-by-side into one PDF (K27 | K36 | Kac | K4)
+############################
+if command -v magick >/dev/null 2>&1; then
+  magick -density 300 Figure4_TSS.pdf Figure4_K4.pdf +append -compress zip -quality 95 \
+    -alpha off -background white Figure4_all.pdf
+else
+  convert -density 300 Figure4_TSS.pdf Figure4_K4.pdf +append -compress zip -quality 95 \
+    -alpha off -background white Figure4_all.pdf
+fi
+
+echo "Done. Final combined file: Figure4_all.pdf"
