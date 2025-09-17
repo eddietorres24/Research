@@ -82,89 +82,206 @@
 # $BAMDIR/SRR9027759/SRR9027759_Aligned.sortedByCoord.out.bam \
 # $BAMDIR/SRR9027689/SRR9027689_Aligned.sortedByCoord.out.bam
 
-set -euo pipefail
+#ChatGPT code
 
-module load SAMtools
-module load Subread 
+# set -euo pipefail
+#
+# # --- modules (adjust names if your cluster uses different module keys) ---
+# module load SAMtools
+# module load Subread
+# module load R
+#
+# cd "$SLURM_SUBMIT_DIR"
+#
+# # ====================== CONFIG ======================
+# THREADS=${SLURM_CPUS_PER_TASK:-4}
+#
+# # BAM roots to search (recursive)
+# BAMDIR="/scratch/evt82290/MappingOutputs/RNAseq/bamFiles"
+# B149DIR="/scratch/evt82290/MappingOutputs/Run149/RNA/bamFiles"
+#
+# # Output
+# OUTDIR="/scratch/evt82290/MappingOutputs/RNAseq/counts"
+# MERGED="$OUTDIR/readcounts_All_CAF1paper.merged.txt"
+#
+# # Annotation
+# GTF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf"
+# STRAND=0          # 0=unstranded, 1=forward, 2=reverse
+#
+# # FeatureCounts target (your current choice)
+# FTYPE="CDS"       # common alternative for gene-level RNA-seq: "exon"
+# GATTR="gene_name" # common alternative: "gene_id"
+# # Optional sample renaming map (TSV with columns: file  sample). Leave empty to skip.
+# SAMPLE_MAP=""
+# # =====================================================
+#
+# mkdir -p "$OUTDIR" "$OUTDIR/tmp"
+#
+# # 1) Collect BAMs recursively from both roots
+# echo "[INFO] Finding BAMs under: $BAMDIR  and  $B149DIR"
+# mapfile -d '' ALL_BAMS < <(find "$BAMDIR" "$B149DIR" -type f -name "*Aligned.sortedByCoord.out.bam" -print0)
+# if (( ${#ALL_BAMS[@]} == 0 )); then
+#   echo "[ERROR] No BAMs found."
+#   exit 1
+# fi
+# echo "[INFO] Found ${#ALL_BAMS[@]} BAMs."
+#
+# # 2) Split into PE vs SE via FLAG 0x1
+# PE_BAMS=()
+# SE_BAMS=()
+# for bam in "${ALL_BAMS[@]}"; do
+#   if (( $(samtools view -c -f 1 "$bam") > 0 )); then
+#     PE_BAMS+=("$bam")
+#   else
+#     SE_BAMS+=("$bam")
+#   fi
+# done
+# echo "[INFO] Detected ${#PE_BAMS[@]} paired-end BAMs and ${#SE_BAMS[@]} single-end BAMs."
+#
+# # 3) Run featureCounts separately
+# SE_OUT=""
+# PE_OUT=""
+#
+# if (( ${#SE_BAMS[@]} )); then
+#   SE_OUT="$OUTDIR/readcounts.SE.txt"
+#   echo "[INFO] Running featureCounts (SE) -> $SE_OUT"
+#   featureCounts -T "$THREADS" \
+#     -t "$FTYPE" -g "$GATTR" -s "$STRAND" --primary \
+#     --tmpDir "$OUTDIR/tmp" \
+#     -a "$GTF" -o "$SE_OUT" \
+#     "${SE_BAMS[@]}"
+# fi
+#
+# if (( ${#PE_BAMS[@]} )); then
+#   PE_OUT="$OUTDIR/readcounts.PE.txt"
+#   echo "[INFO] Running featureCounts (PE) -> $PE_OUT"
+#   featureCounts -T "$THREADS" -p -B -C \
+#     -t "$FTYPE" -g "$GATTR" -s "$STRAND" --primary \
+#     --tmpDir "$OUTDIR/tmp" \
+#     -a "$GTF" -o "$PE_OUT" \
+#     "${PE_BAMS[@]}"
+# fi
+#
+# # 4) Merge into one table with a robust R parser that preserves headers
+# echo "[INFO] Merging outputs -> $MERGED"
+# Rscript - "$SE_OUT" "$PE_OUT" "$MERGED" "$SAMPLE_MAP" <<'RSCRIPT'
+# args <- commandArgs(trailingOnly=TRUE)
+# se <- args[1]; pe <- args[2]; out <- args[3]; map_path <- if (length(args) >= 4) args[4] else ""
+#
+# files <- c(se, pe)
+# files <- files[file.exists(files) & nzchar(files)]
+# if (length(files) == 0) stop("No featureCounts outputs found")
+#
+# read_fc <- function(f) {
+#   x <- read.table(
+#     f,
+#     header = TRUE,           # force header row
+#     sep = "\t",
+#     quote = "",
+#     comment.char = "#",      # drop comment lines
+#     check.names = FALSE,
+#     stringsAsFactors = FALSE
+#   )
+#   # Remove BOM if present
+#   colnames(x)[1] <- sub("^\ufeff", "", colnames(x)[1])
+#
+#   need <- c("Geneid","Chr","Start","End","Strand","Length")
+#   if (!all(need %in% colnames(x)[1:6])) {
+#     stop(sprintf("Header parse failed for %s. First cols: %s",
+#                  f, paste(colnames(x)[1:6], collapse=" | ")))
+#   }
+#   x
+# }
+#
+# dfs <- lapply(files, read_fc)
+#
+# # Start with annotation cols from first file
+# base <- dfs[[1]][, 1:6]
+#
+# # Append sample columns from each file
+# for (d in dfs) {
+#   d[[1]] <- as.character(d[[1]])  # Geneid as character
+#   base <- merge(
+#     base,
+#     d[, c(1, 7:ncol(d)), drop = FALSE],  # Geneid + sample columns
+#     by = "Geneid",
+#     all = FALSE,
+#     sort = FALSE
+#   )
+# }
+#
+# # Order columns: annotation first
+# ann <- c("Geneid","Chr","Start","End","Strand","Length")
+# base <- base[, c(ann, setdiff(colnames(base), ann))]
+#
+# # Always write colnames
+# write.table(base, out, sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
+# RSCRIPT
+#
+# echo "[OK] Merged counts written: $MERGED"
+#
+# # 5) (Optional) print header mapping to verify columns quickly
+# echo "[INFO] Column header check:"
+# awk -F'\t' 'NR==1{for(i=1;i<=NF;i++) printf "%3d  %s\n", i,$i; exit}' "$MERGED"
+
+
+
+#!/bin/bash
+#SBATCH --job-name=fc_merge_only
+#SBATCH --partition=batch
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=evt82290@uga.edu
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=4G
+#SBATCH --time=00:30:00
+#SBATCH --output=../RNAseqMap/logs/fc_merge_only.%j.out
+#SBATCH --error=../RNAseqMap/logs/fc_merge_only.%j.err
+
+#!/bin/bash
+#SBATCH --job-name=fc_merge_only
+#SBATCH --partition=batch
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=evt82290@uga.edu
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=4G
+#SBATCH --time=00:30:00
+#SBATCH --output=../RNAseqMap/logs/fc_merge_only.%j.out
+#SBATCH --error=../RNAseqMap/logs/fc_merge_only.%j.err
+
+set -euo pipefail
 module load R
 
-cd "$SLURM_SUBMIT_DIR"
-
-# --- edit these if needed ---
-THREADS=${SLURM_CPUS_PER_TASK:-8}
-BAMDIR="/scratch/evt82290/MappingOutputs/RNAseq/bamFiles"
-B149DIR="/scratch/evt82290/MappingOutputs/Run149/RNA/bamFiles"
 OUTDIR="/scratch/evt82290/MappingOutputs/RNAseq/counts"
-GTF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf"
-STRAND=0          # 0=unstranded, 1=forward, 2=reverse
-FTYPE="CDS"       # tip: many use "exon" for gene-level RNA-seq
-GATTR="gene_name" # tip: many use "gene_id" to avoid duplicate names
-# ---------------------------
-
-mkdir -p "$OUTDIR" "$OUTDIR/tmp"
-
-# Collect BAMs from both roots
-mapfile -d '' ALL_BAMS < <(find "$BAMDIR" "$B149DIR" -type f -name "*Aligned.sortedByCoord.out.bam" -print0)
-
-# Split into PE vs SE by checking FLAG 0x1
-PE_BAMS=()
-SE_BAMS=()
-for bam in "${ALL_BAMS[@]}"; do
-  if (( $(samtools view -c -f 1 "$bam") > 0 )); then
-    PE_BAMS+=("$bam")
-  else
-    SE_BAMS+=("$bam")
-  fi
-done
-
-echo "Detected ${#PE_BAMS[@]} paired-end BAMs and ${#SE_BAMS[@]} single-end BAMs."
-
-SE_OUT=""
-PE_OUT=""
-
-# Single-end call (no -p)
-if (( ${#SE_BAMS[@]} )); then
-  SE_OUT="$OUTDIR/readcounts.SE.txt"
-  featureCounts -T "$THREADS" \
-    -t "$FTYPE" -g "$GATTR" -s "$STRAND" --primary \
-    --tmpDir "$OUTDIR/tmp" \
-    -a "$GTF" -o "$SE_OUT" \
-    "${SE_BAMS[@]}"
-fi
-
-# Paired-end call (-p; add -B -C for stricter pairing)
-if (( ${#PE_BAMS[@]} )); then
-  PE_OUT="$OUTDIR/readcounts.PE.txt"
-  featureCounts -T "$THREADS" -p -B -C \
-    -t "$FTYPE" -g "$GATTR" -s "$STRAND" --primary \
-    --tmpDir "$OUTDIR/tmp" \
-    -a "$GTF" -o "$PE_OUT" \
-    "${PE_BAMS[@]}"
-fi
-
-# Merge into one matrix
+SE_OUT="$OUTDIR/readcounts.SE.txt"   # set to your SE featureCounts file, or "" if none
+PE_OUT="$OUTDIR/readcounts.PE.txt"   # set to your PE featureCounts file, or "" if none
 MERGED="$OUTDIR/readcounts_All_CAF1paper.merged.txt"
-Rscript - "$SE_OUT" "$PE_OUT" "$MERGED" <<'RSCRIPT'
+
+Rscript - "$SE_OUT" "$PE_OUT" "$MERGED" <<'RS'
 args <- commandArgs(trailingOnly=TRUE)
-se <- args[1]; pe <- args[2]; out <- args[3]
-files <- c(se, pe)
+files <- args[1:2]
 files <- files[file.exists(files) & nzchar(files)]
+if (length(files) == 0) stop("No input featureCounts files found.")
 
-stopifnot(length(files) > 0)
-
-read_fc <- function(f) read.delim(f, comment.char="#", check.names=FALSE)
-dfs <- lapply(files, read_fc)
-
-# Start from annotation columns of the first result
-base <- dfs[[1]][, 1:6]  # Geneid, Chr, Start, End, Strand, Length
-for (d in dfs) {
-  base <- merge(base, d[, c(1, 7:ncol(d)), drop=FALSE], by="Geneid", all=FALSE)
+read_fc <- function(f) {
+  x <- read.table(f, header=TRUE, sep="\t", quote="", comment.char="#",
+                  check.names=FALSE, stringsAsFactors=FALSE)
+  colnames(x)[1] <- sub("^\ufeff", "", colnames(x)[1])  # strip BOM if present
+  x
 }
 
-# Order columns nicely
-ann <- c("Geneid","Chr","Start","End","Strand","Length")
-base <- base[, c(ann, setdiff(colnames(base), ann))]
-write.table(base, out, sep="\t", quote=FALSE, row.names=FALSE)
-RSCRIPT
+dfs <- lapply(files, read_fc)
 
-echo "Done. Merged counts: $MERGED"
+# Start with the 6 annotation columns from the first file
+base <- dfs[[1]][, 1:6]
+
+# Append sample columns from each file
+for (d in dfs) {
+  base <- merge(base, d[, c(1, 7:ncol(d)), drop=FALSE],
+                by="Geneid", all=FALSE, sort=FALSE)
+}
+
+# Write merged table with header
+write.table(base, args[3], sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
+RS
