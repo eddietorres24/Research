@@ -351,6 +351,10 @@ plotHeatmap -m matrix_K4_scale.mat.gz \
 
 set -euo pipefail
 
+# (Optional) modules
+command -v module >/dev/null 2>&1 && { module load texlive 2>/dev/null || true; }
+ml Ghostscript
+
 # panel PDFs you already made
 P1="K27_genes_CAF-1_K27_clustered_K27order.pdf"
 P2="K27_genes_CAF-1_K36_clustered_K27order.pdf"
