@@ -16,7 +16,7 @@ cd $SLURM_SUBMIT_DIR
 
 source config.txt
 
-FASTQ="scratch/evt82290/FastqFiles/ATAC"
+FASTQ="/scratch/evt82290/FastqFiles/ATAC"
 OUTDIR="/scratch/evt82290/MappingOutputs/ATAC"
 mkdir ${OUTDIR}
 
@@ -67,7 +67,8 @@ ml BWA
 bwa mem -M -v 3 -a -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
 
-module load picard/2.27.4-Java-13.0.2
+module load picard
+module load Java
 
 java -jar picard.jar MarkDuplicates \
      I=${bam} \
