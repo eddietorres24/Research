@@ -227,31 +227,31 @@ module load Trim_Galore
 
        #map with STAR
        module load STAR
-         STAR --runMode alignReads \
-         --runThreadN $THREADS \
-         --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
-         --outFileNamePrefix ${bam} \
-         --readFilesIn $trimmed/${accession}_trimmed.fq.gz  \
-         --readFilesCommand zcat \
-         --alignIntronMax 10000 \
-         --outSAMtype BAM SortedByCoordinate \
-         --outSAMunmapped Within \
-         --outSAMattributes Standard \
-         --outBAMsortingBinsN 100 \
-         --limitBAMsortRAM 19990000000
-
-         #create index
+       #   STAR --runMode alignReads \
+       #   --runThreadN $THREADS \
+       #   --genomeDir /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/STAR \
+       #   --outFileNamePrefix ${bam} \
+       #   --readFilesIn $trimmed/${accession}_trimmed.fq.gz  \
+       #   --readFilesCommand zcat \
+       #   --alignIntronMax 10000 \
+       #   --outSAMtype BAM SortedByCoordinate \
+       #   --outSAMunmapped Within \
+       #   --outSAMattributes Standard \
+       #   --outBAMsortingBinsN 100 \
+       #   --limitBAMsortRAM 19990000000
+       #
+       #   #create index
          module load SAMtools
-         samtools index "${bam}Aligned.sortedByCoord.out.bam"
+       #   samtools index "${bam}Aligned.sortedByCoord.out.bam"
 
          ##quantify with featureCounts
          module load Subread
 
          featureCounts -T $THREADS \
+         -p \
          -t CDS \
          -g gene_name \
          -s 0 --primary \
-         -p \
          -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
          -o $counts \
          ${bam}Aligned.sortedByCoord.out.bam
