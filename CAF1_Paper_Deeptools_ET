@@ -349,47 +349,53 @@ plotHeatmap -m matrix_K4_scale.mat.gz \
 #!/usr/bin/env bash
 # Merge four deeptools PDFs side-by-side (vectors preserved for Illustrator)
 
-#!/usr/bin/env bash
 set -euo pipefail
 
-# panel PDFs
+# Your panel PDFs
 P1="K27_genes_CAF-1_K27_clustered_K27order.pdf"
 P2="K27_genes_CAF-1_K36_clustered_K27order.pdf"
 P3="H3K27me3_CAF-1_Kac_clustered_K27order.pdf"
 P4="H3K27me3_CAF-1_K4_clustered_K27order.pdf"
 
-# load TeX if your cluster uses modules
+# Load TeX if needed
 command -v module >/dev/null 2>&1 && module load texlive 2>/dev/null || true
 command -v pdflatex >/dev/null 2>&1 || { echo "pdflatex not found"; exit 1; }
 
-# Big **landscape** page; tweak as needed
-PAGE_W="60in"
-PAGE_H="14in"
+# Page size (make it wide & not too tall so panels fill the height)
+PAGE_W="40in"
+PAGE_H="10in"
 
-cat > combine_side_by_side.tex <<'TEX'
+cat > combine_equal_height.tex <<'TEX'
 \documentclass{article}
 \usepackage[paperwidth=@@W@@,paperheight=@@H@@,margin=0in]{geometry}
 \usepackage{graphicx}
 \pagestyle{empty}
 \begin{document}
 \noindent
-% Four panels, each exactly 1/4 of page width (equal scale), no clipping.
-\includegraphics[page=1,width=.25\paperwidth]{@@P1@@}%
-\includegraphics[page=1,width=.25\paperwidth]{@@P2@@}%
-\includegraphics[page=1,width=.25\paperwidth]{@@P3@@}%
-\includegraphics[page=1,width=.25\paperwidth]{@@P4@@}%
+% Four equal-height, top-aligned columns that fill the page height.
+\begin{minipage}[t][\paperheight][t]{.25\paperwidth}
+  \includegraphics[page=1,height=\paperheight,keepaspectratio]{@@P1@@}
+\end{minipage}%
+\begin{minipage}[t][\paperheight][t]{.25\paperwidth}
+  \includegraphics[page=1,height=\paperheight,keepaspectratio]{@@P2@@}
+\end{minipage}%
+\begin{minipage}[t][\paperheight][t]{.25\paperwidth}
+  \includegraphics[page=1,height=\paperheight,keepaspectratio]{@@P3@@}
+\end{minipage}%
+\begin{minipage}[t][\paperheight][t]{.25\paperwidth}
+  \includegraphics[page=1,height=\paperheight,keepaspectratio]{@@P4@@}
+\end{minipage}%
 \end{document}
 TEX
 
-sed -i "s|@@W@@|$PAGE_W|g" combine_side_by_side.tex
-sed -i "s|@@H@@|$PAGE_H|g" combine_side_by_side.tex
-sed -i "s|@@P1@@|$P1|g"   combine_side_by_side.tex
-sed -i "s|@@P2@@|$P2|g"   combine_side_by_side.tex
-sed -i "s|@@P3@@|$P3|g"   combine_side_by_side.tex
-sed -i "s|@@P4@@|$P4|g"   combine_side_by_side.tex
+# Fill placeholders
+sed -i "s|@@W@@|$PAGE_W|g" combine_equal_height.tex
+sed -i "s|@@H@@|$PAGE_H|g" combine_equal_height.tex
+sed -i "s|@@P1@@|$P1|g"     combine_equal_height.tex
+sed -i "s|@@P2@@|$P2|g"     combine_equal_height.tex
+sed -i "s|@@P3@@|$P3|g"     combine_equal_height.tex
+sed -i "s|@@P4@@|$P4|g"     combine_equal_height.tex
 
-pdflatex -interaction=nonstopmode combine_side_by_side.tex >/dev/null
-mv combine_side_by_side.pdf CAF1_all_panels_wide.pdf
-rm -f combine_side_by_side.{aux,log,tex}
+pdflatex -interaction=nonstopmode -jobname CAF1_all_panels combine_equal_height.tex >/dev/null
 
-echo "Done: CAF1_all_panels_wide.pdf"
+echo "Done: CAF1_all_panels.pdf"
