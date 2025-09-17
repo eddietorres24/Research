@@ -190,7 +190,7 @@ elif [ -f $read2 ]; then
         samtools index "${bam}Aligned.sortedByCoord.out.bam"
 
         ##quantify with featureCounts
-        module load Subread/
+        module load Subread
 
         featureCounts -T $THREADS \
         -p \
@@ -223,7 +223,7 @@ else
 
 module load Trim_Galore
 
-       trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $read1
+       # trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $read1
 
        #map with STAR
        module load STAR
@@ -264,6 +264,14 @@ module load Trim_Galore
          	    module load deepTools
          	    #Plot all reads
          	    bamCoverage -p $THREADS -bs 50 --normalizeUsing BPM -of bigwig -b "${bam}Aligned.sortedByCoord.out.bam" -o "${bw}"
+
+              #log-transformed BigWigs
+              module load ucsc
+
+              bigWigToBedGraph ${bw} ${bg}
+              awk '{ $4=(log($4+1)/log(2)); } 1' < ${bg} > ${bg2}
+              sort -k1,1 -k2,2n ${bg2} > ${bg2_sort}
+              bedGraphToBigWig ${bg2_sort} /home/ad45368/chrom_sizes.txt ${bw2}
 
 fi
 
