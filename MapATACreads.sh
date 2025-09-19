@@ -76,7 +76,7 @@ java -jar picard.jar MarkDuplicates \
      M=./${OUTDIR}/SortedBamFiles/marked_dup_metrics.txt \
      --REMOVE_DUPLICATES=TRUE
 
-perl ./shiftTn5_BAM_2_BED.pl "${bam}" > "${name}.bed"
+perl ./shiftTn5_BAM_2_BED.pl "${bam}" > "${OUTDIR}/${name}.bed"
 
 ############################
 # #deeptools

@@ -36,3 +36,8 @@
 "35" "cac1_suz12_rep1"
 "36" "cac1_suz12_rep2"
 "37" "cac1_suz12_rep3"
+"38" "suz12_rep1"
+"39" "suz12_rep2"
+"40" "suz12_rep3"
+"41" "ash1_rep1"
+"42" "ash1_rep2"
