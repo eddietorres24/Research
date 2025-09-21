@@ -270,7 +270,7 @@ plotHeatmap -m K36_test.gz -out K27_genes_ASH1_K36_clustered.pdf \
                     --zMin 0 --zMax 12
 
 # #RNA-seq
-computeMatrix scale-regions -a 200 -b 200 --regionBodyLength 2000 --scale 3 \
+computeMatrix scale-regions -a 200 -b 200 --regionBodyLength 2000 --scale 2 \
       -S $RNADIR/SRR8269825/SRR8269825_log.bw \
          /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_log.bw \
          $RNADIR/SRR7690268/SRR7690268_log.bw \
@@ -282,7 +282,6 @@ computeMatrix scale-regions -a 200 -b 200 --regionBodyLength 2000 --scale 3 \
             --startLabel "TSS" \
             --endLabel "TES" \
             --sortRegions no \
-            --sortUsingSamples 1 \
             --heatmapHeight 25 \
             --colorMap "seismic" \
             --zMin 0 -zMax 2
