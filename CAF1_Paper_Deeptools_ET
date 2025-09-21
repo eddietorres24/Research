@@ -270,15 +270,14 @@ module load deepTools
 #                     --zMin 0 --zMax 12
 
 # #RNA-seq
-# computeMatrix scale-regions -a 200 -b 200 --regionBodyLength 2000 --scale 2 \
-#       -S $RNADIR/SRR8269825/SRR8269825_log.bw \
-#          /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_log.bw \
-#          $RNADIR/SRR7690268/SRR7690268_log.bw \
-#          $OUTDIR2/set2_RNAseq_ash1paper_1Rep_log.bw \
-#          -R $BEDDIR2/ASH1_K27_order.bed --skipZeros --missingDataAsZero -o matrix_PRC2_RNA.gz
+computeMatrix scale-regions -a 200 -b 200 --regionBodyLength 2000 --scale 2 \
+      -S $RNADIR/SRR8269825/SRR8269825_log.bw \
+         /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_log.bw \
+         $RNADIR/SRR7690268/SRR7690268_log.bw \
+         -R $BEDDIR2/ASH1_K27_order.bed --skipZeros --missingDataAsZero -o matrix_PRC2_RNA.gz
 
     plotHeatmap -m matrix_PRC2_RNA.gz -out CAF-1_ash1_RNA-seq_K27genes_CAF-1_clustered.pdf \
-            --samplesLabel WT cac-1 ash-1 set-2 \
+            --samplesLabel WT cac-1 ash-1 \
             --startLabel "TSS" \
             --endLabel "TES" \
             --sortRegions no \
