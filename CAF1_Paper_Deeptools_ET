@@ -283,7 +283,7 @@ computeMatrix scale-regions -a 200 -b 200 --regionBodyLength 2000 --scale 2 \
             --sortRegions no \
             --heatmapHeight 25 \
             --legendLocation none \
-            --colorMap "bwr" \
+            --colorMap "seismic" \
             --zMin 0 --zMax 3
 
          # $OUTDIR2/SRR10916163_log.bw \
