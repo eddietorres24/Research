@@ -128,9 +128,22 @@ meltedAveragePRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
 
 ```{r statistics, echo=FALSE}
 #I want to run statistical tests to determine the signifcance of the difference in expression b/w mutant strains and WT
-## First, I make histogram to visualize distribution of data. we'll use cac-1 as a comparison to WT
 
-hist <- as.data.frame(AVERAGE_Prc2targetTPM)
+AVERAGE_Prc2targetTPM_ALL <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%rownames(Prc2targetTPM))
+
+#Subset data to filter out non-repressed PRC2 targets regions that got through (cutting out any genes over 10 tpm in WT). Choice of 10 TPM cutoff was arbitrary
+##These are likely genes whose promoters are not marked by H3K27me3, genes on the edge of K27 regions, and/or bivalent genes
+AVERAGE_Prc2targetTPM_ALL <- subset(AVERAGE_Prc2targetTPM_ALL, (AVERAGE_Prc2targetTPM_ALL[,1] < 10))
+
+#resubet PRC2 targets after filtering
+Prc2targetTPM_ALL <- subset(Prc2targetTPM, rownames(Prc2targetTPM)%in%rownames(AVERAGE_Prc2targetTPM_ALL))
+
+#Add sudocount and log transform (if necessary)
+AVERAGE_Prc2targetTPM_ALL <- AVERAGE_Prc2targetTPM_ALL + 1
+AVERAGE_Prc2targetTPM_ALL <- log2(AVERAGE_Prc2targetTPM_ALL)
+
+## First, I make histogram to visualize distribution of data. we'll use cac-1 as a comparison to WT
+hist <- as.data.frame(AVERAGE_Prc2targetTPM_ALL)
 
 long_hist <- hist %>%
   select(WT, `cac-1`) %>%
@@ -158,7 +171,7 @@ atrx_stat <- wilcox.test(hist$`ATRX`, hist$WT, alternative = "greater")
 cac1_2_stat <- wilcox.test(hist$`cac-1_cac-2`, hist$WT, alternative = "greater")
 cac1_suz12_stat <- wilcox.test(hist$`cac-1_suz-12`, hist$WT, alternative = "greater")
 suz12_stat <- wilcox.test(hist$`suz-12`, hist$WT, alternative = "greater")
-ash1_stat <- wilcox.test(hist$`ash1`, hist$WT, alternative = "greater")
+ash1_stat <- wilcox.test(hist$`ash-1`, hist$WT, alternative = "greater")
 
 #Make a list of all wilcox results objects
 wilcox_list <- list(set7_stat, cac1_stat, cac2_stat, cac3_stat, naf1_stat, naf2_stat, asf1_stat, atrx_stat, cac1_2_stat, cac1_suz12_stat, suz12_stat, ash1_stat)
@@ -852,6 +865,34 @@ venn.diagram(
   col=c("#8da0cb","#fc8d62"),
   fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
   output=TRUE)
+
+###################################################
+#K27 lost ash1 K27/K36 lost caf1
+venn.diagram(
+  x = list(K27lostash1$gene_id, CAF_K27_K36_Lost$gene_id),
+  category.names = c("ash1 K27 lost", "CAF K27 lost"),
+  filename = "ASH1_CAF1_K27K36lost.png",
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+CAF1_ASH1_K27lost_fit = euler(c("A" = 286, "B" = 53, "A&B" = 176))
+CAF1_ASH1_K27lost_eulerplot <- plot(CAF1_ASH1_K27lost_fit)
+ggsave(filename = "CAF1_ASH1_K27lost.pdf", plot = CAF1_ASH1_K27lost_eulerplot <- plot(CAF1_ASH1_K27lost_fit), width = 4, height = 4, dpi = 600)
+
+#K27 genes upregulated ash1 caf1
+venn.diagram(
+  x = list(ash1_RNA_K27$Attributes, cacupcombinek27$Attributes),
+  category.names = c("ash1 UP", "CAF UP"),
+  filename = 'ASH1_CAF1_K27_UP_genes.png',
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+CAF1_ASH1_K27_UP_fit = euler(c("A" = 148, "B" = 36, "A&B" = 256))
+CAF1_ASH1_K27_UP_eulerplot <- plot(CAF1_ASH1_K27_UP_fit)
+ggsave(filename = "CAF-1_UP_ASH1_UP.pdf", plot = CAF1_ASH1_K27_UP_eulerplot <- plot(CAF1_ASH1_K27_UP_fit), width = 4, height = 4, dpi = 600)
+####################################################
 
 venn.diagram(
   x = list(ash1_RNA_K27$Attributes, set7_RNA_K27$Attributes, K27lost$gene_id),

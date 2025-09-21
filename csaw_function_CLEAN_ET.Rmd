@@ -2256,14 +2256,14 @@ K36scatter = subset(H3K36me3_Results_K27proms_vWT, H3K36me3_Results_K27proms_vWT
 #Example Use (ChIP vs RNA)
 out <- chip_scatter_flex(
   mode        = "chip_vs_rna",
-  chip_df_x   = K36scatter,  # 
+  chip_df_x   = H3K27me3_CS_Results_K27promTSS_vWT,   
   strain_x    = "cac1",
   rna_df      = cac1RNA,                          # RNA for cac1
   up_thresh      =  1,
   down_thresh    = -1,
-  chip_x_label = "K36",                      # label in axes/title
+  chip_x_label = "K27",                      # label in axes/title
   out_dir     = "scatter_outputs",
-  file_prefix = "K36_K27promTSS_vs_RNA_cac1",
+  file_prefix = "K27_K27promTSS_vs_RNA_cac1",
   width_in    = 12, height_in = 9, dpi = 600
 )
 out$gg
@@ -2629,8 +2629,10 @@ write.table(H3K27me3_noCAF1, file = "H3K27me3_CAF1_lost.bed", sep = "\t", quote 
 
 ####i want to subset genes that lose K27 or K36 in cac-1 or cac-2
 K27lost = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac2 < -0.75)
+K27lostash1 = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_K27promTSS_vWT$logFC_ash1 < -0.75)
 #K27lost = subset(K27lost, K27lost$FDR_cac1 < 0.05 | K27lost$FDR_cac2 < 0.05)
 K27lost = subset(regions$K27genes, regions$K27genes$gene_id %in% K27lost$gene_id)
+K27lostash1 = subset(regions$K27genes, regions$K27genes$gene_id %in% K27lostash1$gene_id)
 
 K36lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.75)
 #K36lost = subset(K36lost, K36lost$FDR_cac1 < 0.05 | K36lost$FDR_cac2 < 0.05)
