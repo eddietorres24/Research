@@ -283,6 +283,7 @@ module load deepTools
             --endLabel "TES" \
             --sortRegions no \
             --heatmapHeight 25 \
+            --legendLocation none \
             --colorMap "bwr" \
             --zMin 0 --zMax 3
 
