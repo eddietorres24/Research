@@ -2273,16 +2273,16 @@ out$gg
 out <- chip_scatter_flex(
   mode        = "chip_vs_chip",
   chip_df_x   = H3K36me3_Results_K27genes_proms_vWT,
-  strain_x    = "cac1",
+  strain_x    = "set7",
   chip_df_y   = Kac_Results_K27genes_proms_vWT,
-  strain_y    = "cac1",
+  strain_y    = "set7",
   chip_x_label = "H3K36me3",
   chip_y_label = "Kac",
   chip_diff_thresh = 1,   # needs ≥1 log2 unit advantage to be called dominant
   chip_colors_map  = c(x_dom = "#a65628", y_dom = "#cab2d6", similar = "gray70"),
   chip_legend_title = "Skew (K36 vs Kac)",
   out_dir     = "scatter_outputs",
-  file_prefix = "H3K36me3_vs_Kac_cac1_promoters_genes",
+  file_prefix = "H3K36me3_vs_Kac_set7_promoters_genes",
   width_in    = 12, height_in = 9, dpi = 600
 )
 out$gg
@@ -2669,6 +2669,36 @@ CAF_K27_K36_Lost <- bind_rows(
   # if you want cac1UP to win on collisions, keep this order
   distinct(gene_id, .keep_all = TRUE) %>%
   select(-.source)
+
+
+
+library(dplyr)
+
+# regions$allgenes has columns:
+# V1 (chrom), V2 (start), V3 (end), V6 (strand), gene_id, etc.
+
+allgenes_promTSS <- regions$allgenes %>%
+  mutate(
+    # Compute new start (V2) and end (V3) based on strand
+    V2_new = if_else(V6 == "+",
+                     pmax(V2 - 500L, 1L),         # + strand: [TSS-500, ...]
+                     pmax(V3 - 300L, 1L)          # - strand: [..., TSS-300]
+    ),
+    V3_new = if_else(V6 == "+",
+                     V2 + 300L,                   # + strand: ... , TSS+300]
+                     V3 + 500L                    # - strand: [TSS+500]
+    )
+  ) %>%
+  # Replace original V2/V3 with the new coordinates
+  mutate(V2 = as.integer(V2_new),
+         V3 = as.integer(V3_new)) %>%
+  select(-V2_new, -V3_new)
+
+# quick sanity checks (optional)
+stopifnot(all(allgenes_promTSS$V2 < allgenes_promTSS$V3))   # intervals are valid
+# View unique strands and a few rows
+# dplyr::glimpse(tss_windows)
+
 
 
 ```
