@@ -437,7 +437,7 @@ plotHeatmap -m matrix_K27.mat.gz \
   --startLabel "TSS" \
   --sortRegions descend \
   --sortUsingSamples 1 2 \
-  --heatmapHeight 8 \
+  --heatmapHeight 10 \
   --outFileSortedRegions "$BEDDIR2/K27_order.bed" \
   --legendLocation none \
   --colorList 'white,g,darkgreen' \
@@ -459,7 +459,7 @@ plotHeatmap -m matrix_K36.mat.gz \
   --samplesLabel WT cac-1 \
   --startLabel "TSS" \
   --sortRegions no \
-  --heatmapHeight 8 \
+  --heatmapHeight 10 \
   --legendLocation none \
   --colorMap "afmhot_r" \
   --zMin 0 --zMax 12
@@ -482,7 +482,7 @@ plotHeatmap -m matrix_Kac.mat.gz \
   --samplesLabel WT cac-1 cac-2 set-7 \
   --startLabel "TSS" \
   --sortRegions no \
-  --heatmapHeight 8 \
+  --heatmapHeight 10 \
   --legendLocation none \
   --colorList 'white, lavender, mediumslateblue' \
   --zMin 0 --zMax 8
@@ -505,7 +505,7 @@ plotHeatmap -m matrix_K4_scale.mat.gz \
   --samplesLabel WT cac-1 cac-2 set-7 \
   --startLabel "TSS" --endLabel "TES" \
   --sortRegions no \
-  --heatmapHeight 8 \
+  --heatmapHeight 10 \
   --legendLocation none \
   --colorList 'white, magenta' \
   --zMin 0
