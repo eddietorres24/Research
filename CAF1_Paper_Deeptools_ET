@@ -284,7 +284,7 @@ computeMatrix scale-regions -a 200 -b 200 --regionBodyLength 2000 --scale 2 \
             --sortRegions descend \
             --sortUsingSamples 2 3 4 \
             --outFileSortedRegions $BEDDIR2/K27genes_lost_RNA_order.bed \
-            --heatmapHeight 24 \
+            --heatmapHeight 12 \
             --legendLocation none \
             --colorMap "bwr" \
             --zMin 0 --zMax 3
