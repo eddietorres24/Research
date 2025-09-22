@@ -2635,6 +2635,12 @@ K27lost = subset(regions$K27genes, regions$K27genes$gene_id %in% K27lost$gene_id
 K27lostash1 = subset(regions$K27genes, regions$K27genes$gene_id %in% K27lostash1$gene_id)
 
 K36lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.75)
+K36lost_set7 = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_set7 < -0.75)
+
+K36lost_CAF_ALL = subset(H3K36me3_Results_allgenes_vWT, H3K36me3_Results_allgenes_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_allgenes_vWT$logFC_cac2 < -0.75)
+
+K36lost_CAF_nonK27 = subset(K36lost_CAF_ALL, ! K36lost_CAF_ALL$gene_id %in% K36lost$gene_id)
+
 #K36lost = subset(K36lost, K36lost$FDR_cac1 < 0.05 | K36lost$FDR_cac2 < 0.05)
 K36lost = subset(regions$K27genes, regions$K27genes$gene_id %in% K36lost$gene_id)
 
@@ -2655,7 +2661,6 @@ write.table(K27lost_only, file = "CAF1_K27_lost_only.bed", sep = "\t", quote = F
 write.table(K27_K36retain, file = "CAF1_K36_K27_retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 ######
-K36lost_CAF_ALL = subset(H3K36me3_Results_allgenes_vWT, H3K36me3_Results_allgenes_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_allgenes_vWT$logFC_cac2 < -0.75)
 
 CAF_K27_K36_Lost <- bind_rows(
   mutate(K27lost, .source = "K27lost"),
