@@ -275,7 +275,7 @@ computeMatrix scale-regions -a 200 -b 200 --regionBodyLength 2000 --scale 2 \
          /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_log.bw \
          $RNADIR/SRR7690268/SRR7690268_log.bw \
          $RNADIR/SRR10916163/SRR10916163_log.bw \
-         -R $BEDDIR2/CAF-1_K36lost.bed $BEDDIR2/CAF1_K27_lost_only.bed $BEDDIR2/CAF1_K36_K27_retain.bed --skipZeros --missingDataAsZero -o matrix_PRC2_RNA.gz
+         -R $BEDDIR2/CAF-1_K36lost.bed $BEDDIR2/CAF1_K27_lost_only.bed --skipZeros --missingDataAsZero -o matrix_PRC2_RNA.gz
 
     plotHeatmap -m matrix_PRC2_RNA.gz -out CAF-1_ash1_RNA-seq_K27genes_CAF-1_clustered.pdf \
             --samplesLabel WT cac-1 ash-1 set-7 \
