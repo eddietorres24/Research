@@ -136,6 +136,50 @@ module load deepTools
 #                     --zMin 0 --zMax 50
 #
 # ###Figure 4
+
+
+###############################
+###TESTING
+
+###Kac
+computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+-S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
+   $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
+   $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
+   $P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw \
+-R $BEDDIR2/Kac_Gain_CAF1.bed $BEDDIR2/Kac_Gain_set7.bed $BEDDIR2/Kac_no_change.bed \
+  --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
+
+plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out H3K27me3_CAF-1_Kac_clustered_Kaccluster.pdf \
+  --samplesLabel WT cac-1 cac-2 set-7 \
+  --startLabel "TSS" \
+  --sortRegions descend \
+  --heatmapHeight 24 \
+  --legendLocation none \
+  --colorList 'white, lavender, mediumslateblue' \
+  --zMin 0 --zMax 8
+
+###K4
+computeMatrix scale-regions \
+-S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
+   $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
+   $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
+   $P146DIR/146-23_ChIP_set-7_H3K4me2_Rep1_S23.bin_25.smooth_75Bulk.bw \
+-R $BEDDIR2/K4_Gain_CAF1.bed $BEDDIR2/K4_Gain_set7.bed $BEDDIR2/K4_no_change.bed \
+  --skipZeros --missingDataAsZero -o matrix_CAF-1_K4_clustered.gz
+
+plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K27me3_CAF-1_K4_clustered_K4cluster.pdf \
+  --samplesLabel WT cac-1 cac-2 set-7 \
+  --startLabel "TSS" --endLabel "TES" \
+  --sortRegions descend \
+  --heatmapHeight 24 \
+  --legendLocation none \
+  --colorList 'white, magenta' \
+  --zMin 0
+
+
+##############################3
+
 # ###cluster of K27 & K36 lost genes
 # computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 # -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw \
@@ -270,24 +314,24 @@ module load deepTools
 #                     --zMin 0 --zMax 12
 
 # #RNA-seq
-computeMatrix scale-regions -a 200 -b 200 --regionBodyLength 2000 --scale 2 \
-      -S $RNADIR/SRR8269825/SRR8269825_log.bw \
-         /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_log.bw \
-         $RNADIR/SRR7690268/SRR7690268_log.bw \
-         $RNADIR/SRR10916163/SRR10916163_log.bw \
-         -R $BEDDIR2/CAF-1_K36lost.bed $BEDDIR2/CAF1_K27_lost_only.bed --skipZeros --missingDataAsZero -o matrix_PRC2_RNA.gz
-
-    plotHeatmap -m matrix_PRC2_RNA.gz -out CAF-1_ash1_RNA-seq_K27genes_CAF-1_clustered.pdf \
-            --samplesLabel WT cac-1 ash-1 set-7 \
-            --startLabel "TSS" \
-            --endLabel "TES" \
-            --sortRegions descend \
-            --sortUsingSamples 2 3 4 \
-            --outFileSortedRegions $BEDDIR2/K27genes_lost_RNA_order.bed \
-            --heatmapHeight 12 \
-            --legendLocation none \
-            --colorMap "bwr" \
-            --zMin 0 --zMax 3
+# computeMatrix scale-regions -a 200 -b 200 --regionBodyLength 2000 --scale 2 \
+#       -S $RNADIR/SRR8269825/SRR8269825_log.bw \
+#          /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_log.bw \
+#          $RNADIR/SRR7690268/SRR7690268_log.bw \
+#          $RNADIR/SRR10916163/SRR10916163_log.bw \
+#          -R $BEDDIR2/CAF-1_K36lost.bed $BEDDIR2/CAF1_K27_lost_only.bed --skipZeros --missingDataAsZero -o matrix_PRC2_RNA.gz
+#
+#     plotHeatmap -m matrix_PRC2_RNA.gz -out CAF-1_ash1_RNA-seq_K27genes_CAF-1_clustered.pdf \
+#             --samplesLabel WT cac-1 ash-1 set-7 \
+#             --startLabel "TSS" \
+#             --endLabel "TES" \
+#             --sortRegions descend \
+#             --sortUsingSamples 2 3 4 \
+#             --outFileSortedRegions $BEDDIR2/K27genes_lost_RNA_order.bed \
+#             --heatmapHeight 12 \
+#             --legendLocation none \
+#             --colorMap "bwr" \
+#             --zMin 0 --zMax 3
 
          # $OUTDIR2/SRR10916163_log.bw \
 

@@ -2289,13 +2289,14 @@ out <- chip_scatter_flex(
 out$gg
 
 
+K36genepromscatter = subset(H3K36me3_Results_K27genes_proms_vWT, H3K36me3_Results_K27genes_proms_vWT$gene_id %in% K36scatter$gene_id)
 #Example Use (ChIP vs ChIP)
 out <- chip_scatter_flex(
   mode          = "chip_vs_chip",
-  chip_df_x     = H3K36me3_Results_K27genes_proms_vWT,
-  strain_x      = "cac2",
+  chip_df_x     = K36genepromscatter,
+  strain_x      = "set7",
   chip_df_y     = Kac_Results_K27genes_proms_vWT,
-  strain_y      = "cac2",
+  strain_y      = "set7",
   chip_x_label  = "H3K36me3",
   chip_y_label  = "Kac",
   chip_abs_cutoff        = 0.75,
@@ -2303,7 +2304,7 @@ out <- chip_scatter_flex(
   chip_both_axes_legend  = NULL,
   show_cutoff_guides     = FALSE,
   out_dir       = "scatter_outputs",
-  file_prefix   = "H3K36me3_vs_Kac_cac2_promoters_genes_abs075",
+  file_prefix   = "H3K36me3_vs_Kac_set7_promoters_genes_abs075",
   width_in      = 12, height_in = 9, dpi = 600
 )
 out$gg
@@ -2675,14 +2676,42 @@ write.table(K36lost, file = "CAF-1_K36lost.bed", sep = "\t", quote = FALSE, row.
 write.table(retainK27, file = "CAF-1_K27retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(retainK36, file = "CAF-1_K36retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
 
-#####
+#######################
 K27lost_only = subset(K27lost, ! K27lost$gene_id %in% K36lost$gene_id)
 K27_K36retain = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K36lost$gene_id & ! regions$K27genes$gene_id %in% K27lost$gene_id)
 
 write.table(K27lost_only, file = "CAF1_K27_lost_only.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K27_K36retain, file = "CAF1_K36_K27_retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
-######
+#################
+
+####
+#Gain in active mods
+Kac_genesprom_gain_CAF = subset(Kac_Results_K27genes_proms_vWT, Kac_Results_K27genes_proms_vWT$logFC_cac1 > 0.75 | Kac_Results_K27genes_proms_vWT$logFC_cac2 > 0.75)
+Kac_genesprom_gain_set7 = subset(Kac_Results_K27genes_proms_vWT, Kac_Results_K27genes_proms_vWT$logFC_set7 > 0.75 & ! Kac_Results_K27genes_proms_vWT$gene_id %in% Kac_genesprom_gain_CAF$gene_id)
+Kac_nochange = subset(Kac_Results_K27genes_proms_vWT, ! Kac_Results_K27genes_proms_vWT$gene_id %in% Kac_genesprom_gain_CAF$gene_id & ! Kac_Results_K27genes_proms_vWT$gene_id %in% Kac_genesprom_gain_set7$gene_id)
+
+Kac_Gain_CAF1 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_genesprom_gain_CAF$gene_id)
+Kac_Gain_set7 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_genesprom_gain_set7$gene_id)
+Kac_no_change = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_nochange$gene_id)
+
+write.table(Kac_Gain_CAF1, file = "Kac_Gain_CAF1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(Kac_Gain_set7, file = "Kac_Gain_set7.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(Kac_no_change, file = "Kac_no_change.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+K4_genes_gain_CAF = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_cac1 > 0.75 | H3K4me2_Results_K27genes_vWT$logFC_cac2 > 0.75)
+K4_genes_gain_set7 = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_set7 > 0.75 & ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_genes_gain_CAF$gene_id)
+K4_nochange = subset(H3K4me2_Results_K27genes_vWT, ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_genes_gain_CAF$gene_id & ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_genes_gain_set7$gene_id)
+
+K4_Gain_CAF1 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_CAF$gene_id)
+K4_Gain_set7 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_set7$gene_id)
+K4_no_change = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_nochange$gene_id)
+
+write.table(K4_Gain_CAF1, file = "K4_Gain_CAF1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K4_Gain_set7, file = "K4_Gain_set7.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K4_no_change, file = "K4_no_change.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+#################
 
 CAF_K27_K36_Lost <- bind_rows(
   mutate(K27lost, .source = "K27lost"),
