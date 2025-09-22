@@ -286,7 +286,7 @@ computeMatrix scale-regions -a 200 -b 200 --regionBodyLength 2000 --scale 2 \
             --outFileSortedRegions $BEDDIR2/K27genes_lost_RNA_order.bed \
             --heatmapHeight 24 \
             --legendLocation none \
-            --colorMap "seismic" \
+            --colorMap "bwr" \
             --zMin 0 --zMax 3
 
          # $OUTDIR2/SRR10916163_log.bw \

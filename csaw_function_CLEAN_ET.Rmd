@@ -49,7 +49,7 @@ matLocus <- GRanges("CM002236.1", IRanges(1856288, 1862459)) # mat
 param <- readParam(discard = matLocus, pe="none", max.frag=1500, minq=20 )
 
 #reading in regions of interest
-regions <- list(K27genes_proms = read.table("../bed_files/K27_genes_prom_100pct_overlap.bed"), K27genes = read.table("../bed_files/K27_genes_stringent.bed"), K27proms = read.table("../bed_files/K27_promoters.bed"), K27promTSS = read.table("../bed_files/K27_prom_TSS.bed"), allgenes = read.table("../bed_files/all_genes_forR.bed")) 
+regions <- list(K27genes_proms = read.table("../bed_files/K27_genes_prom_100pct_overlap.bed"), K27genes = read.table("../bed_files/K27_genes_stringent.bed"), K27proms = read.table("../bed_files/K27_promoters.bed"), K27promTSS = read.table("../bed_files/K27_prom_TSS.bed"), allgenes = read.table("../bed_files/all_genes_forR.bed"), allgenes_promTSS = read.table("../bed_files/allgenes_promTSS.bed")) 
 
 new = read.table("../bed_files/H3K27me3_methylated_TSS_Promoters_FINAL.bed")
 
@@ -2026,7 +2026,7 @@ suppressPackageStartupMessages({
   library(tibble)
 })
 
-# Flexible scatter: ChIP vs RNA  OR  ChIP vs ChIP (with skew coloring)
+# Flexible scatter: ChIP vs RNA  OR  ChIP vs ChIP (with BOTH-AXES cutoff coloring by Y sign)
 chip_scatter_flex <- function(
   mode = c("chip_vs_rna","chip_vs_chip"),
 
@@ -2054,10 +2054,20 @@ chip_scatter_flex <- function(
   rna_colors_map = c(up = "red", down = "blue", ns = "gray50"),
   rna_legend_title = "RNA log2FC group",
 
-  # ChIP vs ChIP: color by skew (difference) between modifications
-  chip_diff_thresh = 1,             # threshold on (x - y) in log2 space
-  chip_colors_map  = c(x_dom = "#d62728", y_dom = "#1f77b4", similar = "gray70"),
-  chip_legend_title = "Skew (X vs Y)",
+  # DEPRECATED (kept only so old calls don't error): skew params are ignored in chip_vs_chip mode
+  chip_diff_thresh = NULL,             # deprecated, ignored
+  chip_colors_map  = NULL,             # deprecated, ignored
+  chip_legend_title = NULL,            # deprecated, ignored
+
+  # New: ChIP vs ChIP coloring based on BOTH axes exceeding |cutoff|, colored by the sign of Y
+  chip_abs_cutoff  = 0.75,
+  chip_both_axes_colors = c(pos = "red", neg = "blue", other = "gray70"),
+  chip_both_axes_legend = "Both axes ≥ |cutoff| (color by sign of Y)",
+
+  # Optional guide lines at ±cutoff on both axes
+  show_cutoff_guides = TRUE,
+  guide_linetype     = "dotted",
+  guide_alpha        = 0.7,
 
   # stats / fit
   cor_method     = c("pearson","spearman"),
@@ -2153,18 +2163,20 @@ chip_scatter_flex <- function(
     col_vals <- setNames(as.character(rna_colors_map[c("up","down","ns")]), c("up","down","ns"))
     legend_title <- rna_legend_title
   } else {
-    # skew by difference (x - y) ~ log2 ratio x/y
+    # New rule: color ONLY points where BOTH |x| and |y| exceed the absolute cutoff.
+    # If so, color by the sign of y: red if y >= +cutoff; blue if y <= -cutoff. Otherwise gray.
+    cutoff <- abs(chip_abs_cutoff)
     plot_df <- mutate(plot_df,
-      diff_xy = x - y,
+      pass_both = (abs(x) >= cutoff & abs(y) >= cutoff),
       color_group = case_when(
-        diff_xy >=  chip_diff_thresh ~ "x_dom",
-        diff_xy <= -chip_diff_thresh ~ "y_dom",
-        TRUE                         ~ "similar"
+        pass_both & y >=  cutoff ~ "pos",
+        pass_both & y <= -cutoff ~ "neg",
+        TRUE                     ~ "other"
       )
     )
-    col_vals <- setNames(as.character(chip_colors_map[c("x_dom","y_dom","similar")]),
-                         c("x_dom","y_dom","similar"))
-    legend_title <- chip_legend_title
+    col_vals <- setNames(as.character(chip_both_axes_colors[c("pos","neg","other")]),
+                         c("pos","neg","other"))
+    legend_title <- chip_both_axes_legend
   }
 
   # stats
@@ -2200,6 +2212,14 @@ chip_scatter_flex <- function(
     labs(x = xlab, y = ylab, title = title) +
     annotate("text", x = x_anno, y = y_anno, label = anno_txt, hjust = 0, size = 4)
 
+  # optional cutoff guides
+  if (mode == "chip_vs_chip" && isTRUE(show_cutoff_guides)) {
+    cutoff <- abs(chip_abs_cutoff)
+    p <- p +
+      geom_hline(yintercept = c(-cutoff, cutoff), linetype = guide_linetype, alpha = guide_alpha, inherit.aes = FALSE) +
+      geom_vline(xintercept = c(-cutoff, cutoff), linetype = guide_linetype, alpha = guide_alpha, inherit.aes = FALSE)
+  }
+
   # regression line (global by default)
   if (isTRUE(add_lm) && isTRUE(fit_global)) {
     p <- p + geom_smooth(
@@ -2221,7 +2241,7 @@ chip_scatter_flex <- function(
     default_stem <- if (mode == "chip_vs_rna") {
       paste0("chip", strain_x, "_vs_rna")
     } else {
-      paste0("chip", strain_x, "_vs_chip", strain_y)
+      paste0("chip", strain_x, "_vs_chip", strain_y, "_absCut", gsub("\\.", "p", as.character(abs(chip_abs_cutoff))))
     }
     stem <- file_prefix %||% default_stem
     fmts <- tolower(save_formats)
@@ -2238,7 +2258,7 @@ chip_scatter_flex <- function(
   }
 
   invisible(list(
-    data  = plot_df,   # GeneID, x, y, (diff_xy), color_group
+    data  = plot_df,   # GeneID, x, y, pass_both, color_group
     cor   = list(r = unname(ct$estimate), r2 = as.numeric(r2_s), p = ct$p.value, method = cor_method),
     gg    = p,
     saved = saved,
@@ -2271,19 +2291,20 @@ out$gg
 
 #Example Use (ChIP vs ChIP)
 out <- chip_scatter_flex(
-  mode        = "chip_vs_chip",
-  chip_df_x   = H3K36me3_Results_K27genes_proms_vWT,
-  strain_x    = "set7",
-  chip_df_y   = Kac_Results_K27genes_proms_vWT,
-  strain_y    = "set7",
-  chip_x_label = "H3K36me3",
-  chip_y_label = "Kac",
-  chip_diff_thresh = 1,   # needs ≥1 log2 unit advantage to be called dominant
-  chip_colors_map  = c(x_dom = "#a65628", y_dom = "#cab2d6", similar = "gray70"),
-  chip_legend_title = "Skew (K36 vs Kac)",
-  out_dir     = "scatter_outputs",
-  file_prefix = "H3K36me3_vs_Kac_set7_promoters_genes",
-  width_in    = 12, height_in = 9, dpi = 600
+  mode          = "chip_vs_chip",
+  chip_df_x     = H3K36me3_Results_K27genes_proms_vWT,
+  strain_x      = "cac2",
+  chip_df_y     = Kac_Results_K27genes_proms_vWT,
+  strain_y      = "cac2",
+  chip_x_label  = "H3K36me3",
+  chip_y_label  = "Kac",
+  chip_abs_cutoff        = 0.75,
+  chip_both_axes_colors  = c(pos = "red", neg = "blue", other = "gray70"),
+  chip_both_axes_legend  = NULL,
+  show_cutoff_guides     = FALSE,
+  out_dir       = "scatter_outputs",
+  file_prefix   = "H3K36me3_vs_Kac_cac2_promoters_genes_abs075",
+  width_in      = 12, height_in = 9, dpi = 600
 )
 out$gg
 
@@ -2594,6 +2615,7 @@ write.table(K36_lost_bed, file = "CAF-1_H3K36me3_lost_K27_genes.bed", sep = "\t"
 write.table(K36_not_lost_bed, file = "CAF-1_H3K36me3_not_lost_K27_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 #Subset files from bed file function (later in script). Here, I am pulling out all genes that don't have H3K36 in ash-1, and that aren't in K27 regions
+###NOTE: I CALCULATED OVER THE WHOLE GENE BODY HERE
 gr_wt   <- GRanges(H3K36me3_allgenes_vInput_WT_BED$seqnames,
                    IRanges(H3K36me3_allgenes_vInput_WT_BED$start + 1,
                            H3K36me3_allgenes_vInput_WT_BED$end))
@@ -2669,36 +2691,5 @@ CAF_K27_K36_Lost <- bind_rows(
   # if you want cac1UP to win on collisions, keep this order
   distinct(gene_id, .keep_all = TRUE) %>%
   select(-.source)
-
-
-
-library(dplyr)
-
-# regions$allgenes has columns:
-# V1 (chrom), V2 (start), V3 (end), V6 (strand), gene_id, etc.
-
-allgenes_promTSS <- regions$allgenes %>%
-  mutate(
-    # Compute new start (V2) and end (V3) based on strand
-    V2_new = if_else(V6 == "+",
-                     pmax(V2 - 500L, 1L),         # + strand: [TSS-500, ...]
-                     pmax(V3 - 300L, 1L)          # - strand: [..., TSS-300]
-    ),
-    V3_new = if_else(V6 == "+",
-                     V2 + 300L,                   # + strand: ... , TSS+300]
-                     V3 + 500L                    # - strand: [TSS+500]
-    )
-  ) %>%
-  # Replace original V2/V3 with the new coordinates
-  mutate(V2 = as.integer(V2_new),
-         V3 = as.integer(V3_new)) %>%
-  select(-V2_new, -V3_new)
-
-# quick sanity checks (optional)
-stopifnot(all(allgenes_promTSS$V2 < allgenes_promTSS$V3))   # intervals are valid
-# View unique strands and a few rows
-# dplyr::glimpse(tss_windows)
-
-
 
 ```
