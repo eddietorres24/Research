@@ -2272,9 +2272,9 @@ out$gg
 #Example Use (ChIP vs ChIP)
 out <- chip_scatter_flex(
   mode        = "chip_vs_chip",
-  chip_df_x   = H3K36me3_Results_K27genes_proms_vWT,  # X = H3K27me3
+  chip_df_x   = H3K36me3_Results_K27genes_proms_vWT,
   strain_x    = "cac1",
-  chip_df_y   = Kac_Results_K27genes_proms_vWT,  # Y = H3K36me3
+  chip_df_y   = Kac_Results_K27genes_proms_vWT,
   strain_y    = "cac1",
   chip_x_label = "H3K36me3",
   chip_y_label = "Kac",
@@ -2282,7 +2282,7 @@ out <- chip_scatter_flex(
   chip_colors_map  = c(x_dom = "#a65628", y_dom = "#cab2d6", similar = "gray70"),
   chip_legend_title = "Skew (K36 vs Kac)",
   out_dir     = "scatter_outputs",
-  file_prefix = "H3K27me3_vs_Kac_cac1_promoters_genes",
+  file_prefix = "H3K36me3_vs_Kac_cac1_promoters_genes",
   width_in    = 12, height_in = 9, dpi = 600
 )
 out$gg

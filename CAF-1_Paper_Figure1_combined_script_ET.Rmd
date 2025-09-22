@@ -993,6 +993,19 @@ CAF1_ASH1_K27_UP_fit = euler(c("A" = 148, "B" = 36, "A&B" = 256))
 CAF1_ASH1_K27_UP_eulerplot <- plot(CAF1_ASH1_K27_UP_fit)
 ggsave(filename = "CAF-1_UP_ASH1_UP.pdf", plot = CAF1_ASH1_K27_UP_eulerplot <- plot(CAF1_ASH1_K27_UP_fit), width = 4, height = 4, dpi = 600)
 
+#K27 genes upregulated ash1 set7
+venn.diagram(
+  x = list(ash1_RNA_K27$Attributes, set7_RNA_K27$Attributes),
+  category.names = c("ash1 UP", "set7 UP"),
+  filename = 'ASH1_set7_K27_UP_genes.png',
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+SET7_ASH1_K27_UP_fit = euler(c("A" = 172, "B" = 83, "A&B" = 232))
+SET7_ASH1_K27_UP_eulerplot <- plot(SET7_ASH1_K27_UP_fit)
+ggsave(filename = "SET7_UP_ASH1_UP.pdf", plot = SET7_ASH1_K27_UP_eulerplot <- plot(SET7_ASH1_K27_UP_fit), width = 4, height = 4, dpi = 600)
+
 #K27 genes upregulated CAF1 K36 lost
 venn.diagram(
   x = list(K36lost$gene_id, cacupcombinek27$Attributes),
