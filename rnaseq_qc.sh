@@ -12,7 +12,6 @@
 
 set -euo pipefail
 cd "$SLURM_SUBMIT_DIR"
-module load R || true
 
 # ---------- user-editable inputs (relative to this folder) ----------
 export COUNTS_FILE="readcounts_All_CAF1paper.merged.txt"
@@ -24,12 +23,26 @@ export REFERENCE_LEVEL="WT"
 export MIN_COUNT_FILTER=10
 # -------------------------------------------------------------------
 
-# Ensure a user R lib exists and auto-install missing packages (if net is allowed)
-export R_LIBS_USER="${HOME}/R/%V"
-mkdir -p "$(Rscript -e 'cat(path.expand(Sys.getenv("R_LIBS_USER")))')"
-Rscript -e 'pkgs <- c("DESeq2","apeglm","pheatmap","data.table","dplyr","tibble","ggplot2","tidyr","ggrepel");
-            if (!requireNamespace("BiocManager", quietly=TRUE)) install.packages("BiocManager", repos="https://cloud.r-project.org");
-            BiocManager::install(pkgs[!sapply(pkgs, requireNamespace, quietly=TRUE)], ask=FALSE, update=FALSE)'
+# ---- Load Miniconda and ensure an environment with Bioc pkgs exists (Sapelo2 supports conda) ----
+module load Miniconda3 || module load Anaconda3 || true   # Sapelo2 docs use Miniconda3
+# Make env name stable
+ENV_NAME="rnaseq-qc"
+
+# Create env once if missing (R 4.4 works well with DESeq2 on conda)
+if ! conda env list | awk '{print $1}' | grep -qx "$ENV_NAME"; then
+  conda create -y -n "$ENV_NAME" -c conda-forge -c bioconda \
+    r-base=4.4 \
+    bioconductor-deseq2 \
+    bioconductor-apeglm \
+    bioconductor-summarizedexperiment \
+    bioconductor-delayedarray \
+    bioconductor-s4arrays \
+    bioconductor-sparsearray \
+    r-pheatmap r-data.table r-tidyverse r-ggrepel
+fi
+
+# Activate env
+source activate "$ENV_NAME" 2>/dev/null || conda activate "$ENV_NAME"
 
 # ------------------------------- R ---------------------------------
 Rscript - <<'RSCRIPT'
@@ -76,11 +89,10 @@ coldata <- coldata[colnames(counts_df), , drop=FALSE]
 if ("condition" %in% names(coldata)) {
   coldata$condition <- factor(coldata$condition)
   if (reference_level %in% levels(coldata$condition)) {
-    coldata$condition <- relevel(coldata$condition, ref = reference_level)
+    coldata$condition <- stats::relevel(coldata$condition, ref = reference_level)
   }
 } else warning("'condition' missing; using ~1 design (no contrasts).")
 
-# optional gene map
 gene_map <- NULL
 if (file.exists(gene_map_file)) {
   gm <- read.csv(gene_map_file, stringsAsFactors = FALSE)
@@ -89,7 +101,6 @@ if (file.exists(gene_map_file)) {
   }
 }
 
-# optional K27 list
 k27_ids <- NULL
 if (file.exists(k27_bed_file)) {
   bed <- tryCatch(read.delim(k27_bed_file, header = FALSE, stringsAsFactors = FALSE), error=function(e) NULL)
@@ -117,7 +128,6 @@ qc_tbl <- tibble(sample_id = names(lib_sizes),
                  size_factor = as.numeric(sizeFactors(dds)))
 write.csv(qc_tbl, file.path(qcdir, "sample_qc_metrics.csv"), row.names = FALSE)
 
-# barplots
 p1 <- ggplot(qc_tbl, aes(reorder(sample_id, library_size), library_size, fill = coldata$condition))+
   geom_col()+coord_flip()+labs(x="Sample", y="Library size", fill="condition")+theme_minimal(11)
 ggsave(file.path(figdir,"library_sizes.pdf"), p1, width=7.5, height=6, useDingbats=FALSE)
@@ -126,14 +136,12 @@ p2 <- ggplot(qc_tbl, aes(reorder(sample_id, detected_genes), detected_genes, fil
   geom_col()+coord_flip()+labs(x="Sample", y="Detected genes (>0)", fill="condition")+theme_minimal(11)
 ggsave(file.path(figdir,"detected_genes.pdf"), p2, width=7.5, height=6, useDingbats=FALSE)
 
-# matrices
 norm_counts <- counts(dds, normalized = TRUE)
 write.csv(norm_counts, file.path(tbldir, "normalized_counts.csv"))
 write.csv(as.data.frame(counts(dds)), file.path(tbldir, "raw_counts_filtered.csv"))
 write.csv(tibble(sample_id = names(sizeFactors(dds)), size_factor = sizeFactors(dds)),
           file.path(tbldir, "size_factors.csv"), row.names = FALSE)
 
-# normalized-count violin (all genes)
 log_norm <- log10(norm_counts + 1)
 ln_df <- as.data.frame(log_norm) |>
   rownames_to_column("gene_id") |>
@@ -167,10 +175,8 @@ dds <- DESeq(dds)
 
 pdf(file.path(figdir,"dispersion_plot.pdf"), width=6, height=5, useDingbats=TRUE); plotDispEsts(dds); dev.off()
 
-if (!"condition" %in% names(coldata)) {
-  warning("No 'condition' column; skipping contrasts.")
-} else {
-  ref <- levels(coldata$condition)[1]  # after relevel, this should be REFERENCE_LEVEL
+ref <- if ("condition" %in% names(coldata)) levels(coldata$condition)[1] else NA_character_
+if (!is.na(ref)) {
   for (lvl in setdiff(levels(coldata$condition), ref)) {
     res <- results(dds, contrast = c("condition", lvl, ref), alpha = 0.05)
     res_df <- as.data.frame(res) |> rownames_to_column("gene_id")
@@ -180,10 +186,10 @@ if (!"condition" %in% names(coldata)) {
       res_shr <- lfcShrink(dds, coef = coef_name, type = "apeglm")
       res_shr_df <- as.data.frame(res_shr) |> rownames_to_column("gene_id")
       names(res_shr_df)[names(res_shr_df)=="log2FoldChange"] <- "log2FoldChange_shrunk"
-      res_df <- left_join(res_df, res_shr_df[, c("gene_id","log2FoldChange_shrunk")], by="gene_id")
+      res_df <- dplyr::left_join(res_df, res_shr_df[, c("gene_id","log2FoldChange_shrunk")], by="gene_id")
     } else res_df$log2FoldChange_shrunk <- NA_real_
 
-    if (!is.null(gene_map)) res_df <- left_join(res_df, gene_map, by="gene_id")
+    if (!is.null(gene_map)) res_df <- dplyr::left_join(res_df, gene_map, by="gene_id")
     write.csv(res_df, file.path(tbldir, paste0("DE_results_", lvl, "_vs_", ref, ".csv")), row.names = FALSE)
 
     pdf(file.path(figdir, paste0("MA_", lvl, "_vs_", ref, ".pdf")), width=6.2, height=5.2, useDingbats=TRUE)
