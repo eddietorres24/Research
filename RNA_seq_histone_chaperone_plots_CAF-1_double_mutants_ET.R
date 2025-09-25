@@ -91,10 +91,11 @@ Prc2targets <- read.table("./bed_files/K27_genes_stringent.bed", header=FALSE, s
 ###SUBSET DATA FOR ALL KO SAMPLES
 Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,10])
 #genes i had to rename in my bed file due to spaces
-hsp <- allDataTPM[rownames(allDataTPM) == "hsp30-like protein", ]
 lac <- allDataTPM[rownames(allDataTPM) == "laccase precursor", ]
+
 #add back missing genes
 Prc2targetTPM <- rbind(Prc2targetTPM, hsp, lac)
+
 #rename rows of added genes
 rownames(Prc2targetTPM)[rownames(Prc2targetTPM) == "hsp"] <- "hsp30-like protein"
 rownames(Prc2targetTPM)[rownames(Prc2targetTPM) == "lac"] <- "laccase precursor"

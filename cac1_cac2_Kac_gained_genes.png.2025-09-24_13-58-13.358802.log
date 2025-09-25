@@ -1,0 +1,18 @@
+INFO [2025-09-24 13:58:13] $x
+INFO [2025-09-24 13:58:13] list(Kac_genesprom_gain_cac1$gene_id, Kac_genesprom_gain_cac2$gene_id)
+INFO [2025-09-24 13:58:13] 
+INFO [2025-09-24 13:58:13] $category.names
+INFO [2025-09-24 13:58:13] c("cac-1 gained", "cac-2 gained")
+INFO [2025-09-24 13:58:13] 
+INFO [2025-09-24 13:58:13] $filename
+INFO [2025-09-24 13:58:13] [1] "cac1_cac2_Kac_gained_genes.png"
+INFO [2025-09-24 13:58:13] 
+INFO [2025-09-24 13:58:13] $col
+INFO [2025-09-24 13:58:13] c("#8da0cb", "#fc8d62")
+INFO [2025-09-24 13:58:13] 
+INFO [2025-09-24 13:58:13] $fill
+INFO [2025-09-24 13:58:13] c(alpha("#8da0cb", 0.25), alpha("#fc8d62", 0.25))
+INFO [2025-09-24 13:58:13] 
+INFO [2025-09-24 13:58:13] $output
+INFO [2025-09-24 13:58:13] [1] TRUE
+INFO [2025-09-24 13:58:13] 

@@ -51,7 +51,7 @@ param <- readParam(discard = matLocus, pe="none", max.frag=1500, minq=20 )
 #reading in regions of interest
 regions <- list(K27genes_proms = read.table("../bed_files/K27_genes_prom_100pct_overlap.bed"), K27genes = read.table("../bed_files/K27_genes_stringent.bed"), K27proms = read.table("../bed_files/K27_promoters.bed"), K27promTSS = read.table("../bed_files/K27_prom_TSS.bed"), allgenes = read.table("../bed_files/all_genes_forR.bed"), allgenes_promTSS = read.table("../bed_files/allgenes_promTSS.bed")) 
 
-new = read.table("../bed_files/H3K27me3_methylated_TSS_Promoters_FINAL.bed")
+new = read.table("../bed_files/H3K27me3_methylated_genes_FINAL.bed")
 
 regions$K27promTSS = subset(regions$K27promTSS, regions$K27promTSS$V10 %in% new$V10)
 regions$K27proms = subset(regions$K27proms, regions$K27proms$V10 %in% new$V10)
@@ -339,7 +339,6 @@ csaw_count_and_fit <- function(
 
   if (return_list) return(out) else invisible(NULL)
 }
-
 
 ```
 
@@ -1014,7 +1013,7 @@ csaw_analysis(
   write_igv   = FALSE,
   mask_region = FALSE,
   out_dir     = "TEST", #output dir, name whatever you want
-  merge_tol   = 300                   # only affects genomewide window mode
+  merge_tol   = 300                   # only affects genome-wide window mode
 )
 
 ```
@@ -2026,26 +2025,27 @@ suppressPackageStartupMessages({
   library(tibble)
 })
 
-# Flexible scatter: ChIP vs RNA  OR  ChIP vs ChIP (with BOTH-AXES cutoff coloring by Y sign)
+# Flexible scatter: ChIP vs RNA  OR  ChIP vs ChIP
+# chip_vs_chip supports directional cutoffs (choose which sides count)
 chip_scatter_flex <- function(
   mode = c("chip_vs_rna","chip_vs_chip"),
 
   # --- inputs shared / aligned by gene id ---
-  gene_col       = "gene_id",          # gene id column inside ChIP dfs
+  gene_col       = "gene_id",
 
   # X axis (ChIP set A)
-  chip_df_x,                        # ChIP df for X (e.g., H3K27me3 promoters)
-  strain_x,                         # e.g., "cac1"
-  chip_col_x     = NULL,            # auto-detect "logFC_<strain_x>"
+  chip_df_x,
+  strain_x,
+  chip_col_x     = NULL,
 
-  # Y axis (depends on mode)
+  # Y axis
   # mode="chip_vs_rna"
-  rna_df         = NULL,            # rownames = gene IDs, has rna_col
+  rna_df         = NULL,
   rna_col        = "log2FoldChange",
   # mode="chip_vs_chip"
-  chip_df_y      = NULL,            # second ChIP df (e.g., H3K36me3 promoters)
-  strain_y       = NULL,            # strain for Y
-  chip_col_y     = NULL,            # auto-detect "logFC_<strain_y>"
+  chip_df_y      = NULL,
+  strain_y       = NULL,
+  chip_col_y     = NULL,
 
   # --- coloring ---
   # ChIP vs RNA: color by RNA magnitude
@@ -2054,18 +2054,21 @@ chip_scatter_flex <- function(
   rna_colors_map = c(up = "red", down = "blue", ns = "gray50"),
   rna_legend_title = "RNA log2FC group",
 
-  # DEPRECATED (kept only so old calls don't error): skew params are ignored in chip_vs_chip mode
-  chip_diff_thresh = NULL,             # deprecated, ignored
-  chip_colors_map  = NULL,             # deprecated, ignored
-  chip_legend_title = NULL,            # deprecated, ignored
+  # ChIP vs ChIP: independent cutoffs per axis (directional)
+  chip_x_cutoff = 0.75,
+  chip_y_cutoff = 0.75,
 
-  # New: ChIP vs ChIP coloring based on BOTH axes exceeding |cutoff|, colored by the sign of Y
-  chip_abs_cutoff  = 0.75,
-  chip_both_axes_colors = c(pos = "red", neg = "blue", other = "gray70"),
-  chip_both_axes_legend = "Both axes ≥ |cutoff| (color by sign of Y)",
+  # Which sides of each axis are considered “passing” the cutoff?
+  # Any subset of: "x_neg","x_pos","y_neg","y_pos".
+  # Defaults to all four (equivalent to absolute value on both axes).
+  chip_cut_use   = c("x_neg","x_pos","y_neg","y_pos"),
 
-  # Optional guide lines at ±cutoff on both axes
+  chip_cut_colors = c(both = "red", x_only = "#a65628", y_only = "#1f77b4", neither = "gray70"),
+  chip_cut_legend = "Cutoffs (X vs Y)",
+
+  # Optional guide lines (by default draw the same sides as chip_cut_use)
   show_cutoff_guides = TRUE,
+  guide_sides        = NULL,   # if NULL, uses chip_cut_use
   guide_linetype     = "dotted",
   guide_alpha        = 0.7,
 
@@ -2085,17 +2088,17 @@ chip_scatter_flex <- function(
   xlab           = NULL,
   ylab           = NULL,
   title          = NULL,
-  chip_x_label   = NULL,            # e.g., "H3K27me3"
-  chip_y_label   = NULL,            # e.g., "H3K36me3"
+  chip_x_label   = NULL,
+  chip_y_label   = NULL,
 
-  # axes (no data drop)
+  # axes
   xlim           = NULL,
   ylim           = NULL,
 
   # hygiene
   drop_na        = TRUE,
 
-  # output (same style as your heatmap helper)
+  # output
   out_dir        = NULL,
   file_prefix    = NULL,
   save_formats   = c("pdf","png"),
@@ -2126,7 +2129,7 @@ chip_scatter_flex <- function(
   x_tbl <- chip_df_x %>%
     transmute(GeneID = .data[[gene_col]], x = suppressWarnings(as.numeric(.data[[chip_col_x]])))
 
-  # Y: depends on mode
+  # Y
   if (mode == "chip_vs_rna") {
     if (is.null(rna_df)) stop("Provide rna_df for mode='chip_vs_rna'.")
     if (is.null(rownames(rna_df))) stop("rna_df must have rownames as gene IDs.")
@@ -2136,9 +2139,7 @@ chip_scatter_flex <- function(
       rownames_to_column("GeneID") %>%
       transmute(GeneID, y = suppressWarnings(as.numeric(.data[[rna_col]])))
   } else {
-    if (is.null(chip_df_y) || is.null(strain_y)) {
-      stop("Provide chip_df_y and strain_y for mode='chip_vs_chip'.")
-    }
+    if (is.null(chip_df_y) || is.null(strain_y)) stop("Provide chip_df_y and strain_y for mode='chip_vs_chip'.")
     stopifnot(gene_col %in% names(chip_df_y))
     if (is.null(chip_col_y)) chip_col_y <- pick_chip_col(chip_df_y, strain_y)
     stopifnot(chip_col_y %in% names(chip_df_y))
@@ -2163,34 +2164,41 @@ chip_scatter_flex <- function(
     col_vals <- setNames(as.character(rna_colors_map[c("up","down","ns")]), c("up","down","ns"))
     legend_title <- rna_legend_title
   } else {
-    # New rule: color ONLY points where BOTH |x| and |y| exceed the absolute cutoff.
-    # If so, color by the sign of y: red if y >= +cutoff; blue if y <= -cutoff. Otherwise gray.
-    cutoff <- abs(chip_abs_cutoff)
+    # Directional passing logic based on chip_cut_use
+    cx <- abs(chip_x_cutoff); cy <- abs(chip_y_cutoff)
+    use <- unique(chip_cut_use)
+
+    pass_x <- rep(FALSE, nrow(plot_df))
+    if ("x_neg" %in% use) pass_x <- pass_x | (plot_df$x <= -cx)
+    if ("x_pos" %in% use) pass_x <- pass_x | (plot_df$x >=  cx)
+
+    pass_y <- rep(FALSE, nrow(plot_df))
+    if ("y_neg" %in% use) pass_y <- pass_y | (plot_df$y <= -cy)
+    if ("y_pos" %in% use) pass_y <- pass_y | (plot_df$y >=  cy)
+
     plot_df <- mutate(plot_df,
-      pass_both = (abs(x) >= cutoff & abs(y) >= cutoff),
+      pass_x = pass_x,
+      pass_y = pass_y,
       color_group = case_when(
-        pass_both & y >=  cutoff ~ "pos",
-        pass_both & y <= -cutoff ~ "neg",
-        TRUE                     ~ "other"
+        pass_x & pass_y ~ "both",
+        pass_x & !pass_y ~ "x_only",
+        !pass_x & pass_y ~ "y_only",
+        TRUE ~ "neither"
       )
     )
-    col_vals <- setNames(as.character(chip_both_axes_colors[c("pos","neg","other")]),
-                         c("pos","neg","other"))
-    legend_title <- chip_both_axes_legend
+    col_vals <- setNames(as.character(chip_cut_colors[c("both","x_only","y_only","neither")]),
+                         c("both","x_only","y_only","neither"))
+    legend_title <- chip_cut_legend
   }
 
   # stats
   ct   <- suppressWarnings(cor.test(plot_df$x, plot_df$y, method = cor_method))
-  r2_s <- sprintf("%.2f", unname(ct$estimate)^2)  # always 2 decimals
+  r2_s <- sprintf("%.2f", unname(ct$estimate)^2)
   pval <- signif(ct$p.value, 3)
 
   # labels & title
   x_comp <- chip_x_label %||% paste0("ChIP (", strain_x, ")")
-  if (mode == "chip_vs_rna") {
-    y_comp <- "RNA"
-  } else {
-    y_comp <- chip_y_label %||% paste0("ChIP (", strain_y, ")")
-  }
+  y_comp <- if (mode == "chip_vs_rna") "RNA" else (chip_y_label %||% paste0("ChIP (", strain_y, ")"))
   if (is.null(xlab)) xlab <- paste0(x_comp, " log2FC")
   if (is.null(ylab)) ylab <- paste0(y_comp, " log2FC")
   if (is.null(title)) {
@@ -2212,12 +2220,14 @@ chip_scatter_flex <- function(
     labs(x = xlab, y = ylab, title = title) +
     annotate("text", x = x_anno, y = y_anno, label = anno_txt, hjust = 0, size = 4)
 
-  # optional cutoff guides
+  # cutoff guides (draw only selected sides; default = chip_cut_use)
   if (mode == "chip_vs_chip" && isTRUE(show_cutoff_guides)) {
-    cutoff <- abs(chip_abs_cutoff)
-    p <- p +
-      geom_hline(yintercept = c(-cutoff, cutoff), linetype = guide_linetype, alpha = guide_alpha, inherit.aes = FALSE) +
-      geom_vline(xintercept = c(-cutoff, cutoff), linetype = guide_linetype, alpha = guide_alpha, inherit.aes = FALSE)
+    cx <- abs(chip_x_cutoff); cy <- abs(chip_y_cutoff)
+    sides <- unique(guide_sides %||% chip_cut_use)
+    if ("y_neg" %in% sides) p <- p + geom_hline(yintercept = -cy, linetype = guide_linetype, alpha = guide_alpha)
+    if ("y_pos" %in% sides) p <- p + geom_hline(yintercept =  cy, linetype = guide_linetype, alpha = guide_alpha)
+    if ("x_neg" %in% sides) p <- p + geom_vline(xintercept = -cx, linetype = guide_linetype, alpha = guide_alpha)
+    if ("x_pos" %in% sides) p <- p + geom_vline(xintercept =  cx, linetype = guide_linetype, alpha = guide_alpha)
   }
 
   # regression line (global by default)
@@ -2241,7 +2251,7 @@ chip_scatter_flex <- function(
     default_stem <- if (mode == "chip_vs_rna") {
       paste0("chip", strain_x, "_vs_rna")
     } else {
-      paste0("chip", strain_x, "_vs_chip", strain_y, "_absCut", gsub("\\.", "p", as.character(abs(chip_abs_cutoff))))
+      paste0("chip", strain_x, "_vs_chip", strain_y)
     }
     stem <- file_prefix %||% default_stem
     fmts <- tolower(save_formats)
@@ -2258,7 +2268,7 @@ chip_scatter_flex <- function(
   }
 
   invisible(list(
-    data  = plot_df,   # GeneID, x, y, pass_both, color_group
+    data  = plot_df,
     cor   = list(r = unname(ct$estimate), r2 = as.numeric(r2_s), p = ct$p.value, method = cor_method),
     gg    = p,
     saved = saved,
@@ -2276,39 +2286,48 @@ K36scatter = subset(H3K36me3_Results_K27proms_vWT, H3K36me3_Results_K27proms_vWT
 #Example Use (ChIP vs RNA)
 out <- chip_scatter_flex(
   mode        = "chip_vs_rna",
-  chip_df_x   = H3K27me3_CS_Results_K27promTSS_vWT,   
-  strain_x    = "cac1",
-  rna_df      = cac1RNA,                          # RNA for cac1
+  chip_df_x   = Kac_Results_K27genes_proms_vWT,   
+  strain_x    = "set7",
+  rna_df      = set7RNA,                          # RNA df
   up_thresh      =  1,
   down_thresh    = -1,
-  chip_x_label = "K27",                      # label in axes/title
+  chip_x_label = "Kac",                      # label in axes/title
   out_dir     = "scatter_outputs",
-  file_prefix = "K27_K27promTSS_vs_RNA_cac1",
+  file_prefix = "Kac_vs_RNA_set7_K27_genes_proms",
   width_in    = 12, height_in = 9, dpi = 600
 )
 out$gg
 
 
 K36genepromscatter = subset(H3K36me3_Results_K27genes_proms_vWT, H3K36me3_Results_K27genes_proms_vWT$gene_id %in% K36scatter$gene_id)
+
+K27lostscatter = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_K27promTSS_vWT$gene_id %in% K27lost$gene_id)
+
 #Example Use (ChIP vs ChIP)
 out <- chip_scatter_flex(
   mode          = "chip_vs_chip",
-  chip_df_x     = K36genepromscatter,
+  chip_df_x     = H3K36me3_Results_K27promTSS_vWT,
   strain_x      = "set7",
   chip_df_y     = Kac_Results_K27genes_proms_vWT,
   strain_y      = "set7",
   chip_x_label  = "H3K36me3",
   chip_y_label  = "Kac",
-  chip_abs_cutoff        = 0.75,
-  chip_both_axes_colors  = c(pos = "red", neg = "blue", other = "gray70"),
-  chip_both_axes_legend  = NULL,
-  show_cutoff_guides     = FALSE,
+  chip_x_cutoff   = 0.75,
+  chip_y_cutoff   = 0.75,
+  # Only consider left-of −0.75 on X and above +0.75 on Y:
+  chip_cut_use     = c("x_neg","y_pos"),
+  chip_cut_colors  = c(both = "red", x_only = "#a65628", y_only = "#cab2d6", neither = "gray70"),
+  # Draw the same two guides; nothing in the unused quadrants, so axes won’t blow out
+  show_cutoff_guides = TRUE,
+  guide_sides        = NULL,   # NULL => uses chip_cut_use
   out_dir       = "scatter_outputs",
-  file_prefix   = "H3K36me3_vs_Kac_set7_promoters_genes_abs075",
+  file_prefix   = "H3K36me3_vs_Kac_set7_promoters_genes",
   width_in      = 12, height_in = 9, dpi = 600
 )
 out$gg
 
+#a65628
+#4daf4a
 
 #View what your plotting
 View(out$data)  
@@ -2657,6 +2676,9 @@ K27lostash1 = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_K27
 K27lost = subset(regions$K27genes, regions$K27genes$gene_id %in% K27lost$gene_id)
 K27lostash1 = subset(regions$K27genes, regions$K27genes$gene_id %in% K27lostash1$gene_id)
 
+#only coding genes (i.e. no tRNA or rRNA genes)
+K27lost_nocode = subset(K27lost, ! K27lost$gene_id %in% rownames(allDataTPM))
+
 K36lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.75)
 K36lost_set7 = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_set7 < -0.75)
 
@@ -2688,37 +2710,84 @@ write.table(K27_K36retain, file = "CAF1_K36_K27_retain.bed", sep = "\t", quote =
 ####
 #Gain in active mods
 Kac_genesprom_gain_CAF = subset(Kac_Results_K27genes_proms_vWT, Kac_Results_K27genes_proms_vWT$logFC_cac1 > 0.75 | Kac_Results_K27genes_proms_vWT$logFC_cac2 > 0.75)
-Kac_genesprom_gain_set7 = subset(Kac_Results_K27genes_proms_vWT, Kac_Results_K27genes_proms_vWT$logFC_set7 > 0.75 & ! Kac_Results_K27genes_proms_vWT$gene_id %in% Kac_genesprom_gain_CAF$gene_id)
+
+Kac_genesprom_gain_cac1 = subset(Kac_Results_K27genes_proms_vWT, Kac_Results_K27genes_proms_vWT$logFC_cac1 > 0.75)
+Kac_genesprom_gain_cac2 = subset(Kac_Results_K27genes_proms_vWT, Kac_Results_K27genes_proms_vWT$logFC_cac2 > 0.75)
+
+Kac_genesprom_gain_set7 = subset(Kac_Results_K27genes_proms_vWT, Kac_Results_K27genes_proms_vWT$logFC_set7 > 0.75 )
+
 Kac_nochange = subset(Kac_Results_K27genes_proms_vWT, ! Kac_Results_K27genes_proms_vWT$gene_id %in% Kac_genesprom_gain_CAF$gene_id & ! Kac_Results_K27genes_proms_vWT$gene_id %in% Kac_genesprom_gain_set7$gene_id)
 
 Kac_Gain_CAF1 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_genesprom_gain_CAF$gene_id)
+Kac_Gain_cac1 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_genesprom_gain_cac1$gene_id)
+Kac_Gain_cac2 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_genesprom_gain_cac2$gene_id)
 Kac_Gain_set7 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_genesprom_gain_set7$gene_id)
 Kac_no_change = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_nochange$gene_id)
 
 write.table(Kac_Gain_CAF1, file = "Kac_Gain_CAF1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(Kac_Gain_cac1, file = "Kac_Gain_cac1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(Kac_Gain_cac2, file = "Kac_Gain_cac2.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(Kac_Gain_set7, file = "Kac_Gain_set7.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(Kac_no_change, file = "Kac_no_change.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 K4_genes_gain_CAF = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_cac1 > 0.75 | H3K4me2_Results_K27genes_vWT$logFC_cac2 > 0.75)
-K4_genes_gain_set7 = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_set7 > 0.75 & ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_genes_gain_CAF$gene_id)
+K4_genes_gain_set7 = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_set7 > 0.75)
 K4_nochange = subset(H3K4me2_Results_K27genes_vWT, ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_genes_gain_CAF$gene_id & ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_genes_gain_set7$gene_id)
 
+K4_genes_gain_cac1 = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_cac1 > 0.75)
+K4_genes_gain_cac2 = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_cac2 > 0.75)
+
 K4_Gain_CAF1 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_CAF$gene_id)
+K4_Gain_cac1 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_cac1$gene_id)
+K4_Gain_cac2 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_cac2$gene_id)
 K4_Gain_set7 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_set7$gene_id)
 K4_no_change = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_nochange$gene_id)
 
 write.table(K4_Gain_CAF1, file = "K4_Gain_CAF1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_set7, file = "K4_Gain_set7.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_no_change, file = "K4_no_change.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K4_Gain_cac1, file = "K4_Gain_cac1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K4_Gain_cac2, file = "K4_Gain_cac2.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+#Gains only within genes that lose K27 or K36
+Kac_CAF1_Gain_K27K36lostgenes = subset(CAF_K27_K36_Lost, CAF_K27_K36_Lost$gene_id %in% Kac_genesprom_gain_CAF$gene_id)
+K4_CAF1_Gain_K27K36lostgenes = subset(CAF_K27_K36_Lost, CAF_K27_K36_Lost$gene_id %in% K4_genes_gain_CAF$gene_id)
+Kac_CAF1_Gain_K27lostgenes = subset(K27lost, K27lost$gene_id %in% Kac_genesprom_gain_CAF$gene_id)
+K4_CAF1_Gain_K27lostgenes = subset(K27lost, K27lost$gene_id %in% K4_genes_gain_CAF$gene_id)
+
+Kac_set7_Gain_K27K36lostgenes = subset(CAF_K27_K36_Lost, CAF_K27_K36_Lost$gene_id %in% Kac_genesprom_gain_set7$gene_id)
+K4_set7_Gain_K27K36lostgenes = subset(CAF_K27_K36_Lost, CAF_K27_K36_Lost$gene_id %in% K4_genes_gain_set7$gene_id)
+Kac_set7_Gain_K27lostgenes = subset(K27lost, K27lost$gene_id %in% Kac_genesprom_gain_set7$gene_id)
+K4_set7_Gain_K27lostgenes = subset(K27lost, K27lost$gene_id %in% K4_genes_gain_set7$gene_id)
+  
+Kac_set7_Gain_K27K36lostgenes_noCAF = subset(CAF_K27_K36_Lost, CAF_K27_K36_Lost$gene_id %in% Kac_genesprom_gain_set7$gene_id & ! CAF_K27_K36_Lost$gene_id %in% Kac_genesprom_gain_CAF$gene_id)
+K4_set7_Gain_K27K36lostgenes_noCAF =  subset(CAF_K27_K36_Lost, CAF_K27_K36_Lost$gene_id %in% K4_genes_gain_set7$gene_id & ! CAF_K27_K36_Lost$gene_id %in% K4_genes_gain_CAF$gene_id)
 
 #################
 
-CAF_K27_K36_Lost <- bind_rows(
-  mutate(K27lost, .source = "K27lost"),
-  mutate(K36lost, .source = "K36lost")
+Kac_K4_set7_Gain <- bind_rows(
+  mutate(Kac_genesprom_gain_set7, .source = "Kac_genesprom_gain_set7"),
+  mutate(K4_genes_gain_set7, .source = "K4_genes_gain_set7")
 ) %>%
   # if you want cac1UP to win on collisions, keep this order
   distinct(gene_id, .keep_all = TRUE) %>%
   select(-.source)
+
+Kac_K4_CAF_Gain <- bind_rows(
+  mutate(Kac_genesprom_gain_CAF, .source = "Kac_genesprom_gain_CAF"),
+  mutate(K4_genes_gain_CAF, .source = "K4_genes_gain_CAF")
+) %>%
+  # if you want cac1UP to win on collisions, keep this order
+  distinct(gene_id, .keep_all = TRUE) %>%
+  select(-.source)
+
+Kac_K4_cac2_Gain <- bind_rows(
+  mutate(Kac_genesprom_gain_cac2, .source = "Kac_genesprom_gain_cac2"),
+  mutate(K4_genes_gain_cac2, .source = "K4_genes_gain_cac2")
+) %>%
+  # if you want cac1UP to win on collisions, keep this order
+  distinct(gene_id, .keep_all = TRUE) %>%
+  select(-.source)
+
 
 ```

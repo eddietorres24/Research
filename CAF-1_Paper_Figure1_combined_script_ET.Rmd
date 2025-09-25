@@ -940,7 +940,7 @@ cac1_suz12RNA_K27 = read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1_suz12__al
 #FIGURE 2
 #Patterns of genes that lose H3K27me3 in CAF-1 mutants
 venn.diagram(
-  x = list(K27lost$gene_id, cacupcombinek27$Attributes),
+  x = list(K27lost_code$gene_id, cacupcombinek27$Attributes),
   category.names = c("K27_lost", "K27lost_CAF_UP"),
   filename = "K27lost_CAF-1_UP.png",
   col=c("#8da0cb","#fc8d62"),
@@ -950,6 +950,9 @@ venn.diagram(
 CAF1_K27_lost_UP_fit = euler(c("A" = 53, "B" = 145, "A&B" = 147))
 CAF1_K27_lost_UP_eulerplot <- plot(CAF1_K27_lost_UP_fit)
 ggsave(filename = "CAF1_K27_lost_UP.pdf", plot = CAF1_K27_lost_UP_eulerplot, width = 4, height = 4, dpi = 600)
+
+K27lost_cac1cac2UP = subset(K27lost_code, K27lost_code$gene_id %in% cacupcombinek27$Attributes)
+K27lost_set7UP = subset(K27lost_code, K27lost_code$gene_id %in% set7_RNA_K27$Attributes)
 
 venn.diagram(
   x = list(K27lost_set7UP$gene_id, K27lost_cac1cac2UP$gene_id),
@@ -1031,9 +1034,63 @@ venn.diagram(
 CAF1_SET7_K36lost_fit = euler(c("A" = 79, "B" = 28, "A&B" = 13))
 CAF1_SET7_K36lost_eulerplot <- plot(CAF1_SET7_K36lost_fit)
 ggsave(filename = "CAF1_SET7_K36lost.pdf", plot = CAF1_SET7_K36lost_eulerplot, width = 4, height = 4, dpi = 600)
+####################################################
+
+#####################################################
+#FIGURE 4
+venn.diagram(
+  x = list(Kac_K4_CAF_Gain$gene_id, cacupcombinek27$Attributes, K27lost$gene_id),
+  category.names = c("CAF gained", "CAF UP", "K27lost"),
+  filename = 'CAF1_Kac_K4_gained_Upreg_genes.png',
+  col=c("#8da0cb","#756bb1","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#756bb1",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+Kac_K4_gain_K27lost_CAF_Up_fit = euler(c("A" = 21, "B" = 35, "C" = 129, "A&B" = 18, "A&C" = 16, "B&C" = 86, "A&B&C" = 61))
+Kac_K4_gain_K27lost_CAF_Up_eulerplot <- plot(Kac_K4_gain_K27lost_CAF_Up_fit)
+ggsave(filename = "Kac_K4_gain_K27lost_CAF_Up.pdf", plot = Kac_K4_gain_K27lost_CAF_Up_eulerplot, width = 4, height = 4, dpi = 600)
+
+venn.diagram(
+  x = list(Kac_K4_CAF_Gain$gene_id, Kac_K4_set7_Gain$gene_id),
+  category.names = c("CAF gained", "SET7 gained"),
+  filename = 'CAF1_set7_Kac_K4me2_gained_genes.png',
+  col=c("#8da0cb","#756bb1"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#756bb1",0.25)),
+  output=TRUE)
+
+CAF1_SET7_K27lost_Kac_K4_Gain_fit = euler(c("A" = 82, "B" = 44, "A&B" = 34))
+CAF1_SET7_K27lost_Kac_K4_Gain_eulerplot <- plot(CAF1_SET7_K27lost_Kac_K4_Gain_fit)
+ggsave(filename = "CAF1_SET7_Kac_K4_Gain.pdf", plot = CAF1_SET7_K27lost_Kac_K4_Gain_eulerplot, width = 4, height = 4, dpi = 600)
+
+venn.diagram(
+  x = list(Kac_K4_CAF_Gain$gene_id, K36lost$gene_id),
+  category.names = c("CAF Kac/K4 gained", "CAF K36 lost"),
+  filename = 'CAF1_Kac_gained_K36me3_lost_genes.png',
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+CAF1_Kac_K4_Gain_K36_lost_fit = euler(c("A" = 79, "B" = 55, "A&B" = 37))
+CAF1_Kac_K4_Gain_K36_lost_eulerplot <- plot(CAF1_Kac_K4_Gain_K36_lost_fit)
+ggsave(filename = "CAF1_Kac_K4_Gain_K36_lost.pdf", plot = CAF1_Kac_K4_Gain_K36_lost_eulerplot, width = 4, height = 4, dpi = 600)
+
+venn.diagram(
+  x = list(Kac_K4_cac1_Gain$gene_id, Kac_K4_cac2_Gain$gene_id),
+  category.names = c("cac-1 gained", "cac-2 gained"),
+  filename = 'cac1_cac2_Kac_K4_gained_genes.png',
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+cac1_cac2_Kac_K4_gained_fit = euler(c("A" = 80, "B" = 2, "A&B" = 34))
+cac1_cac2_Kac_K4_gained_eulerplot <- plot(cac1_cac2_Kac_K4_gained_fit)
+ggsave(filename = "cac1_cac2_Kac_K4_gained.pdf", plot = cac1_cac2_Kac_K4_gained_eulerplot, width = 4, height = 4, dpi = 600)
 
 ####################################################
 
+
+#######################################################
+#FIGURE 5
 ###Double Mutants
 venn.diagram(
   x = list(cac1_cac2RNA_K27$Attributes, cacupcombinek27$Attributes),
