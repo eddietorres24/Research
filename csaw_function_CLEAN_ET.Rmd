@@ -2677,6 +2677,7 @@ K27lost = subset(regions$K27genes, regions$K27genes$gene_id %in% K27lost$gene_id
 K27lostash1 = subset(regions$K27genes, regions$K27genes$gene_id %in% K27lostash1$gene_id)
 
 #only coding genes (i.e. no tRNA or rRNA genes)
+K27lost_code = subset(K27lost, K27lost$gene_id %in% rownames(allDataTPM))
 K27lost_nocode = subset(K27lost, ! K27lost$gene_id %in% rownames(allDataTPM))
 
 K36lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.75)
@@ -2764,6 +2765,7 @@ Kac_set7_Gain_K27K36lostgenes_noCAF = subset(CAF_K27_K36_Lost, CAF_K27_K36_Lost$
 K4_set7_Gain_K27K36lostgenes_noCAF =  subset(CAF_K27_K36_Lost, CAF_K27_K36_Lost$gene_id %in% K4_genes_gain_set7$gene_id & ! CAF_K27_K36_Lost$gene_id %in% K4_genes_gain_CAF$gene_id)
 
 #################
+#Combine dfs and remove duplicate rows
 
 Kac_K4_set7_Gain <- bind_rows(
   mutate(Kac_genesprom_gain_set7, .source = "Kac_genesprom_gain_set7"),
@@ -2781,12 +2783,12 @@ Kac_K4_CAF_Gain <- bind_rows(
   distinct(gene_id, .keep_all = TRUE) %>%
   select(-.source)
 
-Kac_K4_cac2_Gain <- bind_rows(
-  mutate(Kac_genesprom_gain_cac2, .source = "Kac_genesprom_gain_cac2"),
-  mutate(K4_genes_gain_cac2, .source = "K4_genes_gain_cac2")
+cacupcombinek27 <- bind_rows(
+  mutate(cac1_K27, .source = "cac1_K27"),
+  mutate(cac2_K27, .source = "cac2_K27")
 ) %>%
   # if you want cac1UP to win on collisions, keep this order
-  distinct(gene_id, .keep_all = TRUE) %>%
+  distinct(Attributes, .keep_all = TRUE) %>%
   select(-.source)
 
 

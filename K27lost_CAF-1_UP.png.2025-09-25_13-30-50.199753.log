@@ -1,0 +1,18 @@
+INFO [2025-09-25 13:30:50] $x
+INFO [2025-09-25 13:30:50] list(K27lost_code$gene_id, cacupcombinek27$Attributes)
+INFO [2025-09-25 13:30:50] 
+INFO [2025-09-25 13:30:50] $category.names
+INFO [2025-09-25 13:30:50] c("K27_lost", "K27lost_CAF_UP")
+INFO [2025-09-25 13:30:50] 
+INFO [2025-09-25 13:30:50] $filename
+INFO [2025-09-25 13:30:50] [1] "K27lost_CAF-1_UP.png"
+INFO [2025-09-25 13:30:50] 
+INFO [2025-09-25 13:30:50] $col
+INFO [2025-09-25 13:30:50] c("#8da0cb", "#fc8d62")
+INFO [2025-09-25 13:30:50] 
+INFO [2025-09-25 13:30:50] $fill
+INFO [2025-09-25 13:30:50] c(alpha("#8da0cb", 0.25), alpha("#fc8d62", 0.25))
+INFO [2025-09-25 13:30:50] 
+INFO [2025-09-25 13:30:50] $output
+INFO [2025-09-25 13:30:50] [1] TRUE
+INFO [2025-09-25 13:30:50] 
