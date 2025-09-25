@@ -10,21 +10,29 @@
 #SBATCH --output=rnaseq_qc_all.%j.out
 #SBATCH --error=rnaseq_qc_all.%j.err
 
+set -euo pipefail
 cd "$SLURM_SUBMIT_DIR"
 module load R || true
 
-# --- ensure user lib & install missing packages ---
-R_LIBS_USER="${HOME}/R/%V"
-export R_LIBS_USER
+# ---------- user-editable inputs (relative to this folder) ----------
+export COUNTS_FILE="readcounts_All_CAF1paper.merged.txt"
+export COLDATA_FILE="coldata.csv"
+export GENE_MAP_FILE="gene_annotation.csv"                 # optional
+export K27_BED_FILE="H3K27me3_methylated_genes_FINAL.bed"  # optional
+export OUTDIR="RNAseq_QC_out"
+export REFERENCE_LEVEL="WT"
+export MIN_COUNT_FILTER=10
+# -------------------------------------------------------------------
+
+# Ensure a user R lib exists and auto-install missing packages (if net is allowed)
+export R_LIBS_USER="${HOME}/R/%V"
 mkdir -p "$(Rscript -e 'cat(path.expand(Sys.getenv("R_LIBS_USER")))')"
 Rscript -e 'pkgs <- c("DESeq2","apeglm","pheatmap","data.table","dplyr","tibble","ggplot2","tidyr","ggrepel");
             if (!requireNamespace("BiocManager", quietly=TRUE)) install.packages("BiocManager", repos="https://cloud.r-project.org");
-            BiocManager::install(pkgs[!sapply(pkgs, requireNamespace, quietly=TRUE)],
-                                 ask=FALSE, update=FALSE)'
+            BiocManager::install(pkgs[!sapply(pkgs, requireNamespace, quietly=TRUE)], ask=FALSE, update=FALSE)'
 
-# ... your existing heredoc Rscript starts here ...
+# ------------------------------- R ---------------------------------
 Rscript - <<'RSCRIPT'
-# ---------------- R starts here ----------------
 suppressPackageStartupMessages({
   library(DESeq2); library(data.table); library(dplyr); library(tibble)
   library(ggplot2); library(pheatmap); library(readr); library(stringr); library(tidyr)
@@ -32,7 +40,6 @@ suppressPackageStartupMessages({
 have_ggrepel <- requireNamespace("ggrepel", quietly = TRUE)
 have_apeglm  <- requireNamespace("apeglm",  quietly = TRUE)
 
-# pull bash vars
 counts_file      <- Sys.getenv("COUNTS_FILE")
 coldata_file     <- Sys.getenv("COLDATA_FILE")
 gene_map_file    <- Sys.getenv("GENE_MAP_FILE")
@@ -82,7 +89,7 @@ if (file.exists(gene_map_file)) {
   }
 }
 
-# optional K27 list (read now, plot later if wanted)
+# optional K27 list
 k27_ids <- NULL
 if (file.exists(k27_bed_file)) {
   bed <- tryCatch(read.delim(k27_bed_file, header = FALSE, stringsAsFactors = FALSE), error=function(e) NULL)
@@ -143,11 +150,9 @@ write.csv(as.data.frame(assay(vsd)), file.path(tbldir, "vst_matrix.csv"))
 
 pca_df <- DESeq2::plotPCA(vsd, intgroup = intersect(c("condition","type","batch"), colnames(coldata)), returnData = TRUE)
 percentVar <- round(100 * attr(pca_df, "percentVar"))
-p_pca <- ggplot(pca_df, aes(PC1, PC2, color = condition, label = name)) +
-  geom_point(size = 3)
+p_pca <- ggplot(pca_df, aes(PC1, PC2, color = condition, label = name)) + geom_point(size = 3)
 if (have_ggrepel) p_pca <- p_pca + ggrepel::geom_text_repel(size = 3, max.overlaps = 50)
-p_pca <- p_pca + labs(x=paste0("PC1: ", percentVar[1], "%"), y=paste0("PC2: ", percentVar[2], "%"), color="condition") +
-  theme_minimal(12)
+p_pca <- p_pca + labs(x=paste0("PC1: ", percentVar[1], "%"), y=paste0("PC2: ", percentVar[2], "%"), color="condition") + theme_minimal(12)
 ggsave(file.path(figdir,"PCA_vst.pdf"), p_pca, width=6.5, height=5.5, useDingbats=FALSE)
 
 cm <- cor(assay(vsd), method="pearson")
@@ -165,11 +170,7 @@ pdf(file.path(figdir,"dispersion_plot.pdf"), width=6, height=5, useDingbats=TRUE
 if (!"condition" %in% names(coldata)) {
   warning("No 'condition' column; skipping contrasts.")
 } else {
-  levs <- setdiff(levels(coldata$condition), levels(coldata$condition)[1])  # keep vs ref
-  ref  <- levels(coldata$condition)[1]
-  # if ref isn't your desired reference, DESeq2 earlier already relevelled to REFERENCE_LEVEL
-  ref  <- levels(coldata$condition)[1]
-
+  ref <- levels(coldata$condition)[1]  # after relevel, this should be REFERENCE_LEVEL
   for (lvl in setdiff(levels(coldata$condition), ref)) {
     res <- results(dds, contrast = c("condition", lvl, ref), alpha = 0.05)
     res_df <- as.data.frame(res) |> rownames_to_column("gene_id")
@@ -198,5 +199,4 @@ if (!"condition" %in% names(coldata)) {
 
 writeLines(c(capture.output(sessionInfo())), con = file.path(outdir, "sessionInfo.txt"))
 message("\nDone. Outputs in: ", normalizePath(outdir))
-# ---------------- R ends here ----------------
 RSCRIPT
