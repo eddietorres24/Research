@@ -1027,10 +1027,15 @@ make_csaw_heatmap_clusterby <- function(
   df,
   plot_cols        = NULL,
   cluster_by       = c("cac1","cac2"),
-  collapse_mutants = FALSE,
-  fold_cutoff      = 1,                 # set NULL to derive from zero_white_band
+  collapse_mutants = FALSE,     # kept for backwards-compat; ignored in "by_no_signal_per_strain"
+  fold_cutoff      = 1,         # used only in "loss_gain_pair" mode
   sort_reference   = c("WT"),
   sort_decreasing  = TRUE,
+
+  # NEW: choose how rows are split
+  split_mode       = c("auto", "by_no_signal_per_strain", "loss_gain_pair"),
+  # NEW: threshold for "no signal" in vInput-style matrices (<= threshold == no signal)
+  signal_threshold = 0,
 
   cap_percentile   = 0.995,
   clip_negatives_to_zero = FALSE,
@@ -1040,8 +1045,8 @@ make_csaw_heatmap_clusterby <- function(
   show_row_names   = FALSE,
   show_col_names   = TRUE,
   cluster_cols     = FALSE,
-  row_slice_gap_mm = 0,   # 0 = no gaps between clusters
-  col_slice_gap_mm = 1,   # only used if you ever use column_split
+  row_slice_gap_mm = 0,
+  col_slice_gap_mm = 1,
   out_dir   = "csaw_heatmaps",
   out_stem  = "csaw_heatmap_clusterby",
   formats   = c("pdf","png"),
@@ -1051,6 +1056,8 @@ make_csaw_heatmap_clusterby <- function(
   dpi       = 300,
   return_objects = TRUE
 ){
+  `%||%` <- function(a,b) if (!is.null(a)) a else b
+
   stopifnot(is.data.frame(df))
   lfccols <- grep("^logFC_", names(df), value = TRUE)
   if (!length(lfccols)) stop("No 'logFC_*' columns found.")
@@ -1073,15 +1080,10 @@ make_csaw_heatmap_clusterby <- function(
   M <- M_all[, paste0("logFC_", plot_cols), drop = FALSE]
   colnames(M) <- plot_cols
 
-  # derive cutoff from zero_white_band if requested
-  cut <- if (is.null(fold_cutoff)) {
-    if (!is.null(zero_white_band)) {
-      if (length(zero_white_band) == 1) abs(zero_white_band) else max(abs(zero_white_band))
-    } else {
-      1
-    }
-  } else {
-    as.numeric(fold_cutoff)
+  # choose split mode
+  split_mode <- match.arg(split_mode)
+  if (split_mode == "auto") {
+    split_mode <- if (length(cluster_by) == 2L) "loss_gain_pair" else "by_no_signal_per_strain"
   }
 
   # cap & clip for plotting only
@@ -1093,139 +1095,74 @@ make_csaw_heatmap_clusterby <- function(
 
   # Build an 'orig' matrix only for strains that actually exist
   want_for_orig <- unique(c(plot_cols, cluster_by, sort_reference))
-  have_for_orig <- intersect(want_for_orig, strains_all)  # drop missing (e.g., WT in vWT frames)
+  have_for_orig <- intersect(want_for_orig, strains_all)
   if (!length(have_for_orig)) stop("No usable columns found for internal logic.")
   orig <- M_all[, paste0("logFC_", have_for_orig), drop = FALSE]
   colnames(orig) <- have_for_orig
 
-  # Ensure cluster_by present in 'orig'
-  if (!all(cluster_by %in% colnames(orig))) {
-    stop("cluster_by strains are not present in df columns: ",
-         paste(setdiff(cluster_by, colnames(orig)), collapse = ", "))
-  }
+  # ----- Build row splits -----
+  # We'll fill these: 'row_split' (either vector or data.frame) and 'ord' (row order)
+  row_split <- NULL
+  ord <- seq_len(nrow(M))
 
-  # state map using 'cut'
-  state_for <- function(strains) {
-    vals <- orig[, strains, drop = FALSE]
-    d <- matrix(0L, nrow(vals), ncol(vals), dimnames = dimnames(vals))
-    d[vals <= -abs(cut)] <- -1L  # loss
-    d[vals >=  abs(cut)] <-  1L  # gain
-    d
-  }
-  state_cluster <- state_for(cluster_by)
-
-  # clusters
-  cluster_labels <- character(nrow(M))
-  if (!collapse_mutants) {
-    if (length(cluster_by) != 2L) {
+  if (split_mode == "loss_gain_pair") {
+    if (length(cluster_by) != 2L)
       stop("separate mode requires exactly two 'cluster_by' strains. Given: ", paste(cluster_by, collapse = ", "))
-    }
+
+    cut <- as.numeric(fold_cutoff %||% 1)
     a <- cluster_by[1]; b <- cluster_by[2]
-    sA <- state_cluster[, a]; sB <- state_cluster[, b]
+    valsA <- orig[, a]; valsB <- orig[, b]
+    sA <- ifelse(valsA <= -abs(cut), -1L, ifelse(valsA >= abs(cut), 1L, 0L))
+    sB <- ifelse(valsB <= -abs(cut), -1L, ifelse(valsB >= abs(cut), 1L, 0L))
 
     lab <- rep("other", nrow(M))
     lab[sA == -1L & sB == -1L] <- sprintf("loss in both (%s & %s)", a, b)
     lab[sA == -1L & sB ==  0L] <- sprintf("loss in %s only", a)
     lab[sA ==  0L & sB == -1L] <- sprintf("loss in %s only", b)
     lab[sA ==  0L & sB ==  0L] <- sprintf("kept in both (%s & %s)", a, b)
-
     lvl <- c(sprintf("loss in both (%s & %s)", a, b),
              sprintf("loss in %s only", a),
              sprintf("loss in %s only", b),
              sprintf("kept in both (%s & %s)", a, b),
              "other")
-    cluster_labels <- factor(lab, levels = lvl, ordered = TRUE)
-  } else {
-    targets <- setdiff(cluster_by, "WT"); if (!length(targets)) targets <- cluster_by
-    st <- state_cluster[, targets, drop = FALSE]
-    loss_any <- apply(st == -1L, 1, any, na.rm = TRUE)
-    keep_all <- apply(st ==  0L, 1, all, na.rm = TRUE)
-    gain_any <- apply(st ==  1L, 1, any, na.rm = TRUE)
+    row_split <- factor(lab, levels = lvl, ordered = TRUE)
 
-    lab <- rep("other", nrow(M))
-    lab[loss_any] <- sprintf("loss in any (%s)", paste(targets, collapse = " | "))
-    lab[!loss_any & keep_all] <- sprintf("kept in all (%s)", paste(targets, collapse = " & "))
-    lab[!loss_any & !keep_all & gain_any] <- sprintf("gain in any (%s)", paste(targets, collapse = " | "))
+    # simple within-cluster ordering by mean of remaining cluster_by (or sort_reference)
+    scores <- rowMeans(orig[, intersect(plot_cols, colnames(orig)), drop = FALSE], na.rm = TRUE)
+    o <- order(row_split, -scores)  # cluster blocks first, then by score
+    ord <- ord[o]
+    row_split <- row_split[o]
 
-    lvl <- c(sprintf("loss in any (%s)", paste(targets, collapse = " | ")),
-             sprintf("kept in all (%s)", paste(targets, collapse = " & ")),
-             sprintf("gain in any (%s)", paste(targets, collapse = " | ")),
-             "other")
-    cluster_labels <- factor(lab, levels = lvl, ordered = TRUE)
+  } else if (split_mode == "by_no_signal_per_strain") {
+    # For each strain s in cluster_by, split rows into "no signal in s" (<= threshold) vs "signal in s" (> threshold).
+    # This produces nested splits in the order of 'cluster_by'.
+    split_df <- lapply(cluster_by, function(s) {
+      v <- orig[, s]
+      no_sig <- !is.na(v) & v <= signal_threshold
+      factor(ifelse(no_sig, paste0("no signal in ", s),
+                           paste0("signal in ", s)),
+             levels = c(paste0("no signal in ", s),
+                        paste0("signal in ", s)), ordered = TRUE)
+    })
+    names(split_df) <- cluster_by
+    split_df <- as.data.frame(split_df, check.names = FALSE)
+
+    # Order rows lexicographically by those factors, then within each terminal bin by mean signal across plot_cols
+    # (higher signal first unless sort_decreasing = FALSE)
+    # Build a matrix of integer codes for fast ordering:
+    code_mat <- sapply(split_df, as.integer)
+    # fallback score: mean across available plot cols
+    score <- rowMeans(orig[, intersect(plot_cols, colnames(orig)), drop = FALSE], na.rm = TRUE)
+    # composite order: by each split column then by score
+    o <- do.call(order, c(as.data.frame(code_mat), list(order(score, decreasing = sort_decreasing, na.last = TRUE))))
+    ord <- ord[o]
+    row_split <- split_df[o, , drop = FALSE]
   }
 
-  # ordering inside each cluster
-  cluster_levels <- levels(cluster_labels)
-
-  # predefine exclusions for separate mode
-  excl_by_cluster <- list()
-  if (!collapse_mutants && length(cluster_by) == 2L) {
-    a <- cluster_by[1]; b <- cluster_by[2]
-    excl_by_cluster[[sprintf("loss in both (%s & %s)", a, b)]] <- c(a, b)
-    excl_by_cluster[[sprintf("loss in %s only", a)]]           <- c(a)
-    excl_by_cluster[[sprintf("loss in %s only", b)]]           <- c(b)
-    excl_by_cluster[[sprintf("kept in both (%s & %s)", a, b)]] <- character(0)
-    excl_by_cluster[["other"]]                                  <- character(0)
-  }
-
-  # helpers
-  get_vals <- function(rows, use_cols) {
-    if (!length(use_cols)) return(matrix(numeric(0), nrow = length(rows)))
-    use_cols <- intersect(use_cols, colnames(orig))
-    if (!length(use_cols)) return(matrix(numeric(0), nrow = length(rows)))
-    orig[rows, use_cols, drop = FALSE]
-  }
-
-  ord <- integer(0)
-  split_for_ht <- cluster_labels
-
-  for (cl in cluster_levels) {
-    idx <- which(cluster_labels == cl)
-    if (!length(idx)) next
-
-    cols_for_sort <- cluster_by
-
-    if (!collapse_mutants && length(cluster_by) == 2L) {
-      to_exclude <- unique(excl_by_cluster[[cl]] %||% character(0))
-      cols_for_sort <- setdiff(cols_for_sort, to_exclude)
-    }
-
-    scores <- rep(NA_real_, length(idx))
-
-    if (!collapse_mutants) {
-      # simple mean across allowed cluster_by columns; if none, try sort_reference; else mean of cluster_by
-      if (length(cols_for_sort)) {
-        scores <- rowMeans(get_vals(idx, cols_for_sort), na.rm = TRUE)
-      }
-      if (all(is.na(scores))) {
-        ref_cols <- intersect(sort_reference, colnames(orig))
-        if (length(ref_cols)) scores <- rowMeans(get_vals(idx, ref_cols), na.rm = TRUE)
-        if (all(is.na(scores))) scores <- rowMeans(get_vals(idx, cluster_by), na.rm = TRUE)
-      }
-    } else {
-      # collapse mode: per-row, drop lost targets from scoring
-      targets <- setdiff(cluster_by, "WT"); if (!length(targets)) targets <- cluster_by
-      st_rows <- state_cluster[idx, , drop = FALSE]
-      for (i in seq_along(idx)) {
-        keep_cols <- cols_for_sort
-        lost_here <- names(which(st_rows[i, targets, drop = FALSE] == -1L))
-        keep_cols <- setdiff(keep_cols, lost_here)
-        if (!length(keep_cols)) {
-          ref_cols <- intersect(sort_reference, colnames(orig))
-          keep_cols <- if (length(ref_cols)) ref_cols else cluster_by
-        }
-        scores[i] <- mean(orig[idx[i], intersect(keep_cols, colnames(orig))], na.rm = TRUE)
-      }
-    }
-
-    o <- order(scores, decreasing = sort_decreasing, na.last = TRUE)
-    ord <- c(ord, idx[o])
-  }
-
+  # Reorder matrix and splits
   M <- M[ord, , drop = FALSE]
-  split_for_ht <- split_for_ht[ord]
 
-  # colors
+  # ----- Colors -----
   lims <- if (is.null(color_limits)) {
     c(min(M, na.rm = TRUE), max(M, na.rm = TRUE))
   } else {
@@ -1237,12 +1174,11 @@ make_csaw_heatmap_clusterby <- function(
     out
   }
 
-  # build color function (supports optional white band around 0)
   if (is.function(colors)) {
     col_fun <- colors
   } else if (!is.null(zero_white_band) && lims[1] < 0 && lims[2] > 0) {
     band <- if (length(zero_white_band) == 1) c(-abs(zero_white_band), abs(zero_white_band))
-            else sort(as.numeric(zero_white_band))[1:2]
+    else sort(as.numeric(zero_white_band))[1:2]
     neg_col <- if (is.null(colors)) "#3B4CC0" else colors[[1]]
     pos_col <- if (is.null(colors)) "#B40426" else tail(colors, 1)
     mid_col <- "white"
@@ -1270,6 +1206,7 @@ make_csaw_heatmap_clusterby <- function(
     }
   }
 
+  # ----- Build and write heatmap -----
   ht <- Heatmap(
     M,
     name = "signal",
@@ -1278,7 +1215,7 @@ make_csaw_heatmap_clusterby <- function(
     cluster_columns = cluster_cols,
     show_row_names = show_row_names,
     show_column_names = show_col_names,
-    row_split = split_for_ht,
+    row_split = row_split,              # vector OR data.frame (nested split)
     row_gap    = unit(row_slice_gap_mm, "mm"),
     column_gap = unit(col_slice_gap_mm, "mm"),
     use_raster = TRUE, raster_quality = 4
@@ -1304,7 +1241,7 @@ make_csaw_heatmap_clusterby <- function(
   if (return_objects) invisible(list(
     matrix = M,
     row_order = rownames(M),
-    split_labels = as.character(split_for_ht),
+    split_labels = row_split,
     heatmap = ht
   ))
 }
@@ -1330,15 +1267,27 @@ make_csaw_heatmap_clusterby(
 
 make_csaw_heatmap_clusterby(
   df           = H3K27me3_CS_Heatmap_K27promTSS_vInput,
-  plot_cols    = c("WT","cac1","cac2","ash1"),
-  cluster_by   = c("WT","cac1","cac2"),  # WT included but collapse ignores it when deciding loss/keep/gain
-  collapse_mutants = TRUE,               # yields: loss in any (cac1|cac2), kept in all, gain in any
+  plot_cols    = c("WT","cac1","cac2","cac3","set7"),
+  cluster_by   = c("WT","cac1","cac2","cac3"),  # WT included but collapse ignores it when deciding loss/keep/gain
+  collapse_mutants = FALSE,               # yields: loss in any (cac1|cac2), kept in all, gain in any
   fold_cutoff  = 1,
   sort_reference = "WT",                 # nice fallback for 'loss in any' rows where both mutants are lost
   clip_negatives_to_zero = FALSE,        # set TRUE if you want strictly non-negative plotting
   colors       = c("white","#006400"),
   color_limits = c(0, NA),
-  out_stem = "H3K27me3_vInput_collapse_mutants"
+  out_stem = "H3K27me3_vInput_CAF-1"
+)
+
+###########
+make_csaw_heatmap_clusterby(
+  df         = H3K27me3_CS_Heatmap_K27promTSS_vInput,
+  plot_cols  = c("WT","cac1","cac2","cac3","set7"),
+  cluster_by = c("WT","cac1","cac2","cac3","set7"),  # order of sequential splits
+  split_mode = "by_no_signal_per_strain",
+  signal_threshold = 0,           # <= 0 is "no signal"
+  colors       = c("white","#006400"),
+  color_limits = c(0, NA),
+  out_stem     = "H3K27me3_vInput_CAF-1"
 )
 
 ```
@@ -1353,10 +1302,10 @@ set7RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/set7__alpha0.05__ALL_resu
 ash1RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/ash1__alpha0.05__ALL_results_LFC.csv", row.names = 1)
 
 #RNA coloring function for colorbrwer RdBu heatmap
-rng <- c(-2, 2)
-pal  <- colorRampPalette(rev(brewer.pal(7, "RdBu")))(100)  # includes white in the middle
-vals <- seq(rng[1], rng[2], length.out = length(pal))
-rna_col_fun <- colorRamp2(vals, pal)
+#rng <- c(-2, 2)
+#pal  <- colorRampPalette(rev(brewer.pal(7, "RdBu")))(100)  # includes white in the middle
+#vals <- seq(rng[1], rng[2], length.out = length(pal))
+#rna_col_fun <- colorRamp2(vals, pal)
 
 #Plot heatmap with ChIP & RNA-seq log2FC
 
@@ -1953,39 +1902,21 @@ out <- make_chip_rna_heatmap_simple(
   write_plotted_rows = TRUE
 )
 
-
-manual_sort = list(
-    "K36 lost"       = list(on="chip", chip="K36", strains=c("cac1","cac2"), decreasing=FALSE),
-    "K27 lost only"  = list(on="chip", chip="K27", strains=c("cac1","cac2"), decreasing=FALSE),
-    "K27&K36 retain" = list(on="chip",  strains=c("cac1","cac2","set7"), decreasing=FALSE)
-  ),
-  chip_colors_list = list(
-    K27 = c("darkblue","darkred"),
-    K36 = c("darkblue","darkred")
-  ),
-  chip_limits_list = list(
-    K27 = c(-2, 2),
-    K36 = c(-2, 2)
-  ),
-
 #auto-clustering
 out <- make_chip_rna_heatmap_simple(
-  chip_df   = H3K36me3_Results_K27promTSS_vWT,
-  rna_list  = list(cac1 = cac1RNA, cac2 = cac2RNA, set7 = set7RNA),
+  chip_df   = H3K27me3_CS_Heatmap_K27genes_proms_vInput,
+  rna_list  = NULL,
   gene_col  = "gene_id",
-  chip_cols = c("logFC_cac1","logFC_cac2","logFC_set7"),
-  cluster_by       = c("cac1","cac2"),
+  chip_cols = c("logFC_WT","logFC_cac1","logFC_cac2","logFC_cac3","logFC_set7"),
+  cluster_by       = c("cac1","cac2","cac-3"),
   collapse_mutants = FALSE,
-  fold_cutoff      = NULL,          # <- uses chip_zero_band below
-  chip_zero_band   = 1,             # |log2FC| < 1 treated as "kept"
+  fold_cutoff      = NULL,          # <- uses chip_zero_band below            
   sort_reference   = "WT",          # ignored if absent
   sort_decreasing  = FALSE,         # most negative at the top
-  chip_limits = c(-2,2),
-  rna_limits  = c(-6,6),
-  rna_zero_band = 1.5,
+  chip_limits = c(0,5),
   row_gaps_mm = 0,
   out_dir = "csaw_heatmaps",
-  file_prefix = "H3K36me3_vs_RNA_cac1cac2_sep",
+  file_prefix = "H3K27me3_CAF1_clusters",
   save_formats = c("pdf","png"),
   width_in = 8,
   dpi = 300

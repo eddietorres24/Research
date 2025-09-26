@@ -947,7 +947,8 @@ venn.diagram(
   fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
   output=TRUE)
 
-CAF1_K27_lost_UP_fit = euler(c("A" = 53, "B" = 145, "A&B" = 147))
+
+CAF1_K27_lost_UP_fit = euler(c("A" = 43, "B" = 145, "A&B" = 147))
 CAF1_K27_lost_UP_eulerplot <- plot(CAF1_K27_lost_UP_fit)
 ggsave(filename = "CAF1_K27_lost_UP.pdf", plot = CAF1_K27_lost_UP_eulerplot, width = 4, height = 4, dpi = 600)
 
