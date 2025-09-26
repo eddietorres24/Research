@@ -15,7 +15,7 @@ source config.txt
 
 ###ADD a source file with path to FastqFiles
 #variables imported from submission script
-fastqPath="/scratch/evt82290/FastqFiles/RY_fastq"
+fastqPath="/scratch/evt82290/FastqFiles/RY_Fastq"
 # accession="148-59_ChIP_LGIII_1_4670kb_H3K27me3_Rep1_S59"
 outdir="/scratch/evt82290/MappingOutputs/RY_ChIPs"
 
