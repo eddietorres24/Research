@@ -281,7 +281,7 @@ module load deepTools
 #
 # ##applying to H3K4me2 & Kac
 #H3K4me2
-computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+computeMatrix scale-regions \
 -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
    $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
    $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
