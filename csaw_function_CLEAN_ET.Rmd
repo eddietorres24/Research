@@ -2214,17 +2214,18 @@ chip_scatter_flex <- function(
 K36enrich = subset(H3K36me3_Results_K27proms_vInput, H3K36me3_Results_K27proms_vInput$logFC_WT > 0)
 K36scatter = subset(H3K36me3_Results_K27proms_vWT, H3K36me3_Results_K27proms_vWT$gene_id %in% K36enrich$gene_id)
 
+
 #Example Use (ChIP vs RNA)
 out <- chip_scatter_flex(
   mode        = "chip_vs_rna",
-  chip_df_x   = H3K27me3_CS_Results_K27genes_vWT,   
-  strain_x    = "cac1",
-  rna_df      = cac1RNA,                          # RNA df
+  chip_df_x   = Kac_Results_K27promTSS_vWT,   
+  strain_x    = "set7",
+  rna_df      = set7RNA,                          # RNA df
   up_thresh      =  1,
   down_thresh    = -1,
   chip_x_label = "K27",                      # label in axes/title
   out_dir     = "scatter_outputs",
-  file_prefix = "K27_vs_RNA_set7_K27_genes_proms_TESTING",
+  file_prefix = "Kac_vs_RNA_set7_K27_promTSS",
   width_in    = 12, height_in = 9, dpi = 600
 )
 out$gg
@@ -2237,22 +2238,22 @@ K27lostscatter = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_
 #Example Use (ChIP vs ChIP)
 out <- chip_scatter_flex(
   mode          = "chip_vs_chip",
-  chip_df_x     = H3K36me3_Results_K27promTSS_vWT,
-  strain_x      = "set7",
-  chip_df_y     = Kac_Results_K27genes_proms_vWT,
-  strain_y      = "set7",
-  chip_x_label  = "H3K36me3",
+  chip_df_x     = H3K27me3_CS_Results_K27promTSS_vWT,
+  strain_x      = "cac2",
+  chip_df_y     = Kac_Results_K27promTSS_vWT,
+  strain_y      = "cac2",
+  chip_x_label  = "H3K27me3",
   chip_y_label  = "Kac",
   chip_x_cutoff   = 0.75,
   chip_y_cutoff   = 0.75,
   # Only consider left-of −0.75 on X and above +0.75 on Y:
   chip_cut_use     = c("x_neg","y_pos"),
-  chip_cut_colors  = c(both = "red", x_only = "#a65628", y_only = "#cab2d6", neither = "gray70"),
+  chip_cut_colors  = c(both = "red", x_only = "#4daf4a", y_only = "#cab2d6", neither = "gray70"),
   # Draw the same two guides; nothing in the unused quadrants, so axes won’t blow out
   show_cutoff_guides = TRUE,
   guide_sides        = NULL,   # NULL => uses chip_cut_use
   out_dir       = "scatter_outputs",
-  file_prefix   = "H3K36me3_vs_Kac_set7_promoters_genes",
+  file_prefix   = "H3K27me3_vs_Kac_cac2_promTSS",
   width_in      = 12, height_in = 9, dpi = 600
 )
 out$gg
@@ -2518,20 +2519,20 @@ peaks_win <- heatmap_to_bed_peaks(
 
 # Example 2: vInput heatmap, enriched regions per strain across a pre-determined region set (i.e. all genes)
 peaks <- heatmap_to_bed_peaks(
-  hm_df         = H3K36me3_Heatmap_allgenes_vWT,
-  out_dir       = "csaw_beds/H3K36me3_vWT",
-  prefix        = "H3K36me3_lost_allgenes",
+  hm_df         = Kac_Heatmap_K27promTSS_vWT,
+  out_dir       = "csaw_beds/Kac_vWT",
+  prefix        = "Kac_gained_K27promTSS",
   mode          = "region",
-  direction     = "negative",
+  direction     = "positive",
   min_value     = 0.75,                         
   merge_windows = FALSE,                     # ignored in region mode anyway
-  zero_based    = TRUE,
+  zero_based    = FALSE,
   file_norm_tag = NULL,                      # OR "vInput"/"vWT" if you want it appended here
-  source_regions_df = regions$allgenes, # needs to match your original region df with coords + gene IDs
+  source_regions_df = regions$K27promTSS, # needs to match your original region df with coords + gene IDs
   source_key_cols   = c("V1","V2","V3"),
   source_gene_col   = "gene_id",      # may want to use V11, which has NCUs instead of names (change below)
   promote_to_full_genes  = TRUE,
-  universe_df            = regions$allgenes, #IMPORTANT: The df you want to subset
+  universe_df            = regions$K27genes, #IMPORTANT: The df you want to subset
   universe_gene_col      = "gene_id",
   universe_label         = "genes",
   universe_is_zero_based = FALSE,          
@@ -2641,42 +2642,54 @@ write.table(K27_K36retain, file = "CAF1_K36_K27_retain.bed", sep = "\t", quote =
 
 ####
 #Gain in active mods
-Kac_genesprom_gain_CAF = subset(Kac_Results_K27genes_proms_vWT, Kac_Results_K27genes_proms_vWT$logFC_cac1 > 0.75 | Kac_Results_K27genes_proms_vWT$logFC_cac2 > 0.75)
+Kac_prom_gain_CAF = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$logFC_cac1 > 0.75 | Kac_Results_K27promTSS_vWT$logFC_cac2 > 0.75)
 
-Kac_genesprom_gain_cac1 = subset(Kac_Results_K27genes_proms_vWT, Kac_Results_K27genes_proms_vWT$logFC_cac1 > 0.75)
-Kac_genesprom_gain_cac2 = subset(Kac_Results_K27genes_proms_vWT, Kac_Results_K27genes_proms_vWT$logFC_cac2 > 0.75)
+Kac_prom_gain_cac1 = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$logFC_cac1 > 0.75)
+Kac_prom_gain_cac2 = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$logFC_cac2 > 0.75)
 
-Kac_genesprom_gain_set7 = subset(Kac_Results_K27genes_proms_vWT, Kac_Results_K27genes_proms_vWT$logFC_set7 > 0.75 )
+Kac_prom_gain_set7 = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$logFC_set7 > 0.75)
+Kac_prom_gain_suz12 = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$logFC_suz12 > 0.75)
 
-Kac_nochange = subset(Kac_Results_K27genes_proms_vWT, ! Kac_Results_K27genes_proms_vWT$gene_id %in% Kac_genesprom_gain_CAF$gene_id & ! Kac_Results_K27genes_proms_vWT$gene_id %in% Kac_genesprom_gain_set7$gene_id)
+Kac_prom_gain_suz12_noCAF = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$logFC_suz12 > 0.75 & ! Kac_Results_K27promTSS_vWT$gene_id %in% Kac_prom_gain_CAF$gene_id)
 
-Kac_Gain_CAF1 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_genesprom_gain_CAF$gene_id)
-Kac_Gain_cac1 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_genesprom_gain_cac1$gene_id)
-Kac_Gain_cac2 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_genesprom_gain_cac2$gene_id)
-Kac_Gain_set7 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_genesprom_gain_set7$gene_id)
+Kac_nochange = subset(Kac_Results_K27promTSS_vWT, ! Kac_Results_K27promTSS_vWT$gene_id %in% Kac_prom_gain_CAF$gene_id & ! Kac_Results_K27promTSS_vWT$gene_id %in% Kac_prom_gain_suz12$gene_id)
+
+Kac_Gain_CAF1 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_CAF$gene_id)
+Kac_Gain_cac1 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_cac1$gene_id)
+Kac_Gain_cac2 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_cac2$gene_id)
+Kac_Gain_set7 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_set7$gene_id)
+Kac_Gain_suz12 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_suz12$gene_id)
+Kac_Gain_suz12_noCAF = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_suz12_noCAF$gene_id)
 Kac_no_change = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_nochange$gene_id)
 
 write.table(Kac_Gain_CAF1, file = "Kac_Gain_CAF1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(Kac_Gain_cac1, file = "Kac_Gain_cac1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(Kac_Gain_cac2, file = "Kac_Gain_cac2.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(Kac_Gain_set7, file = "Kac_Gain_set7.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(Kac_Gain_suz12, file = "Kac_Gain_suz12.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(Kac_Gain_suz12_noCAF, file = "Kac_Gain_suz12_noCAF.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(Kac_no_change, file = "Kac_no_change.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 K4_genes_gain_CAF = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_cac1 > 0.75 | H3K4me2_Results_K27genes_vWT$logFC_cac2 > 0.75)
 K4_genes_gain_set7 = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_set7 > 0.75)
-K4_nochange = subset(H3K4me2_Results_K27genes_vWT, ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_genes_gain_CAF$gene_id & ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_genes_gain_set7$gene_id)
+K4_genes_gain_suz12 = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_suz12 > 0.75)
+K4_genes_gain_suz12_noCAF = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_suz12 > 0.75 & ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_genes_gain_CAF$gene_id)
+K4_nochange = subset(H3K4me2_Results_K27genes_vWT, ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_genes_gain_CAF$gene_id & ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_genes_gain_suz12$gene_id)
 
 K4_genes_gain_cac1 = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_cac1 > 0.75)
 K4_genes_gain_cac2 = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_cac2 > 0.75)
 
-K4_Gain_CAF1 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_CAF$gene_id)
+K4_Gain_CAF = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_CAF$gene_id)
 K4_Gain_cac1 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_cac1$gene_id)
 K4_Gain_cac2 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_cac2$gene_id)
 K4_Gain_set7 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_set7$gene_id)
+K4_Gain_suz12 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_suz12$gene_id)
+K4_Gain_suz12_noCAF = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_suz12_noCAF$gene_id)
 K4_no_change = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_nochange$gene_id)
 
 write.table(K4_Gain_CAF1, file = "K4_Gain_CAF1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_set7, file = "K4_Gain_set7.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K4_Gain_suz12, file = "K4_Gain_suz12.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_no_change, file = "K4_no_change.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_cac1, file = "K4_Gain_cac1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_cac2, file = "K4_Gain_cac2.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
@@ -2699,7 +2712,7 @@ K4_set7_Gain_K27K36lostgenes_noCAF =  subset(CAF_K27_K36_Lost, CAF_K27_K36_Lost$
 #Combine dfs and remove duplicate rows
 
 Kac_K4_set7_Gain <- bind_rows(
-  mutate(Kac_genesprom_gain_set7, .source = "Kac_genesprom_gain_set7"),
+  mutate(Kac_prom_gain_set7, .source = "Kac_prom_gain_set7"),
   mutate(K4_genes_gain_set7, .source = "K4_genes_gain_set7")
 ) %>%
   # if you want cac1UP to win on collisions, keep this order
@@ -2707,7 +2720,7 @@ Kac_K4_set7_Gain <- bind_rows(
   select(-.source)
 
 Kac_K4_CAF_Gain <- bind_rows(
-  mutate(Kac_genesprom_gain_CAF, .source = "Kac_genesprom_gain_CAF"),
+  mutate(Kac_prom_gain_CAF, .source = "Kac_prom_gain_CAF"),
   mutate(K4_genes_gain_CAF, .source = "K4_genes_gain_CAF")
 ) %>%
   # if you want cac1UP to win on collisions, keep this order
