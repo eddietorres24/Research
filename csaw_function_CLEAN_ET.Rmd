@@ -29,7 +29,7 @@ library(dplyr)
 
 ```{r, read in metadata & regions of interest}
 #reading in metdata
-meta <- read.csv("../csaw_samples_files/cac_csaw.csv")
+meta <- read.csv("../csaw_samples_files/cac_csaw_FINAL.csv")
 
 #fix path (if necessary, should only be if you're in wrong directory)
 meta <- meta %>%
@@ -2217,14 +2217,14 @@ K36scatter = subset(H3K36me3_Results_K27proms_vWT, H3K36me3_Results_K27proms_vWT
 #Example Use (ChIP vs RNA)
 out <- chip_scatter_flex(
   mode        = "chip_vs_rna",
-  chip_df_x   = Kac_Results_K27genes_proms_vWT,   
-  strain_x    = "set7",
-  rna_df      = set7RNA,                          # RNA df
+  chip_df_x   = H3K27me3_CS_Results_K27genes_vWT,   
+  strain_x    = "cac1",
+  rna_df      = cac1RNA,                          # RNA df
   up_thresh      =  1,
   down_thresh    = -1,
-  chip_x_label = "Kac",                      # label in axes/title
+  chip_x_label = "K27",                      # label in axes/title
   out_dir     = "scatter_outputs",
-  file_prefix = "Kac_vs_RNA_set7_K27_genes_proms",
+  file_prefix = "K27_vs_RNA_set7_K27_genes_proms_TESTING",
   width_in    = 12, height_in = 9, dpi = 600
 )
 out$gg
