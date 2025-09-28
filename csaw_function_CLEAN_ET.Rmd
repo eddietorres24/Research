@@ -2687,9 +2687,10 @@ K4_Gain_suz12 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_
 K4_Gain_suz12_noCAF = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_suz12_noCAF$gene_id)
 K4_no_change = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_nochange$gene_id)
 
-write.table(K4_Gain_CAF1, file = "K4_Gain_CAF1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K4_Gain_CAF, file = "K4_Gain_CAF1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_set7, file = "K4_Gain_set7.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_suz12, file = "K4_Gain_suz12.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K4_Gain_suz12_noCAF, file = "K4_Gain_suz12_noCAF.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_no_change, file = "K4_no_change.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_cac1, file = "K4_Gain_cac1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_cac2, file = "K4_Gain_cac2.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)

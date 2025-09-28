@@ -304,7 +304,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 -S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
    $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
    $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
-   $P150DIR/152-74_ChIP_suz12_Kac_Rep1_S74.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-74_ChIP_suz12_Kac_Rep1_S74.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-82_ChIP_cac-1_suz12_Kac_Rep1_S82.bin_25.smooth_75Bulk.bw \
 -R $BEDDIR2/Kac_Gain_CAF1.bed $BEDDIR2/Kac_Gain_suz12_noCAF.bed $BEDDIR2/Kac_no_change.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
