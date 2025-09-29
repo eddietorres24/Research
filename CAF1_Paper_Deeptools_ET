@@ -484,7 +484,7 @@ plotHeatmap -m matrix_Kac.mat.gz \
   --samplesLabel WT cac-1 cac-2 set-7 \
   --startLabel "TSS" \
   --sortRegions descend \
-  --heatmapHeight 10 \
+  --heatmapHeight 24 \
   --outFileSortedRegions "$BEDDIR2/K27lostgenes_Kac_order.bed" \
   --legendLocation none \
   --colorList 'white, lavender, slateblue' \
