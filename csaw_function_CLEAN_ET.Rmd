@@ -2657,16 +2657,13 @@ K4_enrichedvWT = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_v
 #########################
 #Now subsetting for changes
 Kac_prom_gain_CAF = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_cac1 > 0.75 | Kac_enrichedvWT$logFC_cac2 > 0.75)
-
 Kac_prom_gain_cac1 = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_cac1 > 0.75)
 Kac_prom_gain_cac2 = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_cac2 > 0.75)
-
 Kac_prom_gain_set7 = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_set7 > 0.75)
 Kac_prom_gain_suz12 = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_suz12 > 0.75)
-
 Kac_prom_gain_suz12_noCAF = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_suz12 > 0.75 & ! Kac_enrichedvWT$gene_id %in% Kac_prom_gain_CAF$gene_id)
-
-Kac_nochange = subset(Kac_enrichedvWT, ! Kac_enrichedvWT$gene_id %in% Kac_prom_gain_CAF$gene_id & ! Kac_enrichedvWT$gene_id %in% Kac_prom_gain_suz12$gene_id)
+Kac_enriched_nochange = subset(Kac_enrichedvWT, ! Kac_enrichedvWT$gene_id %in% Kac_prom_gain_CAF$gene_id & ! Kac_enrichedvWT$gene_id %in% Kac_prom_gain_suz12$gene_id)
+Kac_uneriched = subset(Kac_Results_K27promTSS_vWT, ! Kac_Results_K27promTSS_vWT$gene_id %in% Kac_enriched)
 
 Kac_Gain_CAF1 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_CAF$gene_id)
 Kac_Gain_cac1 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_cac1$gene_id)
@@ -2675,6 +2672,7 @@ Kac_Gain_set7 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_
 Kac_Gain_suz12 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_suz12$gene_id)
 Kac_Gain_suz12_noCAF = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_suz12_noCAF$gene_id)
 Kac_no_change = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_nochange$gene_id)
+Kac_unerich = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_uneriched$gene_id)
 
 write.table(Kac_Gain_CAF1, file = "Kac_Gain_CAF1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(Kac_Gain_cac1, file = "Kac_Gain_cac1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
@@ -2683,13 +2681,14 @@ write.table(Kac_Gain_set7, file = "Kac_Gain_set7.bed", sep = "\t", quote = FALSE
 write.table(Kac_Gain_suz12, file = "Kac_Gain_suz12.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(Kac_Gain_suz12_noCAF, file = "Kac_Gain_suz12_noCAF.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(Kac_no_change, file = "Kac_no_change.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(Kac_unerich, file = "Kac_uneriched.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 K4_genes_gain_CAF = subset(K4_enrichedvWT, K4_enrichedvWT$logFC_cac1 > 0.75 | K4_enrichedvWT$logFC_cac2 > 0.75)
 K4_genes_gain_set7 = subset(K4_enrichedvWT, K4_enrichedvWT$logFC_set7 > 0.75)
 K4_genes_gain_suz12 = subset(K4_enrichedvWT, K4_enrichedvWT$logFC_suz12 > 0.75)
 K4_genes_gain_suz12_noCAF = subset(K4_enrichedvWT, K4_enrichedvWT$logFC_suz12 > 0.75 & ! K4_enrichedvWT$gene_id %in% K4_genes_gain_CAF$gene_id)
 K4_nochange = subset(K4_enrichedvWT, ! K4_enrichedvWT$gene_id %in% K4_genes_gain_CAF$gene_id & ! K4_enrichedvWT$gene_id %in% K4_genes_gain_suz12$gene_id)
-
+K4_unenriched = subset(H3K4me2_Results_K27genes_vWT, ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_enrichedvWT$gene_id)
 K4_genes_gain_cac1 = subset(K4_enrichedvWT, K4_enrichedvWT$logFC_cac1 > 0.75)
 K4_genes_gain_cac2 = subset(K4_enrichedvWT, K4_enrichedvWT$logFC_cac2 > 0.75)
 
@@ -2700,12 +2699,14 @@ K4_Gain_set7 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_g
 K4_Gain_suz12 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_suz12$gene_id)
 K4_Gain_suz12_noCAF = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_suz12_noCAF$gene_id)
 K4_no_change = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_nochange$gene_id)
+K4_unenrich = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_unenriched$gene_id)
 
 write.table(K4_Gain_CAF, file = "K4_Gain_CAF1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_set7, file = "K4_Gain_set7.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_suz12, file = "K4_Gain_suz12.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_suz12_noCAF, file = "K4_Gain_suz12_noCAF.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_no_change, file = "K4_no_change.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K4_unenrich, file = "K4_unenriched.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_cac1, file = "K4_Gain_cac1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_cac2, file = "K4_Gain_cac2.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
