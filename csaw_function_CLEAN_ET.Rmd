@@ -49,14 +49,17 @@ matLocus <- GRanges("CM002236.1", IRanges(1856288, 1862459)) # mat
 param <- readParam(discard = matLocus, pe="none", max.frag=1500, minq=20 )
 
 #reading in regions of interest
-regions <- list(K27genes_proms = read.table("../bed_files/K27_genes_prom_100pct_overlap.bed"), K27genes = read.table("../bed_files/K27_genes_stringent.bed"), K27proms = read.table("../bed_files/K27_promoters.bed"), K27promTSS = read.table("../bed_files/K27_prom_TSS.bed"), allgenes = read.table("../bed_files/all_genes_forR.bed"), K27promTSSext = read.table("../bed_files/K27genes_promTSSext.bed"), allgenes_promTSSext = read.table("../bed_files/allgenes_promTSSext.bed")) 
+regions <- list(K27genes_proms = read.table("../bed_files/K27_genes_prom_100pct_overlap.bed"), K27genes = read.table("../bed_files/K27_genes_stringent.bed"), K27proms = read.table("../bed_files/K27_promoters.bed"), K27promTSS = read.table("../bed_files/K27_prom_TSS.bed"), allgenes = read.table("../bed_files/all_genes_forR.bed"), K27promTSSext = read.table("../bed_files/K27genes_promTSSext.bed"), allgenes_promTSSext = read.table("../bed_files/allgenes_promTSSext.bed"), allgenes_promTSS = read.table("../bed_files/allgenes_promTSS.bed")) 
 
 new = read.table("../bed_files/H3K27me3_methylated_genes_FINAL.bed")
 
 regions$K27promTSS = subset(regions$K27promTSS, regions$K27promTSS$V10 %in% new$V10)
 regions$K27proms = subset(regions$K27proms, regions$K27proms$V10 %in% new$V10)
 regions$K27genes_proms = subset(regions$K27genes_proms, regions$K27genes_proms$V10 %in% new$V10)
-regions$K27genes= subset(regions$K27genes, regions$K27genes$V10 %in% new$V10)
+regions$K27genes = subset(regions$K27genes, regions$K27genes$V10 %in% new$V10)
+regions$K27promTSSext = subset(regions$K27promTSSext, regions$K27promTSSext$V10 %in% new$V10)
+regions$allgenes_promTSS = subset(regions$allgenes_promTSS, regions$allgenes_promTSS$V10 %in% new$V10)
+regions$allgenes_promTSSext = subset(regions$allgenes_promTSSext, regions$allgenes_promTSSext$V10 %in% new$V10)
 
 ###IMPORTANT: the tables you  read into your list should not have a header (i.e., the column names should be V1, V2, ... VX). If your columns have other names, the count function may not recognize it properly. even if the files you read in have headers, i believe you can adjust the way read.table reads it into a df object. check column names in the "regions" object before continuing
 
@@ -2644,15 +2647,25 @@ write.table(K27_K36retain, file = "CAF1_K36_K27_retain.bed", sep = "\t", quote =
 #Gain in active mods
 
 #First, subsetting genes that are actually enriched in the v Input & v WT dfs
-Kac_enrichedvWT <- Kac_Results_K27promTSS_vInput %>%
+Kac_enriched <- Kac_Results_K27promTSS_vInput %>%
   filter(if_any(starts_with("logFC"),
                 ~ coalesce(.x > 0, FALSE)))
 K4_enriched <- H3K4me2_Results_K27genes_vInput %>%
   filter(if_any(starts_with("logFC"),
                 ~ coalesce(.x > 0, FALSE)))
 
-Kac_enrichedvWT = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$gene_id %in% Kac_enrichedvWT$gene_id)
+Kac_enricheddub <- Kac_Results_K27promTSS_vInput %>%
+  filter(if_any(starts_with("logFC"),
+                ~ coalesce(.x > 0, FALSE)))
+K4_enricheddub <- H3K4me2_Results_K27genes_vInput %>%
+  filter(if_any(starts_with("logFC"),
+                ~ coalesce(.x > 0, FALSE)))
+
+
+Kac_enrichedvWT = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$gene_id %in% Kac_enriched$gene_id)
 K4_enrichedvWT = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$gene_id %in% K4_enriched$gene_id)
+Kac_enrichedvWTdub = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$gene_id %in% Kac_enricheddub$gene_id)
+K4_enrichedvWTdub = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$gene_id %in% K4_enricheddub$gene_id)
 
 #########################
 #Now subsetting for changes
@@ -2664,6 +2677,7 @@ Kac_prom_gain_suz12 = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_suz12 > 0.75
 Kac_prom_gain_suz12_noCAF = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_suz12 > 0.75 & ! Kac_enrichedvWT$gene_id %in% Kac_prom_gain_CAF$gene_id)
 Kac_prom_gain_set7_noCAF = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_set7 > 0.75 & ! Kac_enrichedvWT$gene_id %in% Kac_prom_gain_CAF$gene_id)
 Kac_enriched_nochange = subset(Kac_enrichedvWT, ! Kac_enrichedvWT$gene_id %in% Kac_prom_gain_CAF$gene_id & ! Kac_enrichedvWT$gene_id %in% Kac_prom_gain_suz12$gene_id)
+Kac_enriched_nochangedub = subset(Kac_enrichedvWT, ! Kac_enrichedvWT$gene_id %in% Kac_prom_gain_CAF$gene_id & ! Kac_enrichedvWT$gene_id %in% Kac_prom_gain_suz12$gene_id)
 Kac_uneriched = subset(Kac_Results_K27promTSS_vWT, ! Kac_Results_K27promTSS_vWT$gene_id %in% Kac_enriched$gene_id)
 
 Kac_Gain_CAF1 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_CAF$gene_id)
