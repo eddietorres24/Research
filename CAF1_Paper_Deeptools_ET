@@ -428,8 +428,7 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_CAF-1_Kac_clustered_K27gen
 #     "$P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77.bin_25.smooth_75Bulk.bw" \
 #     "$P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw" \
 #   -R \
-#     "$BEDDIR2/CAF-1_K36lost.bed" \
-#     "$BEDDIR2/CAF1_K27_lost_only.bed" \
+#     "$BEDDIR2/CAF-1_K27lost.bed" \
 #   --missingDataAsZero --skipZeros \
 #   -o matrix_K27.mat.gz
 #
@@ -465,33 +464,35 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_CAF-1_Kac_clustered_K27gen
 #   --legendLocation none \
 #   --colorMap "afmhot_r" \
 #   --zMin 0 --zMax 12
-#
-# ########################################
-# # 3) Kac (TSS-centered) using K27 row order
-# ########################################
-# computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
-#   -S \
-#     "$P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw" \
-#     "$P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw" \
-#     "$P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw" \
-#     "$P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw" \
-#   -R "$BEDDIR2/K27_order.bed" \
-#   --missingDataAsZero --skipZeros \
-#   -o matrix_Kac.mat.gz
-#
-# plotHeatmap -m matrix_Kac.mat.gz \
-#   -out H3K27me3_CAF-1_Kac_clustered_K27order.pdf \
-#   --samplesLabel WT cac-1 cac-2 set-7 \
-#   --startLabel "TSS" \
-#   --sortRegions no \
-#   --heatmapHeight 10 \
-#   --legendLocation none \
-#   --colorList 'white, lavender, mediumslateblue' \
-#   --zMin 0 --zMax 8
-#
-# ########################################
-# # 4) K4 (GENE BODIES via scale-regions) using K27 row order
-# ########################################
+
+########################################
+# 3) Kac (TSS-centered) using K27 row order
+########################################
+computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
+  -S \
+    "$P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw" \
+    "$P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw" \
+    "$P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw" \
+    "$P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw" \
+  -R "$BEDDIR2/CAF-1_K27lost.bed" \
+     "$BEDDIR2/CAF-1_K27retain.bed" \
+  --missingDataAsZero --skipZeros \
+  -o matrix_Kac.mat.gz
+
+plotHeatmap -m matrix_Kac.mat.gz \
+  -out H3K27me3_CAF-1_Kac_clustered_K27order.pdf \
+  --samplesLabel WT cac-1 cac-2 set-7 \
+  --startLabel "TSS" \
+  --sortRegions descend \
+  --heatmapHeight 10 \
+  --outFileSortedRegions "$BEDDIR2/K27lostgenes_Kac_order.bed" \
+  --legendLocation none \
+  --colorList 'white, lavender, slateblue' \
+  --zMin 0 --zMax 9
+
+########################################
+# 4) K4 (GENE BODIES via scale-regions) using K27 row order
+########################################
 # computeMatrix scale-regions \
 #   -S \
 #     "$P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw" \
