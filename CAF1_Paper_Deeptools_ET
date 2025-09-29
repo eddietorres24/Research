@@ -300,7 +300,7 @@ plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_CAF-1_K4_clustered_K27g
   --zMin 0 --zMax 9
 #
 ###Kac
-computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 \
+computeMatrix reference-point --referencePoint TSS -b 1000 -a 1000 \
 -S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
    $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
    $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
