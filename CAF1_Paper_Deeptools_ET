@@ -297,7 +297,7 @@ plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_CAF-1_K4_clustered_K27g
   --outFileSortedRegions K4_order.bed \
   --heatmapHeight 24 \
   --colorList 'white,magenta' \
-  --zMin 0 --zMax 8
+  --zMin 0 --zMax 9
 #
 ###Kac
 computeMatrix reference-point --referencePoint TSS -b 800 -a 800 \
@@ -315,8 +315,8 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_CAF-1_Kac_clustered_K27gen
   --sortRegions descend \
   --heatmapHeight 24 \
   --outFileSortedRegions Kac_order.bed \
-  --colorList 'white, mediumslateblue' \
-  --zMin 0 --zMax 10
+  --colorList 'white, lavender, mediumslateblue' \
+  --zMin 0 --zMax 9
 #
 # ##All_combined
 # computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
