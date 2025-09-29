@@ -2642,17 +2642,31 @@ write.table(K27_K36retain, file = "CAF1_K36_K27_retain.bed", sep = "\t", quote =
 
 ####
 #Gain in active mods
-Kac_prom_gain_CAF = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$logFC_cac1 > 0.75 | Kac_Results_K27promTSS_vWT$logFC_cac2 > 0.75)
 
-Kac_prom_gain_cac1 = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$logFC_cac1 > 0.75)
-Kac_prom_gain_cac2 = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$logFC_cac2 > 0.75)
+#First, subsetting genes that are actually enriched in the v Input & v WT dfs
+Kac_enrichedvWT <- Kac_Results_K27promTSS_vInput %>%
+  filter(if_any(starts_with("logFC"),
+                ~ coalesce(.x > 0, FALSE)))
+K4_enriched <- H3K4me2_Results_K27genes_vInput %>%
+  filter(if_any(starts_with("logFC"),
+                ~ coalesce(.x > 0, FALSE)))
 
-Kac_prom_gain_set7 = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$logFC_set7 > 0.75)
-Kac_prom_gain_suz12 = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$logFC_suz12 > 0.75)
+Kac_enrichedvWT = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$gene_id %in% Kac_enrichedvWT$gene_id)
+K4_enrichedvWT = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$gene_id %in% K4_enriched$gene_id)
 
-Kac_prom_gain_suz12_noCAF = subset(Kac_Results_K27promTSS_vWT, Kac_Results_K27promTSS_vWT$logFC_suz12 > 0.75 & ! Kac_Results_K27promTSS_vWT$gene_id %in% Kac_prom_gain_CAF$gene_id)
+#########################
+#Now subsetting for changes
+Kac_prom_gain_CAF = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_cac1 > 0.75 | Kac_enrichedvWT$logFC_cac2 > 0.75)
 
-Kac_nochange = subset(Kac_Results_K27promTSS_vWT, ! Kac_Results_K27promTSS_vWT$gene_id %in% Kac_prom_gain_CAF$gene_id & ! Kac_Results_K27promTSS_vWT$gene_id %in% Kac_prom_gain_suz12$gene_id)
+Kac_prom_gain_cac1 = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_cac1 > 0.75)
+Kac_prom_gain_cac2 = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_cac2 > 0.75)
+
+Kac_prom_gain_set7 = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_set7 > 0.75)
+Kac_prom_gain_suz12 = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_suz12 > 0.75)
+
+Kac_prom_gain_suz12_noCAF = subset(Kac_enrichedvWT, Kac_enrichedvWT$logFC_suz12 > 0.75 & ! Kac_enrichedvWT$gene_id %in% Kac_prom_gain_CAF$gene_id)
+
+Kac_nochange = subset(Kac_enrichedvWT, ! Kac_enrichedvWT$gene_id %in% Kac_prom_gain_CAF$gene_id & ! Kac_enrichedvWT$gene_id %in% Kac_prom_gain_suz12$gene_id)
 
 Kac_Gain_CAF1 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_CAF$gene_id)
 Kac_Gain_cac1 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_cac1$gene_id)
@@ -2670,14 +2684,14 @@ write.table(Kac_Gain_suz12, file = "Kac_Gain_suz12.bed", sep = "\t", quote = FAL
 write.table(Kac_Gain_suz12_noCAF, file = "Kac_Gain_suz12_noCAF.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(Kac_no_change, file = "Kac_no_change.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
-K4_genes_gain_CAF = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_cac1 > 0.75 | H3K4me2_Results_K27genes_vWT$logFC_cac2 > 0.75)
-K4_genes_gain_set7 = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_set7 > 0.75)
-K4_genes_gain_suz12 = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_suz12 > 0.75)
-K4_genes_gain_suz12_noCAF = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_suz12 > 0.75 & ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_genes_gain_CAF$gene_id)
-K4_nochange = subset(H3K4me2_Results_K27genes_vWT, ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_genes_gain_CAF$gene_id & ! H3K4me2_Results_K27genes_vWT$gene_id %in% K4_genes_gain_suz12$gene_id)
+K4_genes_gain_CAF = subset(K4_enrichedvWT, K4_enrichedvWT$logFC_cac1 > 0.75 | K4_enrichedvWT$logFC_cac2 > 0.75)
+K4_genes_gain_set7 = subset(K4_enrichedvWT, K4_enrichedvWT$logFC_set7 > 0.75)
+K4_genes_gain_suz12 = subset(K4_enrichedvWT, K4_enrichedvWT$logFC_suz12 > 0.75)
+K4_genes_gain_suz12_noCAF = subset(K4_enrichedvWT, K4_enrichedvWT$logFC_suz12 > 0.75 & ! K4_enrichedvWT$gene_id %in% K4_genes_gain_CAF$gene_id)
+K4_nochange = subset(K4_enrichedvWT, ! K4_enrichedvWT$gene_id %in% K4_genes_gain_CAF$gene_id & ! K4_enrichedvWT$gene_id %in% K4_genes_gain_suz12$gene_id)
 
-K4_genes_gain_cac1 = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_cac1 > 0.75)
-K4_genes_gain_cac2 = subset(H3K4me2_Results_K27genes_vWT, H3K4me2_Results_K27genes_vWT$logFC_cac2 > 0.75)
+K4_genes_gain_cac1 = subset(K4_enrichedvWT, K4_enrichedvWT$logFC_cac1 > 0.75)
+K4_genes_gain_cac2 = subset(K4_enrichedvWT, K4_enrichedvWT$logFC_cac2 > 0.75)
 
 K4_Gain_CAF = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_CAF$gene_id)
 K4_Gain_cac1 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_cac1$gene_id)
