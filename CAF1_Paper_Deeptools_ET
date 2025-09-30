@@ -563,7 +563,7 @@ computeMatrix scale-regions -a 200 -b 200 --scale 2 \
          -R "$BEDDIR2/Kac_order_fig4.bed" --skipZeros --missingDataAsZero -o matrix_PRC2_RNA.gz
 
     plotHeatmap -m matrix_PRC2_RNA.gz -out CAF-1__RNA-seq_K27genes_Kac_order.pdf \
-            --samplesLabel WT cac-1 \
+            --samplesLabel WT cac-1 set-7 \
             --startLabel "TSS" \
             --endLabel "TES" \
             --sortRegions no \
