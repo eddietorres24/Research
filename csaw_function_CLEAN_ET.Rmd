@@ -1914,10 +1914,10 @@ rna_cols <- c("cac-1","cac-2","set-7")  # (match column names in your z-score df
 genes_keep <- rownames(rna_z)
 
 # (Recommended) Filter your manual cluster dfs to those same genes
-clust1 <- subset(K36lost, K36lost$gene_id %in% genes_keep)
-clust2 <- subset(K27lost_only, K27lost_only$gene_id %in% genes_keep)
-clust3
-clust4
+clust1 <- subset(Kac_Gain_CAF, Kac_Gain_CAF$gene_id %in% genes_keep)
+clust2 <- subset(Kac_Gain_set7_noCAF, Kac_Gain_set7_noCAF$gene_id %in% genes_keep)
+clust3 <- subset(Kac_no_change, Kac_no_change$gene_id %in% genes_keep)
+clust4 <- subset(Kac_unerich, Kac_unerich$gene_id %in% genes_keep)
 
 ###Kac
 ##vInput
@@ -1936,10 +1936,10 @@ out <- make_chip_rna_heatmap_simple(
   rna_select = rna_cols,
   gene_col  = "gene_id",
   manual_clusters = list(
-    CAF_Gain = Kac_Gain_CAF ,
-    set7_Gain = Kac_Gain_set7_noCAF,
-    no_change = Kac_no_change,
-    unenriched = Kac_unerich
+    CAF_Gain = clust1 ,
+    set7_Gain = clust2,
+    no_change = clust3,
+    unenriched = clust4
   ),
   manual_labels = c("Kac Gain CAF-1","Kac Gain set-7","Kac no change", "Kac unenriched"),
   manual_sort = list(
@@ -2744,7 +2744,7 @@ Kac_Gain_cac2 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_
 Kac_Gain_set7 = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_set7$gene_id)
 Kac_Gain_set7_noCAF = subset(regions$K27genes, regions$K27genes$gene_id %in% Kac_prom_gain_set7_noCAF$gene_id)
 
-write.table(Kac_Gain_CAF1, file = "Kac_Gain_CAF1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(Kac_Gain_CAF, file = "Kac_Gain_CAF.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(Kac_Gain_cac2, file = "Kac_Gain_cac2.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(Kac_Gain_set7, file = "Kac_Gain_set7.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(Kac_Gain_set7_noCAF, file = "Kac_Gain_set7_noCAF.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
@@ -2760,7 +2760,7 @@ K4_Gain_cac2 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_g
 K4_Gain_set7 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_set7$gene_id)
 K4_Gain_set7_noCAF = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_set7_noCAF$gene_id)
 
-write.table(K4_Gain_CAF, file = "K4_Gain_CAF1.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K4_Gain_CAF, file = "K4_Gain_CAF.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_set7, file = "K4_Gain_set7.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_set7_noCAF, file = "K4_Gain_set7_noCAF.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K4_Gain_cac2, file = "K4_Gain_cac2.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
