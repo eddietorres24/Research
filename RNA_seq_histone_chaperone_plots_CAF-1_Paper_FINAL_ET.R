@@ -83,7 +83,7 @@ Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,22:25], na.rm = TRUE),
                                  rowMeans(allDataTPM[,16:18], na.rm = TRUE),
                                  rowMeans(allDataTPM[,13:15], na.rm = TRUE),
                                  rowMeans(allDataTPM[,1:2], na.rm = TRUE))
-averageRowIDs=c("WT","set-7","cac-1","cac-2","ash-1"")
+averageRowIDs=c("WT","set-7","cac-1","cac-2","ash-1")
 colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 
 ####################################################################

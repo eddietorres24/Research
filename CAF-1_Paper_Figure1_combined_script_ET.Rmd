@@ -265,7 +265,7 @@ ggsave("./CAF-1_K27_Violin_Paper_Final.pdf", plot=violin, width = 10, height = 8
 GenesWithChanges <- subset(AVERAGE_Prc2targetTPM, (rowSums(AVERAGE_Prc2targetTPM) > 0))
 
 #plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above
-heatmap <- pheatmap(GenesWithChanges, color = colorRampPalette(rev(brewer.pal(n = 9, name ="RdBu")))(100), cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean", legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5, fontsize = 8)
+heatmap <- pheatmap::pheatmap(GenesWithChanges, color = colorRampPalette(rev(brewer.pal(n = 9, name ="RdBu")))(100), cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean", legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5, fontsize = 8)
 
 #plot
 heatmap_plot <- heatmap[[4]]
