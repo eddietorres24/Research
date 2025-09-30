@@ -323,42 +323,40 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_CAF-1_Kac_clustered_K27gen
 #####################
 #FIGURE 5
 #H3K4me2
-# computeMatrix scale-regions \
-# -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
-#    $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
-#    $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
-#    $P152DIR/152-106_ChIP_suz12_H3K4me2_Rep2_S130.bin_25.smooth_75Bulk.bw \
-#    $P152DIR/152-107_ChIP_cac-1_suz12_H3K4me2_Rep2_S131.bin_25.smooth_75Bulk.bw \
-# -R $BEDDIR2/K4_Gain_CAF1.bed $BEDDIR2/K4_Gain_suz12_noCAF.bed $BEDDIR2/K4_no_change.bed $BEDDIR2/K4_unenriched.bed \
-#   --skipZeros --missingDataAsZero -o matrix_CAF-1_K4_clustered.gz
+computeMatrix scale-regions \
+-S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
+   $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
+   $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-106_ChIP_suz12_H3K4me2_Rep2_S130.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-107_ChIP_cac-1_suz12_H3K4me2_Rep2_S131.bin_25.smooth_75Bulk.bw \
+-R $BEDDIR2/K4_order_fig4.bed \
+  --skipZeros --missingDataAsZero -o matrix_CAF-1_K4_clustered.gz
+
+plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_CAF-1_K4_clustered_K27genes.pdf \
+  --samplesLabel WT cac-1 cac-2 suz-12 cac-1_suz-12 \
+  --startLabel "TSS" \
+  --sortRegions descend \
+  --heatmapHeight 24 \
+  --colorList 'white, violet, magenta' \
+  --zMin 0 --zMax 9
 #
-# plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_CAF-1_K4_clustered_K27genes.pdf \
-#   --samplesLabel WT cac-1 cac-2 suz-12 cac-1_suz-12 \
-#   --startLabel "TSS" \
-#   --sortRegions descend \
-#   --outFileSortedRegions K4_order.bed \
-#   --heatmapHeight 24 \
-#   --colorList 'white, violet, magenta' \
-#   --zMin 0 --zMax 9
-# #
-# ###Kac
-# computeMatrix reference-point --referencePoint TSS -b 800 -a 800 \
-# -S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
-#    $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
-#    $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
-#    $P152DIR/152-74_ChIP_suz12_Kac_Rep1_S74.bin_25.smooth_75Bulk.bw \
-#    $P152DIR/152-82_ChIP_cac-1_suz12_Kac_Rep1_S82.bin_25.smooth_75Bulk.bw \
-# -R $BEDDIR2/Kac_Gain_CAF1.bed $BEDDIR2/Kac_Gain_suz12_noCAF.bed $BEDDIR2/Kac_no_change.bed $BEDDIR2/Kac_unenriched.bed \
-#   --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
-#
-# plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_CAF-1_Kac_clustered_K27genes.pdf \
-#   --samplesLabel WT cac-1 cac-2 suz-12 cac-1_suz-12  \
-#   --startLabel "TSS" \
-#   --sortRegions descend \
-#   --heatmapHeight 24 \
-#   --outFileSortedRegions Kac_order.bed \
-#   --colorList 'white, lavender, slateblue' \
-#   --zMin 0 --zMax 9
+###Kac
+computeMatrix reference-point --referencePoint TSS -b 800 -a 800 \
+-S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
+   $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
+   $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-74_ChIP_suz12_Kac_Rep1_S74.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-82_ChIP_cac-1_suz12_Kac_Rep1_S82.bin_25.smooth_75Bulk.bw \
+-R $BEDDIR2/Kac_order_fig4.bed \
+  --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
+
+plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_CAF-1_Kac_clustered_K27genes.pdf \
+  --samplesLabel WT cac-1 cac-2 suz-12 cac-1_suz-12  \
+  --startLabel "TSS" \
+  --sortRegions descend \
+  --heatmapHeight 24 \
+  --colorList 'white, lavender, slateblue' \
+  --zMin 0 --zMax 9
   ##################################
 
 #
