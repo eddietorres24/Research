@@ -332,7 +332,7 @@ computeMatrix scale-regions \
 -R $BEDDIR2/K4_order_fig4.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_K4_clustered.gz
 
-plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_CAF-1_K4_clustered_K27genes.pdf \
+plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_Figure5.pdf \
   --samplesLabel WT cac-1 cac-2 suz-12 cac-1_suz-12 \
   --startLabel "TSS" \
   --sortRegions descend \
@@ -350,7 +350,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 800 \
 -R $BEDDIR2/Kac_order_fig4.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
 
-plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_CAF-1_Kac_clustered_K27genes.pdf \
+plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure5.pdf \
   --samplesLabel WT cac-1 cac-2 suz-12 cac-1_suz-12  \
   --startLabel "TSS" \
   --sortRegions descend \
