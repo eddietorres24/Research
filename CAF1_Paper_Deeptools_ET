@@ -53,12 +53,13 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
- -R $BEDDIR2/K27genes_K36enriched.bed $BEDDIR2/K27genes_K36unenriched.bed --missingDataAsZero --skipZeros -o K36_matrix_PRC2.gz
+ -R $BEDDIR2/K27genes_K36enriched.bed --missingDataAsZero --skipZeros -o K36_matrix_PRC2.gz
 
     plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_K27genes.pdf \
                     --samplesLabel WT ash-1 cac-1 cac-2 set-7 \
                     --startLabel "TSS" \
                     --sortRegions descend \
+                    --legendLocation none \
                     --outFileSortedRegions CAF-1_K36_order_K27genes.bed \
                     --sortUsingSamples 1 3 4 \
                     --heatmapHeight 25 \
@@ -114,6 +115,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
                     --samplesLabel WT ash-1 cac-1 cac-2 set-7 \
                     --startLabel "TSS" \
                     --sortRegions descend \
+                    --legendLocation none \
                     --sortUsingSamples 1 3 4 \
                     --heatmapHeight 25 \
                     --colorMap "afmhot_r" \
