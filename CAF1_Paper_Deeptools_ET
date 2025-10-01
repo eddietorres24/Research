@@ -289,14 +289,12 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 computeMatrix scale-regions --scale 2 \
         -S $RNADIR/SRR8269825/SRR8269825_log.bw \
            /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_log.bw \
-           $RNADIR/SRR7970629/SRR7970629_log.bw \
            $RNADIR/SRR7970630/SRR7970630_log.bw \
-           $RNADIR/SRR7970631/SRR7970631_log.bw \
            $RNADIR/SRR10916163/SRR10916163_log.bw \
            -R "$BEDDIR2/Kac_order_fig4.bed" --skipZeros --missingDataAsZero -o matrix_PRC2_RNA.gz
 
       plotHeatmap -m matrix_PRC2_RNA.gz -out K27_genes_CAF-1_RNA-seq_Kac_clustered_RNA_order_TEST.pdf \
-              --samplesLabel WT cac-1 cac-2 cac-2_2 cac-2_3 set-7 \
+              --samplesLabel WT cac-1 cac-2 set-7 \
               --startLabel "TSS" \
               --endLabel "TES" \
               --sortRegions descend \
