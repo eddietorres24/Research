@@ -2681,11 +2681,13 @@ K27lostash1 = subset(regions$K27genes, regions$K27genes$gene_id %in% K27lostash1
 K27lost_code = subset(K27lost, K27lost$gene_id %in% rownames(allDataTPM))
 K27lost_nocode = subset(K27lost, ! K27lost$gene_id %in% rownames(allDataTPM))
 
+#only K36 genes
 K27lostK36enriched = H3K36me3_Results_K27promTSS_vInput %>%
-  filter(if_any(all_of(c(6)), ~ coalesce(.x > 0, FALSE)))
+  filter(if_any(all_of(c(6, 9, 12, 15, 18, 21)), ~ coalesce(.x > 0, FALSE)))
+K27lostK36enrichedvWT = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$gene_id %in% K27lostK36enriched$gene_id)
 
-K36lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.75)
-K36lost_set7 = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_set7 < -0.75)
+K36lost = subset(K27lostK36enrichedvWT, K27lostK36enrichedvWT$logFC_cac1 < -0.75 | K27lostK36enrichedvWT$logFC_cac2 < -0.75)
+K36lost_set7 = subset(K27lostK36enrichedvWT, K27lostK36enrichedvWT$logFC_set7 < -0.75)
 
 K36lost_CAF_ALL = subset(H3K36me3_Results_allgenes_vWT, H3K36me3_Results_allgenes_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_allgenes_vWT$logFC_cac2 < -0.75)
 
@@ -2695,10 +2697,14 @@ K36lost_CAF_nonK27 = subset(K36lost_CAF_ALL, ! K36lost_CAF_ALL$gene_id %in% K36l
 K36lost = subset(regions$K27genes, regions$K27genes$gene_id %in% K36lost$gene_id)
 
 retainK27 = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K27lost$gene_id)
-retainK36 = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K36lost$gene_id)
-
+retainK36 = subset(regions$K27genes, regions$K27genes$gene_id %in% K27lostK36enriched$gene_id & ! regions$K27genes$gene_id %in% K36lost$gene_id)
+K36_enriched = subset(regions$K27genes, regions$K27genes$gene_id %in% K27lostK36enriched$gene_id)
+K36_unerniched = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K27lostK36enriched$gene_id)
+                      
 write.table(K27lost, file = "CAF-1_K27lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
-write.table(K36lost, file = "CAF-1_K36lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
+write.table(K36lost, file = "CAF-1_K36lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K36_enriched, file = "K27genes_K36enriched.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
+write.table(K36_unerniched, file = "K27genes_K36unenriched.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
 
 write.table(retainK27, file = "CAF-1_K27retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(retainK36, file = "CAF-1_K36retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
@@ -2859,5 +2865,10 @@ cacupcombinek27 <- bind_rows(
   distinct(Attributes, .keep_all = TRUE) %>%
   select(-.source)
 
+Kac_K4_set7_Gain_code = subset(Kac_K4_set7_Gain, Kac_K4_set7_Gain$gene_id %in% rownames(allDataTPM))
+Kac_K4_CAF_Gain_code = subset(Kac_K4_CAF_Gain, Kac_K4_CAF_Gain$gene_id %in% rownames(allDataTPM))
+
+Kac_K4_cac1_Gain = subset(Kac_K4_CAF_Gain, Kac_K4_CAF_Gain$gene_id %in% K4_Gain_cac1$gene_id | Kac_K4_CAF_Gain$gene_id %in% Kac_Gain_cac1$gene_id )
+Kac_K4_cac2_Gain = subset(Kac_K4_CAF_Gain, Kac_K4_CAF_Gain$gene_id %in% K4_Gain_cac2$gene_id | Kac_K4_CAF_Gain$gene_id %in% Kac_Gain_cac2$gene_id )
 
 ```

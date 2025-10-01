@@ -1038,14 +1038,14 @@ ggsave(filename = "CAF1_SET7_K36lost.pdf", plot = CAF1_SET7_K36lost_eulerplot, w
 #####################################################
 #FIGURE 4
 venn.diagram(
-  x = list(Kac_K4_CAF_Gain$gene_id, cacupcombinek27$Attributes, K27lost$gene_id),
+  x = list(Kac_K4_CAF_Gain_code$gene_id, cacupcombinek27$Attributes, K27lost_code$gene_id),
   category.names = c("CAF gained", "CAF UP", "K27lost"),
   filename = 'CAF1_Kac_K4_gained_Upreg_genes.png',
   col=c("#8da0cb","#756bb1","#fc8d62"),
   fill = c(alpha("#8da0cb",0.25), alpha("#756bb1",0.25), alpha("#fc8d62",0.25)),
   output=TRUE)
 
-Kac_K4_gain_K27lost_CAF_Up_fit = euler(c("A" = 21, "B" = 35, "C" = 129, "A&B" = 18, "A&C" = 16, "B&C" = 86, "A&B&C" = 61))
+Kac_K4_gain_K27lost_CAF_Up_fit = euler(c("A" = 13, "B" = 29, "C" = 131, "A&B" = 14, "A&C" = 14, "B&C" = 71, "A&B&C" = 76))
 Kac_K4_gain_K27lost_CAF_Up_eulerplot <- plot(Kac_K4_gain_K27lost_CAF_Up_fit)
 ggsave(filename = "Kac_K4_gain_K27lost_CAF_Up.pdf", plot = Kac_K4_gain_K27lost_CAF_Up_eulerplot, width = 4, height = 4, dpi = 600)
 
@@ -1057,7 +1057,7 @@ venn.diagram(
   fill = c(alpha("#8da0cb",0.25), alpha("#756bb1",0.25)),
   output=TRUE)
 
-CAF1_SET7_K27lost_Kac_K4_Gain_fit = euler(c("A" = 82, "B" = 44, "A&B" = 34))
+CAF1_SET7_K27lost_Kac_K4_Gain_fit = euler(c("A" = 91, "B" = 54, "A&B" = 32))
 CAF1_SET7_K27lost_Kac_K4_Gain_eulerplot <- plot(CAF1_SET7_K27lost_Kac_K4_Gain_fit)
 ggsave(filename = "CAF1_SET7_Kac_K4_Gain.pdf", plot = CAF1_SET7_K27lost_Kac_K4_Gain_eulerplot, width = 4, height = 4, dpi = 600)
 
@@ -1069,7 +1069,7 @@ venn.diagram(
   fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
   output=TRUE)
 
-CAF1_Kac_K4_Gain_K36_lost_fit = euler(c("A" = 79, "B" = 55, "A&B" = 37))
+CAF1_Kac_K4_Gain_K36_lost_fit = euler(c("A" = 77, "B" = 37, "A&B" = 46))
 CAF1_Kac_K4_Gain_K36_lost_eulerplot <- plot(CAF1_Kac_K4_Gain_K36_lost_fit)
 ggsave(filename = "CAF1_Kac_K4_Gain_K36_lost.pdf", plot = CAF1_Kac_K4_Gain_K36_lost_eulerplot, width = 4, height = 4, dpi = 600)
 
@@ -1081,7 +1081,7 @@ venn.diagram(
   fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
   output=TRUE)
 
-cac1_cac2_Kac_K4_gained_fit = euler(c("A" = 80, "B" = 2, "A&B" = 34))
+cac1_cac2_Kac_K4_gained_fit = euler(c("A" = 61, "B" = 2, "A&B" = 60))
 cac1_cac2_Kac_K4_gained_eulerplot <- plot(cac1_cac2_Kac_K4_gained_fit)
 ggsave(filename = "cac1_cac2_Kac_K4_gained.pdf", plot = cac1_cac2_Kac_K4_gained_eulerplot, width = 4, height = 4, dpi = 600)
 
