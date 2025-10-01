@@ -283,24 +283,6 @@ module load deepTools
 
 #######################
 # FIGURE 4
-# computeMatrix scale-regions \
-# -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
-#    $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
-#    $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
-#    $P152DIR/152-106_ChIP_suz12_H3K4me2_Rep2_S130.bin_25.smooth_75Bulk.bw \
-# -R $BEDDIR2/K4_Gain_CAF.bed $BEDDIR2/K4_Gain_set7_noCAF.bed $BEDDIR2/K4_no_change.bed $BEDDIR2/K4_unenriched.bed \
-#   --skipZeros --missingDataAsZero -o matrix_CAF-1_K4_clustered.gz
-#
-# plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_CAF-1_K4_clustered_K27genes.pdf \
-#   --samplesLabel WT cac-1 cac-2 set-7 \
-#   --startLabel "TSS" \
-#   --sortRegions descend \
-#   --outFileSortedRegions $BEDDIR2/K4_order_fig4.bed \
-#   --heatmapHeight 24 \
---legendLocation none \
-#   --colorList 'white, violet, magenta' \
-#   --zMin 0 --zMax 9
-# #
 # ###Kac
 computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
 -S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
@@ -319,6 +301,26 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_CAF-1_Kac_clustered_K27gen
   --outFileSortedRegions $BEDDIR2/Kac_order_fig4.bed \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
   --zMin 0 --zMax 9
+
+#K4
+computeMatrix scale-regions \
+-S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
+   $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
+   $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-106_ChIP_suz12_H3K4me2_Rep2_S130.bin_25.smooth_75Bulk.bw \
+-R $BEDDIR2/Kac_order_fig4.bed \
+  --skipZeros --missingDataAsZero -o matrix_CAF-1_K4_clustered.gz
+
+plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_CAF-1_K4_clustered_K27genes.pdf \
+  --samplesLabel WT cac-1 cac-2 set-7 \
+  --startLabel "TSS" \
+  --sortRegions descend \
+  --outFileSortedRegions $BEDDIR2/K4_order_fig4.bed \
+  --heatmapHeight 24 \
+  --legendLocation none \
+  --colorList 'white, violet, magenta' \
+  --zMin 0 --zMax 9
+
 
 ######################
 
@@ -376,7 +378,7 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 1500 \
                     --samplesLabel WT ash-1 cac-1 suz12 cac-1_suz12 \
                     --startLabel "TSS" \
                     --sortRegions descend \
-                    --heatmapHeight 25 \
+                    --heatmapHeight 24 \
                     --colorMap "afmhot_r" \
                     --zMin 0 --zMax 12
 
@@ -394,7 +396,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
                     --startLabel "TSS" \
                     --sortRegions descend \
                     --sortUsingSamples 1 3 \
-                    --heatmapHeight 25 \
+                    --heatmapHeight 24 \
                     --legendLocation none \
                     --colorMap "afmhot_r" \
                     --zMin 0 --zMax 12
@@ -407,7 +409,7 @@ computeMatrix scale-regions \
    $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-106_ChIP_suz12_H3K4me2_Rep2_S130.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-107_ChIP_cac-1_suz12_H3K4me2_Rep2_S131.bin_25.smooth_75Bulk.bw \
--R $BEDDIR2/Kac_order_fig4.bed \
+-R $BEDDIR2/K4_Gain_CAF.bed $BEDDIR2/K4_Gain_set7_noCAF.bed $BEDDIR2/K4_no_change.bed $BEDDIR2/K4_unenriched.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_K4_clustered.gz
 
 plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_Figure5.pdf \
