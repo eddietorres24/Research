@@ -315,7 +315,7 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_CAF-1_Kac_clustered_K27gen
   --sortRegions descend \
   --heatmapHeight 24 \
   --outFileSortedRegions $BEDDIR2/Kac_order_fig4.bed \
-  --colorList 'white, lavender, mediumslateblue, slateblue' \
+  --colorList 'white, lavender, lavender, mediumslateblue, slateblue' \
   --zMin 0 --zMax 9
 
 ######################
@@ -413,7 +413,7 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure5.pdf \
   --startLabel "TSS" \
   --sortRegions descend \
   --heatmapHeight 24 \
-  --colorList 'white, lavender, mediumslateblue, slateblue' \
+  --colorList 'white, lavender, lavender, mediumslateblue, slateblue' \
   --zMin 0 --zMax 9
   ##################################
 
