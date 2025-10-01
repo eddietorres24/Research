@@ -354,7 +354,7 @@ computeMatrix scale-regions --scale 2 \
 
 plotHeatmap -m matrix_K27.mat.gz \
   --out K27_genes_CAF-1_H3K27me3_Kac_clustered_RNA_order.pdf \
-  --samplesLabel WT cac-1 \
+  --samplesLabel WT cac-1 cac-2 \
   --startLabel "TSS" \
   --sortRegions no \
   --heatmapHeight 20 \
