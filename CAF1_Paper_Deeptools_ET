@@ -352,8 +352,7 @@ plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out K27_genes_CAF-1_H3K4me2_Kac_clu
     "$P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw" \
   -R "$BEDDIR2/RNA_order_fig4.bed" --missingDataAsZero --skipZeros -o matrix_K27.mat.gz
 
-plotHeatmap -m matrix_K27.mat.gz \
-  --out K27_genes_CAF-1_H3K27me3_Kac_clustered_RNA_order.pdf \
+plotHeatmap -m matrix_K27.mat.gz -out K27_genes_CAF-1_H3K27me3_Kac_clustered_RNA_order.pdf \
   --samplesLabel WT cac-1 cac-2 \
   --startLabel "TSS" \
   --sortRegions no \
