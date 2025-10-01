@@ -117,8 +117,9 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
                     --sortRegions descend \
                     --legendLocation none \
                     --sortUsingSamples 1 3 4 \
-                    --heatmapHeight 5 \
-                    --heatmapWidth 12.5 \
+                    --heatmapHeight 5.5 \
+                    --heatmapWidth 12 \
+                    --whatToShow "heatmap and colorbar" \
                     --colorMap "afmhot_r" \
                     --zMin 0 --zMax 12
 
