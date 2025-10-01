@@ -335,7 +335,7 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 1500 \
     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
     $P152DIR/152-97_ChIP_suz12_H3K36me3_Rep1_S121.bin_25.smooth_75Bulk.bw \
     $P152DIR/152-101_ChIP_cac-1_suz12_H3K36me3_Rep2_S125.bin_25.smooth_75Bulk.bw \
- -R $BEDDIR2/H3K27me3_methylated_TSS_Promoters_FINAL.bed --missingDataAsZero --skipZeros -o K36_K27genes_fig5.gz
+ -R $BEDDIR2/CAF-1_K36lost.bed --missingDataAsZero --skipZeros -o K36_K27genes_fig5.gz
 
     plotHeatmap -m K36_K27genes_fig5.gz -out H3K36me3_K27genes_fig5.pdf \
                     --samplesLabel WT ash-1 cac-1 suz12 cac-1_suz12 \
