@@ -970,13 +970,13 @@ ggsave(filename = "CAF1_K27_lost_set7_UP.pdf", plot = CAF1_K27_lost_set7_UP_eule
 ###################################################
 #FIGURE 3
 #K27 lost ash1 K27/K36 lost caf1
-venn.diagram(
-  x = list(K27lostash1$gene_id, CAF_K27_K36_Lost$gene_id),
-  category.names = c("ash1 K27 lost", "CAF K27 lost"),
-  filename = "ASH1_CAF1_K27K36lost.png",
-  col=c("#8da0cb","#fc8d62"),
-  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
-  output=TRUE)
+#venn.diagram(
+#  x = list(K27lostash1$gene_id, CAF_K27_K36_Lost$gene_id),
+#  category.names = c("ash1 K27 lost", "CAF K27 lost"),
+#  filename = "ASH1_CAF1_K27K36lost.png",
+#  col=c("#8da0cb","#fc8d62"),
+#  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+#  output=TRUE)
 
 CAF1_ASH1_K27lost_fit = euler(c("A" = 286, "B" = 53, "A&B" = 176))
 CAF1_ASH1_K27lost_eulerplot <- plot(CAF1_ASH1_K27lost_fit)
@@ -1008,18 +1008,18 @@ SET7_ASH1_K27_UP_fit = euler(c("A" = 172, "B" = 83, "A&B" = 232))
 SET7_ASH1_K27_UP_eulerplot <- plot(SET7_ASH1_K27_UP_fit)
 ggsave(filename = "SET7_UP_ASH1_UP.pdf", plot = SET7_ASH1_K27_UP_eulerplot <- plot(SET7_ASH1_K27_UP_fit), width = 4, height = 4, dpi = 600)
 
-#K27 genes upregulated CAF1 K36 lost
+#K27 genes upregulated CAF1 K36 K27 lost
 venn.diagram(
-  x = list(K36lost$gene_id, cacupcombinek27$Attributes),
-  category.names = c("K36lost", "CAF UP"),
-  filename = 'K36lost_CAF_UP_genes.png',
-  col=c("#8da0cb","#fc8d62"),
-  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  x = list(K36lost_code$gene_id, K27lost_code$gene_id, cacupcombinek27$Attributes),
+  category.names = c("K36lost", "K27 lost", "CAF UP"),
+  filename = 'K36lost_K27lost_CAF_UP_genes.png',
+  col=c("#8da0cb","#756bb1","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#756bb1",0.25), alpha("#fc8d62",0.25)),
   output=TRUE)
 
-K36lost_CAF_UP_fit = euler(c("A" = 148, "B" = 36, "A&B" = 256))
-K36lost_CAF_UP_eulerplot <- plot(K36lost_CAF_UP_fit)
-ggsave(filename = "K36lost_CAF_UP.pdf", plot = K36lost_CAF_UP_eulerplot, width = 4, height = 4, dpi = 600)
+K36lost_K27lost_CAF_UP_fit = euler(c("A" = 37, "B" = 7, "C" = 127, "A&B" = 6, "A&C" = 102, "B&C" = 18, "A&B&C" = 45))
+K36lost_K27lost_CAF_UP_eulerplot <- plot(K36lost_K27lost_CAF_UP_fit)
+ggsave(filename = "K36lost_K27lost_CAF_UP.pdf", plot = K36lost_K27lost_CAF_UP_eulerplot, width = 4, height = 4, dpi = 600)
 
 #K36 lost genes CAF-1 & set-7
 venn.diagram(
@@ -1077,16 +1077,26 @@ ggsave(filename = "CAF1_SET7_K4_Gain.pdf", plot = CAF1_SET7_K27lost_K4_Gain_eule
 
 ###supplement
 venn.diagram(
-  x = list(Kac_K4_CAF_Gain$gene_id, K36lost$gene_id),
-  category.names = c("CAF Kac/K4 gained", "CAF K36 lost"),
-  filename = 'CAF1_Kac_gained_K36me3_lost_genes.png',
-  col=c("#8da0cb","#fc8d62"),
-  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  x = list(Kac_Gain_CAF$gene_id, K36lost$gene_id, K27lost$gene_id),
+  category.names = c("CAF Kac gained", "CAF K36 lost", "CAF K27 lost"),
+  filename = 'CAF1_Kac_gained_K27me3_K36me3_lost_genes.png',
+  col=c("#8da0cb","#756bb1","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#756bb1",0.25), alpha("#fc8d62",0.25)),
   output=TRUE)
 
-CAF1_Kac_K4_Gain_K36_lost_fit = euler(c("A" = 77, "B" = 37, "A&B" = 46))
-CAF1_Kac_K4_Gain_K36_lost_eulerplot <- plot(CAF1_Kac_K4_Gain_K36_lost_fit)
-ggsave(filename = "CAF1_Kac_K4_Gain_K36_lost.pdf", plot = CAF1_Kac_K4_Gain_K36_lost_eulerplot, width = 4, height = 4, dpi = 600)
+CAF1_Kac_Gain_K36_K27_lost_fit = euler(c("A" = 13, "B" = 21, "C" = 94, "A&B" = 5, "A&C" = 49, "B&C" = 20, "A&B&C" = 37))
+CAF1_Kac_Gain_K36_K27_lost_eulerplot <- plot(CAF1_Kac_Gain_K36_K27_lost_fit)
+ggsave(filename = "CAF1_Kac_Gain_K36_K27_lost.pdf", plot = CAF1_Kac_Gain_K36_K27_lost_eulerplot, width = 4, height = 4, dpi = 600)
+
+
+#venn.diagram(
+#  x = list(K4_Gain_CAF$gene_id, K27lost$gene_id),
+#  category.names = c("CAF K4 gained", "CAF K27 lost"),
+#  filename = 'CAF1_K4gain_K27lost_genes.png',
+#  col=c("#8da0cb","#756bb1"),
+#  fill = c(alpha("#8da0cb",0.25), alpha("#756bb1",0.25)),
+#  output=TRUE)
+
 
 venn.diagram(
   x = list(Kac_K4_cac1_Gain$gene_id, Kac_K4_cac2_Gain$gene_id),

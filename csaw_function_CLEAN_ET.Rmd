@@ -2690,11 +2690,12 @@ K36lost = subset(K27lostK36enrichedvWT, K27lostK36enrichedvWT$logFC_cac1 < -0.75
 K36lost_set7 = subset(K27lostK36enrichedvWT, K27lostK36enrichedvWT$logFC_set7 < -0.75)
 
 K36lost_CAF_ALL = subset(H3K36me3_Results_allgenes_vWT, H3K36me3_Results_allgenes_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_allgenes_vWT$logFC_cac2 < -0.75)
-
 K36lost_CAF_nonK27 = subset(K36lost_CAF_ALL, ! K36lost_CAF_ALL$gene_id %in% K36lost$gene_id)
 
 #K36lost = subset(K36lost, K36lost$FDR_cac1 < 0.05 | K36lost$FDR_cac2 < 0.05)
 K36lost = subset(regions$K27genes, regions$K27genes$gene_id %in% K36lost$gene_id)
+K36lost_code = subset(K36lost, K36lost$gene_id %in% rownames(allDataTPM))
+K36lost_nocode = subset(K36lost, ! K36lost$gene_id %in% rownames(allDataTPM))
 
 retainK27 = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K27lost$gene_id)
 retainK36 = subset(regions$K27genes, regions$K27genes$gene_id %in% K27lostK36enriched$gene_id & ! regions$K27genes$gene_id %in% K36lost$gene_id)
