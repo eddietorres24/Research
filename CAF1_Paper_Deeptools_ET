@@ -636,7 +636,7 @@ plotHeatmap -m matrix_K4_scale.mat.gz \
 
 ##########RNA-seq
 #RNA-seq
-computeMatrix scale-regions -a 200 -b 200 --scale 2 \
+computeMatrix scale-regions --scale 2 \
       -S $RNADIR/SRR8269825/SRR8269825_log.bw \
          /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_log.bw \
          $RNADIR/SRR10916163/SRR10916163_log.bw \
@@ -650,4 +650,4 @@ computeMatrix scale-regions -a 200 -b 200 --scale 2 \
             --heatmapHeight 24 \
             --legendLocation none \
             --colorMap "bwr" \
-            --zMin 0 --zMax 3
+            --zMin 0 --zMax 4
