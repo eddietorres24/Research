@@ -329,12 +329,13 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 1500 \
     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
     $P152DIR/152-97_ChIP_suz12_H3K36me3_Rep1_S121.bin_25.smooth_75Bulk.bw \
-    $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
     $P152DIR/152-98_ChIP_cac-1_suz12_H3K36me3_Rep1_S122.bin_25.smooth_75Bulk.bw \
+    $P152DIR/152-101_ChIP_cac-1_suz12_H3K36me3_Rep2_S125.bin_25.smooth_75Bulk.bw \
+    $P152DIR/152-79_ChIP_cac-1_suz12_H3K36me3_Rep3_S79.bin_25.smooth_75Bulk.bw \
  -R $BEDDIR2/H3K27me3_methylated_TSS_Promoters_FINAL.bed --missingDataAsZero --skipZeros -o K36_K27genes_fig5.gz
 
     plotHeatmap -m K36_K27genes_fig5.gz -out H3K36me3_K27genes_fig5.pdf \
-                    --samplesLabel WT ash-1 cac-1 suz12 set-7 cac-1_suz12 \
+                    --samplesLabel WT ash-1 cac-1 suz12 cac-1_suz12-1 cac-1_suz12-2 cac-1_suz12-3 \
                     --startLabel "TSS" \
                     --sortRegions descend \
                     --outFileSortedRegions CAF-1_K36_order_K27genes.bed \
@@ -349,12 +350,13 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 1500 \
     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
     $P152DIR/152-97_ChIP_suz12_H3K36me3_Rep1_S121.bin_25.smooth_75Bulk.bw \
-    $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
     $P152DIR/152-98_ChIP_cac-1_suz12_H3K36me3_Rep1_S122.bin_25.smooth_75Bulk.bw \
+    $P152DIR/152-101_ChIP_cac-1_suz12_H3K36me3_Rep2_S125.bin_25.smooth_75Bulk.bw \
+    $P152DIR/152-79_ChIP_cac-1_suz12_H3K36me3_Rep3_S79.bin_25.smooth_75Bulk.bw \
  -R $BEDDIR2/ash1_meth_nonK27.bed --missingDataAsZero --skipZeros -o K36_ash1genes_fig5.gz
 
     plotHeatmap -m K36_ash1genes_fig5.gz -out H3K36me3_ash1_methylated_genes_fig5.pdf \
-                    --samplesLabel WT ash-1 cac-1 suz12 set-7 cac-1_suz12 \
+                    --samplesLabel WT ash-1 cac-1 suz12 cac-1_suz12-1 cac-1_suz12-2 cac-1_suz12-3 \
                     --startLabel "TSS" \
                     --sortRegions descend \
                     --sortUsingSamples 1 3 6 \
@@ -368,12 +370,13 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 1500 \
    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
    $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-97_ChIP_suz12_H3K36me3_Rep1_S121.bin_25.smooth_75Bulk.bw \
-   $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-98_ChIP_cac-1_suz12_H3K36me3_Rep1_S122.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-101_ChIP_cac-1_suz12_H3K36me3_Rep2_S125.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-79_ChIP_cac-1_suz12_H3K36me3_Rep3_S79.bin_25.smooth_75Bulk.bw \
  -R $BEDDIR2/set2_meth_only.bed --missingDataAsZero --skipZeros -o K36_fig5_set2.gz
 
     plotHeatmap -m K36_fig5_set2.gz -out H3K36me3_set_methylated_only_genes_fig5.pdf \
-                    --samplesLabel WT ash-1 cac-1 suz12 set-7 cac-1_suz12 \
+                    --samplesLabel WT ash-1 cac-1 suz12 cac-1_suz12-1 cac-1_suz12-2 cac-1_suz12-3 \
                     --startLabel "TSS" \
                     --sortRegions descend \
                     --heatmapHeight 25 \
@@ -409,7 +412,7 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
 
 plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure5.pdf \
-  --samplesLabel WT cac-1 cac-2 suz-12 cac-1_suz-12  \
+  --samplesLabel WT cac-1 cac-2 suz-12 cac-1_suz-12 \
   --startLabel "TSS" \
   --sortRegions descend \
   --heatmapHeight 24 \
