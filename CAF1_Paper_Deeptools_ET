@@ -291,18 +291,21 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
    $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
    $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
    $P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw \
--R $BEDDIR2/Kac_Gain_CAF.bed $BEDDIR2/Kac_Gain_set7_noCAF.bed $BEDDIR2/Kac_no_change.bed $BEDDIR2/Kac_unenriched.bed \
+-R $BEDDIR2/RNA_order_fig4.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
+
+# $BEDDIR2/Kac_Gain_CAF.bed $BEDDIR2/Kac_Gain_set7_noCAF.bed $BEDDIR2/Kac_no_change.bed $BEDDIR2/Kac_unenriched.bed
 
 plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_CAF-1_Kac_clustered_K27genes.pdf \
   --samplesLabel WT cac-1 cac-2 set-7  \
   --startLabel "TSS" \
-  --sortRegions descend \
+  --sortRegions no \
   --heatmapHeight 24 \
   --legendLocation none \
-  --outFileSortedRegions $BEDDIR2/Kac_order_fig4.bed \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
   --zMin 0 --zMax 9
+
+  # --outFileSortedRegions $BEDDIR2/Kac_order_fig4.bed \
 
 #K4
 computeMatrix scale-regions \
@@ -310,7 +313,7 @@ computeMatrix scale-regions \
    $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
    $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-106_ChIP_suz12_H3K4me2_Rep2_S130.bin_25.smooth_75Bulk.bw \
--R $BEDDIR2/Kac_order_fig4.bed \
+-R $BEDDIR2/RNA_order_fig4.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_K4_clustered.gz
 
 plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out K27_genes_CAF-1_H3K4me2_Kac_clustered_Kacorder.pdf \

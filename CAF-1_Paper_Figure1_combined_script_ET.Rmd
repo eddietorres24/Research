@@ -1037,6 +1037,7 @@ ggsave(filename = "CAF1_SET7_K36lost.pdf", plot = CAF1_SET7_K36lost_eulerplot, w
 
 #####################################################
 #FIGURE 4
+###main
 venn.diagram(
   x = list(Kac_K4_CAF_Gain_code$gene_id, cacupcombinek27$Attributes, K27lost_code$gene_id),
   category.names = c("CAF gained", "CAF UP", "K27lost"),
@@ -1050,17 +1051,31 @@ Kac_K4_gain_K27lost_CAF_Up_eulerplot <- plot(Kac_K4_gain_K27lost_CAF_Up_fit)
 ggsave(filename = "Kac_K4_gain_K27lost_CAF_Up.pdf", plot = Kac_K4_gain_K27lost_CAF_Up_eulerplot, width = 4, height = 4, dpi = 600)
 
 venn.diagram(
-  x = list(Kac_K4_CAF_Gain$gene_id, Kac_K4_set7_Gain$gene_id),
+  x = list(Kac_Gain_CAF$gene_id, Kac_Gain_set7$gene_id),
   category.names = c("CAF gained", "SET7 gained"),
-  filename = 'CAF1_set7_Kac_K4me2_gained_genes.png',
+  filename = 'CAF1_set7_Kac_gained_genes.png',
   col=c("#8da0cb","#756bb1"),
   fill = c(alpha("#8da0cb",0.25), alpha("#756bb1",0.25)),
   output=TRUE)
 
-CAF1_SET7_K27lost_Kac_K4_Gain_fit = euler(c("A" = 91, "B" = 54, "A&B" = 32))
-CAF1_SET7_K27lost_Kac_K4_Gain_eulerplot <- plot(CAF1_SET7_K27lost_Kac_K4_Gain_fit)
-ggsave(filename = "CAF1_SET7_Kac_K4_Gain.pdf", plot = CAF1_SET7_K27lost_Kac_K4_Gain_eulerplot, width = 4, height = 4, dpi = 600)
+CAF1_SET7_K27lost_Kac_Gain_fit = euler(c("A" = 92, "B" = 37, "A&B" = 12))
+CAF1_SET7_K27lost_Kac_Gain_eulerplot <- plot(CAF1_SET7_K27lost_Kac_Gain_fit)
+ggsave(filename = "CAF1_SET7_Kac_Gain.pdf", plot = CAF1_SET7_K27lost_Kac_Gain_eulerplot, width = 4, height = 4, dpi = 600)
 
+
+venn.diagram(
+  x = list(K4_Gain_CAF$gene_id, K4_Gain_set7$gene_id),
+  category.names = c("CAF gained", "SET7 gained"),
+  filename = 'CAF1_set7_K4me2_gained_genes.png',
+  col=c("#8da0cb","#756bb1"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#756bb1",0.25)),
+  output=TRUE)
+
+CAF1_SET7_K27lost_K4_Gain_fit = euler(c("A" = 2, "B" = 26, "A&B" = 22))
+CAF1_SET7_K27lost_K4_Gain_eulerplot <- plot(CAF1_SET7_K27lost_K4_Gain_fit)
+ggsave(filename = "CAF1_SET7_K4_Gain.pdf", plot = CAF1_SET7_K27lost_K4_Gain_eulerplot, width = 4, height = 4, dpi = 600)
+
+###supplement
 venn.diagram(
   x = list(Kac_K4_CAF_Gain$gene_id, K36lost$gene_id),
   category.names = c("CAF Kac/K4 gained", "CAF K36 lost"),
