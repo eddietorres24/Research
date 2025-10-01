@@ -324,11 +324,11 @@ module load deepTools
 #FIGURE 5
 
 ##K27 genes
-computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
- -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
+computeMatrix reference-point --referencePoint TSS -b 1000 -a 1500 \
+ -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw  \
     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
-    $P152DIR/152-100_ChIP_suz12_H3K36me3_Rep2_S124.bin_25.smooth_75Bulk.bw \
+    $P152DIR/152-97_ChIP_suz12_H3K36me3_Rep1_S121.bin_25.smooth_75Bulk.bw \
     $P152DIR/152-98_ChIP_cac-1_suz12_H3K36me3_Rep1_S122.bin_25.smooth_75Bulk.bw \
  -R $BEDDIR2/H3K27me3_methylated_TSS_Promoters_FINAL.bed --missingDataAsZero --skipZeros -o K36_K27genes_fig5.gz
 
@@ -343,11 +343,11 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
                     --zMin 0 --zMax 12
 
 ###ASH-1 methylated
-computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
- -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
+computeMatrix reference-point --referencePoint TSS -b 1000 -a 1500 \
+ -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw  \
     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
-    $P152DIR/152-100_ChIP_suz12_H3K36me3_Rep2_S124.bin_25.smooth_75Bulk.bw \
+    $P152DIR/152-97_ChIP_suz12_H3K36me3_Rep1_S121.bin_25.smooth_75Bulk.bw \
     $P152DIR/152-98_ChIP_cac-1_suz12_H3K36me3_Rep1_S122.bin_25.smooth_75Bulk.bw \
  -R $BEDDIR2/ash1_meth_nonK27.bed --missingDataAsZero --skipZeros -o K36_ash1genes_fig5.gz
 
