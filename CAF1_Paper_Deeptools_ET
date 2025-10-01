@@ -300,7 +300,7 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_CAF-1_Kac_clustered_K27gen
   --samplesLabel WT cac-1 cac-2 set-7  \
   --startLabel "TSS" \
   --sortRegions no \
-  --heatmapHeight 24 \
+  --heatmapHeight 20 \
   --legendLocation none \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
   --zMin 0 --zMax 9
@@ -320,7 +320,7 @@ plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out K27_genes_CAF-1_H3K4me2_Kac_clu
   --samplesLabel WT cac-1 cac-2 set-7 \
   --startLabel "TSS" \
   --sortRegions no \
-  --heatmapHeight 24 \
+  --heatmapHeight 20 \
   --legendLocation none \
   --colorList 'white, violet, magenta' \
   --zMin 0 --zMax 9
@@ -339,7 +339,7 @@ computeMatrix scale-regions --scale 2 \
               --endLabel "TES" \
               --sortRegions descend \
               --outFileSortedRegions $BEDDIR2/RNA_order_fig4.bed \
-              --heatmapHeight 24 \
+              --heatmapHeight 20 \
               --legendLocation none \
               --colorMap "bwr" \
               --zMin 0 --zMax 4
@@ -360,7 +360,7 @@ plotHeatmap -m matrix_K27.mat.gz \
   --samplesLabel WT cac-1 \
   --startLabel "TSS" \
   --sortRegions no \
-  --heatmapHeight 24 \
+  --heatmapHeight 20 \
   --legendLocation none \
   --colorList 'white,g,darkgreen' \
   --zMin 0 --zMax 50
