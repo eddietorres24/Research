@@ -465,19 +465,18 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
    $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-80_ChIP_suz12_Kac_Rep1_S80.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-82_ChIP_cac-1_suz12_Kac_Rep1_S82.bin_25.smooth_75Bulk.bw \
--R $BEDDIR2/Kac_Gain_CAF.bed $BEDDIR2/Kac_Gain_set7_noCAF.bed $BEDDIR2/Kac_no_change_dub.bed $BEDDIR2/Kac_Gain_cac1-suz12_only.bed \
+-R $BEDDIR2/Kac_Fig6_order_enriched.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
 
 plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6.pdf \
   --samplesLabel WT cac-1 suz-12 cac-1_suz-12 \
   --startLabel "TSS" \
-  --sortRegions descend \
+  --sortRegions no \
   --legendLocation none \
-  --outFileSortedRegions $BEDDIR2/Kac_Fig6_order_enriched.bed \
   --heatmapHeight 15 \
   --whatToShow "heatmap and colorbar" \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
-  --zMin 0 --zMax 9
+  --zMin 0 --zMax 8
 
 # $BEDDIR2/Kac_Fig6_order_enriched.bed
   ##################################
