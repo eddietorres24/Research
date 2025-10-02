@@ -453,7 +453,7 @@ computeMatrix scale-regions \
 plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_Figure6.pdf \
   --samplesLabel WT cac-1 cac-2 suz-12 cac-1_suz-12 \
   --startLabel "TSS" \
-  --sortRegions descend \
+  --sortRegions no \
   --legendLocation none \
   --colorList 'white, violet, magenta' \
   --zMin 0 --zMax 9
@@ -471,7 +471,7 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
 plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6.pdf \
   --samplesLabel WT cac-1 cac-2 suz-12 cac-1_suz-12 \
   --startLabel "TSS" \
-  --sortRegions descend \
+  --sortRegions no \
   --legendLocation none \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
   --zMin 0 --zMax 9
