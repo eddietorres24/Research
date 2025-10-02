@@ -446,12 +446,16 @@ computeMatrix scale-regions \
    $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
    $P146DIR/146-21_ChIP_cac-2_H3K4me2_Rep1_S21.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-106_ChIP_suz12_H3K4me2_Rep2_S130.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-83_ChIP_suz12_H3K4me2_Rep3_S83.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-103_ChIP_suz12_H3K4me2_Rep1_S127.bin_25.smooth_75Bulk.bw 
    $P152DIR/152-107_ChIP_cac-1_suz12_H3K4me2_Rep2_S131.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-85_ChIP_cac-1_suz12_H3K4me2_Rep3_S85.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-104_ChIP_cac-1_suz12_H3K4me2_Rep1_S128.bin_25.smooth_75Bulk.bw \
 -R $BEDDIR2/K4_Fig6_order.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_K4_clustered.gz
 
 plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_Figure6.pdf \
-  --samplesLabel WT cac-1 cac-2 suz-12 cac-1_suz-12 \
+  --samplesLabel WT cac-1 cac-2 suz-12_1 suz-12_2 suz-12_3 cac-1_suz-12_1 cac-1_suz-12_2 cac-1_suz-12_3 \
   --startLabel "TSS" \
   --sortRegions no \
   --legendLocation none \
@@ -464,12 +468,14 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
    $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
    $P150DIR/150-137_ChIP_cac-2_Kac_Rep2_S152.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-74_ChIP_suz12_Kac_Rep1_S74.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-80_ChIP_suz12_Kac_Rep1_S80.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-82_ChIP_cac-1_suz12_Kac_Rep1_S82.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-76_ChIP_cac-1_suz12_Kac_Rep1_S76.bin_25.smooth_75Bulk.bw \
 -R $BEDDIR2/Kac_Fig6_order.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
 
 plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6.pdf \
-  --samplesLabel WT cac-1 cac-2 suz-12 cac-1_suz-12 \
+  --samplesLabel WT cac-1 cac-2 suz-12_1 suz-12_2 cac-1_suz-12_2 cac-1_suz-12_1 \
   --startLabel "TSS" \
   --sortRegions no \
   --legendLocation none \
