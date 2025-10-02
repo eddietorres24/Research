@@ -291,7 +291,7 @@ computeMatrix scale-regions --scale 2 \
            /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_log.bw \
            $RNADIR/SRR7970630/SRR7970630_log.bw \
            $RNADIR/SRR10916163/SRR10916163_log.bw \
-           -R "$BEDDIR2/Kac_order_fig4.bed" --skipZeros --missingDataAsZero -o matrix_PRC2_RNA.gz
+           -R $BEDDIR2/Kac_Gain_CAF.bed $BEDDIR2/Kac_Gain_set7_noCAF.bed $BEDDIR2/Kac_no_change.bed $BEDDIR2/Kac_unenriched.bed --skipZeros --missingDataAsZero -o matrix_PRC2_RNA.gz
 
       plotHeatmap -m matrix_PRC2_RNA.gz -out K27_genes_CAF-1_RNA-seq_Kac_clustered_RNA_order_TEST.pdf \
               --samplesLabel WT cac-1 cac-2 set-7 \
@@ -457,7 +457,7 @@ plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_Figure6.pdf \
   --legendLocation none \
   --whatToShow "heatmap and colorbar" \
   --colorList 'white, violet, magenta' \
-  --zMin 0 --zMax 9
+  --zMin 0 --zMax 8
 
 ###Kac
 computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
@@ -465,7 +465,7 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
    $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-80_ChIP_suz12_Kac_Rep1_S80.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-82_ChIP_cac-1_suz12_Kac_Rep1_S82.bin_25.smooth_75Bulk.bw \
--R $BEDDIR2/Kac_Fig6_order_enriched.bed \
+-R $BEDDIR2/Kac_Gain_CAF.bed $BEDDIR2/Kac_Gain_set7_noCAF.bed $BEDDIR2/Kac_no_change_dub.bed $BEDDIR2/Kac_Gain_cac1-suz12_only.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
 
 plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6.pdf \
@@ -473,11 +473,13 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6.pdf \
   --startLabel "TSS" \
   --sortRegions no \
   --legendLocation none \
+  --outFileSortedRegions $BEDDIR2/Kac_Fig6_order_enriched.bed \
   --heatmapHeight 15 \
   --whatToShow "heatmap and colorbar" \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
   --zMin 0 --zMax 9
 
+# $BEDDIR2/Kac_Fig6_order_enriched.bed
   ##################################
 #
 # ##All_combined
