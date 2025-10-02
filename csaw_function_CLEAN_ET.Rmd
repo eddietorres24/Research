@@ -2729,6 +2729,9 @@ Kac_enriched <- Kac_Results_K27promTSSext_vInput %>%
 K4_enriched <- H3K4me2_Results_K27genes_vInput %>%
   filter(if_any(all_of(c(6, 9, 12, 18, 21, 24, 27)), ~ coalesce(.x > 0, FALSE)))
 
+Kacno
+
+K4no = subset(H3K4me2_Results_K27genes_vInput, ! H3K4me2_Results_K27genes_vInput$gene_id %in% K4_enriched$gene_id)
 
 #K4_enricheddub <- H3K4me2_Results_K27genes_vInput %>%
  # filter(if_any(all_of(c(6, 9, 12, 18, 21, 24, 27)), ~ coalesce(.x > 0, FALSE)))
@@ -2808,7 +2811,6 @@ K4_unenriched = subset(H3K4me2_Results_K27genes_vWT, ! H3K4me2_Results_K27genes_
 K4_genes_gain_cac1 = subset(K4_enrichedvWT, K4_enrichedvWT$logFC_cac1 > 0.75)
 K4_cac1_suz12_gain_only = subset(K4_nochange, K4_nochange$logFC_cac1_suz12 > 0.585)
 K4_cac1_suz12_gain_only2 = subset(K4_unenriched, K4_unenriched$logFC_cac1_suz12 > 0.585)
-#K4_cac1_suz12_gain_only = subset(K4_enrichedvWT, K4_enrichedvWT$logFC_cac1_suz12 > 0.585 & (! K4_enrichedvWT$gene_id %in% K4_genes_gain_CAF$gene_id | ! K4_enrichedvWT$gene_id %in% K4_genes_gain_set7$gene_id ))
 
 K4_Gain_cac1 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_cac1$gene_id)
 K4_Gain_suz12 = subset(regions$K27genes, regions$K27genes$gene_id %in% K4_genes_gain_suz12$gene_id)

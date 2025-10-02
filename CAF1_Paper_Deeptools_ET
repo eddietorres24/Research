@@ -444,11 +444,9 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 computeMatrix scale-regions \
 -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
    $P146DIR/146-20_ChIP_cac-1_H3K4me2_Rep1_S20.bin_25.smooth_75Bulk.bw \
-   $P152DIR/152-106_ChIP_suz12_H3K4me2_Rep2_S130.bin_25.smooth_75Bulk.bw \
-   $P152DIR/152-83_ChIP_suz12_H3K4me2_Rep3_S83.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-103_ChIP_suz12_H3K4me2_Rep1_S127.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-85_ChIP_cac-1_suz12_H3K4me2_Rep3_S85.bin_25.smooth_75Bulk.bw \
--R $BEDDIR2/K4_Fig6_order.bed \
+-R $BEDDIR2/K4_Fig6_order_enriched.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_K4_clustered.gz
 
 plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_Figure6.pdf \
@@ -456,6 +454,7 @@ plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_Figure6.pdf \
   --startLabel "TSS" \
   --sortRegions no \
   --legendLocation none \
+  --whatToShow "heatmap and colorbar" \
   --colorList 'white, violet, magenta' \
   --zMin 0 --zMax 9
 
@@ -465,7 +464,7 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
    $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-80_ChIP_suz12_Kac_Rep1_S80.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-82_ChIP_cac-1_suz12_Kac_Rep1_S82.bin_25.smooth_75Bulk.bw \
--R $BEDDIR2/Kac_Fig6_order.bed \
+-R $BEDDIR2/Kac_Fig6_order_enriched \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
 
 plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6.pdf \
@@ -473,6 +472,7 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6.pdf \
   --startLabel "TSS" \
   --sortRegions no \
   --legendLocation none \
+  --whatToShow "heatmap and colorbar" \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
   --zMin 0 --zMax 9
 
