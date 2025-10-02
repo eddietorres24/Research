@@ -450,7 +450,7 @@ computeMatrix scale-regions \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_K4_clustered.gz
 
 plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_Figure6.pdf \
-  --samplesLabel WT cac-1 suz-12_1 suz-12_2 suz-12_3 cac-1_suz-12_1 cac-1_suz-12_2 cac-1_suz-12_3 \
+  --samplesLabel WT cac-1 suz-12 cac-1_suz-12 \
   --startLabel "TSS" \
   --sortRegions no \
   --legendLocation none \
