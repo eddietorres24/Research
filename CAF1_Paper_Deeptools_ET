@@ -453,6 +453,7 @@ plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_Figure6.pdf \
   --samplesLabel WT cac-1 suz-12 cac-1_suz-12 \
   --startLabel "TSS" \
   --sortRegions no \
+  --heatmapHeight 5 \
   --legendLocation none \
   --whatToShow "heatmap and colorbar" \
   --colorList 'white, violet, magenta' \
@@ -472,6 +473,7 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6.pdf \
   --startLabel "TSS" \
   --sortRegions no \
   --legendLocation none \
+  --heatmapHeight 15 \
   --whatToShow "heatmap and colorbar" \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
   --zMin 0 --zMax 9
