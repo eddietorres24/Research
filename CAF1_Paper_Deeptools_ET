@@ -447,9 +447,7 @@ computeMatrix scale-regions \
    $P152DIR/152-106_ChIP_suz12_H3K4me2_Rep2_S130.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-83_ChIP_suz12_H3K4me2_Rep3_S83.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-103_ChIP_suz12_H3K4me2_Rep1_S127.bin_25.smooth_75Bulk.bw \
-   $P152DIR/152-107_ChIP_cac-1_suz12_H3K4me2_Rep2_S131.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-85_ChIP_cac-1_suz12_H3K4me2_Rep3_S85.bin_25.smooth_75Bulk.bw \
-   $P152DIR/152-104_ChIP_cac-1_suz12_H3K4me2_Rep1_S128.bin_25.smooth_75Bulk.bw \
 -R $BEDDIR2/K4_Fig6_order.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_K4_clustered.gz
 
