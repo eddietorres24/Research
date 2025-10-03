@@ -457,7 +457,7 @@ plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_Figure6.pdf \
   --legendLocation none \
   --whatToShow "heatmap and colorbar" \
   --colorList 'white, violet, magenta' \
-  --zMin 0 --zMax 8
+  --zMin 0 --zMax 9
 
 ###Kac
 computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
@@ -476,7 +476,7 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6.pdf \
   --heatmapHeight 15 \
   --whatToShow "heatmap and colorbar" \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
-  --zMin 0 --zMax 8
+  --zMin 0 --zMax 9
 
 # $BEDDIR2/Kac_Fig6_order_enriched.bed
   ##################################
