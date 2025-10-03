@@ -368,25 +368,25 @@ plotHeatmap -m matrix_K27.mat.gz -out K27_genes_CAF-1_H3K27me3_Kac_clustered_RNA
 
 ###H3K36me3
 ##K27 genes
-# computeMatrix reference-point --referencePoint TSS -b 1000 -a 1500 \
-#  -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw  \
-#     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
-#     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
-#     $P152DIR/152-97_ChIP_suz12_H3K36me3_Rep1_S121.bin_25.smooth_75Bulk.bw \
-#     $P152DIR/152-101_ChIP_cac-1_suz12_H3K36me3_Rep2_S125.bin_25.smooth_75Bulk.bw \
-#  -R $BEDDIR2/K27genes_K36enriched.bed $BEDDIR2/K27genes_K36unenriched.bed --missingDataAsZero --skipZeros -o K36_K27genes_fig5.gz
-#
-#     plotHeatmap -m K36_K27genes_fig5.gz -out H3K36me3_K27genes_fig5.pdf \
-#                     --samplesLabel WT ash-1 cac-1 suz12 cac-1_suz12 \
-#                     --startLabel "TSS" \
-#                     --sortRegions descend \
-#                     --outFileSortedRegions CAF-1_K36_order_K27genes.bed \
-#                     --sortUsingSamples 1 3 \
-#                     --heatmapHeight 24 \
-#                     --colorMap "afmhot_r" \
-#                     --zMin 0 --zMax 12
-#
-# ###ASH-1 methylated
+computeMatrix reference-point --referencePoint TSS -b 1000 -a 1500 \
+ -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw  \
+    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
+    $P152DIR/152-97_ChIP_suz12_H3K36me3_Rep1_S121.bin_25.smooth_75Bulk.bw \
+    $P152DIR/152-101_ChIP_cac-1_suz12_H3K36me3_Rep2_S125.bin_25.smooth_75Bulk.bw \
+ -R $BEDDIR2/K27genes_K36enriched.bed --missingDataAsZero --skipZeros -o K36_K27genes_fig5.gz
+
+    plotHeatmap -m K36_K27genes_fig5.gz -out H3K36me3_K27genes_fig5.pdf \
+                    --samplesLabel WT ash-1 cac-1 suz12 cac-1_suz12 \
+                    --startLabel "TSS" \
+                    --sortRegions descend \
+                    --outFileSortedRegions CAF-1_K36_order_K27genes.bed \
+                    --sortUsingSamples 1 3 \
+                    --heatmapHeight 24 \
+                    --colorMap "afmhot_r" \
+                    --zMin 0 --zMax 12
+
+###ASH-1 methylated
 # computeMatrix reference-point --referencePoint TSS -b 1000 -a 1500 \
 #  -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw  \
 #     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
