@@ -559,16 +559,20 @@ cac1_vol <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1__alpha0.05__ALL_r
 cac2_vol <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac2__alpha0.05__ALL_results_LFC.csv")
 cac3_vol <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac3__alpha0.05__ALL_results_LFC.csv")
 set7_vol <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/set7__alpha0.05__ALL_results_LFC.csv")
+cac1_suz12_vol <- read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1_SUZ12__alpha0.05__ALL_results_LFC.csv")
 
 #I need to get rid of a few genes with a p-value of 0, as well as the knocked-out gene itself
 cac1_vol <- cac1_vol[cac1_vol$padj != 0, ]
 cac2_vol <- cac2_vol[cac2_vol$padj != 0, ]
 cac3_vol <- cac3_vol[cac3_vol$padj != 0, ]
 set7_vol <- set7_vol[set7_vol$padj != 0, ]
+cac1_suz12_vol <- cac1_suz12_vol[cac1_vol$padj != 0, ]
 cac1_vol <- cac1_vol[-which.min(cac1_vol$log2FoldChange), ]
 cac2_vol <- cac2_vol[-which.min(cac2_vol$log2FoldChange), ]
 cac3_vol <- cac3_vol[-which.min(cac3_vol$log2FoldChange), ]
 set7_vol <- set7_vol[-which.min(set7_vol$log2FoldChange), ]
+cac1_suz12_vol <- cac1_suz12_vol[-which.min(cac1_suz12_vol$log2FoldChange), ]
+cac1_suz12_vol <- subset(cac1_suz12_vol, NCU != "NCU05460")
 
 ##cac-1
 #Assign categories with NS prioritized
@@ -624,7 +628,7 @@ cac1_volcano_plot <- ggplot(cac1_vol, aes(
     legend.position = "bottom",
     legend.box = "horizontal",
     legend.title = element_blank() 
-  ) 
+  ) +
   guides(color = guide_legend(override.aes = list(size = 5)))  # bigger legend dots
 
 #Print the plot
@@ -810,6 +814,69 @@ print(set7_volcano_plot)
 
 #Save Plot
 ggsave("./set7_volcano_plot_FINAL.pdf", plot=set7_volcano_plot, width = 12, height = 9, unit="in",  dpi=400)
+
+##cac-1_suz-12
+#Assign categories with NS prioritized
+cac1_suz12_vol$category <- case_when(
+  cac1_suz12_vol$log2FoldChange > -1 & cac1_suz12_vol$log2FoldChange < 1 ~ "NS",
+  cac1_suz12_vol$NCU %in% Prc2targets$V11 ~ "PRC2",
+  cac1_suz12_vol$log2FoldChange > 1 & cac1_suz12_vol$padj < 0.05 ~ "Upregulated",
+  cac1_suz12_vol$log2FoldChange < -1 & cac1_suz12_vol$padj < 0.05 ~ "Downregulated",
+  TRUE ~ "NS"
+)
+
+#Reorder so PRC2 is plotted last (on top)
+cac1_suz12_vol <- cac1_suz12_vol[order(cac1_suz12_vol$category == "PRC2"), ]
+
+#Plot
+library(ggplot2)
+library(scales)  # breaks_width(), pseudo_log_trans()
+
+cac1_suz12_volcano_plot <- ggplot(cac1_suz12_vol, aes(
+  x = log2FoldChange,
+  y = -log10(padj),
+  color = category
+)) +
+  geom_point(size = 3, alpha = 0.85) +
+  scale_color_manual(
+    values = c(
+      "Upregulated" = "red",
+      "Downregulated" = "blue",
+      "PRC2" = "orange2",
+      "NS" = "grey"
+    ),
+    breaks = c("Upregulated", "Downregulated", "PRC2"), # only show these in legend
+    labels = c("Upregulated", "Downregulated", "PRC2")
+  ) +
+  labs(
+    x = expression(paste("log"[2], "FoldChange(cac-1_suz-12/WT)")),
+    y = expression(paste("-log"[10], "(p-value)")),
+    title = "cac-1_suz-12 vs WT"
+  ) + 
+  scale_x_continuous(breaks = breaks_width(3), minor_breaks = breaks_width(1)) + 
+  scale_y_continuous(trans = pseudo_log_trans(base = 10, sigma = 2),
+                     breaks = c(0,2,5,10,20,50,100,200,300),
+                     limits = c(0, NA)) + 
+  coord_cartesian(ylim = c(0, 300)) +
+  geom_vline(xintercept = c(-1, 1), color = "grey5", linetype = "dashed", alpha = 0.35) +
+  geom_hline(yintercept = -log10(0.05), color = "grey5", linetype = "dashed", alpha = 0.35) +
+  theme_classic(base_size = 20) +
+  theme(
+    axis.title.y = element_text(face = "bold", margin = margin(0, 20, 0, 0), size = rel(1.1), color = 'black'),
+    axis.title.x = element_text(face = "bold", margin = margin(20, 0, 0, 0), size = rel(1.1), color = 'black',),
+    axis.text = element_text(color = "black"),
+    plot.title = element_text(hjust = 0.5, color = "black"),
+    legend.position = "bottom",
+    legend.box = "horizontal",
+    legend.title = element_blank() 
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 5)))  # bigger legend dots
+
+#Print the plot
+print(cac1_suz12_volcano_plot)
+
+ggsave("./cac1_suz12_volcano_plot_FINAL.pdf", plot=cac1_suz12_volcano_plot, width = 12, height = 9, unit="in",  dpi=400)
+
 ```
 
 # Now, I want to make Venn-diagrams to compare the number of genes that are DE across all the CAF-1 mutants & set-7 for K27 genes
@@ -970,15 +1037,15 @@ ggsave(filename = "CAF1_K27_lost_set7_UP.pdf", plot = CAF1_K27_lost_set7_UP_eule
 ###################################################
 #FIGURE 3
 #K27 lost ash1 K27/K36 lost caf1
-#venn.diagram(
-#  x = list(K27lostash1$gene_id, CAF_K27_K36_Lost$gene_id),
-#  category.names = c("ash1 K27 lost", "CAF K27 lost"),
-#  filename = "ASH1_CAF1_K27K36lost.png",
-#  col=c("#8da0cb","#fc8d62"),
-#  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
-#  output=TRUE)
+venn.diagram(
+  x = list(K27lostash1$gene_id, K27lost$gene_id),
+  category.names = c("ash1 K27 lost", "CAF K27 lost"),
+  filename = "ASH1_CAF1_K27K36lost.png",
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
 
-CAF1_ASH1_K27lost_fit = euler(c("A" = 286, "B" = 53, "A&B" = 176))
+CAF1_ASH1_K27lost_fit = euler(c("A" = 310, "B" = 48, "A&B" = 152))
 CAF1_ASH1_K27lost_eulerplot <- plot(CAF1_ASH1_K27lost_fit)
 ggsave(filename = "CAF1_ASH1_K27lost.pdf", plot = CAF1_ASH1_K27lost_eulerplot <- plot(CAF1_ASH1_K27lost_fit), width = 4, height = 4, dpi = 600)
 
@@ -1139,6 +1206,34 @@ venn.diagram(
 CAF1_suz12_Double_K27_UP_fit = euler(c("A" = 146, "B" = 5, "A&B" = 354))
 CAF1_suz12_Double_K27_UP_eulerplot <- plot(CAF1_suz12_Double_K27_UP_fit)
 ggsave(filename = "CAF-1_suz12_Double_UP.pdf", plot = CAF1_suz12_Double_K27_UP_eulerplot, width = 4, height = 4, dpi = 600)
+
+#######################################################
+#FIGURE 6
+###Double Mutants
+venn.diagram(
+  x = list(K4_genes_gain_suz12$gene_id, K4_genes_gain_cac1$gene_id, K4_cac1_suz12_gain$gene_id),
+  category.names = c("suz12 gain", "cac1 gain", "double gain"),
+  filename = 'cac1suz12_K4_gain_genes.png',
+  col=c("#8da0cb","#fc8d62","#66c2a5"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25), alpha("#66c2a5",0.25)),
+  output=TRUE)
+
+CAF1_suz12_Double_K4_fit = euler(c("A" = 0, "B" = 0, "C" = 7, "A&B" = 0, "A&C" = 5, "B&C" = 41, "A&B&C" = 9))
+CAF1_suz12_Double_K4_eulerplot <- plot(CAF1_suz12_Double_K4_fit)
+ggsave(filename = "CAF1_suz12_Double_K4.pdf", plot = CAF1_suz12_Double_K4_eulerplot, width = 4, height = 4, dpi = 600)
+
+venn.diagram(
+  x = list(Kac_Gain_suz12$gene_id, Kac_Gain_cac1$gene_id, Kac_cac1_suz12_gain$gene_id),
+  category.names = c("suz12 gain", "cac1 gain", "double gain"),
+  filename = 'cac1suz12_Kac_gain_genes.png',
+  col=c("#8da0cb","#fc8d62","#66c2a5"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25), alpha("#66c2a5",0.25)),
+  output=TRUE)
+
+CAF1_suz12_Double_Kac_fit = euler(c("A" = 13, "B" = 33, "C" = 33, "A&B" = 1, "A&C" = 14, "B&C" = 14, "A&B&C" = 2))
+CAF1_suz12_Double_Kac_eulerplot <- plot(CAF1_suz12_Double_Kac_fit)
+ggsave(filename = "CAF1_suz12_Double_Kac.pdf", plot = CAF1_suz12_Double_Kac_eulerplot, width = 4, height = 4, dpi = 600)
+
 
 ###Tests
 venn.diagram(
