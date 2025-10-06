@@ -499,7 +499,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
                                         --missingDataColor 1 \
                                         --legendLocation none \
                                         --colorList "white, g, darkgreen" \
-                                        --zMin 0 --zMax 50
+                                        --zMin 0 --zMax 60
 
                                         #149-122_ChIP_cac-2_comp_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw
                                         #149-123_ChIP_cac-2_comp_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw
