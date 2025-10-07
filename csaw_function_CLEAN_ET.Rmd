@@ -1023,6 +1023,77 @@ csaw_analysis(
 ```
 ###########################################################################################
 
+###########################################################################################
+
+```{r, Old manual clustering logic for Heatmaps, echo = FALSE}
+K27_FilteredHeatmap_mat <- as.matrix(H3K27me3_CS_Heatmap_GenomeWide_vInput)
+quantile(K27_FilteredHeatmap_mat, c(.01, .50, .75, .95, .98, .995)) 
+max <- quantile(K27_FilteredHeatmap_mat, 0.995) # identify the 98th percentile value and assign this to max
+K27_FilteredHeatmap_mat[K27_FilteredHeatmap_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
+
+#I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0.1 in all both CAF-1 mutants and WT
+K27_FilteredHeatmap_mat <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] >= 0.101 | K27_FilteredHeatmap_mat[, 2] >= 0.101 | K27_FilteredHeatmap_mat[, 3] >= 0.101)
+
+#throwing our regions that are > 0.1 in set-7 (if any got through)
+K27_FilteredHeatmap_mat <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 5] <= 0.101)
+
+#I only want to look at CAF-1/rtt106 experiment
+K27_FilteredHeatmap_mat_rtt106 <- K27_FilteredHeatmap_mat[,c(8:11)]
+
+#altering the subsetting to clean up heatmap
+no_cac <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 9] <= 0.1 & ! K27_FilteredHeatmap_mat[, 8] <= 0.1 & K27_FilteredHeatmap_mat[, 10] <= 0.1 )
+
+no_cac2 <- subset(K27_FilteredHeatmap_mat, ! K27_FilteredHeatmap_mat[, 9] <= 0.1 & ! K27_FilteredHeatmap_mat[, 8] <= 0.1 & K27_FilteredHeatmap_mat[, 10] <= 0.1 )
+
+no_cac1 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 9] <= 0.1 & ! K27_FilteredHeatmap_mat[, 8] <= 0.1 & ! K27_FilteredHeatmap_mat[, 10] <= 0.1 )
+
+in_all <- subset(K27_FilteredHeatmap_mat, ! K27_FilteredHeatmap_mat[, 8] < 0.101 & ! K27_FilteredHeatmap_mat[, 9] < 0.101 & ! K27_FilteredHeatmap_mat[, 10] <= 0.1)
+
+no_WT <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 8] <= 0.1 & ! K27_FilteredHeatmap_mat[, 9] <= 0.1 & ! K27_FilteredHeatmap_mat[, 10] <= 0.1)
+
+cac1only <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 8] <= 0.1 & ! K27_FilteredHeatmap_mat[, 9] <= 0.1 & K27_FilteredHeatmap_mat[, 10] <= 0.101)
+
+cac2only <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 8] <= 0.1 & K27_FilteredHeatmap_mat[, 9] <= 0.1 & ! K27_FilteredHeatmap_mat[, 10] <= 0.101)
+
+#ordering the subsets so that enrichment is ordered from highest to lowest in each one
+no_cac_order <-order(no_cac[, 8], decreasing = TRUE)
+no_cac2_order <-order(rowMeans(no_cac2[, 8:9]), decreasing = TRUE)
+no_cac1_order <- order(rowMeans(no_cac1[, 8&10]), decreasing = TRUE)
+in_all_order <- order(rowMeans(in_all[, 8:10]), decreasing = TRUE)
+no_WT_order <- order(rowMeans(no_WT[, 9:10]), decreasing = TRUE)
+cac1only_order <- order(cac1only[, 9], decreasing = TRUE)
+cac2only_order <- order(cac2only[, 10], decreasing = TRUE)
+
+#I now have to sort each new subset df separately based on enrichment in desired sample (WT or mutant), then I have to extract the original sorted # to properly sort them on the final heatmap. This is probably a backwards way to do this.
+no_cac_sort <- no_cac[no_cac_order, ]
+no_cac2_sort <- no_cac2[no_cac2_order, ]
+no_cac1_sort <- no_cac1[no_cac1_order, ]
+in_all_sort <- in_all[in_all_order, ]
+no_WT_sort <- no_WT[no_WT_order, ]
+cac1only_sort <- cac1only[cac1only_order, ]
+cac2only_sort <- cac2only[cac2only_order, ]
+
+#need rownames of each subset in order
+forheat1 <- rownames(no_cac_sort)
+forheat2 <- rownames(no_cac2_sort)
+forheat3 <- rownames(no_cac1_sort)
+forheat4 <- rownames(in_all_sort)
+forheat5 <- rownames(no_WT_sort)
+forheat6 <- rownames(cac1only_sort)
+forheat7 <- rownames(cac2only_sort)
+  
+finalorder <- c(forheat1, forheat2, forheat3, forheat4, forheat5, forheat6, forheat7)
+
+
+#setting color scale
+col_fun<- colorRamp2(c(0, max), c("white", "darkgreen"))
+col_fun(seq(0, max, length = 20))
+
+#Applying order to new variable in order to sort heatmap
+K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat_rtt106[finalorder, ]
+```
+
+###########################################################################################
 ```{r, Heatmap Function}
 #This function will be used to generate desired heatmaps using the generated dfs from the analysis function
 
@@ -1405,11 +1476,18 @@ make_csaw_heatmap_clusterby <- function(
 
 ###auto-cluster
 make_csaw_heatmap_clusterby(
-  df = H3K27me3_CS_Heatmap_K27promTSS_vInput,
+  df = K27_CAF_enriched_bins,
   plot_cols  = c("WT","cac1","cac2","ash1"),
   cluster_by = c("cac1","cac2"),
+  split_mode = "auto",
   collapse_mutants = TRUE,      
-  fold_cutoff = 1,
+  fold_cutoff = NULL,
+  width_in  = 6.5,
+  base_height_in = 1.5,
+  per_row_height_in = 0.0005,
+  clip_negatives_to_zero = FALSE,
+  color_limits     = c(0,5),
+  zero_white_band  = 1,
   out_stem = "K27_auto_collapse"
 )
 
@@ -2428,22 +2506,22 @@ K27lostscatter = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_
 #Example Use (ChIP vs ChIP)
 out <- chip_scatter_flex(
   mode          = "chip_vs_chip",
-  chip_df_x     = H3K36me3_Results_K27promTSS_vWT,
-  strain_x      = "set7",
+  chip_df_x     = H3K27me3_CS_Results_K27promTSS_vWT,
+  strain_x      = "cac1",
   chip_df_y     = Kac_Results_K27promTSSext_vWT,
-  strain_y      = "set7",
-  chip_x_label  = "H3K36me3",
+  strain_y      = "cac1",
+  chip_x_label  = "H3K27me3",
   chip_y_label  = "Kac",
   chip_x_cutoff   = 0.75,
-  chip_y_cutoff   = 0.75,
+  chip_y_cutoff   = 0.585,
   # Only consider left-of −0.75 on X and above +0.75 on Y:
   chip_cut_use     = c("x_neg","y_pos"),
-  chip_cut_colors  = c(both = "red", x_only = "#a65628", y_only = "#cab2d6", neither = "gray70"),
+  chip_cut_colors  = c(both = "red", x_only = "#4daf4a", y_only = "#cab2d6", neither = "gray70"),
   # Draw the same two guides; nothing in the unused quadrants, so axes won’t blow out
   show_cutoff_guides = TRUE,
   guide_sides        = NULL,   # NULL => uses chip_cut_use
   out_dir       = "scatter_outputs",
-  file_prefix   = "H3K36me3_vs_Kac_set7_promTSS",
+  file_prefix   = "H3K27me3_vs_Kac_cac1_promTSS",
   width_in      = 12, height_in = 9, dpi = 600
 )
 out$gg
