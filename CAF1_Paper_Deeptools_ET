@@ -598,6 +598,24 @@ computeMatrix scale-regions -a 250 -b 250 --regionBodyLength 2000 \
                     --colorList 'white, indigo' \
                     --zMin 0 --zMax 5
 
+computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+ -S $P133DIR/133-19_ChIP_WT_H4K20me3_Rep1_S17.bin_25.smooth_75Bulk.bw \
+    $P133DIR/133-20_ChIP_cac-1_H4K20me3_Rep1_S18.bin_25.smooth_75Bulk.bw \
+    $P133DIR/133-21_ChIP_cac-2_H4K20me3_Rep1_S19.bin_25.smooth_75Bulk.bw \
+    $P133DIR/133-22_ChIP_set-7_H4K20me3_Rep1_S20.bin_25.smooth_75Bulk.bw  \
+    -R $BEDDIR2/K27genes_K36enriched.bed --skipZeros -o H4K20_matrix_PRC2.gz
+
+    plotHeatmap -m H4K20_matrix_PRC2.gz -out CAF-1_H4K20me3_K27genes_K36enriched.pdf \
+                    --samplesLabel WT cac-1 cac-2 set-7 \
+                    --startLabel "5'" \
+                    --endLabel "3'" \
+                    --sortRegions descend \
+                    --heatmapHeight 15 \
+                    --missingDataColor 1 \
+                    --colorList 'white, indigo' \
+                    --zMin 0 --zMax 5
+
+
 ###FILES
 # 152-100_ChIP_suz12_H3K36me3_Rep2_S124.bin_25.smooth_75Bulk.bw
 # 152-101_ChIP_cac-1_suz12_H3K36me3_Rep2_S125.bin_25.smooth_75Bulk.bw
