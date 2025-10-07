@@ -569,7 +569,7 @@ computeMatrix scale-regions -a 250 -b 250 --regionBodyLength 2000 \
     $P149DIR/149-105_ChIP_cac-1_H3K9me3_Rep3_S129.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-106_ChIP_cac-2_H3K9me3_Rep3_S130.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-108_ChIP_set-7_Input_Rep3_S132.bin_25.smooth_75Bulk.bw \
- -R $BEDDIR2/WT_H3K9me3_Rep1_peaks.bed --skipZeros --missingDataAsZero -o K9_matrix_PRC2.gz
+ -R $BEDDIR2/K9_peaks_descend.bed --skipZeros --missingDataAsZero -o K9_matrix_PRC2.gz
 
     plotHeatmap -m K9_matrix_PRC2.gz -out CAF-1_K9_regions.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \
@@ -577,7 +577,7 @@ computeMatrix scale-regions -a 250 -b 250 --regionBodyLength 2000 \
                     --endLabel "3'" \
                     --sortRegions descend \
                     --missingDataColor 1 \
-                    --heatmapHeight 7 \
+                    --heatmapHeight 6.5 \
                     --colorList 'white, mediumblue' \
                     --zMin 0 --zMax 25
 
