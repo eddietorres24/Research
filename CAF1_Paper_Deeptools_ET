@@ -595,7 +595,6 @@ computeMatrix scale-regions -a 250 -b 250 --regionBodyLength 2000 \
                     --startLabel "5'" \
                     --endLabel "3'" \
                     --sortRegions descend \
-                    --sortUsingSamples 1 \
                     --missingDataColor 1 \
                     --colorList 'white, indigo' \
                     --zMin 0 --zMax 5
