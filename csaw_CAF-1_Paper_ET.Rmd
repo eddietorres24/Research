@@ -1086,7 +1086,7 @@ K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat_rtt106[finalorder, ]
 
 #Plot
 K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "H3K27me3"))
-pdf("./H3K27me3_peaks_CAF-1_rtt106_TEST.pdf", height = 9)
+pdf("./H3K27me3_peaks_CAF-1_ash1_TEST.pdf", height = 9)
 # Draw the heatmap
 draw(K27_Filtered_hm)
 # Close the device to save the file

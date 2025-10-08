@@ -1010,7 +1010,7 @@ csaw_analysis(
   mode        = "window",             # "window" or "region"
   out_obj     = count_results,        # <- REQUIRED so we have counts for merging/coords
   reference_strain = "WT",
-  fdr_cutoff  = NULL,
+  fdr_cutoff  = 0.05,
   pvalue_cutoff = NULL, 
   write_csv_results = FALSE,
   write_csv_heatmap = FALSE,
@@ -1038,31 +1038,31 @@ K27_FilteredHeatmap_mat <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_m
 K27_FilteredHeatmap_mat <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 5] <= 0.101)
 
 #I only want to look at CAF-1/rtt106 experiment
-K27_FilteredHeatmap_mat_rtt106 <- K27_FilteredHeatmap_mat[,c(8:11)]
+K27_FilteredHeatmap_mat_ash1 <- K27_FilteredHeatmap_mat[,c(1:3,6)]
 
 #altering the subsetting to clean up heatmap
-no_cac <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 9] <= 0.1 & ! K27_FilteredHeatmap_mat[, 8] <= 0.1 & K27_FilteredHeatmap_mat[, 10] <= 0.1 )
+no_cac <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1 & K27_FilteredHeatmap_mat[, 3] <= 0.1 )
 
-no_cac2 <- subset(K27_FilteredHeatmap_mat, ! K27_FilteredHeatmap_mat[, 9] <= 0.1 & ! K27_FilteredHeatmap_mat[, 8] <= 0.1 & K27_FilteredHeatmap_mat[, 10] <= 0.1 )
+no_cac2 <- subset(K27_FilteredHeatmap_mat, ! K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1 & K27_FilteredHeatmap_mat[, 3] <= 0.1 )
 
-no_cac1 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 9] <= 0.1 & ! K27_FilteredHeatmap_mat[, 8] <= 0.1 & ! K27_FilteredHeatmap_mat[, 10] <= 0.1 )
+no_cac1 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_mat[, 3] <= 0.1 )
 
-in_all <- subset(K27_FilteredHeatmap_mat, ! K27_FilteredHeatmap_mat[, 8] < 0.101 & ! K27_FilteredHeatmap_mat[, 9] < 0.101 & ! K27_FilteredHeatmap_mat[, 10] <= 0.1)
+in_all <- subset(K27_FilteredHeatmap_mat, ! K27_FilteredHeatmap_mat[, 3] < 0.101 & ! K27_FilteredHeatmap_mat[, 2] < 0.101 & ! K27_FilteredHeatmap_mat[, 1] <= 0.1)
 
-no_WT <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 8] <= 0.1 & ! K27_FilteredHeatmap_mat[, 9] <= 0.1 & ! K27_FilteredHeatmap_mat[, 10] <= 0.1)
+no_WT <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 1] <= 0.1 & ! K27_FilteredHeatmap_mat[, 2] <= 0.1 & ! K27_FilteredHeatmap_mat[, 3] <= 0.1)
 
-cac1only <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 8] <= 0.1 & ! K27_FilteredHeatmap_mat[, 9] <= 0.1 & K27_FilteredHeatmap_mat[, 10] <= 0.101)
+cac1only <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 3] <= 0.1 & ! K27_FilteredHeatmap_mat[, 2] <= 0.1 & K27_FilteredHeatmap_mat[, 1] <= 0.101)
 
-cac2only <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 8] <= 0.1 & K27_FilteredHeatmap_mat[, 9] <= 0.1 & ! K27_FilteredHeatmap_mat[, 10] <= 0.101)
+cac2only <- subset(K27_FilteredHeatmap_mat, ! K27_FilteredHeatmap_mat[, 3] <= 0.1 & K27_FilteredHeatmap_mat[, 2] <= 0.1 & K27_FilteredHeatmap_mat[, 1] <= 0.101)
 
 #ordering the subsets so that enrichment is ordered from highest to lowest in each one
-no_cac_order <-order(no_cac[, 8], decreasing = TRUE)
-no_cac2_order <-order(rowMeans(no_cac2[, 8:9]), decreasing = TRUE)
-no_cac1_order <- order(rowMeans(no_cac1[, 8&10]), decreasing = TRUE)
-in_all_order <- order(rowMeans(in_all[, 8:10]), decreasing = TRUE)
-no_WT_order <- order(rowMeans(no_WT[, 9:10]), decreasing = TRUE)
-cac1only_order <- order(cac1only[, 9], decreasing = TRUE)
-cac2only_order <- order(cac2only[, 10], decreasing = TRUE)
+no_cac_order <- order(rowMeans(no_cac[, c(1,6)]), decreasing = TRUE)
+no_cac2_order <- order(rowMeans(no_cac2[, c(1:2,6)]), decreasing = TRUE)
+no_cac1_order <- order(rowMeans(no_cac1[, c(1,3,6)]), decreasing = TRUE)
+in_all_order <- order(rowMeans(in_all[, c(1:3,6)]), decreasing = TRUE)
+no_WT_order <- order(rowMeans(no_WT[, c(2:3,6)]), decreasing = TRUE)
+cac1only_order <- order(rowMeans(cac1only[, 2&6]), decreasing = TRUE)
+cac2only_order <- order(rowMeans(cac2only[, 3&6]), decreasing = TRUE)
 
 #I now have to sort each new subset df separately based on enrichment in desired sample (WT or mutant), then I have to extract the original sorted # to properly sort them on the final heatmap. This is probably a backwards way to do this.
 no_cac_sort <- no_cac[no_cac_order, ]
@@ -1090,7 +1090,8 @@ col_fun<- colorRamp2(c(0, max), c("white", "darkgreen"))
 col_fun(seq(0, max, length = 20))
 
 #Applying order to new variable in order to sort heatmap
-K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat_rtt106[finalorder, ]
+K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat_ash1[finalorder, ]
+K27_map = as.data.frame(K27_FilteredHeatmap_mat_sort)
 ```
 
 ###########################################################################################
@@ -1476,21 +1477,20 @@ make_csaw_heatmap_clusterby <- function(
 
 ###auto-cluster
 make_csaw_heatmap_clusterby(
-  df = K27_CAF_enriched_bins,
+  df = K27_map,
   plot_cols  = c("WT","cac1","cac2","ash1"),
-  cluster_by = c("cac1","cac2"),
-  split_mode = "auto",
-  collapse_mutants = TRUE,      
+  cluster_by = NULL,
+  manual_clusters = K27_map,
+  collapse_mutants = FALSE,      
   fold_cutoff = NULL,
   width_in  = 6.5,
   base_height_in = 1.5,
-  per_row_height_in = 0.0005,
+  per_row_height_in = 0.001,
   clip_negatives_to_zero = FALSE,
   color_limits     = c(0,5),
-  zero_white_band  = 1,
+  zero_white_band  = 0,
   out_stem = "K27_auto_collapse"
 )
-
 
 ```
 
@@ -2787,20 +2787,20 @@ peaks_win <- heatmap_to_bed_peaks(
 
 # Example 2: vInput heatmap, enriched regions per strain across a pre-determined region set (i.e. all genes)
 peaks <- heatmap_to_bed_peaks(
-  hm_df         = Kac_Heatmap_K27promTSS_vWT,
-  out_dir       = "csaw_beds/Kac_vWT",
-  prefix        = "Kac_gained_K27promTSS",
+  hm_df         = H3K36me3_Heatmap_allgenes_vWT,
+  out_dir       = "csaw_beds/TEST",
+  prefix        = "H3K36me3_lost_genes_vWT",
   mode          = "region",
-  direction     = "positive",
-  min_value     = 0.75,                         
+  direction     = "negative",
+  min_value     = 1,                         
   merge_windows = FALSE,                     # ignored in region mode anyway
   zero_based    = FALSE,
   file_norm_tag = NULL,                      # OR "vInput"/"vWT" if you want it appended here
-  source_regions_df = regions$K27promTSS, # needs to match your original region df with coords + gene IDs
+  source_regions_df = regions$allgenes, # needs to match your original region df with coords + gene IDs
   source_key_cols   = c("V1","V2","V3"),
   source_gene_col   = "gene_id",      # may want to use V11, which has NCUs instead of names (change below)
   promote_to_full_genes  = TRUE,
-  universe_df            = regions$K27genes, #IMPORTANT: The df you want to subset
+  universe_df            = regions$allgenes, #IMPORTANT: The df you want to subset
   universe_gene_col      = "gene_id",
   universe_label         = "genes",
   universe_is_zero_based = FALSE,          
@@ -2828,22 +2828,22 @@ H3K36me3_Results_K27promTSS_vWT <- H3K36me3_Results_K27promTSS_vWT %>%
 CAF1_K36_lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.75)
 
 ##subset the bed
-K36_lost_bed = subset(K27_genes, K27_genes$V10 %in% CAF1_K36_lost$V10)
-K36_not_lost_bed = subset(K27_genes, ! K27_genes$V10 %in% K36_lost_bed$V10)
+K36_lost_bed = subset(regions$K27genes, regions$K27genes$gene_id %in% CAF1_K36_lost$gene_id)
+K36_not_lost_bed = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K36_lost_bed$gene_id)
 
 write.table(K36_lost_bed, file = "CAF-1_H3K36me3_lost_K27_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K36_not_lost_bed, file = "CAF-1_H3K36me3_not_lost_K27_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 #Subset files from bed file function (later in script). Here, I am pulling out all genes that don't have H3K36 in ash-1, and that aren't in K27 regions
 ###NOTE: I CALCULATED OVER THE WHOLE GENE BODY HERE
-gr_wt   <- GRanges(H3K36me3_allgenes_vInput_WT_BED$seqnames,
-                   IRanges(H3K36me3_allgenes_vInput_WT_BED$start + 1,
-                           H3K36me3_allgenes_vInput_WT_BED$end))
-gr_ash1 <- GRanges(H3K36me3_allgenes_vInput_ash1_BED$seqnames,
-                   IRanges(H3K36me3_allgenes_vInput_ash1_BED$start + 1,
-                           H3K36me3_allgenes_vInput_ash1_BED$end))
+gr_wt   <- GRanges(H3K36me3_allgenes_vInput_log2FC_0.75_WT_BED$seqnames,
+                   IRanges(H3K36me3_allgenes_vInput_log2FC_0.75_WT_BED$start,
+                           H3K36me3_allgenes_vInput_log2FC_0.75_WT_BED$end))
+gr_ash1 <- GRanges(H3K36me3_allgenes_vInput_log2FC_0.75_ash1_BED$seqnames,
+                   IRanges(H3K36me3_allgenes_vInput_log2FC_0.75_ash1_BED$start,
+                           H3K36me3_allgenes_vInput_log2FC_0.75_ash1_BED$end))
 
-WT_not_in_ash1 <- H3K36me3_allgenes_vInput_WT_BED[countOverlaps(gr_wt, gr_ash1) == 0, ]
+WT_not_in_ash1 <- H3K36me3_allgenes_vInput_log2FC_0.75_WT_BED[countOverlaps(gr_wt, gr_ash1) == 0, ]
 
 #ash-1 methylated genes
 H3K36me3_no_ash1 = subset(H3K36me3_lost_genes_log2FC_1_ash1_genes_BED, H3K36me3_lost_genes_log2FC_1_ash1_genes_BED$V10 %in% regions$allgenes$V10 )
