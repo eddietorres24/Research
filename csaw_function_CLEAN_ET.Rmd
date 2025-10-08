@@ -2792,7 +2792,7 @@ peaks <- heatmap_to_bed_peaks(
   prefix        = "H3K36me3_lost_genes_vWT",
   mode          = "region",
   direction     = "negative",
-  min_value     = 1,                         
+  min_value     = 1.5,                         
   merge_windows = FALSE,                     # ignored in region mode anyway
   zero_based    = FALSE,
   file_norm_tag = NULL,                      # OR "vInput"/"vWT" if you want it appended here
@@ -2813,15 +2813,6 @@ peaks <- heatmap_to_bed_peaks(
 ```{r, Processing Dataframes}
 #Use these template commands for processing dataframes to create csvs, bed files, etc. for downstream analysis or use outisde of R. Note, these are not tied to any functions, just some useful lines of code to process the outputs of the analysis functions
 
-#reassign gene names to data frame of interest using dplyr. This is useful if you are wanting to extract out a list of genes of interest (like genes that lose K27me3 in a mutant). 
-library(dplyr)
-
-H3K36me3_Results_K27promTSS_vWT <- H3K36me3_Results_K27promTSS_vWT %>%
-  left_join(
-    regions$K27promTSS %>% select(V1, V2, V3, V10), #you may have to change the column names 
-    by = c("seqnames" = "V1", "start" = "V2", "end" = "V3")
-  )
-
 #subset your original bed file for genes/regions of interest. For example, here, I will subset my promoter-TSS bed to only include genes that lose H3K36me3 in cac-1 or cac-2
 
 ##isolate genes of interest
@@ -2834,25 +2825,24 @@ K36_not_lost_bed = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K36_
 write.table(K36_lost_bed, file = "CAF-1_H3K36me3_lost_K27_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K36_not_lost_bed, file = "CAF-1_H3K36me3_not_lost_K27_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
-#Subset files from bed file function (later in script). Here, I am pulling out all genes that don't have H3K36 in ash-1, and that aren't in K27 regions
-###NOTE: I CALCULATED OVER THE WHOLE GENE BODY HERE
-gr_wt   <- GRanges(H3K36me3_allgenes_vInput_log2FC_0.75_WT_BED$seqnames,
-                   IRanges(H3K36me3_allgenes_vInput_log2FC_0.75_WT_BED$start,
-                           H3K36me3_allgenes_vInput_log2FC_0.75_WT_BED$end))
-gr_ash1 <- GRanges(H3K36me3_allgenes_vInput_log2FC_0.75_ash1_BED$seqnames,
-                   IRanges(H3K36me3_allgenes_vInput_log2FC_0.75_ash1_BED$start,
-                           H3K36me3_allgenes_vInput_log2FC_0.75_ash1_BED$end))
 
-WT_not_in_ash1 <- H3K36me3_allgenes_vInput_log2FC_0.75_WT_BED[countOverlaps(gr_wt, gr_ash1) == 0, ]
+##############################
+#determining genes enriched for H3K36me3 in WT (log2FC > 1 over input)
+K36_enriched_genes <- H3K36me3_Results_allgenes_vInput %>%
+  filter(if_any(all_of(c(6)), ~ coalesce(.x > 0, FALSE)))
+
+#K27
+K27_enriched_genes <- H3K27me3_CS_Results_allgenes_vInput %>%
+  filter(if_any(all_of(c(6)), ~ coalesce(.x > 1, FALSE)))
 
 #ash-1 methylated genes
-H3K36me3_no_ash1 = subset(H3K36me3_lost_genes_log2FC_1_ash1_genes_BED, H3K36me3_lost_genes_log2FC_1_ash1_genes_BED$V10 %in% regions$allgenes$V10 )
+H3K36me3_no_ash1 = subset(K36_enriched_genes, K36_enriched_genes$logFC_ash1 < -0.585)
 
 #ash-1 methylated, non-K27
-H3K36me3_no_ash1_nonK27 = subset(H3K36me3_no_ash1, ! H3K36me3_no_ash1$V10 %in% K27_enriched$V10 )
+H3K36me3_no_ash1_nonK27 = subset(H3K36me3_no_ash1, ! H3K36me3_no_ash1$gene_id %in% regions$K27genes$gene_id)
 
 #Not ash-1 methylated
-H3K36me3_set2_meth <- subset(H3K36me3_enriched_genes_log2FC_0.5_WT_genes_BED, ! H3K36me3_enriched_genes_log2FC_0.5_WT_genes_BED$V10 %in% H3K36me3_no_ash1$V10 & ! H3K36me3_enriched_genes_log2FC_0.5_WT_genes_BED$V10 %in% K27_enriched$V10)
+H3K36me3_set2_meth <- subset(K36_enriched_genes, ! K36_enriched_genes$gene_id %in% H3K36me3_no_ash1_nonK27$gene_id & ! K36_enriched_genes$gene_id %in% regions$K27genes$gene_id)
 
 #write files
 write.table(H3K36me3_no_ash1_nonK27, file = "ash1_meth_nonK27.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
@@ -2928,7 +2918,6 @@ Kac_enriched <- Kac_Results_K27promTSSext_vInput %>%
 K4_enriched <- H3K4me2_Results_K27genes_vInput %>%
   filter(if_any(all_of(c(6, 9, 12, 18, 21, 24, 27)), ~ coalesce(.x > 0, FALSE)))
 
-Kacno
 
 K4no = subset(H3K4me2_Results_K27genes_vInput, ! H3K4me2_Results_K27genes_vInput$gene_id %in% K4_enriched$gene_id)
 
