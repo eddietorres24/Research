@@ -49,7 +49,9 @@ matLocus <- GRanges("CM002236.1", IRanges(1856288, 1862459)) # mat
 param <- readParam(discard = matLocus, pe="none", max.frag=1500, minq=20 )
 
 #reading in regions of interest
-regions <- list(K27genes_proms = read.table("../bed_files/K27_genes_prom_100pct_overlap.bed"), K27genes = read.table("../bed_files/K27_genes_stringent.bed"), K27proms = read.table("../bed_files/K27_promoters.bed"), K27promTSS = read.table("../bed_files/K27_prom_TSS.bed"), allgenes = read.table("../bed_files/all_genes_forR.bed"), K27promTSSext = read.table("../bed_files/K27promTSSext.bed"), allgenes_promTSSext = read.table("../bed_files/allgenespromTSSext.bed")) 
+regions <- list(K27genes_proms = read.table("../bed_files/K27_genes_prom_100pct_overlap.bed"), K27genes = read.table("../bed_files/K27_genes_stringent.bed"), K27proms = read.table("../bed_files/K27_promoters.bed"), K27promTSS = read.table("../bed_files/K27_prom_TSS.bed"), allgenes = read.table("../bed_files/all_genes_forR.bed"), K27promTSSext = read.table("../bed_files/K27promTSSext.bed"), allgenespromTSS = read.table("../bed_files/allgenes_promTSS.bed"), allgenes_promTSSext = read.table("../bed_files/allgenespromTSSext.bed")) 
+
+#K27genes_proms = read.table("../bed_files/K27_genes_prom_100pct_overlap.bed"), K27genes = read.table("../bed_files/K27_genes_stringent.bed"), K27proms = read.table("../bed_files/K27_promoters.bed"), K27promTSS = read.table("../bed_files/K27_prom_TSS.bed"), allgenes = read.table("../bed_files/all_genes_forR.bed"), K27promTSSext = read.table("../bed_files/K27promTSSext.bed"), 
 
 new = read.table("../bed_files/H3K27me3_methylated_genes_FINAL.bed")
 
@@ -351,13 +353,12 @@ csaw_count_and_fit <- function(
 #This is where you change the parameters and run the function
 count_results <- csaw_count_and_fit(
   metadata_df = meta,
-  region_list = NULL,
-  mode = "window", #"region" or "window"
+  region_list = regions,
+  mode = "region", #"region" or "window"
   window_size = 300,
   design_mat = design.mat,
   param = param
 )
-
 
 ```
 ###########################################################################################
@@ -762,10 +763,21 @@ csaw_analysis <- function(
       final_df <- .attach_gene_id_any(final_df, gr_for_region, region_tag)
     }
 
-    # HEATMAP (masked/filtered)
     logfc_cols <- grep("^logFC_", colnames(final_df), value = TRUE)
     logfc_cols <- order_cols_wt_first(logfc_cols, wt = reference_strain)
     heatmap_df <- final_df[, logfc_cols, drop = FALSE]
+
+    ## --- NEW: de-duplicate coord rows before assigning rownames ---
+    dup <- duplicated(base_key_coords)
+    if (any(dup)) {
+      message("    [dedup] dropping ", sum(dup), " duplicated coord rows (",
+              length(base_key_coords), " -> ", sum(!dup), ")")
+      base_key_coords <- base_key_coords[!dup]
+      final_df  <- final_df[!dup, , drop = FALSE]
+      heatmap_df <- heatmap_df[!dup, , drop = FALSE]
+    }
+    ## --- END NEW ---
+    
     rownames(heatmap_df) <- base_key_coords
 
     if (mode == "window") {
@@ -1007,7 +1019,7 @@ csaw_analysis <- function(
 csaw_analysis(
   metadata_df = meta,
   design_mat  = design.mat,
-  mode        = "window",             # "window" or "region"
+  mode        = "region",             # "window" or "region"
   out_obj     = count_results,        # <- REQUIRED so we have counts for merging/coords
   reference_strain = "WT",
   fdr_cutoff  = 0.05,
@@ -2478,46 +2490,249 @@ chip_scatter_flex <- function(
 ```
 
 ```{r, use scatter plot function}
-#genes actually enirched for H3K36me3
-K36enrich = subset(H3K36me3_Results_K27proms_vInput, H3K36me3_Results_K27proms_vInput$logFC_WT > 0)
-K36scatter = subset(H3K36me3_Results_K27proms_vWT, H3K36me3_Results_K27proms_vWT$gene_id %in% K36enrich$gene_id)
-
-
-#Example Use (ChIP vs RNA)
+###Figure 2
+#K27 vs RNA cac-1
 out <- chip_scatter_flex(
   mode        = "chip_vs_rna",
-  chip_df_x   = Kac_Results_K27promTSSext_vWT,   
+  chip_df_x   = H3K27me3_CS_Results_K27promTSS_vWT,   
+  strain_x    = "cac1",
+  rna_df      = cac1RNA,                          # RNA df
+  up_thresh      =  1,
+  down_thresh    = -1,
+  chip_x_label = "K27",                      # label in axes/title
+  out_dir     = "scatter_outputs",
+  file_prefix = "K27_vs_RNA_cac1_K27_promTSSext",
+  width_in    = 12, height_in = 9, dpi = 600
+)
+out$gg
+
+###Figure 4
+#genes actually enirched for Kac
+Kac_enriched <- Kac_Results_K27promTSSext_vInput %>%
+  filter(if_any(all_of(c(6, 9, 12, 18, 21, 24, 27)), ~ coalesce(.x > 0, FALSE)))
+Kacscatter = subset(Kac_Results_K27promTSSext_vWT, Kac_Results_K27promTSSext_vWT$gene_id %in% Kac_enriched$gene_id)
+
+#Kac vs K27 cac-2
+out <- chip_scatter_flex(
+  mode          = "chip_vs_chip",
+  chip_df_x     = H3K27me3_CS_Results_K27promTSS_vWT,
+  strain_x      = "cac2",
+  chip_df_y     = Kacscatter,
+  strain_y      = "cac2",
+  chip_x_label  = "H3K27me3",
+  chip_y_label  = "Kac",
+  chip_x_cutoff   = 0.75,
+  chip_y_cutoff   = 0.585,
+  chip_cut_use     = c("x_neg","y_pos"),
+  chip_cut_colors  = c(both = "red", x_only = "#4daf4a", y_only = "#cab2d6", neither = "gray70"),
+  show_cutoff_guides = TRUE,
+  guide_sides        = NULL,   # NULL => uses chip_cut_use
+  out_dir       = "scatter_outputs",
+  file_prefix   = "H3K27me3_vs_Kac_cac2_promTSS",
+  width_in      = 12, height_in = 9, dpi = 600
+)
+out$gg
+
+#Kac vs RNA cac-2
+out <- chip_scatter_flex(
+  mode        = "chip_vs_rna",
+  chip_df_x   = Kacscatter,   
+  strain_x    = "cac2",
+  rna_df      = cac2RNA,                          # RNA df
+  up_thresh      =  1,
+  down_thresh    = -1,
+  chip_x_label = "Kac",                      # label in axes/title
+  out_dir     = "scatter_outputs",
+  file_prefix = "Kac_vs_RNA_cac2_K27_promTSSext",
+  width_in    = 12, height_in = 9, dpi = 600
+)
+out$gg
+
+##Supplement
+#genes actually enirched for H3K36me3
+K36enrich = subset(H3K36me3_Results_K27promTSS_vInput, H3K36me3_Results_K27proms_vInput$logFC_WT > 0)
+K36scatter = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27proms_vWT$gene_id %in% K36enrich$gene_id)
+
+#K36 vs RNA
+out <- chip_scatter_flex(
+  mode        = "chip_vs_rna",
+  chip_df_x   = K36scatter,   
+  strain_x    = "cac1",
+  rna_df      = cac1RNA,                          # RNA df
+  up_thresh      =  1,
+  down_thresh    = -1,
+  chip_x_label = "K36",                      # label in axes/title
+  out_dir     = "scatter_outputs",
+  file_prefix = "K36_vs_RNA_cac1_K27_promTSS",
+  width_in    = 12, height_in = 9, dpi = 600
+)
+out$gg
+
+#
+out <- chip_scatter_flex(
+  mode        = "chip_vs_rna",
+  chip_df_x   = K36scatter,   
+  strain_x    = "cac2",
+  rna_df      = cac2RNA,                          # RNA df
+  up_thresh      =  1,
+  down_thresh    = -1,
+  chip_x_label = "K36",                      # label in axes/title
+  out_dir     = "scatter_outputs",
+  file_prefix = "K36_vs_RNA_cac2_K27_promTSS",
+  width_in    = 12, height_in = 9, dpi = 600
+)
+out$gg
+
+#
+out <- chip_scatter_flex(
+  mode        = "chip_vs_rna",
+  chip_df_x   = K36scatter,   
   strain_x    = "set7",
   rna_df      = set7RNA,                          # RNA df
   up_thresh      =  1,
   down_thresh    = -1,
-  chip_x_label = "K27",                      # label in axes/title
+  chip_x_label = "K36",                      # label in axes/title
+  out_dir     = "scatter_outputs",
+  file_prefix = "K36_vs_RNA_set7_K27_promTSS",
+  width_in    = 12, height_in = 9, dpi = 600
+)
+out$gg
+
+#K36 vs Kac
+out <- chip_scatter_flex(
+  mode          = "chip_vs_chip",
+  chip_df_x     = K36scatter,
+  strain_x      = "cac1",
+  chip_df_y     = Kacscatter,
+  strain_y      = "cac1",
+  chip_x_label  = "H3K36me3",
+  chip_y_label  = "Kac",
+  chip_x_cutoff   = 0.75,
+  chip_y_cutoff   = 0.585,
+  chip_cut_use     = c("x_neg","y_pos"),
+  chip_cut_colors  = c(both = "red", x_only = "#a65628", y_only = "#cab2d6", neither = "gray70"),
+  show_cutoff_guides = TRUE,
+  guide_sides        = NULL,   # NULL => uses chip_cut_use
+  out_dir       = "scatter_outputs",
+  file_prefix   = "H3K36me3_vs_Kac_cac1_promTSS",
+  width_in      = 12, height_in = 9, dpi = 600
+)
+out$gg
+
+#
+out <- chip_scatter_flex(
+  mode          = "chip_vs_chip",
+  chip_df_x     = K36scatter,
+  strain_x      = "cac2",
+  chip_df_y     = Kacscatter,
+  strain_y      = "cac2",
+  chip_x_label  = "H3K36me3",
+  chip_y_label  = "Kac",
+  chip_x_cutoff   = 0.75,
+  chip_y_cutoff   = 0.585,
+  chip_cut_use     = c("x_neg","y_pos"),
+  chip_cut_colors  = c(both = "red", x_only = "#a65628", y_only = "#cab2d6", neither = "gray70"),
+  show_cutoff_guides = TRUE,
+  guide_sides        = NULL,   # NULL => uses chip_cut_use
+  out_dir       = "scatter_outputs",
+  file_prefix   = "H3K36me3_vs_Kac_cac2_promTSS",
+  width_in      = 12, height_in = 9, dpi = 600
+)
+out$gg
+
+out <- chip_scatter_flex(
+  mode          = "chip_vs_chip",
+  chip_df_x     = K36scatter,
+  strain_x      = "set7",
+  chip_df_y     = Kacscatter,
+  strain_y      = "set7",
+  chip_x_label  = "H3K36me3",
+  chip_y_label  = "Kac",
+  chip_x_cutoff   = 0.75,
+  chip_y_cutoff   = 0.585,
+  chip_cut_use     = c("x_neg","y_pos"),
+  chip_cut_colors  = c(both = "red", x_only = "#a65628", y_only = "#cab2d6", neither = "gray70"),
+  show_cutoff_guides = TRUE,
+  guide_sides        = NULL,   # NULL => uses chip_cut_use
+  out_dir       = "scatter_outputs",
+  file_prefix   = "H3K36me3_vs_Kac_set7_promTSS",
+  width_in      = 12, height_in = 9, dpi = 600
+)
+out$gg
+
+#other Kac vs RNA
+out <- chip_scatter_flex(
+  mode        = "chip_vs_rna",
+  chip_df_x   = Kacscatter,   
+  strain_x    = "set7",
+  rna_df      = set7RNA,                          # RNA df
+  up_thresh      =  1,
+  down_thresh    = -1,
+  chip_x_label = "Kac",                      # label in axes/title
   out_dir     = "scatter_outputs",
   file_prefix = "Kac_vs_RNA_set7_K27_promTSSext",
   width_in    = 12, height_in = 9, dpi = 600
 )
 out$gg
 
+#
+out <- chip_scatter_flex(
+  mode        = "chip_vs_rna",
+  chip_df_x   = Kacscatter,   
+  strain_x    = "cac1",
+  rna_df      = cac1RNA,                          # RNA df
+  up_thresh      =  1,
+  down_thresh    = -1,
+  chip_x_label = "Kac",                      # label in axes/title
+  out_dir     = "scatter_outputs",
+  file_prefix = "Kac_vs_RNA_cac1_K27_promTSSext",
+  width_in    = 12, height_in = 9, dpi = 600
+)
+out$gg
 
-K36genepromscatter = subset(H3K36me3_Results_K27genes_proms_vWT, H3K36me3_Results_K27genes_proms_vWT$gene_id %in% K36scatter$gene_id)
+#other K27 vs RNA
+out <- chip_scatter_flex(
+  mode        = "chip_vs_rna",
+  chip_df_x   = H3K27me3_CS_Results_K27promTSS_vWT,   
+  strain_x    = "cac2",
+  rna_df      = cac2RNA,                          # RNA df
+  up_thresh      =  1,
+  down_thresh    = -1,
+  chip_x_label = "K27",                      # label in axes/title
+  out_dir     = "scatter_outputs",
+  file_prefix = "K27_vs_RNA_cac2_K27_promTSSext",
+  width_in    = 12, height_in = 9, dpi = 600
+)
+out$gg
 
-K27lostscatter = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_K27promTSS_vWT$gene_id %in% K27lost$gene_id)
+#
+out <- chip_scatter_flex(
+  mode        = "chip_vs_rna",
+  chip_df_x   = H3K27me3_CS_Results_K27promTSS_vWT,   
+  strain_x    = "ash1",
+  rna_df      = ash1RNA,                          # RNA df
+  up_thresh      =  1,
+  down_thresh    = -1,
+  chip_x_label = "K27",                      # label in axes/title
+  out_dir     = "scatter_outputs",
+  file_prefix = "K27_vs_RNA_ash1_K27_promTSSext",
+  width_in    = 12, height_in = 9, dpi = 600
+)
+out$gg
 
-#Example Use (ChIP vs ChIP)
+#cac1 Kac vs K27
 out <- chip_scatter_flex(
   mode          = "chip_vs_chip",
   chip_df_x     = H3K27me3_CS_Results_K27promTSS_vWT,
   strain_x      = "cac1",
-  chip_df_y     = Kac_Results_K27promTSSext_vWT,
+  chip_df_y     = Kacscatter,
   strain_y      = "cac1",
   chip_x_label  = "H3K27me3",
   chip_y_label  = "Kac",
   chip_x_cutoff   = 0.75,
   chip_y_cutoff   = 0.585,
-  # Only consider left-of −0.75 on X and above +0.75 on Y:
   chip_cut_use     = c("x_neg","y_pos"),
   chip_cut_colors  = c(both = "red", x_only = "#4daf4a", y_only = "#cab2d6", neither = "gray70"),
-  # Draw the same two guides; nothing in the unused quadrants, so axes won’t blow out
   show_cutoff_guides = TRUE,
   guide_sides        = NULL,   # NULL => uses chip_cut_use
   out_dir       = "scatter_outputs",
@@ -2526,12 +2741,8 @@ out <- chip_scatter_flex(
 )
 out$gg
 
-#a65628
-#4daf4a
-
 #View what your plotting
 View(out$data)  
-
 ```
 
 ```{r, function to make bed files from windowCounts}
@@ -2827,6 +3038,7 @@ write.table(K36_not_lost_bed, file = "CAF-1_H3K36me3_not_lost_K27_genes.bed", se
 
 
 ##############################
+###Figure 3
 #determining genes enriched for H3K36me3 in WT (log2FC > 1 over input)
 K36_enriched_genes <- H3K36me3_Results_allgenes_vInput %>%
   filter(if_any(all_of(c(6)), ~ coalesce(.x > 0, FALSE)))
@@ -2841,24 +3053,24 @@ H3K36me3_no_ash1 = subset(K36_enriched_genes, K36_enriched_genes$logFC_ash1 < -0
 #ash-1 methylated, non-K27
 H3K36me3_no_ash1_nonK27 = subset(H3K36me3_no_ash1, ! H3K36me3_no_ash1$gene_id %in% regions$K27genes$gene_id)
 
+#ash-1 methylated, non-K27, lost in CAF (going over TSS)
+H3K36me3_no_ash1_no_CAF = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_$gene_id %in% H3K36me3_no_ash1_nonK27$gene_id & (H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.75 ))
+
+
 #Not ash-1 methylated
-H3K36me3_set2_meth <- subset(K36_enriched_genes, ! K36_enriched_genes$gene_id %in% H3K36me3_no_ash1_nonK27$gene_id & ! K36_enriched_genes$gene_id %in% regions$K27genes$gene_id)
+H3K36me3_set2_meth <- subset(K36_enriched_genes, ! K36_enriched_genes$gene_id %in% H3K36me3_no_ash1$gene_id & ! K36_enriched_genes$gene_id %in% regions$K27genes$gene_id)
 
 #write files
-write.table(H3K36me3_no_ash1_nonK27, file = "ash1_meth_nonK27.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(H3K36me3_no_ash1_nonK27, file = "ash1_meth_nonK27_V2.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
-write.table(H3K36me3_set2_meth, file = "set2_meth_only.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(H3K36me3_no_ash1_TEST, file = "ash1_meth_nonK27_TEST.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
-#K27 enrichment
-K27_enriched = subset(H3K27me3_promTSS_enriched_log2FC_2_WT_genes_BED, H3K27me3_promTSS_enriched_log2FC_2_WT_genes_BED$gene_id %in% H3K27me3_prom_enriched_log2FC_2_WT_genes_BED$gene_id)
+write.table(H3K36me3_set2_meth, file = "set2_meth_only_V2.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
-H3K27me3_inCAF1 = subset(K27_enriched, ! K27_enriched$gene_id %in% H3K27me3_lost_genes_log2FC_2_cac1_genes_BED$gene_id | ! K27_enriched$gene_id %in% H3K27me3_lost_genes_log2FC_2_cac2_genes_BED$gene_id)
 
-H3K27me3_noCAF1 = subset(K27_enriched, K27_enriched$gene_id %in% H3K27me3_lost_genes_log2FC_2_cac1_genes_BED$gene_id | K27_enriched$gene_id %in% H3K27me3_lost_genes_log2FC_2_cac2_genes_BED$gene_id)
- 
-write.table(H3K27me3_inCAF1, file = "H3K27me3_CAF1_retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
-write.table(H3K27me3_noCAF1, file = "H3K27me3_CAF1_lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
 
+##################################
+###K27
 ####i want to subset genes that lose K27 or K36 in cac-1 or cac-2
 K27lost = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac2 < -0.75)
 K27lostash1 = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_K27promTSS_vWT$logFC_ash1 < -0.75)

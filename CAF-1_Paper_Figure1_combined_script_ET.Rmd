@@ -551,6 +551,55 @@ deg_map <- export_deseq_csvs(
 
 ```
 
+#GO Analysis
+```{r, Rochelle's GO Script}
+NcrassaKEGG <- read.csv("./output_KEGG.csv", row.names=1)
+
+# Assuming NcrassaKEGG is your KEGG data frame
+# Initialize a list to store results
+kegg_results <- list()
+
+# Loop through each column in final_wide (excluding Source_Target)
+for (col_name in names(final_wide)[-1]) {
+    # Get the genes from the current column
+    genes <- final_wide[[col_name]]
+    
+    # Create a data frame to store the results for the current column
+    column_results <- data.frame(Gene = character(), Level1 = character(), Level2 = character(), Level3 = character(), stringsAsFactors = FALSE)
+    
+    for (gene in genes) {
+        # Check if the gene is present in the info1 column (case-insensitive)
+        matched_row <- NcrassaKEGG[grepl(gene, NcrassaKEGG$info1, ignore.case = TRUE), ]
+        
+        # If there's a match, extract the corresponding levels
+        if (nrow(matched_row) > 0) {
+            for (i in 1:nrow(matched_row)) {
+                column_results <- rbind(column_results, data.frame(Gene = gene, 
+                                                                    Level1 = matched_row$level1[i], 
+                                                                    Level2 = matched_row$level2[i], 
+                                                                    Level3 = matched_row$level3[i],
+                                                                    stringsAsFactors = FALSE))
+            }
+        } else {
+            # If no match is found, add an entry with NA
+            column_results <- rbind(column_results, data.frame(Gene = gene, Level1 = NA, Level2 = NA, Level3 = NA, stringsAsFactors = FALSE))
+        }
+    }
+    
+    # Add the results for the current column to the main list
+    kegg_results[[col_name]] <- column_results
+}
+
+# Combine all results into a single data frame
+final_kegg_results <- do.call(rbind, kegg_results)
+
+# View the results
+print(final_kegg_results)
+
+# Optionally, save the results to a CSV
+write.csv(final_kegg_results, "kegg_results.csv", row.names = FALSE)
+```
+
 #Next, make Volcano Plots displaying all DE genes
 ```{r, Volcano Plots}
 #Make New variables for plot
