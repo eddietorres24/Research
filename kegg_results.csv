@@ -1,0 +1,1042 @@
+"Gene","Level1","Level2","Level3"
+"NCU17270",NA,NA,NA
+"NCU17271",NA,NA,NA
+"NCU17264",NA,NA,NA
+"NCU17267",NA,NA,NA
+"NCU17268",NA,NA,NA
+"NCU17269",NA,NA,NA
+"NCU17244",NA,NA,NA
+"NCU17247",NA,NA,NA
+"NCU17249",NA,NA,NA
+"NCU17230",NA,NA,NA
+"NCU17202",NA,NA,NA
+"NCU17203",NA,NA,NA
+"NCU17187",NA,NA,NA
+"NCU17172",NA,NA,NA
+"NCU17157",NA,NA,NA
+"NCU17127",NA,NA,NA
+"NCU17105",NA,NA,NA
+"NCU17087",NA,NA,NA
+"NCU17064",NA,NA,NA
+"NCU17054",NA,NA,NA
+"NCU17043",NA,NA,NA
+"NCU17032",NA,NA,NA
+"NCU16998",NA,NA,NA
+"NCU16960",NA,NA,NA
+"NCU16940",NA,NA,NA
+"NCU16925",NA,NA,NA
+"NCU16926",NA,NA,NA
+"NCU16929",NA,NA,NA
+"NCU16913",NA,NA,NA
+"NCU16906",NA,NA,NA
+"NCU16876",NA,NA,NA
+"NCU16846",NA,NA,NA
+"NCU16823",NA,NA,NA
+"NCU16805",NA,NA,NA
+"NCU16746",NA,NA,NA
+"NCU16738",NA,NA,NA
+"NCU16720",NA,NA,NA
+"NCU16728",NA,NA,NA
+"NCU16714",NA,NA,NA
+"NCU16705",NA,NA,NA
+"NCU16695",NA,NA,NA
+"NCU16673",NA,NA,NA
+"NCU16632",NA,NA,NA
+"NCU16633",NA,NA,NA
+"NCU16624","A09120 Genetic Information Processing","B  09123 Folding, sorting and degradation","C    04122 Sulfur relay system [PATH:ncr04122]"
+"NCU16624","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03016 Transfer RNA biogenesis [BR:ncr03016]"
+"NCU16616",NA,NA,NA
+"NCU16600",NA,NA,NA
+"NCU16588",NA,NA,NA
+"NCU16567",NA,NA,NA
+"NCU16540",NA,NA,NA
+"NCU16538",NA,NA,NA
+"NCU16539",NA,NA,NA
+"NCU16482",NA,NA,NA
+"NCU16483",NA,NA,NA
+"NCU16488",NA,NA,NA
+"NCU16474",NA,NA,NA
+"NCU16440",NA,NA,NA
+"NCU16439",NA,NA,NA
+"NCU16402",NA,NA,NA
+"NCU16396","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00860 Porphyrin metabolism [PATH:ncr00860]"
+"NCU16350",NA,NA,NA
+"NCU16341",NA,NA,NA
+"NCU16344",NA,NA,NA
+"NCU16334",NA,NA,NA
+"NCU16327",NA,NA,NA
+"NCU16003","A09100 Metabolism","B  09102 Energy metabolism","C    00190 Oxidative phosphorylation [PATH:ncr00190]"
+"NCU16003","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03029 Mitochondrial biogenesis [BR:ncr03029]"
+"NCU12154",NA,NA,NA
+"NCU12100","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03029 Mitochondrial biogenesis [BR:ncr03029]"
+"NCU12075",NA,NA,NA
+"NCU12076",NA,NA,NA
+"NCU12068",NA,NA,NA
+"NCU12069","A09100 Metabolism","B  09104 Nucleotide metabolism","C    00240 Pyrimidine metabolism [PATH:ncr00240]"
+"NCU12052",NA,NA,NA
+"NCU12051",NA,NA,NA
+"NCU12050",NA,NA,NA
+"NCU12045",NA,NA,NA
+"NCU12028",NA,NA,NA
+"NCU12025",NA,NA,NA
+"NCU11411",NA,NA,NA
+"NCU11405",NA,NA,NA
+"NCU11383",NA,NA,NA
+"NCU11365","A09100 Metabolism","B  09105 Amino acid metabolism","C    00340 Histidine metabolism [PATH:ncr00340]"
+"NCU11364",NA,NA,NA
+"NCU11363",NA,NA,NA
+"NCU11356",NA,NA,NA
+"NCU11340",NA,NA,NA
+"NCU11320","A09100 Metabolism","B  09105 Amino acid metabolism","C    00330 Arginine and proline metabolism [PATH:ncr00330]"
+"NCU11320","A09100 Metabolism","B  09106 Metabolism of other amino acids","C    00470 D-Amino acid metabolism [PATH:ncr00470]"
+"NCU11286",NA,NA,NA
+"NCU11289",NA,NA,NA
+"NCU11134",NA,NA,NA
+"NCU11054",NA,NA,NA
+"NCU11038",NA,NA,NA
+"NCU11006",NA,NA,NA
+"NCU10799",NA,NA,NA
+"NCU10684",NA,NA,NA
+"NCU10659",NA,NA,NA
+"NCU10644",NA,NA,NA
+"NCU10605",NA,NA,NA
+"NCU10539",NA,NA,NA
+"NCU10512",NA,NA,NA
+"NCU10502",NA,NA,NA
+"NCU10470",NA,NA,NA
+"NCU10457",NA,NA,NA
+"NCU10444",NA,NA,NA
+"NCU10448",NA,NA,NA
+"NCU10449",NA,NA,NA
+"NCU10392",NA,NA,NA
+"NCU10387",NA,NA,NA
+"NCU10369",NA,NA,NA
+"NCU10344",NA,NA,NA
+"NCU10304",NA,NA,NA
+"NCU10276","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU10186",NA,NA,NA
+"NCU10152",NA,NA,NA
+"NCU10144",NA,NA,NA
+"NCU10014",NA,NA,NA
+"NCU09992",NA,NA,NA
+"NCU09990",NA,NA,NA
+"NCU09986",NA,NA,NA
+"NCU09954",NA,NA,NA
+"NCU09949",NA,NA,NA
+"NCU09939",NA,NA,NA
+"NCU09933",NA,NA,NA
+"NCU09924",NA,NA,NA
+"NCU09911","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00630 Glyoxylate and dicarboxylate metabolism [PATH:ncr00630]"
+"NCU09911","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00670 One carbon pool by folate [PATH:ncr00670]"
+"NCU09907",NA,NA,NA
+"NCU09908",NA,NA,NA
+"NCU09909","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU09876",NA,NA,NA
+"NCU09874",NA,NA,NA
+"NCU09872",NA,NA,NA
+"NCU09852",NA,NA,NA
+"NCU09854",NA,NA,NA
+"NCU09834",NA,NA,NA
+"NCU09835",NA,NA,NA
+"NCU09837",NA,NA,NA
+"NCU09810","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00020 Citrate cycle (TCA cycle) [PATH:ncr00020]"
+"NCU09810","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00640 Propanoate metabolism [PATH:ncr00640]"
+"NCU09781",NA,NA,NA
+"NCU09774",NA,NA,NA
+"NCU09773",NA,NA,NA
+"NCU09761",NA,NA,NA
+"NCU09742",NA,NA,NA
+"NCU09726",NA,NA,NA
+"NCU09724",NA,NA,NA
+"NCU09717",NA,NA,NA
+"NCU09698","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU09683",NA,NA,NA
+"NCU09671",NA,NA,NA
+"NCU09660",NA,NA,NA
+"NCU09665",NA,NA,NA
+"NCU09659",NA,NA,NA
+"NCU09645",NA,NA,NA
+"NCU09648",NA,NA,NA
+"NCU09634",NA,NA,NA
+"NCU09633",NA,NA,NA
+"NCU09623",NA,NA,NA
+"NCU09613",NA,NA,NA
+"NCU09605",NA,NA,NA
+"NCU09604",NA,NA,NA
+"NCU09603",NA,NA,NA
+"NCU09596",NA,NA,NA
+"NCU09593",NA,NA,NA
+"NCU09590",NA,NA,NA
+"NCU09589",NA,NA,NA
+"NCU09586",NA,NA,NA
+"NCU09578",NA,NA,NA
+"NCU09569",NA,NA,NA
+"NCU09541",NA,NA,NA
+"NCU09536",NA,NA,NA
+"NCU09513","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03019 Messenger RNA biogenesis [BR:ncr03019]"
+"NCU09513","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03016 Transfer RNA biogenesis [BR:ncr03016]"
+"NCU09513","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03012 Translation factors [BR:ncr03012]"
+"NCU09506",NA,NA,NA
+"NCU09505",NA,NA,NA
+"NCU09504",NA,NA,NA
+"NCU09498",NA,NA,NA
+"NCU09497","A09100 Metabolism","B  09103 Lipid metabolism","C    01040 Biosynthesis of unsaturated fatty acids [PATH:ncr01040]"
+"NCU09484",NA,NA,NA
+"NCU09471",NA,NA,NA
+"NCU09473","A09100 Metabolism","B  09103 Lipid metabolism","C    00061 Fatty acid biosynthesis [PATH:ncr00061]"
+"NCU09473","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00780 Biotin metabolism [PATH:ncr00780]"
+"NCU09473","A09100 Metabolism","B  09110 Biosynthesis of other secondary metabolites","C    00333 Prodigiosin biosynthesis"
+"NCU09473","A09180 Brite Hierarchies","B  09181 Protein families: metabolism","C    01004 Lipid biosynthesis proteins [BR:ncr01004]"
+"NCU09458",NA,NA,NA
+"NCU09445","A09190 Not Included in Pathway or Brite","B  09191 Unclassified: metabolism","C    99980 Enzymes with EC numbers"
+"NCU09448",NA,NA,NA
+"NCU09430",NA,NA,NA
+"NCU09431",NA,NA,NA
+"NCU09423",NA,NA,NA
+"NCU09418",NA,NA,NA
+"NCU09415",NA,NA,NA
+"NCU09412",NA,NA,NA
+"NCU09404",NA,NA,NA
+"NCU09403",NA,NA,NA
+"NCU09402",NA,NA,NA
+"NCU09391","A09100 Metabolism","B  09105 Amino acid metabolism","C    00360 Phenylalanine metabolism [PATH:ncr00360]"
+"NCU09379",NA,NA,NA
+"NCU09372",NA,NA,NA
+"NCU09306",NA,NA,NA
+"NCU09280",NA,NA,NA
+"NCU09279",NA,NA,NA
+"NCU09275",NA,NA,NA
+"NCU09274",NA,NA,NA
+"NCU09273",NA,NA,NA
+"NCU09272",NA,NA,NA
+"NCU09271",NA,NA,NA
+"NCU09236",NA,NA,NA
+"NCU09231",NA,NA,NA
+"NCU09225",NA,NA,NA
+"NCU09196",NA,NA,NA
+"NCU09171",NA,NA,NA
+"NCU09172",NA,NA,NA
+"NCU09173",NA,NA,NA
+"NCU09179",NA,NA,NA
+"NCU09163",NA,NA,NA
+"NCU09165",NA,NA,NA
+"NCU09147",NA,NA,NA
+"NCU09148",NA,NA,NA
+"NCU09116","A09100 Metabolism","B  09105 Amino acid metabolism","C    00270 Cysteine and methionine metabolism [PATH:ncr00270]"
+"NCU09116","A09100 Metabolism","B  09105 Amino acid metabolism","C    00300 Lysine biosynthesis [PATH:ncr00300]"
+"NCU09116","A09100 Metabolism","B  09105 Amino acid metabolism","C    00350 Tyrosine metabolism [PATH:ncr00350]"
+"NCU09116","A09100 Metabolism","B  09105 Amino acid metabolism","C    00360 Phenylalanine metabolism [PATH:ncr00360]"
+"NCU09116","A09100 Metabolism","B  09105 Amino acid metabolism","C    00380 Tryptophan metabolism [PATH:ncr00380]"
+"NCU09116","A09100 Metabolism","B  09105 Amino acid metabolism","C    00400 Phenylalanine, tyrosine and tryptophan biosynthesis [PATH:ncr00400]"
+"NCU09116","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00130 Ubiquinone and other terpenoid-quinone biosynthesis [PATH:ncr00130]"
+"NCU09116","A09180 Brite Hierarchies","B  09181 Protein families: metabolism","C    01007 Amino acid related enzymes [BR:ncr01007]"
+"NCU09093","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03019 Messenger RNA biogenesis [BR:ncr03019]"
+"NCU09093","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03041 Spliceosome [BR:ncr03041]"
+"NCU09093","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03036 Chromosome and associated proteins [BR:ncr03036]"
+"NCU09094","A09120 Genetic Information Processing","B  09126 Chromosome","C    03083 Polycomb repressive complex [PATH:ncr03083]"
+"NCU09094","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03009 Ribosome biogenesis [BR:ncr03009]"
+"NCU09099",NA,NA,NA
+"NCU09081",NA,NA,NA
+"NCU09052",NA,NA,NA
+"NCU09053",NA,NA,NA
+"NCU09059",NA,NA,NA
+"NCU09046",NA,NA,NA
+"NCU09049",NA,NA,NA
+"NCU09026","A09190 Not Included in Pathway or Brite","B  09191 Unclassified: metabolism","C    99980 Enzymes with EC numbers"
+"NCU09027","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU08986",NA,NA,NA
+"NCU08969",NA,NA,NA
+"NCU08917",NA,NA,NA
+"NCU08916",NA,NA,NA
+"NCU08915",NA,NA,NA
+"NCU08887",NA,NA,NA
+"NCU08885",NA,NA,NA
+"NCU08884",NA,NA,NA
+"NCU08877","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00630 Glyoxylate and dicarboxylate metabolism [PATH:ncr00630]"
+"NCU08877","A09100 Metabolism","B  09105 Amino acid metabolism","C    00260 Glycine, serine and threonine metabolism [PATH:ncr00260]"
+"NCU08877","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00785 Lipoic acid metabolism [PATH:ncr00785]"
+"NCU08877","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00670 One carbon pool by folate [PATH:ncr00670]"
+"NCU08865",NA,NA,NA
+"NCU08863",NA,NA,NA
+"NCU08856","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00053 Ascorbate and aldarate metabolism [PATH:ncr00053]"
+"NCU08856","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00562 Inositol phosphate metabolism [PATH:ncr00562]"
+"NCU08853",NA,NA,NA
+"NCU08847",NA,NA,NA
+"NCU08839",NA,NA,NA
+"NCU08838",NA,NA,NA
+"NCU08837",NA,NA,NA
+"NCU08835",NA,NA,NA
+"NCU08834",NA,NA,NA
+"NCU08832",NA,NA,NA
+"NCU08830",NA,NA,NA
+"NCU08818",NA,NA,NA
+"NCU08814",NA,NA,NA
+"NCU08812",NA,NA,NA
+"NCU08802",NA,NA,NA
+"NCU08801",NA,NA,NA
+"NCU08800",NA,NA,NA
+"NCU08796",NA,NA,NA
+"NCU08789",NA,NA,NA
+"NCU08786",NA,NA,NA
+"NCU08780",NA,NA,NA
+"NCU08777",NA,NA,NA
+"NCU08774",NA,NA,NA
+"NCU08757",NA,NA,NA
+"NCU08756",NA,NA,NA
+"NCU08753",NA,NA,NA
+"NCU08734",NA,NA,NA
+"NCU08738",NA,NA,NA
+"NCU08724",NA,NA,NA
+"NCU08727",NA,NA,NA
+"NCU08654",NA,NA,NA
+"NCU08649",NA,NA,NA
+"NCU08648",NA,NA,NA
+"NCU08630",NA,NA,NA
+"NCU08613",NA,NA,NA
+"NCU08614",NA,NA,NA
+"NCU08615","A09100 Metabolism","B  09105 Amino acid metabolism","C    00350 Tyrosine metabolism [PATH:ncr00350]"
+"NCU08619",NA,NA,NA
+"NCU08572",NA,NA,NA
+"NCU08571",NA,NA,NA
+"NCU08548",NA,NA,NA
+"NCU08547",NA,NA,NA
+"NCU08546",NA,NA,NA
+"NCU08543",NA,NA,NA
+"NCU08542",NA,NA,NA
+"NCU08539",NA,NA,NA
+"NCU08535","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00620 Pyruvate metabolism [PATH:ncr00620]"
+"NCU08535","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00640 Propanoate metabolism [PATH:ncr00640]"
+"NCU08535","A09100 Metabolism","B  09103 Lipid metabolism","C    00061 Fatty acid biosynthesis [PATH:ncr00061]"
+"NCU08535","A09100 Metabolism","B  09110 Biosynthesis of other secondary metabolites","C    00254 Aflatoxin biosynthesis"
+"NCU08534",NA,NA,NA
+"NCU08533",NA,NA,NA
+"NCU08532",NA,NA,NA
+"NCU08531",NA,NA,NA
+"NCU08530",NA,NA,NA
+"NCU08529",NA,NA,NA
+"NCU08523",NA,NA,NA
+"NCU08522",NA,NA,NA
+"NCU08473",NA,NA,NA
+"NCU08447",NA,NA,NA
+"NCU08437",NA,NA,NA
+"NCU08425",NA,NA,NA
+"NCU08404",NA,NA,NA
+"NCU08406",NA,NA,NA
+"NCU08407","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU08390",NA,NA,NA
+"NCU08398","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00010 Glycolysis / Gluconeogenesis [PATH:ncr00010]"
+"NCU08398","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00052 Galactose metabolism [PATH:ncr00052]"
+"NCU08397",NA,NA,NA
+"NCU08383",NA,NA,NA
+"NCU08371",NA,NA,NA
+"NCU08361",NA,NA,NA
+"NCU08358",NA,NA,NA
+"NCU08355",NA,NA,NA
+"NCU08351",NA,NA,NA
+"NCU08318",NA,NA,NA
+"NCU08307",NA,NA,NA
+"NCU08261",NA,NA,NA
+"NCU08254",NA,NA,NA
+"NCU08244",NA,NA,NA
+"NCU08221",NA,NA,NA
+"NCU08222",NA,NA,NA
+"NCU08226",NA,NA,NA
+"NCU08204",NA,NA,NA
+"NCU08192",NA,NA,NA
+"NCU08180","A09140 Cellular Processes","B  09143 Cell growth and death","C    04113 Meiosis - yeast [PATH:ncr04113]"
+"NCU08180","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU08183",NA,NA,NA
+"NCU08184",NA,NA,NA
+"NCU08178",NA,NA,NA
+"NCU08152",NA,NA,NA
+"NCU08154",NA,NA,NA
+"NCU08155",NA,NA,NA
+"NCU08156",NA,NA,NA
+"NCU08148","A09190 Not Included in Pathway or Brite","B  09193 Unclassified: signaling and cellular processes","C    99977 Transport"
+"NCU08138","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00860 Porphyrin metabolism [PATH:ncr00860]"
+"NCU08116",NA,NA,NA
+"NCU08117","A09100 Metabolism","B  09102 Energy metabolism","C    00920 Sulfur metabolism [PATH:ncr00920]"
+"NCU08117","A09100 Metabolism","B  09105 Amino acid metabolism","C    00270 Cysteine and methionine metabolism [PATH:ncr00270]"
+"NCU08117","A09100 Metabolism","B  09106 Metabolism of other amino acids","C    00450 Selenocompound metabolism [PATH:ncr00450]"
+"NCU08102",NA,NA,NA
+"NCU08103",NA,NA,NA
+"NCU08109",NA,NA,NA
+"NCU08097","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00500 Starch and sucrose metabolism [PATH:ncr00500]"
+"NCU08084",NA,NA,NA
+"NCU08085",NA,NA,NA
+"NCU08086",NA,NA,NA
+"NCU08087",NA,NA,NA
+"NCU08089",NA,NA,NA
+"NCU08073",NA,NA,NA
+"NCU08074",NA,NA,NA
+"NCU08075",NA,NA,NA
+"NCU08077",NA,NA,NA
+"NCU08078",NA,NA,NA
+"NCU08058",NA,NA,NA
+"NCU08011",NA,NA,NA
+"NCU08016",NA,NA,NA
+"NCU07981",NA,NA,NA
+"NCU07983",NA,NA,NA
+"NCU07970",NA,NA,NA
+"NCU07969",NA,NA,NA
+"NCU07959",NA,NA,NA
+"NCU07928",NA,NA,NA
+"NCU07923",NA,NA,NA
+"NCU07920",NA,NA,NA
+"NCU07919","A09100 Metabolism","B  09105 Amino acid metabolism","C    00350 Tyrosine metabolism [PATH:ncr00350]"
+"NCU07919","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    03037 Cilium and associated proteins [BR:ncr03037]"
+"NCU07919","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    04147 Exosome [BR:ncr04147]"
+"NCU07905",NA,NA,NA
+"NCU07897",NA,NA,NA
+"NCU07894",NA,NA,NA
+"NCU07848",NA,NA,NA
+"NCU07820","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU07812",NA,NA,NA
+"NCU07810",NA,NA,NA
+"NCU07801",NA,NA,NA
+"NCU07789",NA,NA,NA
+"NCU07781",NA,NA,NA
+"NCU07752",NA,NA,NA
+"NCU07749",NA,NA,NA
+"NCU07748",NA,NA,NA
+"NCU07690","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00670 One carbon pool by folate [PATH:ncr00670]"
+"NCU07651",NA,NA,NA
+"NCU07652",NA,NA,NA
+"NCU07653",NA,NA,NA
+"NCU07640",NA,NA,NA
+"NCU07641",NA,NA,NA
+"NCU07643",NA,NA,NA
+"NCU07644",NA,NA,NA
+"NCU07645",NA,NA,NA
+"NCU07646",NA,NA,NA
+"NCU07647",NA,NA,NA
+"NCU07648",NA,NA,NA
+"NCU07633",NA,NA,NA
+"NCU07637",NA,NA,NA
+"NCU07623",NA,NA,NA
+"NCU07625",NA,NA,NA
+"NCU07627",NA,NA,NA
+"NCU07610",NA,NA,NA
+"NCU07600",NA,NA,NA
+"NCU07609","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU07592",NA,NA,NA
+"NCU07599",NA,NA,NA
+"NCU07581",NA,NA,NA
+"NCU07583",NA,NA,NA
+"NCU07589",NA,NA,NA
+"NCU07573",NA,NA,NA
+"NCU07536",NA,NA,NA
+"NCU07525",NA,NA,NA
+"NCU07503",NA,NA,NA
+"NCU07501",NA,NA,NA
+"NCU07500",NA,NA,NA
+"NCU07499",NA,NA,NA
+"NCU07485",NA,NA,NA
+"NCU07480",NA,NA,NA
+"NCU07475",NA,NA,NA
+"NCU07433",NA,NA,NA
+"NCU07429",NA,NA,NA
+"NCU07410",NA,NA,NA
+"NCU07372",NA,NA,NA
+"NCU07370",NA,NA,NA
+"NCU07334","A09190 Not Included in Pathway or Brite","B  09193 Unclassified: signaling and cellular processes","C    99977 Transport"
+"NCU07316",NA,NA,NA
+"NCU07266","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03012 Translation factors [BR:ncr03012]"
+"NCU07249",NA,NA,NA
+"NCU07245",NA,NA,NA
+"NCU07235",NA,NA,NA
+"NCU07229",NA,NA,NA
+"NCU07227",NA,NA,NA
+"NCU07222",NA,NA,NA
+"NCU07218",NA,NA,NA
+"NCU07217",NA,NA,NA
+"NCU07216",NA,NA,NA
+"NCU07214",NA,NA,NA
+"NCU07212",NA,NA,NA
+"NCU07208",NA,NA,NA
+"NCU07204",NA,NA,NA
+"NCU07200",NA,NA,NA
+"NCU07185",NA,NA,NA
+"NCU07180",NA,NA,NA
+"NCU07163",NA,NA,NA
+"NCU07161",NA,NA,NA
+"NCU07159",NA,NA,NA
+"NCU07152",NA,NA,NA
+"NCU07150",NA,NA,NA
+"NCU07149",NA,NA,NA
+"NCU07144",NA,NA,NA
+"NCU07143",NA,NA,NA
+"NCU07129","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU07126",NA,NA,NA
+"NCU07116",NA,NA,NA
+"NCU07115",NA,NA,NA
+"NCU07112","A09100 Metabolism","B  09102 Energy metabolism","C    00920 Sulfur metabolism [PATH:ncr00920]"
+"NCU07111",NA,NA,NA
+"NCU07110",NA,NA,NA
+"NCU07106",NA,NA,NA
+"NCU07105",NA,NA,NA
+"NCU07104",NA,NA,NA
+"NCU07092",NA,NA,NA
+"NCU07091",NA,NA,NA
+"NCU07090",NA,NA,NA
+"NCU07089",NA,NA,NA
+"NCU07088",NA,NA,NA
+"NCU07087",NA,NA,NA
+"NCU07086",NA,NA,NA
+"NCU07085",NA,NA,NA
+"NCU07084",NA,NA,NA
+"NCU07074",NA,NA,NA
+"NCU07073",NA,NA,NA
+"NCU07054",NA,NA,NA
+"NCU07051",NA,NA,NA
+"NCU07050",NA,NA,NA
+"NCU07046",NA,NA,NA
+"NCU07047",NA,NA,NA
+"NCU07049",NA,NA,NA
+"NCU06973",NA,NA,NA
+"NCU06964",NA,NA,NA
+"NCU06953",NA,NA,NA
+"NCU06954",NA,NA,NA
+"NCU06955",NA,NA,NA
+"NCU06936",NA,NA,NA
+"NCU06937",NA,NA,NA
+"NCU06938",NA,NA,NA
+"NCU06911",NA,NA,NA
+"NCU06916",NA,NA,NA
+"NCU06917",NA,NA,NA
+"NCU06918","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU06919",NA,NA,NA
+"NCU06902",NA,NA,NA
+"NCU06903",NA,NA,NA
+"NCU06896",NA,NA,NA
+"NCU06897",NA,NA,NA
+"NCU06898",NA,NA,NA
+"NCU06899",NA,NA,NA
+"NCU06886",NA,NA,NA
+"NCU06887",NA,NA,NA
+"NCU06888",NA,NA,NA
+"NCU06889","A09120 Genetic Information Processing","B  09121 Transcription","C    03020 RNA polymerase [PATH:ncr03020]"
+"NCU06889","A09120 Genetic Information Processing","B  09124 Replication and repair","C    03420 Nucleotide excision repair [PATH:ncr03420]"
+"NCU06889","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03021 Transcription machinery [BR:ncr03021]"
+"NCU06889","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03400 DNA repair and recombination proteins [BR:ncr03400]"
+"NCU06823",NA,NA,NA
+"NCU06822",NA,NA,NA
+"NCU06795",NA,NA,NA
+"NCU06794",NA,NA,NA
+"NCU06793",NA,NA,NA
+"NCU06784",NA,NA,NA
+"NCU06721","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03012 Translation factors [BR:ncr03012]"
+"NCU06725",NA,NA,NA
+"NCU06711",NA,NA,NA
+"NCU06675",NA,NA,NA
+"NCU06625","A09100 Metabolism","B  09105 Amino acid metabolism","C    00270 Cysteine and methionine metabolism [PATH:ncr00270]"
+"NCU06625","A09100 Metabolism","B  09106 Metabolism of other amino acids","C    00430 Taurine and hypotaurine metabolism [PATH:ncr00430]"
+"NCU06614",NA,NA,NA
+"NCU06618","A09180 Brite Hierarchies","B  09181 Protein families: metabolism","C    01002 Peptidases and inhibitors [BR:ncr01002]"
+"NCU06590",NA,NA,NA
+"NCU06591",NA,NA,NA
+"NCU06571",NA,NA,NA
+"NCU06573",NA,NA,NA
+"NCU06574",NA,NA,NA
+"NCU06565",NA,NA,NA
+"NCU06557",NA,NA,NA
+"NCU06558","A09100 Metabolism","B  09105 Amino acid metabolism","C    00260 Glycine, serine and threonine metabolism [PATH:ncr00260]"
+"NCU06558","A09100 Metabolism","B  09105 Amino acid metabolism","C    00330 Arginine and proline metabolism [PATH:ncr00330]"
+"NCU06558","A09100 Metabolism","B  09106 Metabolism of other amino acids","C    00470 D-Amino acid metabolism [PATH:ncr00470]"
+"NCU06558","A09100 Metabolism","B  09110 Biosynthesis of other secondary metabolites","C    00311 Penicillin and cephalosporin biosynthesis"
+"NCU06558","A09140 Cellular Processes","B  09141 Transport and catabolism","C    04146 Peroxisome [PATH:ncr04146]"
+"NCU06548",NA,NA,NA
+"NCU06531",NA,NA,NA
+"NCU06514",NA,NA,NA
+"NCU06505",NA,NA,NA
+"NCU06475",NA,NA,NA
+"NCU06476",NA,NA,NA
+"NCU06425",NA,NA,NA
+"NCU06416",NA,NA,NA
+"NCU06376",NA,NA,NA
+"NCU06360","A09100 Metabolism","B  09105 Amino acid metabolism","C    00340 Histidine metabolism [PATH:ncr00340]"
+"NCU06360","A09100 Metabolism","B  09105 Amino acid metabolism","C    00350 Tyrosine metabolism [PATH:ncr00350]"
+"NCU06360","A09100 Metabolism","B  09105 Amino acid metabolism","C    00360 Phenylalanine metabolism [PATH:ncr00360]"
+"NCU06360","A09100 Metabolism","B  09105 Amino acid metabolism","C    00400 Phenylalanine, tyrosine and tryptophan biosynthesis [PATH:ncr00400]"
+"NCU06360","A09180 Brite Hierarchies","B  09181 Protein families: metabolism","C    01007 Amino acid related enzymes [BR:ncr01007]"
+"NCU06359",NA,NA,NA
+"NCU06350",NA,NA,NA
+"NCU06340","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03110 Chaperones and folding catalysts [BR:ncr03110]"
+"NCU06329",NA,NA,NA
+"NCU06301",NA,NA,NA
+"NCU06293",NA,NA,NA
+"NCU06288",NA,NA,NA
+"NCU06231","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU06236",NA,NA,NA
+"NCU06206",NA,NA,NA
+"NCU06165",NA,NA,NA
+"NCU06164",NA,NA,NA
+"NCU06163",NA,NA,NA
+"NCU06161",NA,NA,NA
+"NCU06160",NA,NA,NA
+"NCU06157",NA,NA,NA
+"NCU06155",NA,NA,NA
+"NCU06154",NA,NA,NA
+"NCU06140",NA,NA,NA
+"NCU06137","A09100 Metabolism","B  09102 Energy metabolism","C    00910 Nitrogen metabolism [PATH:ncr00910]"
+"NCU06137","A09180 Brite Hierarchies","B  09181 Protein families: metabolism","C    00199 Cytochrome P450 [BR:ncr00199]"
+"NCU06134",NA,NA,NA
+"NCU06133",NA,NA,NA
+"NCU06109",NA,NA,NA
+"NCU06082",NA,NA,NA
+"NCU06080","A09190 Not Included in Pathway or Brite","B  09191 Unclassified: metabolism","C    99980 Enzymes with EC numbers"
+"NCU06060",NA,NA,NA
+"NCU06042",NA,NA,NA
+"NCU06040",NA,NA,NA
+"NCU05978",NA,NA,NA
+"NCU05946",NA,NA,NA
+"NCU05940",NA,NA,NA
+"NCU05912",NA,NA,NA
+"NCU05908",NA,NA,NA
+"NCU05903",NA,NA,NA
+"NCU05887",NA,NA,NA
+"NCU05888",NA,NA,NA
+"NCU05875",NA,NA,NA
+"NCU05877",NA,NA,NA
+"NCU05862",NA,NA,NA
+"NCU05859",NA,NA,NA
+"NCU05845",NA,NA,NA
+"NCU05849",NA,NA,NA
+"NCU05830","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU05831",NA,NA,NA
+"NCU05832",NA,NA,NA
+"NCU05835",NA,NA,NA
+"NCU05821",NA,NA,NA
+"NCU05822",NA,NA,NA
+"NCU05823",NA,NA,NA
+"NCU05827",NA,NA,NA
+"NCU05812",NA,NA,NA
+"NCU05818",NA,NA,NA
+"NCU05773",NA,NA,NA
+"NCU05760",NA,NA,NA
+"NCU05761",NA,NA,NA
+"NCU05762","A09100 Metabolism","B  09105 Amino acid metabolism","C    00350 Tyrosine metabolism [PATH:ncr00350]"
+"NCU05764",NA,NA,NA
+"NCU05769",NA,NA,NA
+"NCU05759",NA,NA,NA
+"NCU05732",NA,NA,NA
+"NCU05711",NA,NA,NA
+"NCU05712",NA,NA,NA
+"NCU05707",NA,NA,NA
+"NCU05698",NA,NA,NA
+"NCU05678",NA,NA,NA
+"NCU05651",NA,NA,NA
+"NCU05650","A09120 Genetic Information Processing","B  09122 Translation","C    03013 Nucleocytoplasmic transport [PATH:ncr03013]"
+"NCU05650","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03009 Ribosome biogenesis [BR:ncr03009]"
+"NCU05642","A09120 Genetic Information Processing","B  09122 Translation","C    00970 Aminoacyl-tRNA biosynthesis [PATH:ncr00970]"
+"NCU05642","A09180 Brite Hierarchies","B  09181 Protein families: metabolism","C    01007 Amino acid related enzymes [BR:ncr01007]"
+"NCU05642","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03016 Transfer RNA biogenesis [BR:ncr03016]"
+"NCU05629",NA,NA,NA
+"NCU05626",NA,NA,NA
+"NCU05616",NA,NA,NA
+"NCU05613",NA,NA,NA
+"NCU05612",NA,NA,NA
+"NCU05611",NA,NA,NA
+"NCU05604",NA,NA,NA
+"NCU05572",NA,NA,NA
+"NCU05570",NA,NA,NA
+"NCU05569",NA,NA,NA
+"NCU05563",NA,NA,NA
+"NCU05557",NA,NA,NA
+"NCU05529",NA,NA,NA
+"NCU05518","A09100 Metabolism","B  09105 Amino acid metabolism","C    00260 Glycine, serine and threonine metabolism [PATH:ncr00260]"
+"NCU05518","A09100 Metabolism","B  09105 Amino acid metabolism","C    00350 Tyrosine metabolism [PATH:ncr00350]"
+"NCU05518","A09100 Metabolism","B  09105 Amino acid metabolism","C    00360 Phenylalanine metabolism [PATH:ncr00360]"
+"NCU05518","A09100 Metabolism","B  09106 Metabolism of other amino acids","C    00410 beta-Alanine metabolism [PATH:ncr00410]"
+"NCU05506",NA,NA,NA
+"NCU05505",NA,NA,NA
+"NCU05504",NA,NA,NA
+"NCU05480",NA,NA,NA
+"NCU05481",NA,NA,NA
+"NCU05483",NA,NA,NA
+"NCU05470",NA,NA,NA
+"NCU05472",NA,NA,NA
+"NCU05477",NA,NA,NA
+"NCU05479",NA,NA,NA
+"NCU05462",NA,NA,NA
+"NCU05463",NA,NA,NA
+"NCU05466",NA,NA,NA
+"NCU05467",NA,NA,NA
+"NCU05469",NA,NA,NA
+"NCU05358",NA,NA,NA
+"NCU05341",NA,NA,NA
+"NCU05321",NA,NA,NA
+"NCU05319",NA,NA,NA
+"NCU05284",NA,NA,NA
+"NCU05191",NA,NA,NA
+"NCU05190",NA,NA,NA
+"NCU05187",NA,NA,NA
+"NCU05186",NA,NA,NA
+"NCU05176",NA,NA,NA
+"NCU05175",NA,NA,NA
+"NCU05173",NA,NA,NA
+"NCU05172",NA,NA,NA
+"NCU05171",NA,NA,NA
+"NCU05166",NA,NA,NA
+"NCU05165",NA,NA,NA
+"NCU05163",NA,NA,NA
+"NCU05108",NA,NA,NA
+"NCU05106",NA,NA,NA
+"NCU05105",NA,NA,NA
+"NCU05102",NA,NA,NA
+"NCU05101",NA,NA,NA
+"NCU05100",NA,NA,NA
+"NCU05098","A09100 Metabolism","B  09103 Lipid metabolism","C    00564 Glycerophospholipid metabolism [PATH:ncr00564]"
+"NCU05097",NA,NA,NA
+"NCU05096",NA,NA,NA
+"NCU05086",NA,NA,NA
+"NCU05083",NA,NA,NA
+"NCU05080",NA,NA,NA
+"NCU05079",NA,NA,NA
+"NCU05071","A09180 Brite Hierarchies","B  09181 Protein families: metabolism","C    01002 Peptidases and inhibitors [BR:ncr01002]"
+"NCU05059",NA,NA,NA
+"NCU05058",NA,NA,NA
+"NCU05056",NA,NA,NA
+"NCU05055",NA,NA,NA
+"NCU05049",NA,NA,NA
+"NCU05048",NA,NA,NA
+"NCU05045",NA,NA,NA
+"NCU05042","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00860 Porphyrin metabolism [PATH:ncr00860]"
+"NCU05036",NA,NA,NA
+"NCU05034",NA,NA,NA
+"NCU05030",NA,NA,NA
+"NCU05015",NA,NA,NA
+"NCU05014",NA,NA,NA
+"NCU05013",NA,NA,NA
+"NCU05004",NA,NA,NA
+"NCU04998",NA,NA,NA
+"NCU04988",NA,NA,NA
+"NCU04953",NA,NA,NA
+"NCU04942",NA,NA,NA
+"NCU04947",NA,NA,NA
+"NCU04935",NA,NA,NA
+"NCU04938",NA,NA,NA
+"NCU04920",NA,NA,NA
+"NCU04922",NA,NA,NA
+"NCU04926",NA,NA,NA
+"NCU04916",NA,NA,NA
+"NCU04918",NA,NA,NA
+"NCU04919",NA,NA,NA
+"NCU04909",NA,NA,NA
+"NCU04891",NA,NA,NA
+"NCU04894",NA,NA,NA
+"NCU04897",NA,NA,NA
+"NCU04882",NA,NA,NA
+"NCU04886",NA,NA,NA
+"NCU04870","A09190 Not Included in Pathway or Brite","B  09191 Unclassified: metabolism","C    99980 Enzymes with EC numbers"
+"NCU04872",NA,NA,NA
+"NCU04873",NA,NA,NA
+"NCU04876",NA,NA,NA
+"NCU04877",NA,NA,NA
+"NCU04879",NA,NA,NA
+"NCU04860",NA,NA,NA
+"NCU04867",NA,NA,NA
+"NCU04869",NA,NA,NA
+"NCU04852",NA,NA,NA
+"NCU04853",NA,NA,NA
+"NCU04821","A09120 Genetic Information Processing","B  09124 Replication and repair","C    03420 Nucleotide excision repair [PATH:ncr03420]"
+"NCU04821","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03400 DNA repair and recombination proteins [BR:ncr03400]"
+"NCU04805",NA,NA,NA
+"NCU04710",NA,NA,NA
+"NCU04701",NA,NA,NA
+"NCU04703",NA,NA,NA
+"NCU04705",NA,NA,NA
+"NCU04707",NA,NA,NA
+"NCU04708",NA,NA,NA
+"NCU04697","A09100 Metabolism","B  09106 Metabolism of other amino acids","C    00460 Cyanoamino acid metabolism [PATH:ncr00460]"
+"NCU04689",NA,NA,NA
+"NCU04672","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU04657","A09100 Metabolism","B  09105 Amino acid metabolism","C    00270 Cysteine and methionine metabolism [PATH:ncr00270]"
+"NCU04648","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00760 Nicotinate and nicotinamide metabolism [PATH:ncr00760]"
+"NCU04631",NA,NA,NA
+"NCU04630",NA,NA,NA
+"NCU04625","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU04624",NA,NA,NA
+"NCU04616",NA,NA,NA
+"NCU04593","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU04583",NA,NA,NA
+"NCU04569","A09100 Metabolism","B  09106 Metabolism of other amino acids","C    00480 Glutathione metabolism [PATH:ncr00480]"
+"NCU04547",NA,NA,NA
+"NCU04546",NA,NA,NA
+"NCU04542",NA,NA,NA
+"NCU04537",NA,NA,NA
+"NCU04524",NA,NA,NA
+"NCU04496",NA,NA,NA
+"NCU04485",NA,NA,NA
+"NCU04482",NA,NA,NA
+"NCU04445",NA,NA,NA
+"NCU04435","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU04417",NA,NA,NA
+"NCU04400","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00051 Fructose and mannose metabolism [PATH:ncr00051]"
+"NCU04400","A09100 Metabolism","B  09102 Energy metabolism","C    00680 Methane metabolism [PATH:ncr00680]"
+"NCU04400","A09100 Metabolism","B  09103 Lipid metabolism","C    00561 Glycerolipid metabolism [PATH:ncr00561]"
+"NCU04398",NA,NA,NA
+"NCU04396",NA,NA,NA
+"NCU04366",NA,NA,NA
+"NCU04360",NA,NA,NA
+"NCU04357",NA,NA,NA
+"NCU04356",NA,NA,NA
+"NCU04303","A09100 Metabolism","B  09105 Amino acid metabolism","C    00250 Alanine, aspartate and glutamate metabolism [PATH:ncr00250]"
+"NCU04303","A09180 Brite Hierarchies","B  09181 Protein families: metabolism","C    01002 Peptidases and inhibitors [BR:ncr01002]"
+"NCU04267",NA,NA,NA
+"NCU04234",NA,NA,NA
+"NCU04236",NA,NA,NA
+"NCU04222",NA,NA,NA
+"NCU04219",NA,NA,NA
+"NCU04169",NA,NA,NA
+"NCU04134",NA,NA,NA
+"NCU04118","A09100 Metabolism","B  09105 Amino acid metabolism","C    00260 Glycine, serine and threonine metabolism [PATH:ncr00260]"
+"NCU04118","A09100 Metabolism","B  09105 Amino acid metabolism","C    00270 Cysteine and methionine metabolism [PATH:ncr00270]"
+"NCU04118","A09100 Metabolism","B  09105 Amino acid metabolism","C    00300 Lysine biosynthesis [PATH:ncr00300]"
+"NCU04118","A09100 Metabolism","B  09110 Biosynthesis of other secondary metabolites","C    00261 Monobactam biosynthesis [PATH:ncr00261]"
+"NCU04108",NA,NA,NA
+"NCU04097","A09120 Genetic Information Processing","B  09123 Folding, sorting and degradation","C    03018 RNA degradation [PATH:ncr03018]"
+"NCU04097","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03019 Messenger RNA biogenesis [BR:ncr03019]"
+"NCU04030",NA,NA,NA
+"NCU04031",NA,NA,NA
+"NCU04034",NA,NA,NA
+"NCU04039",NA,NA,NA
+"NCU04016",NA,NA,NA
+"NCU03974",NA,NA,NA
+"NCU03960",NA,NA,NA
+"NCU03935","A09100 Metabolism","B  09105 Amino acid metabolism","C    00260 Glycine, serine and threonine metabolism [PATH:ncr00260]"
+"NCU03935","A09100 Metabolism","B  09105 Amino acid metabolism","C    00270 Cysteine and methionine metabolism [PATH:ncr00270]"
+"NCU03935","A09100 Metabolism","B  09105 Amino acid metabolism","C    00300 Lysine biosynthesis [PATH:ncr00300]"
+"NCU03873",NA,NA,NA
+"NCU03879",NA,NA,NA
+"NCU03843",NA,NA,NA
+"NCU03844",NA,NA,NA
+"NCU03847",NA,NA,NA
+"NCU03785",NA,NA,NA
+"NCU03789",NA,NA,NA
+"NCU03775",NA,NA,NA
+"NCU03767",NA,NA,NA
+"NCU03682",NA,NA,NA
+"NCU03684",NA,NA,NA
+"NCU03640",NA,NA,NA
+"NCU03639",NA,NA,NA
+"NCU03582",NA,NA,NA
+"NCU03581",NA,NA,NA
+"NCU03577",NA,NA,NA
+"NCU03562",NA,NA,NA
+"NCU03561",NA,NA,NA
+"NCU03553",NA,NA,NA
+"NCU03540",NA,NA,NA
+"NCU03531",NA,NA,NA
+"NCU03512",NA,NA,NA
+"NCU03511",NA,NA,NA
+"NCU03499",NA,NA,NA
+"NCU03490",NA,NA,NA
+"NCU03481",NA,NA,NA
+"NCU03478",NA,NA,NA
+"NCU03477",NA,NA,NA
+"NCU03476",NA,NA,NA
+"NCU03475",NA,NA,NA
+"NCU03473",NA,NA,NA
+"NCU03456",NA,NA,NA
+"NCU03429",NA,NA,NA
+"NCU03428",NA,NA,NA
+"NCU03382",NA,NA,NA
+"NCU03376",NA,NA,NA
+"NCU03351",NA,NA,NA
+"NCU03322",NA,NA,NA
+"NCU03286",NA,NA,NA
+"NCU03273","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03000 Transcription factors [BR:ncr03000]"
+"NCU03273","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    04121 Ubiquitin system [BR:ncr04121]"
+"NCU03250",NA,NA,NA
+"NCU03163",NA,NA,NA
+"NCU03092","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03009 Ribosome biogenesis [BR:ncr03009]"
+"NCU03092","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03036 Chromosome and associated proteins [BR:ncr03036]"
+"NCU03011",NA,NA,NA
+"NCU02964",NA,NA,NA
+"NCU02924","A09100 Metabolism","B  09103 Lipid metabolism","C    00590 Arachidonic acid metabolism [PATH:ncr00590]"
+"NCU02924","A09140 Cellular Processes","B  09141 Transport and catabolism","C    04146 Peroxisome [PATH:ncr04146]"
+"NCU02924","A09180 Brite Hierarchies","B  09181 Protein families: metabolism","C    01009 Protein phosphatases and associated proteins [BR:ncr01009]"
+"NCU02924","A09180 Brite Hierarchies","B  09181 Protein families: metabolism","C    01002 Peptidases and inhibitors [BR:ncr01002]"
+"NCU02923",NA,NA,NA
+"NCU02922","A09100 Metabolism","B  09103 Lipid metabolism","C    00564 Glycerophospholipid metabolism [PATH:ncr00564]"
+"NCU02922","A09100 Metabolism","B  09103 Lipid metabolism","C    00565 Ether lipid metabolism [PATH:ncr00565]"
+"NCU02900",NA,NA,NA
+"NCU02889",NA,NA,NA
+"NCU02873",NA,NA,NA
+"NCU02872",NA,NA,NA
+"NCU02868",NA,NA,NA
+"NCU02865",NA,NA,NA
+"NCU02864",NA,NA,NA
+"NCU02862",NA,NA,NA
+"NCU02858",NA,NA,NA
+"NCU02857",NA,NA,NA
+"NCU02772",NA,NA,NA
+"NCU02722",NA,NA,NA
+"NCU02727","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00630 Glyoxylate and dicarboxylate metabolism [PATH:ncr00630]"
+"NCU02727","A09100 Metabolism","B  09105 Amino acid metabolism","C    00260 Glycine, serine and threonine metabolism [PATH:ncr00260]"
+"NCU02727","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00785 Lipoic acid metabolism [PATH:ncr00785]"
+"NCU02727","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00670 One carbon pool by folate [PATH:ncr00670]"
+"NCU02710",NA,NA,NA
+"NCU02675","A09120 Genetic Information Processing","B  09122 Translation","C    03008 Ribosome biogenesis in eukaryotes [PATH:ncr03008]"
+"NCU02675","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03009 Ribosome biogenesis [BR:ncr03009]"
+"NCU02502","A09100 Metabolism","B  09103 Lipid metabolism","C    00100 Steroid biosynthesis [PATH:ncr00100]"
+"NCU02503",NA,NA,NA
+"NCU02480",NA,NA,NA
+"NCU02487",NA,NA,NA
+"NCU02475","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00630 Glyoxylate and dicarboxylate metabolism [PATH:ncr00630]"
+"NCU02475","A09100 Metabolism","B  09105 Amino acid metabolism","C    00260 Glycine, serine and threonine metabolism [PATH:ncr00260]"
+"NCU02475","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00785 Lipoic acid metabolism [PATH:ncr00785]"
+"NCU02475","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00670 One carbon pool by folate [PATH:ncr00670]"
+"NCU02428","A09120 Genetic Information Processing","B  09122 Translation","C    03008 Ribosome biogenesis in eukaryotes [PATH:ncr03008]"
+"NCU02428","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03009 Ribosome biogenesis [BR:ncr03009]"
+"NCU02383",NA,NA,NA
+"NCU02378",NA,NA,NA
+"NCU02361","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00630 Glyoxylate and dicarboxylate metabolism [PATH:ncr00630]"
+"NCU02361","A09100 Metabolism","B  09102 Energy metabolism","C    00910 Nitrogen metabolism [PATH:ncr00910]"
+"NCU02361","A09100 Metabolism","B  09106 Metabolism of other amino acids","C    00460 Cyanoamino acid metabolism [PATH:ncr00460]"
+"NCU02341",NA,NA,NA
+"NCU02339",NA,NA,NA
+"NCU02331",NA,NA,NA
+"NCU02329","A09190 Not Included in Pathway or Brite","B  09194 Poorly characterized","C    99997 Function unknown"
+"NCU02326",NA,NA,NA
+"NCU02324",NA,NA,NA
+"NCU02323",NA,NA,NA
+"NCU02307",NA,NA,NA
+"NCU02269","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU02246",NA,NA,NA
+"NCU02197",NA,NA,NA
+"NCU02146",NA,NA,NA
+"NCU02096","A09190 Not Included in Pathway or Brite","B  09191 Unclassified: metabolism","C    99980 Enzymes with EC numbers"
+"NCU02077",NA,NA,NA
+"NCU02061",NA,NA,NA
+"NCU02046",NA,NA,NA
+"NCU02037",NA,NA,NA
+"NCU02031",NA,NA,NA
+"NCU02023",NA,NA,NA
+"NCU01995",NA,NA,NA
+"NCU01988",NA,NA,NA
+"NCU01987",NA,NA,NA
+"NCU01980","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03016 Transfer RNA biogenesis [BR:ncr03016]"
+"NCU01976",NA,NA,NA
+"NCU01882","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU01873",NA,NA,NA
+"NCU01869",NA,NA,NA
+"NCU01812",NA,NA,NA
+"NCU01790",NA,NA,NA
+"NCU01735",NA,NA,NA
+"NCU01672",NA,NA,NA
+"NCU01652","A09100 Metabolism","B  09102 Energy metabolism","C    00920 Sulfur metabolism [PATH:ncr00920]"
+"NCU01652","A09100 Metabolism","B  09105 Amino acid metabolism","C    00270 Cysteine and methionine metabolism [PATH:ncr00270]"
+"NCU01631",NA,NA,NA
+"NCU01562",NA,NA,NA
+"NCU01561",NA,NA,NA
+"NCU01532",NA,NA,NA
+"NCU01531",NA,NA,NA
+"NCU01529",NA,NA,NA
+"NCU01511","A09190 Not Included in Pathway or Brite","B  09192 Unclassified: genetic information processing","C    99975 Protein processing"
+"NCU01495",NA,NA,NA
+"NCU01462",NA,NA,NA
+"NCU01402","A09100 Metabolism","B  09105 Amino acid metabolism","C    00380 Tryptophan metabolism [PATH:ncr00380]"
+"NCU01407",NA,NA,NA
+"NCU01392",NA,NA,NA
+"NCU01380",NA,NA,NA
+"NCU01381",NA,NA,NA
+"NCU01382",NA,NA,NA
+"NCU01357",NA,NA,NA
+"NCU01348","A09100 Metabolism","B  09105 Amino acid metabolism","C    00330 Arginine and proline metabolism [PATH:ncr00330]"
+"NCU01348","A09100 Metabolism","B  09106 Metabolism of other amino acids","C    00470 D-Amino acid metabolism [PATH:ncr00470]"
+"NCU01326",NA,NA,NA
+"NCU01311",NA,NA,NA
+"NCU01289",NA,NA,NA
+"NCU01196",NA,NA,NA
+"NCU01151",NA,NA,NA
+"NCU01147",NA,NA,NA
+"NCU01134",NA,NA,NA
+"NCU01090",NA,NA,NA
+"NCU01091",NA,NA,NA
+"NCU01093",NA,NA,NA
+"NCU01095",NA,NA,NA
+"NCU01071",NA,NA,NA
+"NCU01075",NA,NA,NA
+"NCU01076",NA,NA,NA
+"NCU01077",NA,NA,NA
+"NCU01079",NA,NA,NA
+"NCU01064",NA,NA,NA
+"NCU01065","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU01055",NA,NA,NA
+"NCU01057",NA,NA,NA
+"NCU01058",NA,NA,NA
+"NCU01042",NA,NA,NA
+"NCU01043",NA,NA,NA
+"NCU01049",NA,NA,NA
+"NCU01033",NA,NA,NA
+"NCU01038",NA,NA,NA
+"NCU00995",NA,NA,NA
+"NCU00994",NA,NA,NA
+"NCU00955",NA,NA,NA
+"NCU00932",NA,NA,NA
+"NCU00891","A09100 Metabolism","B  09101 Carbohydrate metabolism","C    00040 Pentose and glucuronate interconversions [PATH:ncr00040]"
+"NCU00878",NA,NA,NA
+"NCU00871",NA,NA,NA
+"NCU00859",NA,NA,NA
+"NCU00852",NA,NA,NA
+"NCU00850",NA,NA,NA
+"NCU00848",NA,NA,NA
+"NCU00845",NA,NA,NA
+"NCU00844",NA,NA,NA
+"NCU00829",NA,NA,NA
+"NCU00826",NA,NA,NA
+"NCU00822",NA,NA,NA
+"NCU00817",NA,NA,NA
+"NCU00806",NA,NA,NA
+"NCU00800",NA,NA,NA
+"NCU00763",NA,NA,NA
+"NCU00755","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU00746",NA,NA,NA
+"NCU00739",NA,NA,NA
+"NCU00704",NA,NA,NA
+"NCU00604","A09190 Not Included in Pathway or Brite","B  09191 Unclassified: metabolism","C    99980 Enzymes with EC numbers"
+"NCU00602","A09100 Metabolism","B  09108 Metabolism of cofactors and vitamins","C    00860 Porphyrin metabolism [PATH:ncr00860]"
+"NCU00547",NA,NA,NA
+"NCU00525",NA,NA,NA
+"NCU00510",NA,NA,NA
+"NCU00474",NA,NA,NA
+"NCU00437","A09100 Metabolism","B  09102 Energy metabolism","C    00910 Nitrogen metabolism [PATH:ncr00910]"
+"NCU00437","A09100 Metabolism","B  09105 Amino acid metabolism","C    00380 Tryptophan metabolism [PATH:ncr00380]"
+"NCU00437","A09100 Metabolism","B  09106 Metabolism of other amino acids","C    00460 Cyanoamino acid metabolism [PATH:ncr00460]"
+"NCU00425",NA,NA,NA
+"NCU00405","A09120 Genetic Information Processing","B  09122 Translation","C    00970 Aminoacyl-tRNA biosynthesis [PATH:ncr00970]"
+"NCU00405","A09180 Brite Hierarchies","B  09181 Protein families: metabolism","C    01007 Amino acid related enzymes [BR:ncr01007]"
+"NCU00405","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03016 Transfer RNA biogenesis [BR:ncr03016]"
+"NCU00405","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03029 Mitochondrial biogenesis [BR:ncr03029]"
+"NCU00370",NA,NA,NA
+"NCU00367",NA,NA,NA
+"NCU00354",NA,NA,NA
+"NCU00312",NA,NA,NA
+"NCU00318",NA,NA,NA
+"NCU00319","A09120 Genetic Information Processing","B  09122 Translation","C    03008 Ribosome biogenesis in eukaryotes [PATH:ncr03008]"
+"NCU00319","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03009 Ribosome biogenesis [BR:ncr03009]"
+"NCU00319","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03016 Transfer RNA biogenesis [BR:ncr03016]"
+"NCU00319","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03029 Mitochondrial biogenesis [BR:ncr03029]"
+"NCU00306",NA,NA,NA
+"NCU00290","A09130 Environmental Information Processing","B  09131 Membrane transport","C    02010 ABC transporters [PATH:ncr02010]"
+"NCU00290","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU00290","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    04147 Exosome [BR:ncr04147]"
+"NCU00290","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    04090 CD molecules [BR:ncr04090]"
+"NCU00292",NA,NA,NA
+"NCU00285",NA,NA,NA
+"NCU00263",NA,NA,NA
+"NCU00265",NA,NA,NA
+"NCU00250",NA,NA,NA
+"NCU00231",NA,NA,NA
+"NCU00224",NA,NA,NA
+"NCU00227","A09180 Brite Hierarchies","B  09182 Protein families: genetic information processing","C    03029 Mitochondrial biogenesis [BR:ncr03029]"
+"NCU00227","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    02000 Transporters [BR:ncr02000]"
+"NCU00208",NA,NA,NA
+"NCU00177","A09100 Metabolism","B  09104 Nucleotide metabolism","C    00230 Purine metabolism [PATH:ncr00230]"
+"NCU00149",NA,NA,NA
+"NCU00121","A09180 Brite Hierarchies","B  09183 Protein families: signaling and cellular processes","C    04040 Ion channels [BR:ncr04040]"
+"NCU00090",NA,NA,NA
+"NCU00069",NA,NA,NA
+"NCU00031",NA,NA,NA
