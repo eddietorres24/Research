@@ -690,7 +690,7 @@ computeMatrix scale-regions --scale 2 \
               --sortRegions descend \
               --outFileSortedRegions $BEDDIR2/RNA_order_fig6_supp.bed \
               --heatmapHeight 20 \
-              --legendLocation none \
+              --legendLocation center-left \
               --colorMap "bwr" \
               --zMin 0 --zMax 4
 
@@ -706,13 +706,10 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6_SUPP.pdf \
   --samplesLabel WT cac-1 suz-12 cac-1_suz-12 \
   --startLabel "TSS" \
   --sortRegions no \
-  --legendLocation none \
+  --legendLocation center-left \
   --heatmapHeight 20 \
-  --whatToShow "heatmap and colorbar" \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
   --zMin 0 --zMax 9
-
-
 
 ###FILES
 # 152-100_ChIP_suz12_H3K36me3_Rep2_S124.bin_25.smooth_75Bulk.bw
