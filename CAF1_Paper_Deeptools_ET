@@ -547,15 +547,16 @@ plotHeatmap -m K27_test_K36.gz -out H3K27me3_CAF1_H3K36_lost_cluster.pdf \
 ###Supplement for Fiugre 4 (Kac/K4)
 ##Kac in suz-12 vs set-7
 computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
--S $P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw \
+-S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
+   $P150DIR/150-139_ChIP_set-7_Kac_Rep2_S154.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-80_ChIP_suz12_Kac_Rep1_S80.bin_25.smooth_75Bulk.bw \
 -R $BEDDIR2/Kac_Gain_set7.bed $BEDDIR2/Kac_NO_Gain_set7.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
 
 plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_PRC2_mutants_clustered.pdf \
-  --samplesLabel set-7 suz-12 \
+  --samplesLabel WT set-7 suz-12 \
   --startLabel "TSS" \
-  --sortRegions no \
+  --sortRegions descend \
   --heatmapHeight 20 \
   --legendLocation none \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
@@ -596,7 +597,8 @@ plotHeatmap -m K27_test.gz -out H3K27me3_CAF1_lost_cluster_Kac_order.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 \
                     --startLabel "TSS" \
                     --sortRegions no \
-                    --heatmapHeight 24 \
+                    --heatmapHeight 20 \
+                    --legendLocation none \
                     --colorList 'white,g,darkgreen' \
                     --zMin 0 --zMax 50
 
@@ -692,7 +694,7 @@ computeMatrix scale-regions --scale 2 \
               --sortRegions descend \
               --outFileSortedRegions $BEDDIR2/RNA_order_fig6_supp.bed \
               --heatmapHeight 20 \
-              --legendLocation center-left \
+              --legendLocation none \
               --colorMap "bwr" \
               --zMin 0 --zMax 4
 
@@ -708,7 +710,7 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6_SUPP.pdf \
   --samplesLabel WT cac-1 suz-12 cac-1_suz-12 \
   --startLabel "TSS" \
   --sortRegions no \
-  --legendLocation center-left \
+  --legendLocation none \
   --heatmapHeight 20 \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
   --zMin 0 --zMax 9
