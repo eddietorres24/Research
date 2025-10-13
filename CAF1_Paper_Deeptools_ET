@@ -557,7 +557,7 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_PRC2_mutants_clustered.pdf
   --samplesLabel WT set-7 suz-12 \
   --startLabel "TSS" \
   --sortRegions descend \
-  --heatmapHeight 20 \
+  --heatmapHeight 12 \
   --legendLocation none \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
   --zMin 0 --zMax 9
