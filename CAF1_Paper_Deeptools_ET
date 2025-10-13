@@ -687,14 +687,14 @@ computeMatrix scale-regions --scale 2 \
         -R $BEDDIR2/Kac_Gain_cac1.bed $BEDDIR2/Kac_Gain_suz12_no_cac1.bed $BEDDIR2/Kac_no_change_dub.bed $BEDDIR2/Kac_Gain_cac1-suz12_only.bed $BEDDIR2/Kac_unenriched.bed \
           --missingDataAsZero --skipZeros -o doublemutant_RNA.gz
 
-      plotHeatmap -m doublemutant_RNA.gz -out K27_genes_doublemutant_RNA-seq_Kac_clustered_RNA_order.pdf \
+      plotHeatmap -m doublemutant_RNA.gz -out K27_genes_doublemutant_RNA-seq_Kac_clustered_RNA_order_WithLegend.pdf \
               --samplesLabel WT cac-1 suz12 cac1_suz12 \
               --startLabel "TSS" \
               --endLabel "TES" \
               --sortRegions descend \
               --outFileSortedRegions $BEDDIR2/RNA_order_fig6_supp.bed \
               --heatmapHeight 20 \
-              --legendLocation none \
+              --legendLocation left \
               --colorMap "bwr" \
               --zMin 0 --zMax 4
 
@@ -706,11 +706,11 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
 -R $BEDDIR2/RNA_order_fig6_supp.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
 
-plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6_SUPP.pdf \
+plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6_SUPP_WithLegend.pdf \
   --samplesLabel WT cac-1 suz-12 cac-1_suz-12 \
   --startLabel "TSS" \
   --sortRegions no \
-  --legendLocation none \
+  --legendLocation left \
   --heatmapHeight 20 \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
   --zMin 0 --zMax 9
