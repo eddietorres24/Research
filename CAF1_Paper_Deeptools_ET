@@ -400,24 +400,43 @@ module load deepTools
 #                                         --colorMap "afmhot_r" \
 #                                         --zMin 0 --zMax 12
 
-#set-2 genes
-computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
-                  -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw \
-                     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
-                     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
-                     $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
-                     $P152DIR/152-118_ChIP_cac-1_comp_H3K36me3_Rep2_S142.bin_25.smooth_75Bulk.bw \
-                     $P152DIR/152-120_ChIP_cac-2_comp_H3K36me3_Rep2_S144.bin_25.smooth_75Bulk.bw \
-                        -R $BEDDIR2/set2_meth_only_V2.bed --skipZeros --missingDataAsZero -o matrix_K36_ash_cac_comp.gz
+# ash-1 genes
+# computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+#                   -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw \
+#                      $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
+#                      $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
+#                      $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
+#                      $P152DIR/152-118_ChIP_cac-1_comp_H3K36me3_Rep2_S142.bin_25.smooth_75Bulk.bw \
+#                      $P152DIR/152-120_ChIP_cac-2_comp_H3K36me3_Rep2_S144.bin_25.smooth_75Bulk.bw \
+#                         -R $BEDDIR2/ash1_dep_CAF_lost.bed --skipZeros --missingDataAsZero -o matrix_K36_ash_cac_comp.gz
+#
+#                         plotHeatmap -m matrix_K36_ash_cac_comp.gz -out CAF1_comp_K36_regions.pdf \
+#                                         --samplesLabel WT ash-1 cac-1 cac-2 cac1_comp cac-2_comp \
+#                                         --startLabel "TSS" \
+#                                         --sortRegions descend \
+#                                         --missingDataColor 1 \
+#                                         --legendLocation none \
+#                                         --colorMap "afmhot_r" \
+#                                         --zMin 0 --zMax 12
 
-                        plotHeatmap -m matrix_K36_ash_cac_comp.gz -out CAF1_comp_K36_regions.pdf \
-                                        --samplesLabel WT ash-1 cac-1 cac-2 cac1_comp cac-2_comp \
-                                        --startLabel "TSS" \
-                                        --sortRegions descend \
-                                        --missingDataColor 1 \
-                                        --legendLocation none \
-                                        --colorMap "afmhot_r" \
-                                        --zMin 0 --zMax 12
+# set-2 genes
+# computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+#                   -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw \
+#                      $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
+#                      $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
+#                      $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
+#                      $P152DIR/152-118_ChIP_cac-1_comp_H3K36me3_Rep2_S142.bin_25.smooth_75Bulk.bw \
+#                      $P152DIR/152-120_ChIP_cac-2_comp_H3K36me3_Rep2_S144.bin_25.smooth_75Bulk.bw \
+#                         -R $BEDDIR2/set2_meth_only_V2.bed --skipZeros --missingDataAsZero -o matrix_K36_ash_cac_comp.gz
+#
+#                         plotHeatmap -m matrix_K36_ash_cac_comp.gz -out CAF1_comp_K36_regions.pdf \
+#                                         --samplesLabel WT ash-1 cac-1 cac-2 cac1_comp cac-2_comp \
+#                                         --startLabel "TSS" \
+#                                         --sortRegions descend \
+#                                         --missingDataColor 1 \
+#                                         --legendLocation none \
+#                                         --colorMap "afmhot_r" \
+#                                         --zMin 0 --zMax 12
 
 
 ###H3K9ME3 & H4K20ME3 ANALYSIS
@@ -500,12 +519,12 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
     $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-103_ChIP_set-7_H3K36me3_Rep3_S127.bin_25.smooth_75Bulk.bw \
     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
- -R $BEDDIR2/CAF-1_K27lost_genes_K27_order.bed --missingDataAsZero --skipZeros -o K36_matrix_PRC2.gz
+ -R $BEDDIR2/CAF-1_K27lost.bed $BEDDIR2/CAF-1_K27retain.bed --missingDataAsZero --skipZeros -o K36_matrix_PRC2.gz
 
     plotHeatmap -m K36_matrix_PRC2.gz -out CAF-1_H3K36me3_K27genes_CAF1lost_cluster.pdf \
                     --samplesLabel WT cac-1 cac-2 set-7 ash-1 \
                     --startLabel "TSS" \
-                    --sortRegions no \
+                    --sortRegions descend \
                     --legendLocation none \
                     --outFileSortedRegions CAF-1_K36_order_K27genes.bed \
                     --heatmapHeight 24 \
