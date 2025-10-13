@@ -297,24 +297,24 @@ plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out H3K4me2_Figure6.pdf \
   --zMin 0 --zMax 9
 
 ###Kac
-computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
--S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
-   $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
-   $P152DIR/152-80_ChIP_suz12_Kac_Rep1_S80.bin_25.smooth_75Bulk.bw \
-   $P152DIR/152-82_ChIP_cac-1_suz12_Kac_Rep1_S82.bin_25.smooth_75Bulk.bw \
--R $BEDDIR2/Kac_Gain_cac1.bed $BEDDIR2/Kac_Gain_suz12_no_cac1.bed $BEDDIR2/Kac_no_change_dub.bed $BEDDIR2/Kac_Gain_cac1-suz12_only.bed \
-  --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
-
-plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6.pdf \
-  --samplesLabel WT cac-1 suz-12 cac-1_suz-12 \
-  --startLabel "TSS" \
-  --sortRegions descend \
-  --legendLocation none \
-  --heatmapHeight 15 \
-  --outFileSortedRegions $BEDDIR2/Kac_Fig6_order_enriched.bed
-  --whatToShow "heatmap and colorbar" \
-  --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
-  --zMin 0 --zMax 9
+# computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
+# -S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
+#    $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \
+#    $P152DIR/152-80_ChIP_suz12_Kac_Rep1_S80.bin_25.smooth_75Bulk.bw \
+#    $P152DIR/152-82_ChIP_cac-1_suz12_Kac_Rep1_S82.bin_25.smooth_75Bulk.bw \
+# -R $BEDDIR2/Kac_Gain_cac1.bed $BEDDIR2/Kac_Gain_suz12_no_cac1.bed $BEDDIR2/Kac_no_change_dub.bed $BEDDIR2/Kac_Gain_cac1-suz12_only.bed \
+#   --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
+#
+# plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6.pdf \
+#   --samplesLabel WT cac-1 suz-12 cac-1_suz-12 \
+#   --startLabel "TSS" \
+#   --sortRegions descend \
+#   --legendLocation none \
+#   --heatmapHeight 15 \
+#   --outFileSortedRegions $BEDDIR2/Kac_Fig6_order_enriched.bed
+#   --whatToShow "heatmap and colorbar" \
+#   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
+#   --zMin 0 --zMax 9
 
 
 computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
