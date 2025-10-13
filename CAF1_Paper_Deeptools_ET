@@ -697,7 +697,7 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
 -R $BEDDIR2/RNA_order_fig6_supp.bed \
   --skipZeros --missingDataAsZero -o matrix_CAF-1_Kac_clustered.gz
 
-plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6.pdf \
+plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6_SUPP.pdf \
   --samplesLabel WT cac-1 suz-12 cac-1_suz-12 \
   --startLabel "TSS" \
   --sortRegions no \
