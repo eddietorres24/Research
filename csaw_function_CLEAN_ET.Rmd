@@ -3137,13 +3137,23 @@ K27lostK36enriched = H3K36me3_Results_K27promTSS_vInput %>%
 K27lostK36enrichedvWT = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$gene_id %in% K27lostK36enriched$gene_id)
 
 K36lost = subset(K27lostK36enrichedvWT, K27lostK36enrichedvWT$logFC_cac1 < -0.75 | K27lostK36enrichedvWT$logFC_cac2 < -0.75)
+
 K36lost_set7 = subset(K27lostK36enrichedvWT, K27lostK36enrichedvWT$logFC_set7 < -0.75)
+
+K36lost_double_only = subset(K27lostK36enrichedvWT, K27lostK36enrichedvWT$logFC_cac1_suz12 < -0.75 & ! K27lostK36enrichedvWT$gene_id %in% K36lost$gene_id)
+
+K36_Retain_double = subset(K27lostK36enrichedvWT, ! K27lostK36enrichedvWT$gene_id %in% K36lost$gene_id & ! K27lostK36enrichedvWT$gene_id %in% K36lost_double_only$gene_id)
 
 #K36lost_CAF_ALL = subset(H3K36me3_Results_allgenes_vWT, H3K36me3_Results_allgenes_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_allgenes_vWT$logFC_cac2 < -0.75)
 K36lost_CAF_nonK27 = subset(K36lost_CAF_ALL, ! K36lost_CAF_ALL$gene_id %in% K36lost$gene_id)
 
 #K36lost = subset(K36lost, K36lost$FDR_cac1 < 0.05 | K36lost$FDR_cac2 < 0.05)
 K36lost = subset(regions$K27genes, regions$K27genes$gene_id %in% K36lost$gene_id)
+
+K36lost_cac1suz12 = subset(regions$K27genes, regions$K27genes$gene_id %in% K36lost_double_only$gene_id)
+
+K36retain_double = subset(regions$K27genes, regions$K27genes$gene_id %in% K36_Retain_double$gene_id)
+
 K36lost_code = subset(K36lost, K36lost$gene_id %in% rownames(allDataTPM))
 K36lost_nocode = subset(K36lost, ! K36lost$gene_id %in% rownames(allDataTPM))
 
@@ -3154,6 +3164,8 @@ K36_unerniched = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K27los
                       
 write.table(K27lost, file = "CAF-1_K27lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K36lost, file = "CAF-1_K36lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K36lost_cac1suz12, file = "cac1suz12_K36lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(K36retain_double, file = "double_K36_retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(K36_enriched, file = "K27genes_K36enriched.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
 write.table(K36_unerniched, file = "K27genes_K36unenriched.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE) 
 
