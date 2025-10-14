@@ -680,11 +680,11 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 #K36 at set-2 genes
 ##SET-2 methylated, all reps of double mutant & cac-1
 #doubles
-computeMatrix reference-point --referencePoint TSS -b 800 -a 3500 \
+computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw  \
    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
    $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
-   $P152DIR/152-97_ChIP_suz12_H3K36me3_Rep1_S121.bin_25.smooth_75Bulk.bw
+   $P152DIR/152-97_ChIP_suz12_H3K36me3_Rep1_S121.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-79_ChIP_cac-1_suz12_H3K36me3_Rep3_S79.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-98_ChIP_cac-1_suz12_H3K36me3_Rep1_S122.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-101_ChIP_cac-1_suz12_H3K36me3_Rep2_S125.bin_25.smooth_75Bulk.bw \
