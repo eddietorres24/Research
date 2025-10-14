@@ -702,8 +702,11 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw  \
    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
    $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
-   $P138DIR/138-63_ChIP_cac-1_H3K36me3_Rep2_6252_S62.bin_25.smooth_75Bulk.bw \
-   $P150DIR/150-94_ChIP_cac-1_H3K36me3_Rep4_S94.bin_25.smooth_75Bulk.bw \
+   $P129DIR/129-91_ChIP_cac-1_H3K36me3_Rep1_S72.bin_25.smooth_75Bulk.bw \
+   $P152DIR/150-94_ChIP_cac-1_H3K36me3_Rep4_S94.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-77_ChIP_suz12_H3K36me3_Rep3_S77.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-97_ChIP_suz12_H3K36me3_Rep1_S121.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-100_ChIP_suz12_H3K36me3_Rep2_S124.bin_25.smooth_75Bulk.bw \
  -R $BEDDIR2/set2_meth_only_V2.bed --missingDataAsZero --skipZeros -o K36_fig5_set2_cac1.gz
 
     plotHeatmap -m K36_fig5_set2_cac1.gz -out H3K36me3_set_methylated_only_genes_cac-1_reps.pdf \
