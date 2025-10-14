@@ -222,40 +222,40 @@ module load deepTools
 
 ###H3K36me3
 #K27 genes
-# computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
-#  -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw  \
-#     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
-#     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
-#     $P152DIR/152-97_ChIP_suz12_H3K36me3_Rep1_S121.bin_25.smooth_75Bulk.bw \
-#     $P152DIR/152-101_ChIP_cac-1_suz12_H3K36me3_Rep2_S125.bin_25.smooth_75Bulk.bw \
-#  -R $BEDDIR2/K27genes_K36enriched.bed --missingDataAsZero --skipZeros -o K36_K27genes_fig5.gz
-#
-#     plotHeatmap -m K36_K27genes_fig5.gz -out H3K36me3_K27genes_fig5.pdf \
-#                     --samplesLabel WT ash-1 cac-1 suz12 cac-1_suz12 \
-#                     --startLabel "TSS" \
-#                     --sortRegions descend \
-#                     --outFileSortedRegions CAF-1_K36_order_K27genes.bed \
-#                     --sortUsingSamples 1 3 \
-#                     --heatmapHeight 24 \
-#                     --colorMap "afmhot_r" \
-#                     --zMin 0 --zMax 12
+computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+ -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw  \
+    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
+    $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
+    $P152DIR/152-100_ChIP_suz12_H3K36me3_Rep2_S124.bin_25.smooth_75Bulk.bw \
+    $P152DIR/152-101_ChIP_cac-1_suz12_H3K36me3_Rep2_S125.bin_25.smooth_75Bulk.bw \
+ -R $BEDDIR2/K27genes_K36enriched.bed --missingDataAsZero --skipZeros -o K36_K27genes_fig5.gz
 
-##SET-2 methylated
-# computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
-# -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw  \
-#    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
-#    $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
-#    $P152DIR/152-97_ChIP_suz12_H3K36me3_Rep1_S121.bin_25.smooth_75Bulk.bw \
-#    $P152DIR/152-79_ChIP_cac-1_suz12_H3K36me3_Rep3_S79.bin_25.smooth_75Bulk.bw \
-#  -R $BEDDIR2/set2_meth_only_V2.bed --missingDataAsZero --skipZeros -o K36_fig5_set2.gz
-#
-#     plotHeatmap -m K36_fig5_set2.gz -out H3K36me3_set_methylated_only_genes_fig5.pdf \
-#                     --samplesLabel WT ash-1 cac-1 suz12 cac-1_suz12 \
-#                     --startLabel "TSS" \
-#                     --sortRegions descend \
-#                     --heatmapHeight 24 \
-#                     --colorMap "afmhot_r" \
-#                     --zMin 0 --zMax 12
+    plotHeatmap -m K36_K27genes_fig5.gz -out H3K36me3_K27genes_fig6.pdf \
+                    --samplesLabel WT ash-1 cac-1 suz12 cac-1_suz12 \
+                    --startLabel "TSS" \
+                    --sortRegions descend \
+                    --outFileSortedRegions CAF-1_K36_order_K27genes.bed \
+                    --sortUsingSamples 1 3 \
+                    --heatmapHeight 24 \
+                    --colorMap "afmhot_r" \
+                    --zMin 0 --zMax 12
+
+#SET-2 methylated
+computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+-S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw  \
+   $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
+   $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-100_ChIP_suz12_H3K36me3_Rep2_S124.bin_25.smooth_75Bulk.bw \
+   $P152DIR/152-101_ChIP_cac-1_suz12_H3K36me3_Rep2_S125.bin_25.smooth_75Bulk.bw \
+ -R $BEDDIR2/set2_meth_only_V2.bed --missingDataAsZero --skipZeros -o K36_fig5_set2.gz
+
+    plotHeatmap -m K36_fig5_set2.gz -out H3K36me3_set_methylated_only_genes_fig6.pdf \
+                    --samplesLabel WT ash-1 cac-1 suz12 cac-1_suz12 \
+                    --startLabel "TSS" \
+                    --sortRegions descend \
+                    --heatmapHeight 24 \
+                    --colorMap "afmhot_r" \
+                    --zMin 0 --zMax 12
 
 ###H3K4me2
 # computeMatrix scale-regions \
@@ -669,7 +669,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
     $P152DIR/152-101_ChIP_cac-1_suz12_H3K36me3_Rep2_S125.bin_25.smooth_75Bulk.bw \
  -R $BEDDIR2/ash1_meth_nonK27_V2.bed --missingDataAsZero --skipZeros -o K36_ash1genes_fig5.gz
 
-    plotHeatmap -m K36_ash1genes_fig5.gz -out H3K36me3_ash1_methylated_genes_fig6.pdf \
+    plotHeatmap -m K36_ash1genes_fig5.gz -out H3K36me3_ash1_methylated_genes_fig6_supp.pdf \
                     --samplesLabel WT ash-1 cac-1 suz12 cac-1_suz12 \
                     --startLabel "TSS" \
                     --sortRegions descend \
