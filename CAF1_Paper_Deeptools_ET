@@ -680,7 +680,7 @@ plotHeatmap -m matrix_CAF-1_K4_clustered.gz -out K27_genes_CAF-1_H3K4me2_Cluster
 
 #K36 at set-2 genes
 ##SET-2 methylated, all reps of double mutant
-computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+computeMatrix reference-point --referencePoint TSS -b 800 -a 3500 \
 -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw  \
    $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
    $P152DIR/152-79_ChIP_cac-1_suz12_H3K36me3_Rep3_S79.bin_25.smooth_75Bulk.bw \
@@ -702,7 +702,7 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
     $P152DIR/152-97_ChIP_suz12_H3K36me3_Rep1_S121.bin_25.smooth_75Bulk.bw \
-    $P152DIR/152-79_ChIP_cac-1_suz12_H3K36me3_Rep3_S79.bin_25.smooth_75Bulk.bw \
+    $P152DIR/152-101_ChIP_cac-1_suz12_H3K36me3_Rep2_S125.bin_25.smooth_75Bulk.bw \
  -R $BEDDIR2/CAF-1_K36lost.bed $BEDDIR2/cac1suz12_K36lost.bed $BEDDIR2/double_K36_retain.bed --missingDataAsZero --skipZeros -o K36_clust_fig6_test.gz
 
     plotHeatmap -m K36_clust_fig6_test.gz -out K36_cluster_fig6.pdf \
