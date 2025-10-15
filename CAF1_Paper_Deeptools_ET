@@ -810,9 +810,11 @@ plotHeatmap -m matrix_CAF-1_Kac_clustered.gz -out Kac_Figure6_SUPP_Metaplot.pdf 
   --zMin 0 --zMax 9
 
 ###cac-3 phenotypes
-#K27
+##Looking at CAF-1 muatnts
 computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
 -S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77_bin_25_smooth_75Bulk.bw \
+   $P136DIR/6147_136-79_ChIP_cac-1_H3K27me3_CS_Rep2_S78.bin_25.smooth_75Bulk.bw \
+   $P136DIR/6147_136-80_ChIP_cac-2_H3K27me3_CS_Rep2_S79.bin_25.smooth_75Bulk.bw \
    $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
 -R $BEDDIR2/cac-3_K27_lost.bed $BEDDIR2/cac-3_K27_retain.bed \
   --skipZeros --missingDataAsZero -o matrix_cac-3_K27_clustered.gz
@@ -826,11 +828,46 @@ plotHeatmap -m matrix_cac-3_K27_clustered.gz -out K27_cac-3_supp.pdf \
   --colorList "white, g, darkgreen" \
   --zMin 0 --zMax 50
 
+###Looking at other mods and RNA in cac-3
+#RNA
+computeMatrix scale-regions --scale 2 \
+        -S $RNADIR/SRR8269825/SRR8269825_log.bw \
+           $RNADIR/SRR7970598/SRR7970598_log.bw \
+        -R $BEDDIR2/cac-3_K27_lost.bed $BEDDIR2/cac-3_K27_retain.bed \
+          --missingDataAsZero --skipZeros -o doublemutant_RNA.gz
+
+      plotHeatmap -m doublemutant_RNA.gz -out cac3_RNA_supp.pdf \
+              --samplesLabel WT cac-3 \
+              --startLabel "TSS" \
+              --endLabel "TES" \
+              --sortRegions descend \
+              --legendLocation none \
+              --outFileSortedRegions $BEDDIR2/cac3_K27_genes_RNA_order.bed \
+              --heatmapHeight 20 \
+              --colorMap "bwr" \
+              --zMin 0 --zMax 4
+
+#K27
+computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
+-S $P136DIR/6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77_bin_25_smooth_75Bulk.bw \
+   $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
+-R $BEDDIR2/cac3_K27_genes_RNA_order.bed \
+  --skipZeros --missingDataAsZero -o matrix_cac-3_K27_clustered.gz
+
+plotHeatmap -m matrix_cac-3_K27_clustered.gz -out K27_cac-3_supp.pdf \
+  --samplesLabel WT cac-3 \
+  --startLabel "TSS" \
+  --sortRegions no \
+  --heatmapHeight 20 \
+  --legendLocation none \
+  --colorList "white, g, darkgreen" \
+  --zMin 0 --zMax 50
+
 #K4
 computeMatrix scale-regions \
 -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
    $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
--R $BEDDIR2/cac3_k27_order.bed \
+-R $BEDDIR2/cac3_K27_genes_RNA_order.bed \
   --skipZeros --missingDataAsZero -o matrix_cac-3_K4_clustered.gz
 
 plotHeatmap -m matrix_cac-3_K4_clustered.gz -out K4_cac-3_supp.pdf \
@@ -838,6 +875,7 @@ plotHeatmap -m matrix_cac-3_K4_clustered.gz -out K4_cac-3_supp.pdf \
   --startLabel "TSS" \
   --sortRegions no \
   --heatmapHeight 20 \
+  --legendLocation none \
   --colorList 'white, violet, magenta' \
   --zMin 0 --zMax 8
 
@@ -845,7 +883,7 @@ plotHeatmap -m matrix_cac-3_K4_clustered.gz -out K4_cac-3_supp.pdf \
 computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
 -S $P150DIR/150-93_ChIP_WT_H3K36me3_Rep4_S93.bin_25.smooth_75Bulk.bw \
    $P150DIR/150-131_ChIP_cac-3_H3K36me3_Rep4_S146.bin_25.smooth_75Bulk.bw \
--R $BEDDIR2/cac3_k27_order.bed \
+-R $BEDDIR2/cac3_K27_genes_RNA_order.bed \
   --skipZeros --missingDataAsZero -o matrix_cac-3_K36_clustered.gz
 
 plotHeatmap -m matrix_cac-3_K36_clustered.gz -out K36_cac-3_supp.pdf \
@@ -853,6 +891,7 @@ plotHeatmap -m matrix_cac-3_K36_clustered.gz -out K36_cac-3_supp.pdf \
   --startLabel "TSS" \
   --sortRegions no \
   --heatmapHeight 20 \
+  --legendLocation none \
   --colorMap "afmhot_r" \
   --zMin 0 --zMax 12
 
@@ -860,7 +899,7 @@ plotHeatmap -m matrix_cac-3_K36_clustered.gz -out K36_cac-3_supp.pdf \
 computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
 -S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
    $P150DIR/150-138_ChIP_cac-3_Kac_Rep2_S153.bin_25.smooth_75Bulk.bw \
--R $BEDDIR2/cac3_k27_order.bed \
+-R $BEDDIR2/cac3_K27_genes_RNA_order.bed \
   --skipZeros --missingDataAsZero -o matrix_cac-3_Kac_clustered.gz
 
 plotHeatmap -m matrix_cac-3_Kac_clustered.gz -out Kac_cac-3_supp.pdf \
@@ -868,25 +907,10 @@ plotHeatmap -m matrix_cac-3_Kac_clustered.gz -out Kac_cac-3_supp.pdf \
   --startLabel "TSS" \
   --sortRegions no \
   --heatmapHeight 20 \
+  --legendLocation none \
   --colorList 'white, ghostwhite, lavender, mediumslateblue, slateblue' \
   --zMin 0 --zMax 9
 
-#RNA
-computeMatrix scale-regions --scale 2 \
-        -S $RNADIR/SRR8269825/SRR8269825_log.bw \
-           $RNADIR/SRR7970598/SRR7970598_log.bw \
-        -R $BEDDIR2/cac3_k27_order.bed\
-          --missingDataAsZero --skipZeros -o doublemutant_RNA.gz
-
-      plotHeatmap -m doublemutant_RNA.gz -out cac3_RNA_supp.pdf \
-              --samplesLabel WT cac-3 \
-              --startLabel "TSS" \
-              --endLabel "TES" \
-              --sortRegions no \
-              --legendLocation none \
-              --heatmapHeight 20 \
-              --colorMap "bwr" \
-              --zMin 0 --zMax 4
 
 ###FILES
 # 152-100_ChIP_suz12_H3K36me3_Rep2_S124.bin_25.smooth_75Bulk.bw
