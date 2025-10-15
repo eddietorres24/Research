@@ -820,11 +820,10 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
   --skipZeros --missingDataAsZero -o matrix_cac-3_K27_clustered.gz
 
 plotHeatmap -m matrix_cac-3_K27_clustered.gz -out K27_cac-3_supp.pdf \
-  --samplesLabel WT cac-3 \
+  --samplesLabel WT cac-1 cac-2 cac-3 \
   --startLabel "TSS" \
   --sortRegions descend \
   --heatmapHeight 20 \
-  --outFileSortedRegions $BEDDIR2/cac3_k27_order.bed \
   --colorList "white, g, darkgreen" \
   --zMin 0 --zMax 50
 
