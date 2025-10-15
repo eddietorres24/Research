@@ -816,7 +816,7 @@ computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
    $P136DIR/6147_136-81_ChIP_cac-3_H3K27me3_CS_Rep2_S80.bin_25.smooth_75Bulk.bw \
 -R $BEDDIR2/cac-3_K27_lost.bed $BEDDIR2/cac-3_K27_retain.bed \
   --skipZeros --missingDataAsZero -o matrix_cac-3_K27_clustered.gz
-6147_136-78_ChIP_WT_H3K27me3_CS_Rep2_S77_bin_25_smooth_75Bulk.bw
+
 plotHeatmap -m matrix_cac-3_K27_clustered.gz -out K27_cac-3_supp.pdf \
   --samplesLabel WT cac-3 \
   --startLabel "TSS" \
