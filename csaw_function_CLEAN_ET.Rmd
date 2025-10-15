@@ -1512,6 +1512,7 @@ make_csaw_heatmap_clusterby(
 #read in log2FC Expression data saved from DESeq for whatever strains you want
 cac1RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1__alpha0.05__ALL_results_LFC.csv", row.names = 1)
 cac2RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac2__alpha0.05__ALL_results_LFC.csv", row.names = 1)
+cac3RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac3__alpha0.05__ALL_results_LFC.csv", row.names = 1)
 set7RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/set7__alpha0.05__ALL_results_LFC.csv", row.names = 1)
 ash1RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/ash1__alpha0.05__ALL_results_LFC.csv", row.names = 1)
 cac1suz12RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1_suz12__alpha0.05__ALL_results_LFC.csv", row.names = 1)
@@ -2706,6 +2707,21 @@ out$gg
 out <- chip_scatter_flex(
   mode        = "chip_vs_rna",
   chip_df_x   = H3K27me3_CS_Results_K27promTSS_vWT,   
+  strain_x    = "cac3",
+  rna_df      = cac3RNA,                          # RNA df
+  up_thresh      =  1,
+  down_thresh    = -1,
+  chip_x_label = "K27",                      # label in axes/title
+  out_dir     = "scatter_outputs",
+  file_prefix = "K27_vs_RNA_cac3_K27_promTSSext",
+  width_in    = 12, height_in = 9, dpi = 600
+)
+out$gg
+
+#
+out <- chip_scatter_flex(
+  mode        = "chip_vs_rna",
+  chip_df_x   = H3K27me3_CS_Results_K27promTSS_vWT,   
   strain_x    = "ash1",
   rna_df      = ash1RNA,                          # RNA df
   up_thresh      =  1,
@@ -3390,5 +3406,8 @@ cac3_retain = subset(H3K27me3_CS_Results_K27promTSS_vWT, ! H3K27me3_CS_Results_K
 
 cac3_k27_lost = subset(regions$K27genes, regions$K27genes$gene_id %in% cac3_lost$gene_id)
 cac3_k27_retain = subset(regions$K27genes, regions$K27genes$gene_id %in% cac3_retain$gene_id)
-  
+
+write.table(cac3_k27_lost, file = "cac-3_K27_lost.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(cac3_k27_retain, file = "cac-3_K27_retain.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
 ```

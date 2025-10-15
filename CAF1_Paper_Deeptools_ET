@@ -782,9 +782,9 @@ computeMatrix scale-regions --scale 2 \
            $RNADIR/SRR9027658/SRR9027658_log.bw \
            /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-96_RNA_cac-1-suz-12__Rep1_S96/149-96_RNA_cac-1-suz-12__Rep1_S96_log.bw \
         -R $BEDDIR2/Kac_Gain_cac1.bed \
-          --missingDataAsZero --skipZeros -o doublemutant_RNA.gz
+          --missingDataAsZero --skipZeros -o CAF-1_cac-3_K27_cluster.gz
 
-      plotHeatmap -m doublemutant_RNA.gz -out K27_genes_doublemutant_RNA-seq_Kac_clustered_RNA_order_Metaplot.pdf \
+      plotHeatmap -m CAF-1_cac-3_K27_cluster.gz -out CAF-1_cac-3_K27_cluster.pdf \
               --samplesLabel WT cac-1 suz12 cac1_suz12 \
               --startLabel "TSS" \
               --endLabel "TES" \
