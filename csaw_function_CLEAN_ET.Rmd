@@ -3383,4 +3383,12 @@ Kac_K4_CAF_Gain_code = subset(Kac_K4_CAF_Gain, Kac_K4_CAF_Gain$gene_id %in% rown
 Kac_K4_cac1_Gain = subset(Kac_K4_CAF_Gain, Kac_K4_CAF_Gain$gene_id %in% K4_Gain_cac1$gene_id | Kac_K4_CAF_Gain$gene_id %in% Kac_Gain_cac1$gene_id )
 Kac_K4_cac2_Gain = subset(Kac_K4_CAF_Gain, Kac_K4_CAF_Gain$gene_id %in% K4_Gain_cac2$gene_id | Kac_K4_CAF_Gain$gene_id %in% Kac_Gain_cac2$gene_id )
 
+#######################
+#cac-3 analysis
+cac3_lost = subset(H3K27me3_CS_Results_K27promTSS_vWT, H3K27me3_CS_Results_K27promTSS_vWT$logFC_cac3 < -0.75 )
+cac3_retain = subset(H3K27me3_CS_Results_K27promTSS_vWT, ! H3K27me3_CS_Results_K27promTSS_vWT$gene_id %in% cac3_lost$gene_id)
+
+cac3_k27_lost = subset(regions$K27genes, regions$K27genes$gene_id %in% cac3_lost$gene_id)
+cac3_k27_retain = subset(regions$K27genes, regions$K27genes$gene_id %in% cac3_retain$gene_id)
+  
 ```
