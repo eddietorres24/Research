@@ -823,13 +823,13 @@ plotHeatmap -m matrix_cac-3_K27_clustered.gz -out K27_cac-3_supp.pdf \
   --sortRegions descend \
   --heatmapHeight 20 \
   --outFileSortedRegions $BEDDIR2/cac3_k27_order.bed \
-  ---colorList "white, g, darkgreen" \
+  --colorList "white, g, darkgreen" \
   --zMin 0 --zMax 50
 
 #K4
 computeMatrix scale-regions \
-$P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
-$P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
+-S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
+   $P146DIR/146-22_ChIP_cac-3_H3K4me2_Rep1_S22.bin_25.smooth_75Bulk.bw \
 -R $BEDDIR2/cac3_k27_order.bed \
   --skipZeros --missingDataAsZero -o matrix_cac-3_K4_clustered.gz
 
@@ -843,8 +843,8 @@ plotHeatmap -m matrix_cac-3_K4_clustered.gz -out K4_cac-3_supp.pdf \
 
 #K36
 computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
-$P150DIR/150-93_ChIP_WT_H3K36me3_Rep4_S93.bin_25.smooth_75Bulk.bw \
-$P150DIR/150-131_ChIP_cac-3_H3K36me3_Rep4_S146.bin_25.smooth_75Bulk.bw \
+-S $P150DIR/150-93_ChIP_WT_H3K36me3_Rep4_S93.bin_25.smooth_75Bulk.bw \
+   $P150DIR/150-131_ChIP_cac-3_H3K36me3_Rep4_S146.bin_25.smooth_75Bulk.bw \
 -R $BEDDIR2/cac3_k27_order.bed \
   --skipZeros --missingDataAsZero -o matrix_cac-3_K36_clustered.gz
 
@@ -858,8 +858,8 @@ plotHeatmap -m matrix_cac-3_K36_clustered.gz -out K36_cac-3_supp.pdf \
 
 #Kac
 computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
-$P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
-$P150DIR/150-138_ChIP_cac-3_Kac_Rep2_S153.bin_25.smooth_75Bulk.bw \
+-S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
+   $P150DIR/150-138_ChIP_cac-3_Kac_Rep2_S153.bin_25.smooth_75Bulk.bw \
 -R $BEDDIR2/cac3_k27_order.bed \
   --skipZeros --missingDataAsZero -o matrix_cac-3_Kac_clustered.gz
 
