@@ -824,6 +824,7 @@ plotHeatmap -m CAF-1_cac-3_K27_cluster.gz -out CAF-1_cac-3_K27_cluster.pdf\
   --startLabel "TSS" \
   --sortRegions descend \
   --heatmapHeight 20 \
+  --legendLocation none \
   --colorList "white, g, darkgreen" \
   --zMin 0 --zMax 50
 
