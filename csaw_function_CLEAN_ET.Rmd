@@ -2806,6 +2806,79 @@ out <- chip_scatter_flex(
 )
 out$gg
 
+#########
+#cac-3 plots
+
+#RNA
+out <- chip_scatter_flex(
+  mode        = "chip_vs_rna",
+  chip_df_x   = Kac_Results_K27promTSSext_vWT,   
+  strain_x    = "cac3",
+  rna_df      = cac3RNA,                          # RNA df
+  up_thresh      =  1,
+  down_thresh    = -1,
+  chip_x_label = "Kac",                      # label in axes/title
+  out_dir     = "scatter_outputs",
+  file_prefix = "Kac_vs_RNA_cac3_K27_promTSS",
+  width_in    = 12, height_in = 9, dpi = 600
+)
+out$gg
+
+out <- chip_scatter_flex(
+  mode        = "chip_vs_rna",
+  chip_df_x   = K36scatter,   
+  strain_x    = "cac3",
+  rna_df      = cac3RNA,                          # RNA df
+  up_thresh      =  1,
+  down_thresh    = -1,
+  chip_x_label = "K36",                      # label in axes/title
+  out_dir     = "scatter_outputs",
+  file_prefix = "K36_vs_RNA_cac3_K27_promTSS",
+  width_in    = 12, height_in = 9, dpi = 600
+)
+out$gg
+
+#Kac vs K27 cac-3
+out <- chip_scatter_flex(
+  mode          = "chip_vs_chip",
+  chip_df_x     = H3K27me3_CS_Results_K27promTSS_vWT,
+  strain_x      = "cac3",
+  chip_df_y     = Kac_Results_K27promTSSext_vWT,
+  strain_y      = "cac3",
+  chip_x_label  = "H3K27me3",
+  chip_y_label  = "Kac",
+  chip_x_cutoff   = 0.75,
+  chip_y_cutoff   = 0.585,
+  chip_cut_use     = c("x_neg","y_pos"),
+  chip_cut_colors  = c(both = "red", x_only = "#4daf4a", y_only = "#cab2d6", neither = "gray70"),
+  show_cutoff_guides = TRUE,
+  guide_sides        = NULL,   # NULL => uses chip_cut_use
+  out_dir       = "scatter_outputs",
+  file_prefix   = "H3K27me3_vs_Kac_cac3_promTSS",
+  width_in      = 12, height_in = 9, dpi = 600
+)
+out$gg
+
+#K36 vs Kac cac-3
+out <- chip_scatter_flex(
+  mode          = "chip_vs_chip",
+  chip_df_x     = K36scatter,
+  strain_x      = "cac3",
+  chip_df_y     = Kac_Results_K27promTSSext_vWT,
+  strain_y      = "cac3",
+  chip_x_label  = "H3K36me3",
+  chip_y_label  = "Kac",
+  chip_x_cutoff   = 0.75,
+  chip_y_cutoff   = 0.585,
+  chip_cut_use     = c("x_neg","y_pos"),
+  chip_cut_colors  = c(both = "red", x_only = "#a65628", y_only = "#cab2d6", neither = "gray70"),
+  show_cutoff_guides = TRUE,
+  guide_sides        = NULL,   # NULL => uses chip_cut_use
+  out_dir       = "scatter_outputs",
+  file_prefix   = "H3K36me3_vs_Kac_cac3_promTSS",
+  width_in      = 12, height_in = 9, dpi = 600
+)
+out$gg
 
 
 #View what your plotting
