@@ -864,7 +864,9 @@ run_diffbind_only(metaQC, out_dir = "QC_DiffBindOnly")
 run_chipqc_only(metaQC, out_dir = "QC_ChIPQCOnly")
 chipqc_metrics_to_excel(metaQC, out_dir = "QC_ChIPQCOnly", xlsx_file = "ChIPQC_metrics.xlsx")
 
-run_chipqc_only(metaQC, out_dir = "QC_ChIPQCOnly", mods = "H3K4me2")
+meta_k4 <- subset(metaQC, grepl("H3K4me2", Antibody, ignore.case = TRUE))
+run_chipqc_only(meta_k4, out_dir = "QC_ChIPQCOnly_H3K4me2", normalize_only_mod_regex = NULL)
+
 
 ```
 ###########################################################################################
