@@ -30,7 +30,7 @@ library(dplyr)
 ```{r, read in metadata & regions of interest}
 #reading in metdata
 meta <- read.csv("../csaw_samples_files/cac_csaw_FINAL.csv")
-metaQC <- read.csv("../csaw_samples_files/cac_csaw_QC_FINAL.csv")
+metaQC <- read.csv("../csaw_samples_files/cac_csaw_QC_TEST.csv")
 
 #fix path (if necessary, should only be if you're in wrong directory)
 meta <- meta %>%
@@ -574,22 +574,19 @@ run_diffbind_only <- function(metadata, out_dir = "QC_DiffBindOnly") {
 
 
 # ============================================================
-# SCRIPT 2: ChIPQC-only (per modification)
-#   - Independent from DiffBind
-#   - Forces PeakCaller="bed" to avoid numeric score requirement
-#   - Drops samples with 0 reads-in-peaks, then makes one full report per Antibody
-#   - No tryCatch wrappers
+# SCRIPT: ChIPQC-only (per modification)
+#   - No DiffBind here
+#   - No tryCatch, no slow pre-count checks
+#   - Drops samples with 0 reads-in-peaks before making report
+#   - Forces PeakCaller="bed"
+#   - Writes metrics CSVs and one report per Antibody
+#   - Optional 'mods' to run only a subset (e.g., mods="H3K4me2")
 # ============================================================
 suppressPackageStartupMessages({
   library(ChIPQC)
   library(BiocParallel)
   library(dplyr)
   library(tools)
-  # for reads-in-peaks screening:
-  library(rtracklayer)
-  library(GenomicRanges)
-  library(GenomicAlignments)
-  library(Rsamtools)
 })
 
 .safe_dir_qc <- function(d){
@@ -619,49 +616,15 @@ suppressPackageStartupMessages({
   as.integer(rep_num)
 }
 
-# --- minimal helper to count reads overlapping peaks (to drop zero-read samples) ---
-.reads_in_peaks_count_qc <- function(bam, peaks, mapq = 0, max_peaks = 5000){
-  if (!file.exists(bam) || !file.exists(peaks)) return(0L)
-
-  # Import peaks (accept narrowPeak/broadPeak/bed/gff/gtf)
-  ext <- tolower(tools::file_ext(peaks))
-  fmt <- if (ext %in% c("narrowpeak","broadpeak","bed","gff","gff3","gtf")) ext else "bed"
-  gr  <- rtracklayer::import(peaks, format = fmt)
-  if (length(gr) == 0L) return(0L)
-  if (length(gr) > max_peaks) gr <- gr[seq_len(max_peaks)]
-
-  # Detect pairedness safely
-  paired <- FALSE
-  tp <- try(Rsamtools::testPairedEndBam(bam), silent = TRUE)
-  if (!inherits(tp, "try-error") && is.logical(tp) && !is.na(tp)) {
-    paired <- isTRUE(tp)
-  }
-
-  bf  <- Rsamtools::BamFile(bam, yieldSize = 1e6)
-  prm <- Rsamtools::ScanBamParam(
-    mapqFilter = mapq,
-    flag = Rsamtools::scanBamFlag(isSecondaryAlignment = FALSE)
-  )
-
-  # singleEnd must be TRUE (SE) or FALSE (PE); fragments=TRUE for PE
-  se <- GenomicAlignments::summarizeOverlaps(
-    features      = gr,
-    reads         = bf,
-    singleEnd     = !paired,
-    fragments     = paired,
-    mode          = "Union",
-    ignore.strand = TRUE,
-    param         = prm
-  )
-  as.integer(sum(SummarizedExperiment::assay(se)))
-}
-
-
-run_chipqc_only <- function(metadata, out_dir = "QC_ChIPQCOnly", mapq = 0) {
+# ---------- MAIN ----------
+# metadata: data.frame or path to CSV with at least SampleID, Antibody, bamReads, Peaks
+# out_dir : output directory
+# mods    : NULL (all) or character vector of Antibody values to run (e.g., "H3K4me2")
+run_chipqc_only <- function(metadata, out_dir = "QC_ChIPQCOnly", mods = NULL) {
   .safe_dir_qc(out_dir)
   register(BiocParallel::SerialParam())
 
-  # accept data.frame or CSV path
+  # Ingest metadata
   if (is.character(metadata) && length(metadata) == 1 && file.exists(metadata)) {
     meta <- read.csv(metadata, stringsAsFactors = FALSE)
   } else if (is.data.frame(metadata)) {
@@ -674,51 +637,33 @@ run_chipqc_only <- function(metadata, out_dir = "QC_ChIPQCOnly", mapq = 0) {
   miss <- setdiff(req, names(meta))
   if (length(miss)) stop("Metadata missing column(s): ", paste(miss, collapse = ", "))
 
+  # Basic normalize; exclude anything labelled like 'input'
   meta <- meta %>%
     mutate(
       SampleID  = as.character(SampleID),
       Antibody  = as.character(Antibody),
-      bamReads  = trimws(as.character(bamReads)),
-      Peaks     = trimws(as.character(Peaks)),
-      is_input  = .is_input_row_qc(.),
-      bam_ok    = !is.na(bamReads) & bamReads != "" & file.exists(bamReads),
-      peak_ok   = !is.na(Peaks)    & Peaks    != "" & file.exists(Peaks)
-    )
+      bamReads  = as.character(bamReads),
+      Peaks     = as.character(Peaks),
+      is_input  = .is_input_row_qc(.)
+    ) %>%
+    filter(!is_input)
 
-  inc0 <- meta %>% filter(!is_input & bam_ok & peak_ok)
+  if (!is.null(mods)) {
+    meta <- meta %>% filter(Antibody %in% mods)
+  }
 
   message("Total rows: ", nrow(meta))
-  message("Included for ChIPQC (pre-screen): ", nrow(inc0))
-  if (nrow(inc0) == 0) stop("No valid rows for ChIPQC after filtering.")
+  if (nrow(meta) == 0) stop("No rows to run in ChIPQC after filtering.")
 
-  # --- DROP zero reads-in-peaks samples ---
-  message("Screening reads-in-peaks (dropping zeros)…")
-  rip <- mapply(.reads_in_peaks_count_qc,
-                bam   = inc0$bamReads,
-                peaks = inc0$Peaks,
-                MoreArgs = list(mapq = mapq, max_peaks = 5000))
-  inc0$reads_in_peaks <- rip
-
-  drop_zero <- inc0 %>% filter(reads_in_peaks <= 0L)
-  inc       <- inc0  %>% filter(reads_in_peaks > 0L)
-
-  if (nrow(drop_zero) > 0) {
-    message("Dropped (0 reads in peaks): ", paste(drop_zero$SampleID, collapse = ", "))
-    write.csv(drop_zero, file.path(out_dir, "dropped_zero_reads_in_peaks.csv"), row.names = FALSE)
-  }
-  message("Remaining for ChIPQC: ", nrow(inc))
-  if (nrow(inc) == 0) stop("All samples had 0 reads overlapping peaks; nothing to report.")
-
-  # --- one full report per modification (Antibody) ---
-  mods <- unique(inc$Antibody)
+  # Per-modification run
   message("\n[ChIPQC] Generating reports per modification…")
-  for (mod in mods) {
-    mod_df  <- inc %>% filter(Antibody == mod)
-    if (nrow(mod_df) == 0) next
+  for (mod in unique(meta$Antibody)) {
+    mod_df  <- meta %>% filter(Antibody == mod)
     mod_out <- .safe_dir_qc(file.path(out_dir, paste0("ChIPQC_", mod)))
+
     message("  [", mod, "] Samples: ", paste(mod_df$SampleID, collapse = ", "))
 
-    # Minimal sheet for ChIPQC
+    # Minimal sheet; Tissue/Condition are optional, fill with simple values if absent
     chip_sheet <- mod_df %>%
       mutate(
         Tissue     = if ("Tissue" %in% names(.)) as.character(Tissue) else "All",
@@ -726,11 +671,30 @@ run_chipqc_only <- function(metadata, out_dir = "QC_ChIPQCOnly", mapq = 0) {
                        if ("Strain" %in% names(.)) as.character(Strain) else "All",
         Factor     = if ("Factor" %in% names(.)) as.character(Factor) else Antibody,
         Replicate  = .make_numeric_replicate_qc(.),
-        PeakCaller = "bed"  # force BED to avoid numeric-score requirement
+        PeakCaller = "bed" # enforce BED to avoid score/width requirements
       ) %>%
       select(SampleID, Tissue, Factor, Condition, Replicate, bamReads, Peaks, PeakCaller)
 
-    chipObj <- ChIPQC(as.data.frame(chip_sheet), mapq = mapq)
+    # Build once to get metrics
+    chipObj_all <- ChIPQC(as.data.frame(chip_sheet))
+
+    # Grab metrics; drop any 0 reads-in-peaks
+    mets_all <- QCmetrics(chipObj_all)
+    mets_csv <- file.path(mod_out, paste0("ChIPQC_metrics_all_", mod, ".csv"))
+    .safe_dir_qc(mod_out)
+    write.csv(mets_all, mets_csv, row.names = FALSE)
+
+    keep_idx <- which(is.finite(mets_all$ReadsInPeaks) & mets_all$ReadsInPeaks > 0)
+    if (length(keep_idx) == 0) {
+      message("    No samples with reads-in-peaks > 0 for ", mod, " — skipping report.")
+      next
+    }
+    # Optional: write filtered metrics
+    mets_kept_csv <- file.path(mod_out, paste0("ChIPQC_metrics_kept_", mod, ".csv"))
+    write.csv(mets_all[keep_idx, , drop=FALSE], mets_kept_csv, row.names = FALSE)
+
+    # Subset object and report
+    chipObj <- chipObj_all[keep_idx]
     ChIPQCreport(
       chipObj,
       reportName   = paste0("ChIPQC_report_", mod),
@@ -742,6 +706,122 @@ run_chipqc_only <- function(metadata, out_dir = "QC_ChIPQCOnly", mapq = 0) {
   message("\nDone (ChIPQC only). Outputs in: ", normalizePath(out_dir))
 }
 
+
+# =========================
+# Export ChIPQC metrics → Excel
+# (one sheet per modification + a combined sheet)
+# =========================
+suppressPackageStartupMessages({
+  library(ChIPQC)
+  library(dplyr)
+  library(writexl)   # install.packages("writexl") if needed
+  library(tools)
+})
+
+.safe_dir <- function(d){
+  if (!dir.exists(d)) dir.create(d, recursive = TRUE)
+  normalizePath(d, mustWork = FALSE)
+}
+
+.is_input_row <- function(df){
+  fields <- paste(
+    if ("Antibody" %in% names(df)) df$Antibody else "",
+    if ("Factor"   %in% names(df)) df$Factor   else "",
+    if ("SampleID" %in% names(df)) df$SampleID else "",
+    sep = " "
+  )
+  grepl("(^|[^A-Za-z])input([^A-Za-z]|$)", tolower(fields), perl = TRUE)
+}
+
+.make_numeric_replicate <- function(df){
+  rep_num <- NA_integer_
+  if ("Replicate" %in% names(df)) {
+    rep_num <- suppressWarnings(as.integer(gsub("\\D", "", as.character(df$Replicate))))
+  }
+  if (all(is.na(rep_num))) {
+    grp <- if ("Strain" %in% names(df)) interaction(df$Antibody, df$Strain, drop=TRUE) else df$Antibody
+    rep_num <- ave(seq_len(nrow(df)), grp, FUN = function(x) seq_along(x))
+  }
+  as.integer(rep_num)
+}
+
+chipqc_metrics_to_excel <- function(metadata, out_dir = "QC_ChIPQCOnly", xlsx_file = "ChIPQC_metrics.xlsx"){
+  .safe_dir(out_dir)
+
+  # accept data.frame or CSV path
+  if (is.character(metadata) && length(metadata) == 1 && file.exists(metadata)) {
+    meta <- read.csv(metadata, stringsAsFactors = FALSE)
+  } else if (is.data.frame(metadata)) {
+    meta <- metadata
+  } else {
+    stop("`metadata` must be a data.frame or a path to an existing CSV.")
+  }
+
+  req <- c("SampleID","Antibody","bamReads","Peaks")
+  miss <- setdiff(req, names(meta))
+  if (length(miss)) stop("Metadata missing column(s): ", paste(miss, collapse = ", "))
+
+  meta <- meta %>%
+    mutate(
+      SampleID = as.character(SampleID),
+      Antibody = as.character(Antibody),
+      bamReads = as.character(bamReads),
+      Peaks    = as.character(Peaks),
+      is_input = .is_input_row(.),
+      bam_ok   = !is.na(bamReads) & bamReads != "" & file.exists(bamReads),
+      peak_ok  = !is.na(Peaks)    & Peaks    != "" & file.exists(Peaks)
+    ) %>%
+    filter(!is_input & bam_ok & peak_ok)
+
+  if (!nrow(meta)) stop("No valid rows after filtering.")
+
+  mods <- unique(meta$Antibody)
+  sheets <- list()
+  all_rows <- list()
+
+  message("[ChIPQC] Collecting metrics for: ", paste(mods, collapse=", "))
+
+  for (mod in mods) {
+    mod_df <- meta %>% filter(Antibody == mod)
+
+    # Minimal ChIPQC sheet; force PeakCaller='bed' to avoid score requirements
+    chip_sheet <- mod_df %>%
+      mutate(
+        Tissue     = if ("Tissue" %in% names(.)) as.character(Tissue) else "All",
+        Condition  = if ("Condition" %in% names(.)) as.character(Condition) else
+                       if ("Strain" %in% names(.)) as.character(Strain) else "All",
+        Factor     = if ("Factor" %in% names(.)) as.character(Factor) else Antibody,
+        Replicate  = .make_numeric_replicate(.),
+        PeakCaller = "bed"
+      ) %>%
+      select(SampleID, Tissue, Factor, Condition, Replicate, bamReads, Peaks, PeakCaller)
+
+    chipObj <- ChIPQC(as.data.frame(chip_sheet))
+
+    # Extract per-sample metrics
+    met <- as.data.frame(QCmetrics(chipObj))
+    # carry useful annotations
+    met <- met %>%
+      mutate(
+        Antibody  = mod,
+        Condition = chip_sheet$Condition[match(met$Sample, chip_sheet$SampleID)],
+        Replicate = chip_sheet$Replicate[match(met$Sample, chip_sheet$SampleID)]
+      ) %>%
+      relocate(Antibody, Sample, Condition, Replicate)
+
+    sheets[[mod]] <- met
+    all_rows[[mod]] <- met
+  }
+
+  # write one workbook with multiple sheets (+ combined)
+  combined <- dplyr::bind_rows(all_rows)
+  wb_path  <- file.path(out_dir, xlsx_file)
+  writexl::write_xlsx(c(sheets, list(`ALL_mods_combined` = combined)), path = wb_path)
+  message("✅ Wrote metrics workbook: ", wb_path)
+
+  invisible(wb_path)
+}
+
 ```
 
 ###########################################################################################
@@ -750,6 +830,11 @@ run_chipqc_only <- function(metadata, out_dir = "QC_ChIPQCOnly", mapq = 0) {
 #This is where you change the parameters and run the function
 run_diffbind_only(metaQC, out_dir = "QC_DiffBindOnly")
 run_chipqc_only(metaQC, out_dir = "QC_ChIPQCOnly")
+chipqc_metrics_to_excel(metaQC, out_dir = "QC_ChIPQCOnly", xlsx_file = "ChIPQC_metrics.xlsx")
+
+run_chipqc_only(dplyr::filter(metaQC, Antibody=="H3K4me2"),
+                out_dir = "QC_ChIPQCOnly_fix")
+
 
 ```
 ###########################################################################################
