@@ -382,23 +382,23 @@ module load deepTools
 #
 # #K36
 #K27 genes
-computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
-                  -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw \
-                     $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
-                     $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
-                     $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
-                     $P152DIR/152-118_ChIP_cac-1_comp_H3K36me3_Rep2_S142.bin_25.smooth_75Bulk.bw \
-                     $P152DIR/152-120_ChIP_cac-2_comp_H3K36me3_Rep2_S144.bin_25.smooth_75Bulk.bw \
-                        -R $BEDDIR2/K27genes_K36enriched.bed --skipZeros --missingDataAsZero -o matrix_K36_cac_comp.gz
-
-                        plotHeatmap -m matrix_K36_cac_comp.gz -out CAF1_comp_K36_regions.pdf \
-                                        --samplesLabel WT ash-1 cac-1 cac-2 cac1_comp cac-2_comp \
-                                        --startLabel "TSS" \
-                                        --sortRegions descend \
-                                        --missingDataColor 1 \
-                                        --legendLocation none \
-                                        --colorMap "afmhot_r" \
-                                        --zMin 0 --zMax 12
+# computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
+#                   -S $P152DIR/152-111_ChIP_WT_H3K36me3__S135.bin_25.smooth_75Bulk.bw \
+#                      $MISCDIR/ash1_K36_ash1paper.bin_25.smooth_75Bulk.bw \
+#                      $P149DIR/149-100_ChIP_cac-1_H3K36me3_Rep3_S124.bin_25.smooth_75Bulk.bw \
+#                      $P149DIR/149-101_ChIP_cac-2_H3K36me3_Rep3_S125.bin_25.smooth_75Bulk.bw \
+#                      $P152DIR/152-118_ChIP_cac-1_comp_H3K36me3_Rep2_S142.bin_25.smooth_75Bulk.bw \
+#                      $P152DIR/152-120_ChIP_cac-2_comp_H3K36me3_Rep2_S144.bin_25.smooth_75Bulk.bw \
+#                         -R $BEDDIR2/K27genes_K36enriched.bed --skipZeros --missingDataAsZero -o matrix_K36_cac_comp.gz
+#
+#                         plotHeatmap -m matrix_K36_cac_comp.gz -out CAF1_comp_K36_regions.pdf \
+#                                         --samplesLabel WT ash-1 cac-1 cac-2 cac1_comp cac-2_comp \
+#                                         --startLabel "TSS" \
+#                                         --sortRegions descend \
+#                                         --missingDataColor 1 \
+#                                         --legendLocation none \
+#                                         --colorMap "afmhot_r" \
+#                                         --zMin 0 --zMax 12
 
 #ash-1 genes
 computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
