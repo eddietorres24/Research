@@ -2037,6 +2037,16 @@ CAF1_up_ASH1_up_K27K36_eulerplot <- plot(CAF1_up_ASH1_up_K27K36_fit)
 #Save file
 ggsave(filename = "CAF-1_Up_ASH1_Up_K27K36_loss.pdf", plot = CAF1_up_ASH1_up_K27K36_eulerplot <- plot(CAF1_up_ASH1_up_K27K36_fit), width = 4, height = 4, dpi = 600)
 
+###CAF-1 ectopic genes
+venn.diagram(
+  x = list(cac1DOWN$Attributes, CAF1_ectopic_K27_genes_CODE$gene_id),
+  category.names = c("down", "ectopic"),
+  filename = 'CAF-1_ectopic_gene_downreg.png',
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+
 ```
 
 #Lastly, I want to make an IGV track for visualizing DE data with ChIP data

@@ -29,15 +29,15 @@ library(dplyr)
 
 ```{r, read in metadata & regions of interest}
 #reading in metdata
-meta <- read.csv("../csaw_samples_files/cac_csaw_FINAL.csv")
-metaQC <- read.csv("../csaw_samples_files/cac_csaw_QC_TEST.csv")
+meta <- read.csv("../csaw_samples_files/csaw_qa-suz12_ET.csv")
+# metaQC <- read.csv("../csaw_samples_files/cac_csaw_QC_TEST.csv")
 
 #fix path (if necessary, should only be if you're in wrong directory)
 meta <- meta %>%
   mutate(bamReads = paste0("../", bamReads))
 
-metaQC <- metaQC %>%
-  mutate(bamReads = paste0("../", bamReads))
+# metaQC <- metaQC %>%
+  # mutate(bamReads = paste0("../", bamReads))
 
 #meta <- meta %>%
 #mutate(Peaks = paste0("../", Peaks))
@@ -56,16 +56,10 @@ matLocus <- GRanges("CM002236.1", IRanges(1856288, 1862459)) # mat
 param <- readParam(discard = matLocus, pe="none", max.frag=1500, minq=20 )
 
 #reading in regions of interest
-regions <- list(K27genes_proms = read.table("../bed_files/K27_genes_prom_100pct_overlap.bed"), K27genes = read.table("../bed_files/K27_genes_stringent.bed"), K27proms = read.table("../bed_files/K27_promoters.bed"), K27promTSS = read.table("../bed_files/K27_prom_TSS.bed"), allgenes = read.table("../bed_files/all_genes_forR.bed"), K27promTSSext = read.table("../bed_files/K27promTSSext.bed"), allgenespromTSS = read.table("../bed_files/allgenes_promTSS.bed"), allgenes_promTSSext = read.table("../bed_files/allgenespromTSSext.bed")) 
-
-#K27genes_proms = read.table("../bed_files/K27_genes_prom_100pct_overlap.bed"), K27genes = read.table("../bed_files/K27_genes_stringent.bed"), K27proms = read.table("../bed_files/K27_promoters.bed"), K27promTSS = read.table("../bed_files/K27_prom_TSS.bed"), allgenes = read.table("../bed_files/all_genes_forR.bed"), K27promTSSext = read.table("../bed_files/K27promTSSext.bed"), 
+regions <- list(K27peaks = read.table("../bed_files/WT_0_24_hr_qa_merge.bed"), K27peaks_ectopic = read.table("../bed_files/qa-suz12_no_WT_0_or_24.bed"), K27genes = read.table("../bed_files/H3K27me3_methylated_genes_FINAL.bed"), Allpeaks = read.table("../bed_files/qa-suz12_WT_K27_merged_FIXED_LGI.bed"), K27promTSSext = read.table("../bed_files/K27promTSSext.bed"), allgenes_promTSSext = read.table("../bed_files/allgenespromTSSext.bed")) 
 
 new = read.table("../bed_files/H3K27me3_methylated_genes_FINAL.bed")
 
-regions$K27promTSS = subset(regions$K27promTSS, regions$K27promTSS$V10 %in% new$V10)
-regions$K27proms = subset(regions$K27proms, regions$K27proms$V10 %in% new$V10)
-regions$K27genes_proms = subset(regions$K27genes_proms, regions$K27genes_proms$V10 %in% new$V10)
-regions$K27genes = subset(regions$K27genes, regions$K27genes$V10 %in% new$V10)
 regions$K27promTSSext = subset(regions$K27promTSSext, regions$K27promTSSext$V10 %in% new$V10)
 
 ###IMPORTANT: the tables you  read into your list should not have a header (i.e., the column names should be V1, V2, ... VX). If your columns have other names, the count function may not recognize it properly. even if the files you read in have headers, i believe you can adjust the way read.table reads it into a df object. check column names in the "regions" object before continuing

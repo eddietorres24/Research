@@ -369,62 +369,62 @@ FC_suz12_24hrvInput.K27.tabular <- FC_suz12_24hrvInput.merged$combined
 FC_suz12_24hrvInput.K27.out.ranges <- FC_suz12_24hrvInput.merged$regions
 mcols(FC_suz12_24hrvInput.K27.out.ranges) <- DataFrame(FC_suz12_24hrvInput.K27.tabular)
 
-#cac-1_CS
-FC_cac1_CSvInput.K27.contrast <- makeContrasts(K27vcac1_CS=cac1_CS.H3K27me3-cac1_CS.input,levels=design.mat)
-FC_cac1_CSvInput.res <- glmQLFTest(fitK27, contrast=FC_cac1_CSvInput.K27.contrast)
-FC_cac1_CSvInput.merged <- mergeResults(filtered.dataK27, FC_cac1_CSvInput.res$table, tol=300, 
-                            merge.args=list(max.width=300))
-FC_cac1_CSvInput.K27.tabular <- FC_cac1_CSvInput.merged$combined
-FC_cac1_CSvInput.K27.out.ranges <- FC_cac1_CSvInput.merged$regions
-mcols(FC_cac1_CSvInput.K27.out.ranges) <- DataFrame(FC_cac1_CSvInput.K27.tabular)
-
-#cac-2_CS
-FC_cac2_CSvInput.K27.contrast <- makeContrasts(K27vcac2_CS=cac2_CS.H3K27me3-cac2_CS.input,levels=design.mat)
-FC_cac2_CSvInput.res <- glmQLFTest(fitK27, contrast=FC_cac2_CSvInput.K27.contrast)
-FC_cac2_CSvInput.merged <- mergeResults(filtered.dataK27, FC_cac2_CSvInput.res$table, tol=300, 
-                            merge.args=list(max.width=300))
-FC_cac2_CSvInput.K27.tabular <- FC_cac2_CSvInput.merged$combined
-FC_cac2_CSvInput.K27.out.ranges <- FC_cac2_CSvInput.merged$regions
-mcols(FC_cac2_CSvInput.K27.out.ranges) <- DataFrame(FC_cac2_CSvInput.K27.tabular)
-
-#cac-3_CS
-FC_cac3_CSvInput.K27.contrast <- makeContrasts(K27vcac3_CS=cac3_CS.H3K27me3-cac3_CS.input,levels=design.mat)
-FC_cac3_CSvInput.res <- glmQLFTest(fitK27, contrast=FC_cac3_CSvInput.K27.contrast)
-FC_cac3_CSvInput.merged <- mergeResults(filtered.dataK27, FC_cac3_CSvInput.res$table, tol=300, 
-                            merge.args=list(max.width=300))
-FC_cac3_CSvInput.K27.tabular <- FC_cac3_CSvInput.merged$combined
-FC_cac3_CSvInput.K27.out.ranges <- FC_cac3_CSvInput.merged$regions
-mcols(FC_cac3_CSvInput.K27.out.ranges) <- DataFrame(FC_cac3_CSvInput.K27.tabular)
-
-#cac-1_abc
-
-FC_cac1_abcvInput.K27.contrast <- makeContrasts(K27vcac1_abc=cac1_abc.H3K27me3-cac1_abc.input,levels=design.mat)
-FC_cac1_abcvInput.res <- glmQLFTest(fitK27, contrast=FC_cac1_abcvInput.K27.contrast)
-FC_cac1_abcvInput.merged <- mergeResults(filtered.dataK27, FC_cac1_abcvInput.res$table, tol=300, 
-                            merge.args=list(max.width=300))
-FC_cac1_abcvInput.K27.tabular <- FC_cac1_abcvInput.merged$combined
-FC_cac1_abcvInput.K27.out.ranges <- FC_cac1_abcvInput.merged$regions
-mcols(FC_cac1_abcvInput.K27.out.ranges) <- DataFrame(FC_cac1_abcvInput.K27.tabular)
-
-#cac-2_abc
-
-FC_cac2_abcvInput.K27.contrast <- makeContrasts(K27vcac2_abc=cac2_abc.H3K27me3-cac2_abc.input,levels=design.mat)
-FC_cac2_abcvInput.res <- glmQLFTest(fitK27, contrast=FC_cac2_abcvInput.K27.contrast)
-FC_cac2_abcvInput.merged <- mergeResults(filtered.dataK27, FC_cac2_abcvInput.res$table, tol=300, 
-                            merge.args=list(max.width=300))
-FC_cac2_abcvInput.K27.tabular <- FC_cac2_abcvInput.merged$combined
-FC_cac2_abcvInput.K27.out.ranges <- FC_cac2_abcvInput.merged$regions
-mcols(FC_cac2_abcvInput.K27.out.ranges) <- DataFrame(FC_cac2_abcvInput.K27.tabular)
-
-#cac-3_abc
-
-FC_cac3_abcvInput.K27.contrast <- makeContrasts(K27vcac3_abc=cac3_abc.H3K27me3-cac3_abc.input,levels=design.mat)
-FC_cac3_abcvInput.res <- glmQLFTest(fitK27, contrast=FC_cac3_abcvInput.K27.contrast)
-FC_cac3_abcvInput.merged <- mergeResults(filtered.dataK27, FC_cac3_abcvInput.res$table, tol=300, 
-                            merge.args=list(max.width=300))
-FC_cac3_abcvInput.K27.tabular <- FC_cac3_abcvInput.merged$combined
-FC_cac3_abcvInput.K27.out.ranges <- FC_cac3_abcvInput.merged$regions
-mcols(FC_cac3_abcvInput.K27.out.ranges) <- DataFrame(FC_cac3_abcvInput.K27.tabular)
+# #cac-1_CS
+# FC_cac1_CSvInput.K27.contrast <- makeContrasts(K27vcac1_CS=cac1_CS.H3K27me3-cac1_CS.input,levels=design.mat)
+# FC_cac1_CSvInput.res <- glmQLFTest(fitK27, contrast=FC_cac1_CSvInput.K27.contrast)
+# FC_cac1_CSvInput.merged <- mergeResults(filtered.dataK27, FC_cac1_CSvInput.res$table, tol=300, 
+#                             merge.args=list(max.width=300))
+# FC_cac1_CSvInput.K27.tabular <- FC_cac1_CSvInput.merged$combined
+# FC_cac1_CSvInput.K27.out.ranges <- FC_cac1_CSvInput.merged$regions
+# mcols(FC_cac1_CSvInput.K27.out.ranges) <- DataFrame(FC_cac1_CSvInput.K27.tabular)
+# 
+# #cac-2_CS
+# FC_cac2_CSvInput.K27.contrast <- makeContrasts(K27vcac2_CS=cac2_CS.H3K27me3-cac2_CS.input,levels=design.mat)
+# FC_cac2_CSvInput.res <- glmQLFTest(fitK27, contrast=FC_cac2_CSvInput.K27.contrast)
+# FC_cac2_CSvInput.merged <- mergeResults(filtered.dataK27, FC_cac2_CSvInput.res$table, tol=300, 
+#                             merge.args=list(max.width=300))
+# FC_cac2_CSvInput.K27.tabular <- FC_cac2_CSvInput.merged$combined
+# FC_cac2_CSvInput.K27.out.ranges <- FC_cac2_CSvInput.merged$regions
+# mcols(FC_cac2_CSvInput.K27.out.ranges) <- DataFrame(FC_cac2_CSvInput.K27.tabular)
+# 
+# #cac-3_CS
+# FC_cac3_CSvInput.K27.contrast <- makeContrasts(K27vcac3_CS=cac3_CS.H3K27me3-cac3_CS.input,levels=design.mat)
+# FC_cac3_CSvInput.res <- glmQLFTest(fitK27, contrast=FC_cac3_CSvInput.K27.contrast)
+# FC_cac3_CSvInput.merged <- mergeResults(filtered.dataK27, FC_cac3_CSvInput.res$table, tol=300, 
+#                             merge.args=list(max.width=300))
+# FC_cac3_CSvInput.K27.tabular <- FC_cac3_CSvInput.merged$combined
+# FC_cac3_CSvInput.K27.out.ranges <- FC_cac3_CSvInput.merged$regions
+# mcols(FC_cac3_CSvInput.K27.out.ranges) <- DataFrame(FC_cac3_CSvInput.K27.tabular)
+# 
+# #cac-1_abc
+# 
+# FC_cac1_abcvInput.K27.contrast <- makeContrasts(K27vcac1_abc=cac1_abc.H3K27me3-cac1_abc.input,levels=design.mat)
+# FC_cac1_abcvInput.res <- glmQLFTest(fitK27, contrast=FC_cac1_abcvInput.K27.contrast)
+# FC_cac1_abcvInput.merged <- mergeResults(filtered.dataK27, FC_cac1_abcvInput.res$table, tol=300, 
+#                             merge.args=list(max.width=300))
+# FC_cac1_abcvInput.K27.tabular <- FC_cac1_abcvInput.merged$combined
+# FC_cac1_abcvInput.K27.out.ranges <- FC_cac1_abcvInput.merged$regions
+# mcols(FC_cac1_abcvInput.K27.out.ranges) <- DataFrame(FC_cac1_abcvInput.K27.tabular)
+# 
+# #cac-2_abc
+# 
+# FC_cac2_abcvInput.K27.contrast <- makeContrasts(K27vcac2_abc=cac2_abc.H3K27me3-cac2_abc.input,levels=design.mat)
+# FC_cac2_abcvInput.res <- glmQLFTest(fitK27, contrast=FC_cac2_abcvInput.K27.contrast)
+# FC_cac2_abcvInput.merged <- mergeResults(filtered.dataK27, FC_cac2_abcvInput.res$table, tol=300, 
+#                             merge.args=list(max.width=300))
+# FC_cac2_abcvInput.K27.tabular <- FC_cac2_abcvInput.merged$combined
+# FC_cac2_abcvInput.K27.out.ranges <- FC_cac2_abcvInput.merged$regions
+# mcols(FC_cac2_abcvInput.K27.out.ranges) <- DataFrame(FC_cac2_abcvInput.K27.tabular)
+# 
+# #cac-3_abc
+# 
+# FC_cac3_abcvInput.K27.contrast <- makeContrasts(K27vcac3_abc=cac3_abc.H3K27me3-cac3_abc.input,levels=design.mat)
+# FC_cac3_abcvInput.res <- glmQLFTest(fitK27, contrast=FC_cac3_abcvInput.K27.contrast)
+# FC_cac3_abcvInput.merged <- mergeResults(filtered.dataK27, FC_cac3_abcvInput.res$table, tol=300, 
+#                             merge.args=list(max.width=300))
+# FC_cac3_abcvInput.K27.tabular <- FC_cac3_abcvInput.merged$combined
+# FC_cac3_abcvInput.K27.out.ranges <- FC_cac3_abcvInput.merged$regions
+# mcols(FC_cac3_abcvInput.K27.out.ranges) <- DataFrame(FC_cac3_abcvInput.K27.tabular)
 
 #combine
 K27.chip.Filteredres.df <- data.frame(seqnames=seqnames(WT_0hrvI.K27.out.ranges),
@@ -468,25 +468,25 @@ K27.chip.Filteredres.df <- data.frame(seqnames=seqnames(WT_0hrvI.K27.out.ranges)
   FDR_suz12_0hrvInput_K27me3 = FC_suz12_0hrvInput.K27.out.ranges$FDR,
   logFC_suz12_24hrvInput_K27me3 = FC_suz12_24hrvInput.K27.out.ranges$rep.logFC,
   PValue_suz12_24hrvInput_K27me3 = FC_suz12_24hrvInput.K27.out.ranges$PValue,
-  FDR_suz12_24hrvInput_K27me3 = FC_suz12_24hrvInput.K27.out.ranges$FDR,
-  logFC_cac1_CSvInput_K27me3 = FC_cac1_CSvInput.K27.out.ranges$rep.logFC,
-  PValue_cac1_CSvInput_K27me3 = FC_cac1_CSvInput.K27.out.ranges$PValue,
-  FDR_cac1_CSvInput_K27me3 = FC_cac1_CSvInput.K27.out.ranges$FDR,
-   logFC_cac2_CSvInput_K27me3 = FC_cac2_CSvInput.K27.out.ranges$rep.logFC,
-  PValue_cac2_CSvInput_K27me3 = FC_cac2_CSvInput.K27.out.ranges$PValue,
-  FDR_cac2_CSvInput_K27me3 = FC_cac2_CSvInput.K27.out.ranges$FDR,
-  logFC_cac3_CSvInput_K27me3 = FC_cac3_CSvInput.K27.out.ranges$rep.logFC,
-  PValue_cac3_CSvInput_K27me3 = FC_cac3_CSvInput.K27.out.ranges$PValue,
-  FDR_cac3_CSvInput_K27me3 = FC_cac3_CSvInput.K27.out.ranges$FDR,
-  logFC_cac1_abcvInput_K27me3 = FC_cac1_abcvInput.K27.out.ranges$rep.logFC,
-  PValue_cac1_abcvInput_K27me3 = FC_cac1_abcvInput.K27.out.ranges$PValue,
-  FDR_cac1_abcvInput_K27me3 = FC_cac1_abcvInput.K27.out.ranges$FDR,
-   logFC_cac2_abcvInput_K27me3 = FC_cac2_abcvInput.K27.out.ranges$rep.logFC,
-  PValue_cac2_abcvInput_K27me3 = FC_cac2_abcvInput.K27.out.ranges$PValue,
-  FDR_cac2_abcvInput_K27me3 = FC_cac2_abcvInput.K27.out.ranges$FDR,
-  logFC_cac3_abcvInput_K27me3 = FC_cac3_abcvInput.K27.out.ranges$rep.logFC,
-  PValue_cac3_abcvInput_K27me3 = FC_cac3_abcvInput.K27.out.ranges$PValue,
-  FDR_cac3_abcvInput_K27me3 = FC_cac3_abcvInput.K27.out.ranges$FDR)
+  FDR_suz12_24hrvInput_K27me3 = FC_suz12_24hrvInput.K27.out.ranges$FDR)
+  # logFC_cac1_CSvInput_K27me3 = FC_cac1_CSvInput.K27.out.ranges$rep.logFC,
+  # PValue_cac1_CSvInput_K27me3 = FC_cac1_CSvInput.K27.out.ranges$PValue,
+  # FDR_cac1_CSvInput_K27me3 = FC_cac1_CSvInput.K27.out.ranges$FDR,
+  #  logFC_cac2_CSvInput_K27me3 = FC_cac2_CSvInput.K27.out.ranges$rep.logFC,
+  # PValue_cac2_CSvInput_K27me3 = FC_cac2_CSvInput.K27.out.ranges$PValue,
+  # FDR_cac2_CSvInput_K27me3 = FC_cac2_CSvInput.K27.out.ranges$FDR,
+  # logFC_cac3_CSvInput_K27me3 = FC_cac3_CSvInput.K27.out.ranges$rep.logFC,
+  # PValue_cac3_CSvInput_K27me3 = FC_cac3_CSvInput.K27.out.ranges$PValue,
+  # FDR_cac3_CSvInput_K27me3 = FC_cac3_CSvInput.K27.out.ranges$FDR,
+  # logFC_cac1_abcvInput_K27me3 = FC_cac1_abcvInput.K27.out.ranges$rep.logFC,
+  # PValue_cac1_abcvInput_K27me3 = FC_cac1_abcvInput.K27.out.ranges$PValue,
+  # FDR_cac1_abcvInput_K27me3 = FC_cac1_abcvInput.K27.out.ranges$FDR,
+  #  logFC_cac2_abcvInput_K27me3 = FC_cac2_abcvInput.K27.out.ranges$rep.logFC,
+  # PValue_cac2_abcvInput_K27me3 = FC_cac2_abcvInput.K27.out.ranges$PValue,
+  # FDR_cac2_abcvInput_K27me3 = FC_cac2_abcvInput.K27.out.ranges$FDR,
+  # logFC_cac3_abcvInput_K27me3 = FC_cac3_abcvInput.K27.out.ranges$rep.logFC,
+  # PValue_cac3_abcvInput_K27me3 = FC_cac3_abcvInput.K27.out.ranges$PValue,
+  # FDR_cac3_abcvInput_K27me3 = FC_cac3_abcvInput.K27.out.ranges$FDR)
 
 
 ##convert all non-sig values to 0
@@ -514,20 +514,20 @@ K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logF
 
 K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly, logFC_suz12_24hrvInput_K27me3[FDR_suz12_24hrvInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac1_CSvInput_K27me3[FDR_cac1_CSvInput_K27me3 > 0.05] <- 0)
+# K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac1_CSvInput_K27me3[FDR_cac1_CSvInput_K27me3 > 0.05] <- 0)
+# 
+# K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac2_CSvInput_K27me3[FDR_cac2_CSvInput_K27me3 > 0.05] <- 0)
+# 
+# K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac3_CSvInput_K27me3[FDR_cac3_CSvInput_K27me3 > 0.05] <- 0)
+# 
+# K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac1_abcvInput_K27me3[FDR_cac1_abcvInput_K27me3 > 0.05] <- 0)
+# 
+# K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac2_abcvInput_K27me3[FDR_cac2_abcvInput_K27me3 > 0.05] <- 0)
+# 
+# K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac3_abcvInput_K27me3[FDR_cac3_abcvInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac2_CSvInput_K27me3[FDR_cac2_CSvInput_K27me3 > 0.05] <- 0)
 
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac3_CSvInput_K27me3[FDR_cac3_CSvInput_K27me3 > 0.05] <- 0)
-
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac1_abcvInput_K27me3[FDR_cac1_abcvInput_K27me3 > 0.05] <- 0)
-
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac2_abcvInput_K27me3[FDR_cac2_abcvInput_K27me3 > 0.05] <- 0)
-
-K27.chip.Filteredres.df_SigOnly  <- within(K27.chip.Filteredres.df_SigOnly , logFC_cac3_abcvInput_K27me3[FDR_cac3_abcvInput_K27me3 > 0.05] <- 0)
-
-
-K27_FilteredHeatmap_df <- dplyr::select(K27.chip.Filteredres.df_SigOnly,7,10,13,16,19,22,25,28,31,34,37,40,43,46,49,52,55,58)
+K27_FilteredHeatmap_df <- dplyr::select(K27.chip.Filteredres.df_SigOnly,7,10,13,16,19,22,25,28,31,34,37,40)
 
 rownames(K27_FilteredHeatmap_df) <- paste(K27.chip.Filteredres.df_SigOnly$seqnames, K27.chip.Filteredres.df_SigOnly$start, K27.chip.Filteredres.df_SigOnly$end, sep=".")
 
