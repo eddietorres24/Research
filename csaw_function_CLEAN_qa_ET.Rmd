@@ -1437,7 +1437,7 @@ csaw_analysis(
   write_csv_heatmap = FALSE,
   write_igv   = FALSE,
   mask_region = FALSE,
-  out_dir     = "TEST", #output dir, name whatever you want
+  out_dir     = "qa-suz12_analysis", #output dir, name whatever you want
   merge_tol   = 300                   # only affects genome-wide window mode
 )
 
