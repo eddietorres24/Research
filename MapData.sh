@@ -16,7 +16,7 @@ source config.txt
 ###ADD a source file with path to FastqFiles
 #variables imported from submission script
 fastqPath="/scratch/evt82290/FastqFiles/misc_data"
-# accession="csr-1_telo_rep"
+accession="epr-1_selker_rep1"
 outdir="/scratch/evt82290/MappingOutputs/misc_data"
 
 # #if output directory doesn't exist, create it
@@ -34,7 +34,6 @@ fi
 #input file variables
 # read1="${fastqPath}/${accession}*_R1_001.fastq.gz"
 # read2="${fastqPath}/${accession}*_R2_001.fastq.gz"
-$accession="epr-1_selker_rep1"
 read1="${fastqPath}/${accession}.fastq.gz"
 # read2="${fastqPath}/${accession}_2.fastq.gz"
 
