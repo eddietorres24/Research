@@ -34,7 +34,7 @@ fi
 #input file variables
 # read1="${fastqPath}/${accession}*_R1_001.fastq.gz"
 # read2="${fastqPath}/${accession}*_R2_001.fastq.gz"
-
+$accession="epr-1_selker_rep1"
 read1="${fastqPath}/${accession}.fastq.gz"
 # read2="${fastqPath}/${accession}_2.fastq.gz"
 
@@ -82,8 +82,6 @@ name=${bam/*.fq.gz/}
 ml SAMtools
 ml BWA
 
-#
-
 #make directory to store temporary files written by samtools sort
 mkdir -p ${tmp}/${accession}
 # bwa mem -M -v 3 -t $THREADS $GENOME ${trimmed}/*val_1.fq.gz ${trimmed}/*val_2.fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T ${tmp}/${accession} -o "$bam" -
@@ -101,7 +99,7 @@ bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 20 --s
 #bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --minMappingQuality 20 --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
 
 #call Peaks
-module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
+module load MACS3
 
 #using --nolambda paramenter to call peaks without control
 macs3 callpeak -t "${bam}" -f BAMPE -n "${accession}" --broad -g 41037538 --broad-cutoff 0.1 --outdir "${PeakDir}" --min-length 800 --max-gap 500 --nolambda
