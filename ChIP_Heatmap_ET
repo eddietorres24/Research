@@ -84,7 +84,7 @@ computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
                --whatToShow "heatmap and colorbar" \
                --colorList 'white, g, darkgreen' \
                --zMin 0 \
-               --zMax 40
+               --zMax 50
 
 computeMatrix scale-regions -a 150 -b 150 --scale 2 \
  -S $P150DIR/150-106_RNA_WT_0hr__Rep4_S121/150-106_RNA_WT_0hr__Rep4_S121_log.bw \
