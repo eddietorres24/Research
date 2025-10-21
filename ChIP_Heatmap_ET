@@ -58,12 +58,13 @@ computeMatrix scale-regions \
          			 --endLabel "3'" \
                --missingDataColor 1 \
                --heatmapHeight 12 \
+               --heatmapWidth 8 \
                --sortUsing sum \
                --sortRegions descend \
                --outFileSortedRegions heatmap.bed \
                --colorList 'white, g, darkgreen' \
                --zMin 0 \
-               --zMax 50
+               --zMax 40
 
 ###################################################################################################################################
 
