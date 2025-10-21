@@ -43,28 +43,66 @@ module load deepTools
 ####################################################################################################################################
 ###NEW HEATMAPS FOR QA-SUZ12
 #recovered vs unrecovered peaks
-computeMatrix scale-regions -a 150 -b 150 \
- -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
-    -R $QABED/early_recovered_peaks.bed $QABED/late_recovered_peaks.bed $QABED/unrecovered_peaks.bed --skipZeros -o matrix_qa-suz12.gz
+# computeMatrix scale-regions -a 150 -b 150 \
+#  -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
+#     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
+#     -R $QABED/early_recovered_peaks.bed $QABED/late_recovered_peaks.bed $QABED/unrecovered_peaks.bed --skipZeros -o matrix_qa-suz12.gz
+#
+#     plotHeatmap -m matrix_qa-suz12.gz -out qa-suz12_recover_cluster.pdf \
+#                --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
+#                --startLabel "5'" \
+#          			 --endLabel "3'" \
+#                --missingDataColor 1 \
+#                --heatmapHeight 12 \
+#                --heatmapWidth 2.8 \
+#                --sortUsing sum \
+#                --sortRegions descend \
+#                --outFileSortedRegions heatmap.bed \
+#                --colorList 'white, g, darkgreen' \
+#                --zMin 0 \
+#                --zMax 40
 
-    plotHeatmap -m matrix_qa-suz12.gz -out qa-suz12_recover_cluster.pdf \
-               --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
+#recovered genes vs unrecovered genes RNA-seq
+computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
+ -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
+    -R $QABED/early_recovered_genes.bed $QABED/late_recovered_genes.bed $QABED/unrecovered_genes.bed --skipZeros -o qa_genes.gz
+
+    plotHeatmap -m qa_genes.gz -out qa-suz12_recover_genes_clustered.pdf \
+               --samplesLabel WT 4hr 24hr \
                --startLabel "5'" \
          			 --endLabel "3'" \
                --missingDataColor 1 \
                --heatmapHeight 12 \
-               --heatmapWidth 2.8 \
                --sortUsing sum \
                --sortRegions descend \
-               --outFileSortedRegions heatmap.bed \
                --colorList 'white, g, darkgreen' \
                --zMin 0 \
                --zMax 40
+
+computeMatrix scale-regions -a 150 -b 150 --scale 2 \
+ -S $P150DIR/150-106_RNA_WT_0hr__Rep4_S121/150-106_RNA_WT_0hr__Rep4_S121_log.bw \
+    $P150DIR/150-111_RNA_qa_0hr__Rep4_S126/150-111_RNA_qa_0hr__Rep4_S126_log.bw \
+    $P150DIR/150-114_RNA_qa_24hr__Rep5_S129/150-114_RNA_qa_24hr__Rep5_S129_log.bw \
+    -R $QABED/early_recovered_genes.bed $QABED/late_recovered_genes.bed $QABED/unrecovered_genes.bed --skipZeros -o qa_genes_RNA.gz
+
+    plotHeatmap -m qa_genes_RNA.gz -out qa-suz12_recover_genes_clustered.pdf \
+               --samplesLabel WT_0hr qa_0hr qa_24hr \
+               --startLabel "5'" \
+         			 --endLabel "3'" \
+               --missingDataColor 1 \
+               --heatmapHeight 12 \
+               --sortUsing sum \
+               --sortRegions descend \
+               --colorMap "bwr" \
+               --zMin 0 --zMax 3
+
+               # --outFileSortedRegions heatmap.bed \
 
 ###################################################################################################################################
 

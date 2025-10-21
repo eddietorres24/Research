@@ -739,25 +739,25 @@ computeMatrix reference-point --referencePoint TSS -b 800 -a 1500 \
 #
 # #Kac vs RNA
 # #RNA
-# computeMatrix scale-regions --scale 2 \
-#         -S $RNADIR/SRR8269825/SRR8269825_log.bw \
-#            /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_log.bw \
-#            $RNADIR/SRR9027658/SRR9027658_log.bw \
-#            /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-96_RNA_cac-1-suz-12__Rep1_S96/149-96_RNA_cac-1-suz-12__Rep1_S96_log.bw \
-#         -R $BEDDIR2/Kac_Gain_cac1.bed $BEDDIR2/Kac_Gain_suz12_no_cac1.bed $BEDDIR2/Kac_no_change_dub.bed $BEDDIR2/Kac_Gain_cac1-suz12_only.bed $BEDDIR2/Kac_unenriched.bed \
-#           --missingDataAsZero --skipZeros -o doublemutant_RNA.gz
-#
-#       plotHeatmap -m doublemutant_RNA.gz -out K27_genes_doublemutant_RNA-seq_Kac_clustered_RNA_order.pdf \
-#               --samplesLabel WT cac-1 suz12 cac1_suz12 \
-#               --startLabel "TSS" \
-#               --endLabel "TES" \
-#               --sortRegions descend \
-#               --legendLocation none \
-#               --outFileSortedRegions $BEDDIR2/RNA_order_fig6_supp.bed \
-#               --heatmapHeight 20 \
-#               --colorMap "bwr" \
-#               --zMin 0 --zMax 4
-#
+computeMatrix scale-regions --scale 2 \
+        -S $RNADIR/SRR8269825/SRR8269825_log.bw \
+           /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-115_RNA_cac-1__Rep1_S139/149-115_RNA_cac-1__Rep1_S139_log.bw \
+           $RNADIR/SRR9027658/SRR9027658_log.bw \
+           /scratch/evt82290/MappingOutputs/Run149/RNA/bigWig/149-96_RNA_cac-1-suz-12__Rep1_S96/149-96_RNA_cac-1-suz-12__Rep1_S96_log.bw \
+        -R $BEDDIR2/Kac_Gain_cac1.bed $BEDDIR2/Kac_Gain_suz12_no_cac1.bed $BEDDIR2/Kac_no_change_dub.bed $BEDDIR2/Kac_Gain_cac1-suz12_only.bed $BEDDIR2/Kac_unenriched.bed \
+          --missingDataAsZero --skipZeros -o doublemutant_RNA.gz
+
+      plotHeatmap -m doublemutant_RNA.gz -out K27_genes_doublemutant_RNA-seq_Kac_clustered_RNA_order.pdf \
+              --samplesLabel WT cac-1 suz12 cac1_suz12 \
+              --startLabel "TSS" \
+              --endLabel "TES" \
+              --sortRegions descend \
+              --legendLocation none \
+              --outFileSortedRegions $BEDDIR2/RNA_order_fig6_supp.bed \
+              --heatmapHeight 20 \
+              --colorMap "bwr" \
+              --zMin 0 --zMax 4
+
 # computeMatrix reference-point --referencePoint TSS -b 1000 -a 800 \
 # -S $P150DIR/150-135_ChIP_WT_Kac_Rep2_S150.bin_25.smooth_75Bulk.bw \
 #    $P150DIR/150-136_ChIP_cac-1_Kac_Rep2_S151.bin_25.smooth_75Bulk.bw \

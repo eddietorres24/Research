@@ -41,7 +41,7 @@ knitr::opts_knit$set(root.dir = "workingdir")
 ```{r, data processing}
 #Bring in table with unnormalized transcription counts; check.names is important if you have dashes in the gene names 
 #row.names=1 command sets geneIDs as the row name
-countdataInteractors <- read.table("../text_files/readcounts_qa_paper.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
+countdataInteractors <- read.table("../text_files/readcounts_qa_paper_FINAL.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
 #countdataInteractors_final = cbind(countdataInteractors, countdataInteractors_ash3[,6:7])
 #countdataInteractors <- data.matrix(countdataInteractors_final)
 
@@ -245,19 +245,16 @@ rownames(wilcox_df) <- names(wilcox_list)
 write.csv(wilcox_df, "Wilcoxon_summary_stats.csv", row.names = TRUE)
 ```
 
+#I want to make a violin plot instead of boxplot. Going to adapt Abby's code
 ```{r Plotting data in Violin Plot, echo=FALSE}
 # Define factor order and formatted x-axis labels
-label_order <- c("WT", "set-7", "cac-1", "cac-2", "cac-3", "naf-1", "naf-2", "asf-1", "ATRX")
+label_order <- c("WT_0hr", "WT_24hr", "suz-12", "qa-suz12_0hr", "qa-suz12_24hr")
 formatted_labels <- c(
-  "WT",
-  expression(italic("\u0394set-7")),
-  expression(italic("\u0394cac-1")),
-  expression(italic("\u0394cac-2")),
-  expression(italic("\u0394cac-3")),
-  expression(italic("\u0394naf-1")),
-  expression(italic("\u0394naf-2")),
-  expression(italic("\u0394asf-1")),
-  expression(italic("\u0394atrx"))
+  "WT_0hr",
+  "WT_24hr",
+  "suz12",
+  "qa_0hr",
+  "qa_24hr"
 )
 
 #Group and summarize
@@ -295,34 +292,11 @@ violin <- total2 %>%
 print(violin)
 
 #save plot
-ggsave("./CAF-1_K27_Violin_Paper_Final.pdf", plot=violin, width = 10, height = 8, unit="in",  dpi=400)
+ggsave("./qa-suz12_PRC2_Gene_expression.pdf", plot=violin, width = 10, height = 8, unit="in",  dpi=400)
 ```
 
-#I want to make a violin plot instead of boxplot. Going to adapt Abby's code
-```{r, violin}
-total2 <- meltedAveragePRC2targetData %>%
-  group_by(Sample)
-total_dist = meltedAveragePRC2targetData %>%
-  group_by(Sample) %>% summarise(num=n())
 
-#Setting distance between violins in plot
-dodge <- position_dodge(width = 1)
-###  plotting violin plot
-### this chunk is just for putting samples in the order that I want ###
-violin <- total2 %>%
-  left_join(total_dist) %>%
-  arrange(factor(Sample, levels = c("WT_0hr","WT_24hr","suz-12","qa-suz12_0hr", "qa-suz12_24hr"))) %>%
-  mutate(Sample = factor(Sample)) %>%
-  ### everything below is the actual violin plot ###
-  ggplot(aes(x=Sample, y=Count)) + 
-  geom_violin(position = dodge, scale="width", trim=FALSE) +
-  stat_summary(fun = "mean", geom = "crossbar", width = 0.25, colour = "red") +
-  scale_fill_manual("",values = c("orchid1", "springgreen3")) +
-  labs(x = "Strain",y = expression("Expression Level (log "[2]~"(TPM+1)")) + 
-  theme_classic(base_size = 20)
-
-print(violin)
-ggsave("./qa-suz12_PRC2_Gene_expression.pdf", plot=violin, width = 10, height = 8, unit="in",  dpi=400)
+```{r, heatmap}
 
 #stat_summary(fun.data = "mean_se", geom = "errorbar", width = 0.25, colour = "red") +
 
@@ -516,7 +490,7 @@ export_deseq_csvs_no_intersections(
 ```{r Make IGV Track, echo=FALSE}
 #calling list of files
 ##Note: this will only work if the ONLY csv's in this directory are the ones containing the Data you want on the track (i.e. you need to move any other csv's from this directory, or move the ones you want on the track to a new one and change the path)
-list_of_files <- list.files(path = "./Research",
+list_of_files <- list.files(path = "../Research",
                             recursive = FALSE,
                             pattern = ".csv$")
 
@@ -536,7 +510,7 @@ l2fc_data[is.na(l2fc_data)] <- 0
 l2fc <- tibble::rownames_to_column(l2fc_data, "VALUE")
 
 #read in file w/ all genes
-ngenes = read.csv("./csv_files/neurospora_genes_edit.csv")
+ngenes = read.csv("../csv_files/neurospora_genes_edit.csv")
 
 #Make IGV Track
 ##Note: only genes with DE in one or more strains will display data in the track
@@ -545,3 +519,4 @@ track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", 
 
 #write track to file
 write.table(track, file="RNAseq_qa-suz12_Paper_Final.igv", sep="\t", row.names = FALSE, quote = FALSE)
+```

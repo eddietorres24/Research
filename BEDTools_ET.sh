@@ -140,6 +140,17 @@ for file in *.bed; do
 done
 
 ### qa-suz12 ###
+
+###rethinking ectopic peak calls
+#going to keep all regions not overlapping WT samples and cut out small peaks (< 650 bp)
+qa-suz12_24hr_H3K27me3_Rep2_peaks_peaks.bed
+WT_24hr_H3K27me3_Rep2_peaks_peaks.bed
+
+
+
+
+
+
 #Rep1
 # bedtools multiinter-bams ${OUTDIR1}/WT_0hr_H3K27me3_Rep1_peaks_sorted.bed \
 #                                ${OUTDIR1}/qa-suz12_4hr_H3K27me3_Rep1_peaks_sorted.bed \
