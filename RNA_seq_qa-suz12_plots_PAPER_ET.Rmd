@@ -1,0 +1,547 @@
+#commands to set up environment
+#need to install DESeq2, ggplot2, and other common packages
+#install scater package to calculate TPM from featurecounts
+#uncomment the following three lines if you need to install the package
+```{r, libraries}
+#local({r <- getOption("repos")
+#r["CRAN"] <- "http://cran.r-project.org"
+#options(repos=r)})
+
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")# BiocManager::install("scater")
+# BiocManager::install("DESeq2")
+
+library("DESeq2")
+library("ggplot2")
+library("gplots")
+library("ggrepel")
+library("dplyr")
+library("pheatmap")
+library("grid")
+library("corrplot")
+library(RColorBrewer)
+library(reshape2)
+library(grDevices)
+library("scater")
+
+knitr::opts_chunk$set(echo = TRUE)
+
+# Set working environment
+
+workingdir="C:/Users/eddie/Research/GitHub"
+
+#set working directory to the correct location for working machine
+knitr::opts_knit$set(root.dir = "workingdir")
+```
+
+##################################
+#start analysis here, qa-suz12
+##################################
+
+```{r, data processing}
+#Bring in table with unnormalized transcription counts; check.names is important if you have dashes in the gene names 
+#row.names=1 command sets geneIDs as the row name
+countdataInteractors <- read.table("../text_files/readcounts_qa_paper.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
+#countdataInteractors_final = cbind(countdataInteractors, countdataInteractors_ash3[,6:7])
+#countdataInteractors <- data.matrix(countdataInteractors_final)
+
+#################################################
+#Section 1: calculate tpm using the scater package
+#################################################
+
+#convert count file to matrix. Note:: I initially tried to use as.matrix, 
+#but this DID NOT WORK. once I used v <- data.matrix(countfile) then it all worked fine#
+
+#create matrix containing count data only; i.e. eliminate contig, start, stop, length fields
+Interactors_countsOnly <- data.matrix(countdataInteractors[ ,6:ncol(countdataInteractors)])
+
+##Run calculateTPM function - must load "scater" library
+Interactors_tpm <- calculateTPM(Interactors_countsOnly, lengths = countdataInteractors[,5])
+
+##convert to matrix again
+allDataTPM  <- data.matrix(Interactors_tpm)
+
+#rename columns with human readable sample names
+
+###THIS NEXT SECTION REQUIRED MANUAL INPUT INTO A SPREADSHEET OR TEXT EDITOR
+
+#step 1 create a varialbe with the current, long column names
+samplesname <- colnames(allDataTPM)
+
+#write the long sample names to a spreadsheet file so these can be manipulated in excel or text editor
+write.table(samplesname, file="samplenames.txt", sep="\t")
+
+#################
+
+#create a list of column names that you want to plot; !!!!You must include the column name for gene ID
+
+#move the subset of genes you want to plot into a new matrix
+sampleNames <- colnames(allDataTPM)
+write.table(sampleNames, file="names.txt")
+Ordered_KO_data <- cbind(allDataTPM[,4:6],allDataTPM[,7:9],allDataTPM[,1:3],allDataTPM[,10:12],allDataTPM[,13:15])
+Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,4:6], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,7:9], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,1:3], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,10:12], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,13:15], na.rm = TRUE))
+averageRowIDs=c("WT_0hr","WT_24hr","suz-12","qa-suz12_0hr", "qa-suz12_24hr")
+colnames(Averaged_Orderd_KO_data) <- averageRowIDs
+
+
+####################################################################
+
+#SECTION 3
+#subset data to sample only PRC2-target genes
+
+#read in geneIDs of PRC2 target genes
+Prc2targets <- read.table("../bed_files/H3K27me3_methylated_genes_FINAL.bed", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
+
+#reading in csvs w/ upregulated genes in CAF-1 mutants
+
+###SUBSET DATA FOR ALL KO SAMPLES
+Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,10])
+
+###SUBSET DATA FOR AVERAGED KO SAMPLES
+AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,10])
+
+###Subset data to filter out non-PRC2 target regions that got through (cutting out any genes over 2 tpm in WT)
+AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 6))
+AVERAGE_AlldataTPM <- subset(Averaged_Orderd_KO_data, (Averaged_Orderd_KO_data[,1] > -0.1))
+
+###resubet PRC2 targets after filtering
+Prc2targetTPM <- subset(Prc2targetTPM, rownames(Prc2targetTPM)%in%rownames(AVERAGE_Prc2targetTPM))
+
+###Add sudocount and log transform (if necessary)
+AVERAGE_Prc2targetTPM <- AVERAGE_Prc2targetTPM + 1
+AVERAGE_Prc2targetTPM <- log2(AVERAGE_Prc2targetTPM)
+
+AVERAGE_AlldataTPM <- AVERAGE_AlldataTPM + 1
+AVERAGE_AlldataTPM <- log2(AVERAGE_AlldataTPM)
+#melt data to get it into a format ggplots can use (load library "reshape2")
+
+
+meltedPRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
+                             varnames=c('GeneID', 'Sample'))
+
+#Alldata
+meltedAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
+                             varnames=c('GeneID', 'Sample'))
+```
+
+#################################################################################
+
+##PLOT AVERAGE DATA FOR FIGURE 1A
+
+##################################################################
+```{r, boxplot}
+#melt the data and label value "Count" and the sample IDs GeneID and Sample
+#meltedData <- melt(tpm, value.name = "Count",
+#varnames=c('GeneID', 'Sample'))
+
+meltedAveragePRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
+                             varnames=c('GeneID', 'Sample'))
+
+meltedAverageAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
+                      varnames=c('GeneID', 'Sample'))
+
+altorder = rev(c("WT_0hr","WT_24hr","suz-12","qa-suz12_0hr", "qa-suz12_24hr"))
+
+meltedAveragePRC2targetData$Sample <- factor(meltedAveragePRC2targetData$Sample)
+
+meltedAverageAllData$Sample <- factor(meltedAverageAllData$Sample)
+
+# Plot box & whisker chart
+xlabels = averageRowIDs
+colors = c( "#4575b4","#4575b4", "#fee090", "#fee090", "orange")
+
+box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
+  labs(y="Expression Level (Transcripts per Million)", x="Strain") +
+  stat_boxplot(geom = "errorbar", width = 0.2) + 
+  geom_boxplot(notch = TRUE, fill=colors, size=0.1, coef=1.5, lwd=0.25) +
+  ylim(0, 10) +
+  theme_get() + 
+  theme(axis.line.x = element_line(size = 0.5, colour = "black"),
+        axis.line.y = element_line(size = 0.5, colour = "black"),
+        axis.line = element_line(size=3, colour = "black"))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank()) +
+  theme(text = element_text(size = 10), axis.title.x=element_text(size=10, margin=margin(t = 10, r = 0, b = 0, l = 0),),axis.title.y=element_text( size=10)) +
+  theme(axis.text.x=element_text(angle = 270, vjust = 0.5, hjust = 1, size=10 )) +
+  theme(axis.text.y=element_text(vjust = 0.5, hjust = 1, size=10 )) 
+  guides(fill=F) 
+
+#device.on()
+box
+
+ggsave(filename = "histone_chaperone_boxplot_PAPER_DELETE.pdf", plot = box, dpi=600, height= 3, width=4)
+```
+
+```{r statistics, echo=FALSE}
+#I want to run statistical tests to determine the signifcance of the difference in expression b/w mutant strains and WT
+
+AVERAGE_Prc2targetTPM_ALL <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%rownames(Prc2targetTPM))
+
+#Subset data to filter out non-repressed PRC2 targets regions that got through (cutting out any genes over 10 tpm in WT). Choice of 10 TPM cutoff was arbitrary
+##These are likely genes whose promoters are not marked by H3K27me3, genes on the edge of K27 regions, and/or bivalent genes
+AVERAGE_Prc2targetTPM_ALL <- subset(AVERAGE_Prc2targetTPM_ALL, (AVERAGE_Prc2targetTPM_ALL[,1] < 10))
+
+#resubet PRC2 targets after filtering
+Prc2targetTPM_ALL <- subset(Prc2targetTPM, rownames(Prc2targetTPM)%in%rownames(AVERAGE_Prc2targetTPM_ALL))
+
+#Add sudocount and log transform (if necessary)
+AVERAGE_Prc2targetTPM_ALL <- AVERAGE_Prc2targetTPM_ALL + 1
+AVERAGE_Prc2targetTPM_ALL <- log2(AVERAGE_Prc2targetTPM_ALL)
+
+## First, I make histogram to visualize distribution of data. we'll use cac-1 as a comparison to WT
+hist <- as.data.frame(AVERAGE_Prc2targetTPM_ALL)
+
+long_hist <- hist %>%
+  select(WT, `cac-1`) %>%
+  pivot_longer(cols = everything(), names_to = "Strain", values_to = "TPM")
+
+# Plot overlapping histograms
+ggplot(long_hist, aes(x = TPM, fill = Strain)) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 15, color = "black") +
+  theme_minimal() +
+  labs(title = "TPM Distribution in WT and cac-1",
+       x = "TPM",
+       y = "Frequency") +
+  scale_fill_manual(values = c("WT" = "steelblue", "cac-1" = "tomato"))
+
+#Histogram shows non-normal distribution (skewed right), so proceed with wilcox test instead of t test
+##running tests
+set7_stat <- wilcox.test(hist$`set-7`, hist$WT, alternative = "greater")
+cac1_stat <- wilcox.test(hist$`cac-1`, hist$WT, alternative = "greater")
+cac2_stat <- wilcox.test(hist$`cac-2`, hist$WT, alternative = "greater")
+cac3_stat <- wilcox.test(hist$`cac-3`, hist$WT, alternative = "greater")
+naf1_stat <- wilcox.test(hist$`naf-1`, hist$WT, alternative = "greater")
+naf2_stat <- wilcox.test(hist$`naf-2`, hist$WT, alternative = "greater")
+asf1_stat <- wilcox.test(hist$`asf-1`, hist$WT, alternative = "greater")
+atrx_stat <- wilcox.test(hist$`ATRX`, hist$WT, alternative = "greater")
+cac1_2_stat <- wilcox.test(hist$`cac-1_cac-2`, hist$WT, alternative = "greater")
+cac1_suz12_stat <- wilcox.test(hist$`cac-1_suz-12`, hist$WT, alternative = "greater")
+suz12_stat <- wilcox.test(hist$`suz-12`, hist$WT, alternative = "greater")
+ash1_stat <- wilcox.test(hist$`ash-1`, hist$WT, alternative = "greater")
+
+#Make a list of all wilcox results objects
+wilcox_list <- list(set7_stat, cac1_stat, cac2_stat, cac3_stat, naf1_stat, naf2_stat, asf1_stat, atrx_stat, cac1_2_stat, cac1_suz12_stat, suz12_stat, ash1_stat)
+
+#rename objects
+names(wilcox_list) <- c("set7", "cac1", "cac2", "cac3", "naf1", "naf2", "asf1", "atrx", "cac-1_cac-2", "cac-1_suz-12", "suz-12", "ash-1")
+
+#Extract relevant stats into a dataframe
+wilcox_df <- do.call(rbind, lapply(wilcox_list, function(res) {
+  data.frame(
+    statistic = unname(res$statistic),
+    p_value = res$p.value,
+    alternative = res$alternative,
+    method = res$method
+  )
+}))
+
+# Set strain names as row names
+rownames(wilcox_df) <- names(wilcox_list)
+
+# Save to CSV
+write.csv(wilcox_df, "Wilcoxon_summary_stats.csv", row.names = TRUE)
+```
+
+```{r Plotting data in Violin Plot, echo=FALSE}
+# Define factor order and formatted x-axis labels
+label_order <- c("WT", "set-7", "cac-1", "cac-2", "cac-3", "naf-1", "naf-2", "asf-1", "ATRX")
+formatted_labels <- c(
+  "WT",
+  expression(italic("\u0394set-7")),
+  expression(italic("\u0394cac-1")),
+  expression(italic("\u0394cac-2")),
+  expression(italic("\u0394cac-3")),
+  expression(italic("\u0394naf-1")),
+  expression(italic("\u0394naf-2")),
+  expression(italic("\u0394asf-1")),
+  expression(italic("\u0394atrx"))
+)
+
+#Group and summarize
+total2 <- meltedAveragePRC2targetData %>%
+  group_by(Sample)
+
+total_dist <- meltedAveragePRC2targetData %>%
+  group_by(Sample) %>%
+  summarise(num = n())
+
+#Set dodge for violin spacing
+dodge <- position_dodge(width = 1)
+
+#Build plot
+violin <- total2 %>%
+  left_join(total_dist) %>%
+  arrange(factor(Sample, levels = label_order)) %>%
+  mutate(Sample = factor(Sample, levels = label_order)) %>%
+  ggplot(aes(x = Sample, y = Count)) +
+  geom_violin(position = dodge, scale = "width", trim = FALSE) +
+  stat_summary(fun = "mean", geom = "crossbar", width = 0.25, colour = "red") +
+  scale_x_discrete(labels = formatted_labels) +
+  labs(
+    x = "Strain",
+    y = expression("Expression Level (log"[2]~"(TPM+1))")) +
+  theme_classic(base_size = 20) +
+  theme(
+    axis.text.x = element_text(color = "black"),
+    axis.text.y = element_text(color = "black"),
+    axis.title.x = element_text(color = "black"),
+    axis.title.y = element_text(color = "black")
+  )
+
+#check it
+print(violin)
+
+#save plot
+ggsave("./CAF-1_K27_Violin_Paper_Final.pdf", plot=violin, width = 10, height = 8, unit="in",  dpi=400)
+```
+
+#I want to make a violin plot instead of boxplot. Going to adapt Abby's code
+```{r, violin}
+total2 <- meltedAveragePRC2targetData %>%
+  group_by(Sample)
+total_dist = meltedAveragePRC2targetData %>%
+  group_by(Sample) %>% summarise(num=n())
+
+#Setting distance between violins in plot
+dodge <- position_dodge(width = 1)
+###  plotting violin plot
+### this chunk is just for putting samples in the order that I want ###
+violin <- total2 %>%
+  left_join(total_dist) %>%
+  arrange(factor(Sample, levels = c("WT_0hr","WT_24hr","suz-12","qa-suz12_0hr", "qa-suz12_24hr"))) %>%
+  mutate(Sample = factor(Sample)) %>%
+  ### everything below is the actual violin plot ###
+  ggplot(aes(x=Sample, y=Count)) + 
+  geom_violin(position = dodge, scale="width", trim=FALSE) +
+  stat_summary(fun = "mean", geom = "crossbar", width = 0.25, colour = "red") +
+  scale_fill_manual("",values = c("orchid1", "springgreen3")) +
+  labs(x = "Strain",y = expression("Expression Level (log "[2]~"(TPM+1)")) + 
+  theme_classic(base_size = 20)
+
+print(violin)
+ggsave("./qa-suz12_PRC2_Gene_expression.pdf", plot=violin, width = 10, height = 8, unit="in",  dpi=400)
+
+#stat_summary(fun.data = "mean_se", geom = "errorbar", width = 0.25, colour = "red") +
+
+########################3
+############################################################################
+
+breaks1=seq(-4, 5, by=.09) #This is to set a custom heatmaps scale. Not used here.
+
+#filter all data with no changes >>>>> if the sum of all rows divided by the # of rows is > 0.
+
+##Experiment with different heatmap strategies
+##strategy 1 - Plot the average TMP of all genes that change expression; row normalization; clustredRows
+
+##Keep Only Genes that are expressed in at least one sample
+GenesWithChanges <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0) & (rowSums(AVERAGE_Prc2targetTPM) > 0))
+#CAFUpGenes <- subset(AVERAGE_CAFTPM, (rowSums(CAFUpTPM) > 0))
+GenesWithChanges_95 <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0))
+
+#plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above
+
+heatmap1 <- pheatmap(GenesWithChanges[,rev(altorder)], color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
+                   cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
+                   legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5)
+
+#to plot with ggplot, you need to extract [[4]] from the heatmap object
+heatmap_plot <- heatmap1[[4]]
+
+ggsave(filename = "./qa-suz12_log2_prc2_genes_heatmap_rowscale.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
+#dev.off()
+```
+
+#Moving on to DESeq2
+##We will use this to determine the genes significantly DE (p < 0.05 & < 0.01)
+##These lists will be used to make volcano plots, Venn Diagrams, and for GO Analysis
+
+```{r importing counts}
+#Note: file was already read in, using a different variable name for DESeq to avoid confusion this was already done
+## change ncol to match number of columns
+cts_numeric <- matrix(as.numeric(Interactors_countsOnly), ncol = 15)
+dimnames(cts_numeric) <- list(rownames(Interactors_countsOnly), colnames(Interactors_countsOnly))
+
+#Rename columns
+names = read.table(file="names_qa.txt" , sep="", row.names = 1, header = TRUE)
+colnames(cts_numeric) <- names[,1]
+```
+
+```{r group samples, echo=FALSE}
+#grouping samples by strain for DESeq analysis
+##Note, I am leaving old cac-1 strain in analysis since the counts are in the file, but will not be utilizing the data for figures. I will be using the "cac-1_new" data instead
+WT_0hr <- rowMeans(cts_numeric[, 4:6], na.rm = TRUE)
+WT_24hr <- rowMeans(cts_numeric[, 7:9], na.rm = TRUE)
+suz12_24hr <- rowMeans(cts_numeric[, 1:3], na.rm = TRUE)
+qa_0hr <- rowMeans(cts_numeric[, 10:12], na.rm = TRUE)
+qa_24hr <- rowMeans(cts_numeric[, 13:15], na.rm = TRUE)
+
+```
+
+```{r load coldata, echo = FALSE}
+#Loading in column data file. This will be used to assign the counts samples to the correct strains in DESeq
+##Make sure you have the desired strain listed as a control in this sheet
+coldata <- read.csv("../coldata_qa.csv", header= TRUE, row.names = 1)
+coldata$condition <- factor(coldata$condition)
+coldata$type <- factor(coldata$type)
+
+#Confirm that the number and order of samples are the same in each dataset before proceeding. Important, because this will throw off/fail DESeq otherwise
+all(rownames(coldata) %in% colnames(cts_numeric))
+all(rownames(coldata) == colnames(cts_numeric))
+
+```
+
+```{r, Run DESeq analysis, echo=FALSE}
+# --- your setup code (unchanged) ---
+cts_numeric_pseudo = cts_numeric + 1
+dds <- DESeqDataSetFromMatrix(countData = round(cts_numeric_pseudo),
+                              colData = coldata,
+                              design = ~ condition)
+keep <- rowSums(counts(dds)) > 16
+dds <- dds[keep,]
+dds$condition <- relevel(dds$condition, ref = "WT_0hr")
+
+dds2 <- DESeq(dds)
+plotDispEsts(dds2)
+
+```
+
+```{r create csvs with DE genes for each strain, echo=FALSE}
+# Minimal exporter: per-strain CSVs only (ALL, DE, UP, DOWN), no intersections.
+# Assumes your DESeq2 object has a factor column (e.g., 'condition') with levels:
+# WT_0hr, WT_24hr, suz12_24hr, qa_0hr, qa_24hr
+export_deseq_csvs_no_intersections <- function(
+  dds,
+  condition_col   = "condition",
+  ref_level       = "WT_0hr",
+  strains,                      # e.g., c("WT_24hr","suz12_24hr","qa_0hr","qa_24hr")
+  lfc_cutoff      = 1.0,
+  alphas          = c(0.05, 0.01)
+) {
+  # ---- helpers ----
+  alpha_lab  <- function(a) formatC(a, format = "f", digits = 2)
+  lfc_tag    <- function(x) paste0("ge_", gsub("\\.", "p", sprintf("%.1f", x)))  # e.g., ge_1p0
+  sanitize   <- function(x) gsub("[^A-Za-z0-9._-]+", "_", x)
+  safe_write <- function(df, fname) utils::write.csv(df, file = sanitize(fname), row.names = FALSE)
+
+  # Make sure the design/levels line up
+  stopifnot(condition_col %in% colnames(colData(dds)))
+  cond <- as.character(colData(dds)[[condition_col]])
+  if (!ref_level %in% cond) stop("ref_level '", ref_level, "' not found in colData(dds)$", condition_col, ".")
+  # Relevel the factor if needed
+  colData(dds)[[condition_col]] <- relevel(factor(cond), ref = ref_level)
+
+  # Pull results for one strain/alpha
+  res_for <- function(strain, alpha) {
+    df <- as.data.frame(DESeq2::results(
+      dds, contrast = c(condition_col, strain, ref_level), alpha = alpha
+    ))
+    df$gene_id <- rownames(df)
+    df <- df[!is.na(df$padj), ]
+    sig <- df[df$padj < alpha & abs(df$log2FoldChange) >= lfc_cutoff, ]
+    up  <- sig[sig$log2FoldChange >=  lfc_cutoff, ]
+    dn  <- sig[sig$log2FoldChange <= -lfc_cutoff, ]
+    list(all = sig, up = up, dn = dn, full = df)
+  }
+
+  write_deg_csvs <- function(strain, alpha, reslist) {
+    a   <- alpha_lab(alpha)
+    lt  <- lfc_tag(lfc_cutoff)
+    base <- paste0(strain, "__vs__", ref_level, "__alpha", a)
+
+    # 1) ALL results (no independent filtering to keep every row)
+    res_all <- as.data.frame(DESeq2::results(
+      dds, contrast = c(condition_col, strain, ref_level),
+      independentFiltering = FALSE
+    ))
+    res_all$gene_id <- rownames(res_all)
+    safe_write(res_all[, c("gene_id", setdiff(names(res_all), "gene_id"))],
+               sprintf("%s__ALL_results_LFC.csv", base))
+
+    # 2) DE (padj<alpha & |LFC|>=cutoff)
+    safe_write(reslist$all[, c("gene_id", setdiff(names(reslist$all), "gene_id"))],
+               sprintf("%s__DE_absLFC_%s.csv", base, lt))
+
+    # 3) UP only
+    if (nrow(reslist$up)) {
+      safe_write(reslist$up[, c("gene_id", setdiff(names(reslist$up), "gene_id"))],
+                 sprintf("%s__UP_results_LFC_%s.csv", base, lt))
+    } else {
+      safe_write(data.frame(), sprintf("%s__UP_results_LFC_%s.csv", base, lt))
+    }
+
+    # 4) DOWN only
+    if (nrow(reslist$dn)) {
+      safe_write(reslist$dn[, c("gene_id", setdiff(names(reslist$dn), "gene_id"))],
+                 sprintf("%s__DOWN_results_LFC_%s.csv", base, lt))
+    } else {
+      safe_write(data.frame(), sprintf("%s__DOWN_results_LFC_%s.csv", base, lt))
+    }
+
+    invisible(TRUE)
+  }
+
+  # ---- main loop ----
+  available_levels <- levels(colData(dds)[[condition_col]])
+  for (alpha in alphas) {
+    for (s in strains) {
+      if (!(s %in% available_levels)) {
+        warning("Skipping '", s, "' — not found in levels(colData(dds)$", condition_col, ").")
+        next
+      }
+      rl <- res_for(s, alpha)
+      write_deg_csvs(s, alpha, rl)
+    }
+  }
+
+  invisible(TRUE)
+}
+
+
+# Example call
+export_deseq_csvs_no_intersections(
+  dds          = dds2,                 # your DESeq2 object for this analysis
+  condition_col= "condition",             # change if you used a different column
+  ref_level    = "WT_0hr",
+  strains      = c("WT_24hr","suz12","qa_0hr","qa_24hr"),
+  lfc_cutoff   = 1.0,
+  alphas       = c(0.05, 0.01)
+)
+
+```
+
+#Lastly, I want to make an IGV track for visualizing DE data with ChIP data
+```{r Make IGV Track, echo=FALSE}
+#calling list of files
+##Note: this will only work if the ONLY csv's in this directory are the ones containing the Data you want on the track (i.e. you need to move any other csv's from this directory, or move the ones you want on the track to a new one and change the path)
+list_of_files <- list.files(path = "./Research",
+                            recursive = FALSE,
+                            pattern = ".csv$")
+
+induced_genes <- readr::read_csv(list_of_files, id = "file_name")
+
+##convert to wide format
+l2fc_data <- data.frame(pivot_wider(data = induced_genes, id_cols = "gene_id", names_from = "file_name", values_from = "log2FoldChange"))
+
+#assigning row names and deleting extra column
+rownames(l2fc_data) <- l2fc_data[,1]
+l2fc_data <- l2fc_data[,-1]
+
+#assigning NA values to 0
+l2fc_data[is.na(l2fc_data)] <- 0
+
+#tibble NCU names back to first column
+l2fc <- tibble::rownames_to_column(l2fc_data, "VALUE")
+
+#read in file w/ all genes
+ngenes = read.csv("./csv_files/neurospora_genes_edit.csv")
+
+#Make IGV Track
+##Note: only genes with DE in one or more strains will display data in the track
+combine <- transform(merge(ngenes, l2fc, by = "VALUE"))
+track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", "WT_24hr__vs__WT_0hr__alpha0.05__DE_absLFC_ge_1p0.csv", "suz12__vs__WT_0hr__alpha0.05__DE_absLFC_ge_1p0.csv", "qa_0hr__vs__WT_0hr__alpha0.05__DE_absLFC_ge_1p0.csv", "qa_24hr__vs__WT_0hr__alpha0.05__DE_absLFC_ge_1p0.csv")
+
+#write track to file
+write.table(track, file="RNAseq_qa-suz12_Paper_Final.igv", sep="\t", row.names = FALSE, quote = FALSE)

@@ -34,13 +34,13 @@ workingdir="C:/Users/eddie/Research/GitHub"
 knitr::opts_knit$set(root.dir = "workingdir")
 
 ##################################
-#start anaysis here, qa-suz12
+#start analysis here, qa-suz12
 ##################################
 
 
 #Bring in table with unnormalized transcription counts; check.names is important if you have dashes in the gene names 
 #row.names=1 command sets geneIDs as the row name
-countdataInteractors <- read.table("./text_files/readcounts_qa_new.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
+countdataInteractors <- read.table("./text_files/readcounts_qa_paper.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
 #countdataInteractors_final = cbind(countdataInteractors, countdataInteractors_ash3[,6:7])
 #countdataInteractors <- data.matrix(countdataInteractors_final)
 
@@ -77,14 +77,13 @@ write.table(samplesname, file="samplenames.txt", sep="\t")
 #move the subset of genes you want to plot into a new matrix
 sampleNames <- colnames(allDataTPM)
 write.table(sampleNames, file="names.txt")
-Ordered_KO_data <- cbind(allDataTPM[,4:7],allDataTPM[,8:12],allDataTPM[,13:17],allDataTPM[,1:3],allDataTPM[,18:21],allDataTPM[,22:25])
-Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,4:7], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,8:12], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,13:17], na.rm = TRUE),
+Ordered_KO_data <- cbind(allDataTPM[,4:6],allDataTPM[,7:9],allDataTPM[,1:3],allDataTPM[,10:12],allDataTPM[,13:15])
+Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,4:6], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,7:9], na.rm = TRUE),
                                  rowMeans(allDataTPM[,1:3], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,18:21], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,22:25], na.rm = TRUE))
-averageRowIDs=c("WT","WT_0hr","WT_24hr","suz-12","qa-suz12_0hr", "qa-suz12_24hr")
+                                 rowMeans(allDataTPM[,10:12], na.rm = TRUE),
+                                 rowMeans(allDataTPM[,13:15], na.rm = TRUE))
+averageRowIDs=c("WT_0hr","WT_24hr","suz-12","qa-suz12_0hr", "qa-suz12_24hr")
 colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 
 
@@ -94,7 +93,7 @@ colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 #subset data to sample only PRC2-target genes
 
 #read in geneIDs of PRC2 target genes
-Prc2targets <- read.table("./bed_files/K27_genes_stringent.bed", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
+Prc2targets <- read.table("./bed_files/H3K27me3_methylated_genes_FINAL.bed", header=FALSE, stringsAsFactors=FALSE, check.names=FALSE, sep="\t") 
 
 #reading in csvs w/ upregulated genes in CAF-1 mutants
 
@@ -143,7 +142,7 @@ meltedAveragePRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
 meltedAverageAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
                       varnames=c('GeneID', 'Sample'))
 
-altorder = rev(c("WT","WT_0hr","WT_24hr","suz-12","qa-suz12_0hr", "qa-suz12_24hr"))
+altorder = rev(c("WT_0hr","WT_24hr","suz-12","qa-suz12_0hr", "qa-suz12_24hr"))
 
 meltedAveragePRC2targetData$Sample <- factor(meltedAveragePRC2targetData$Sample)
 
@@ -151,13 +150,13 @@ meltedAverageAllData$Sample <- factor(meltedAverageAllData$Sample)
 
 # Plot box & whisker chart
 xlabels = averageRowIDs
-colors = c( "#4575b4","#4575b4","#4575b4", "#fee090", "#fee090", "#4575b4")
+colors = c( "#4575b4","#4575b4", "#fee090", "#fee090", "orange")
 
 box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
   labs(y="Expression Level (Transcripts per Million)", x="Strain") +
   stat_boxplot(geom = "errorbar", width = 0.2) + 
   geom_boxplot(notch = TRUE, fill=colors, size=0.1, coef=1.5, lwd=0.25) +
-  ylim(0, 11.5) +
+  ylim(0, 10) +
   theme_get() + 
   theme(axis.line.x = element_line(size = 0.5, colour = "black"),
         axis.line.y = element_line(size = 0.5, colour = "black"),
@@ -200,7 +199,7 @@ dodge <- position_dodge(width = 1)
 ### this chunk is just for putting samples in the order that I want ###
 violin <- total2 %>%
   left_join(total_dist) %>%
-  arrange(factor(Sample, levels = c("WT","WT_0hr","WT_24hr","suz-12","qa-suz12_0hr", "qa-suz12_24hr"))) %>%
+  arrange(factor(Sample, levels = c("WT_0hr","WT_24hr","suz-12","qa-suz12_0hr", "qa-suz12_24hr"))) %>%
   mutate(Sample = factor(Sample)) %>%
   ### everything below is the actual violin plot ###
   ggplot(aes(x=Sample, y=Count)) + 
@@ -227,7 +226,7 @@ breaks1=seq(-4, 5, by=.09) #This is to set a custom heatmaps scale. Not used her
 
 ##Keep Only Genes that are expressed in at least one sample
 GenesWithChanges <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0) & (rowSums(AVERAGE_Prc2targetTPM) > 0))
-CAFUpGenes <- subset(AVERAGE_CAFTPM, (rowSums(CAFUpTPM) > 0))
+#CAFUpGenes <- subset(AVERAGE_CAFTPM, (rowSums(CAFUpTPM) > 0))
 GenesWithChanges_95 <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0))
 
 #plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above

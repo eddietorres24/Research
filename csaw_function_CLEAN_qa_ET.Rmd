@@ -3570,6 +3570,40 @@ peaks <- heatmap_to_bed_peaks(
 
 ```
 
+```{r, Pie Chart Code}
+library(ggplot2)
+library(scales)
+
+# --- data ---
+df <- data.frame(
+  group = c("Early recovered", "Late recovered", "Unrecovered"),
+  bp    = c(early_recovered_bp, late_recovered_bp, unrecovered_bp)
+)
+df$pct <- df$bp / sum(df$bp)
+df$lbl <- sprintf("%s (%.1f%%)", df$group, 100*df$pct)
+
+# --- custom light colors ---
+base_colors <- c("#66c2a5", "#fc8d62", "#8da0cb")  # soft palette
+light_colors <- alpha(base_colors, 0.6)            # lighter transparency
+
+# --- plot ---
+p <- ggplot(df, aes(x = "", y = bp, fill = group)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  scale_fill_manual(values = light_colors) +
+  geom_text(aes(label = lbl),
+            position = position_stack(vjust = 0.5),
+            size = 3) +
+  theme_void() +
+  guides(fill = guide_legend(title = NULL)) +
+  ggtitle("Coverage by category")
+
+p
+
+ggsave("peak_coverage_pie.pdf", p, width = 3, height = 3)
+
+```
+
 ```{r, Processing Dataframes}
 #K27 Peaks regained in timecourse
 early_recover = subset(H3K27me3_Results_K27peaks_vInput, (H3K27me3_Results_K27peaks_vInput$logFC_qa_4hr > 1 | H3K27me3_Results_K27peaks_vInput$logFC_qa_0hr > 1) & H3K27me3_Results_K27peaks_vInput$FDR_qa_4hr < 0.05)
@@ -3634,5 +3668,19 @@ write.table(early_recover_BED, file = "early_recovered_peaks.bed", sep = "\t", q
 write.table(late_recover_BED, file = "late_recovered_peaks.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 write.table(unrecovered_BED, file = "unrecovered_peaks.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+#calculating total length of peaks
+# helper: sum of BED widths (half-open intervals: length = end - start)
+total_bp <- function(bed) {
+  start <- as.integer(bed$V2)
+  end   <- as.integer(bed$V3)
+  sum(pmax(end - start, 0L), na.rm = TRUE)
+}
+
+# compute totals
+early_recovered_bp <- total_bp(early_recover_BED)
+late_recovered_bp  <- total_bp(late_recover_BED)
+unrecovered_bp     <- total_bp(unrecovered_BED)
+
 
 ```
