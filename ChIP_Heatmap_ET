@@ -52,14 +52,13 @@ computeMatrix scale-regions -a 150 -b 150 \
     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
     -R $QABED/early_recovered_peaks.bed $QABED/late_recovered_peaks.bed $QABED/unrecovered_peaks.bed --skipZeros -o matrix_qa-suz12.gz
 
-    plotHeatmap -m matrix_qa-suz12.gz -out qa-suz12_recover_cluster_nolegend.pdf \
+    plotHeatmap -m matrix_qa-suz12.gz -out qa-suz12_recover_cluster.pdf \
                --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
                --startLabel "5'" \
          			 --endLabel "3'" \
                --missingDataColor 1 \
                --heatmapHeight 12 \
                --heatmapWidth 2.8 \
-               --whatToShow "heatmap and colorbar" \
                --sortUsing sum \
                --sortRegions descend \
                --outFileSortedRegions heatmap.bed \
