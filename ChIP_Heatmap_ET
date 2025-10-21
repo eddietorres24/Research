@@ -57,7 +57,7 @@ computeMatrix scale-regions \
                --startLabel "5'" \
          			 --endLabel "3'" \
                --missingDataColor 1 \
-               --whatToShow "heatmap and colorbar" \
+               --heatmapHeight 12 \
                --sortUsing sum \
                --sortRegions descend \
                --outFileSortedRegions heatmap.bed \
