@@ -28,7 +28,9 @@ P145DIR="/scratch/evt82290/MappingOutputs/Run145/bigWig"
 P146DIR="/scratch/evt82290/MappingOutputs/Run146/bigWig"
 P148DIR="/scratch/evt82290/MappingOutputs/Run148/bigWig"
 P149DIR="/scratch/evt82290/MappingOutputs/Run149/bigWig"
-P149DIR="/scratch/evt82290/MappingOutputs/Run150/bigWig"
+P150DIR="/scratch/evt82290/MappingOutputs/Run150/bigWig"
+P151DIR="/scratch/evt82290/MappingOutputs/Run151/bigWig"
+P152DIR="/scratch/evt82290/MappingOutputs/Run152/bigWig"
 MISCDIR="/scratch/evt82290/MappingOutputs/misc_data/bigWig"
 #bed file directories
 QABED="/home/evt82290/Research/bed_files/qa-suz12"
@@ -38,10 +40,39 @@ BEDDIR2="/home/evt82290/Research/bed_files"
 #load deepTools
 module load deepTools
 
+####################################################################################################################################
+###NEW HEATMAPS FOR QA-SUZ12
+#recovered vs unrecovered peaks
+computeMatrix scale-regions \
+ -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-126_ChIP_qa-suz12_4hr_H3K27me3_Rep1_S145.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-127_ChIP_qa-suz12_8hr_H3K27me3_Rep1_S146.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-128_ChIP_qa-suz12_12hr_H3K27me3_Rep1_S147.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
+    -R $QABED/early_recovered_peaks.bed $QABED/late_recovered_peaks.bed $QABED/unrecovered_peaks.bed --skipZeros -o matrix_qa-suz12.gz
+
+    plotHeatmap -m matrix_qa-suz12.gz -out qa-suz12_recover_cluster.pdf \
+               --samplesLabel WT 0hr 4hr 8hr 12hr 24hr \
+               --startLabel "5'" \
+         			 --endLabel "3'" \
+               --missingDataColor 1 \
+               --whatToShow "heatmap and colorbar" \
+               --sortUsing sum \
+               --sortRegions descend \
+               --outFileSortedRegions heatmap.bed \
+               --colorList 'white, g, darkgreen' \
+               --zMin 0 \
+               --zMax 50
+
+###################################################################################################################################
+
 ###referencePoint
 # computeMatrix reference-point --referencePoint center -a 2500 -b 2500 -bs 2 --scale 0.5 \
 
-# scale-regions
+
+
+#scale-regions
 # computeMatrix scale-regions \
 #  -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
 #     $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
@@ -157,27 +188,27 @@ module load deepTools
   #   --sortRegions no
 
 #Look at other mutants
-      computeMatrix scale-regions \
-        -S $P144DIR/144-28_ChIP_WT_0hr_H3K27me3_Rep3_S28.bin_25.smooth_75Bulk.bw \
-           $P144DIR/144-31_ChIP_qa-suz12_4hr_H3K27me3_Rep2_S31.bin_25.smooth_75Bulk.bw \
-           $P146DIR/146-40_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S40.bin_25.smooth_75Bulk.bw \
-           $MISCDIR/hpo_H3K27me3.bin_25.smooth_75Bulk.bw \
-           $MISCDIR/h2az_H3K27me2me3_Rep2.bin_25.smooth_75Bulk.bw \
-           $MISCDIR/isw_H3K27me2me3_rep1.bin_25.smooth_75Bulk.bw \
-           $MISCDIR/ash1_H3K27me2me3_Rep1.bin_25.smooth_75Bulk.bw  \
-           $P141DIR/141-91_ChIP_cac-3_H3K27me2_Rep1_S85.bin_25.smooth_75Bulk.bw  \
-        -R recovered_grouped.bed unrecovered_grouped.bed ectopic_grouped.bed \
-        --skipZeros \
-        -o matrix_qa-suz12_clustered.gz
-
-      plotHeatmap -m matrix_qa-suz12_clustered.gz -out H3K27me3_qa-suz12_clustered_mutants_test.pdf \
-        --samplesLabel WT 4hr 24hr hpo h2az isw ash1 cac-3 \
-        --startLabel "5'" --endLabel "3'" \
-        --missingDataColor 1 \
-        --sortRegions descend --sortUsing sum --sortUsingSamples 1 3 \
-        --whatToShow "heatmap and colorbar" \
-        --colorList 'white,g,darkgreen' \
-        --zMin 0 --zMax 50 \
+      # computeMatrix scale-regions \
+      #   -S $P144DIR/144-28_ChIP_WT_0hr_H3K27me3_Rep3_S28.bin_25.smooth_75Bulk.bw \
+      #      $P144DIR/144-31_ChIP_qa-suz12_4hr_H3K27me3_Rep2_S31.bin_25.smooth_75Bulk.bw \
+      #      $P146DIR/146-40_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S40.bin_25.smooth_75Bulk.bw \
+      #      $MISCDIR/hpo_H3K27me3.bin_25.smooth_75Bulk.bw \
+      #      $MISCDIR/h2az_H3K27me2me3_Rep2.bin_25.smooth_75Bulk.bw \
+      #      $MISCDIR/isw_H3K27me2me3_rep1.bin_25.smooth_75Bulk.bw \
+      #      $MISCDIR/ash1_H3K27me2me3_Rep1.bin_25.smooth_75Bulk.bw  \
+      #      $P141DIR/141-91_ChIP_cac-3_H3K27me2_Rep1_S85.bin_25.smooth_75Bulk.bw  \
+      #   -R recovered_grouped.bed unrecovered_grouped.bed ectopic_grouped.bed \
+      #   --skipZeros \
+      #   -o matrix_qa-suz12_clustered.gz
+      #
+      # plotHeatmap -m matrix_qa-suz12_clustered.gz -out H3K27me3_qa-suz12_clustered_mutants_test.pdf \
+      #   --samplesLabel WT 4hr 24hr hpo h2az isw ash1 cac-3 \
+      #   --startLabel "5'" --endLabel "3'" \
+      #   --missingDataColor 1 \
+      #   --sortRegions descend --sortUsing sum --sortUsingSamples 1 3 \
+      #   --whatToShow "heatmap and colorbar" \
+      #   --colorList 'white,g,darkgreen' \
+      #   --zMin 0 --zMax 50 \
 
 
         # $P144DIR/144-28_ChIP_WT_0hr_H3K27me3_Rep3_S28.bin_25.smooth_75Bulk.bw
