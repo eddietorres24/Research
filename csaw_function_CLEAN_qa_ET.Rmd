@@ -3589,13 +3589,44 @@ late_key  <- do.call(paste, c(late_recover[keys],  sep = "\u0001"))
 
 late_only <- late_recover[!(late_key %in% early_key), ]
 
-unreocvered <- subset(
+unrecovered <- subset(
   H3K27me3_Results_K27peaks_vInput,
   !(do.call(paste, c(H3K27me3_Results_K27peaks_vInput[keys], sep="\u0001")) %in%
       union(key_str(early_recover), key_str(late_recover)))
 )
 
 #Make dfs for bed
+## --- helper: join a (seqnames,start,end) df to regions$K27peaks and keep BED coords ---
+make_bed <- function(df, regions_k27) {
+  # Coerce types to ensure exact key matches
+  df <- transform(df,
+    seqnames = as.character(seqnames),
+    start    = as.integer(start),
+    end      = as.integer(end)
+  )
+  regions_k27 <- transform(regions_k27,
+    V1 = as.character(V1),
+    V2 = as.integer(V2),
+    V3 = as.integer(V3)
+  )
+  # Inner join on the 3-key; keep K27peaks coordinates
+  m <- merge(
+    df[c("seqnames","start","end")],
+    regions_k27,
+    by.x = c("seqnames","start","end"),
+    by.y = c("V1","V2","V3"),
+    all = FALSE
+  )
+  # Keep only BED cols, de-dup, and optionally sort
+  bed <- unique(m[c("seqnames","start","end")])
+  names(bed) <- c("V1","V2","V3")
+  bed[order(bed$V1, bed$V2, bed$V3), ]
+}
+
+## --- build the three BED data.frames ---
+early_recover_BED   <- make_bed(early_recover,   regions$K27peaks)
+late_recover_BED    <- make_bed(late_only,       regions$K27peaks)    # your "late minus early" df
+unrecovered_BED  <- make_bed(unrecovered,  regions$K27peaks)    # in neither early nor late
 
 #write beds
 write.table(early_recover_BED, file = "early_recovered_peaks.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
