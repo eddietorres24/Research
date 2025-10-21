@@ -81,6 +81,7 @@ computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
                --heatmapHeight 12 \
                --sortUsing sum \
                --sortRegions descend \
+               --whatToShow "heatmap and colorbar" \
                --colorList 'white, g, darkgreen' \
                --zMin 0 \
                --zMax 40
@@ -89,16 +90,19 @@ computeMatrix scale-regions -a 150 -b 150 --scale 2 \
  -S $P150DIR/150-106_RNA_WT_0hr__Rep4_S121/150-106_RNA_WT_0hr__Rep4_S121_log.bw \
     $P150DIR/150-111_RNA_qa_0hr__Rep4_S126/150-111_RNA_qa_0hr__Rep4_S126_log.bw \
     $P150DIR/150-114_RNA_qa_24hr__Rep5_S129/150-114_RNA_qa_24hr__Rep5_S129_log.bw \
+    $P150DIR/150-113_RNA_qa_24hr__Rep4_S128/150-113_RNA_qa_24hr__Rep4_S128_log.bw \
+    $P150DIR/150-115_RNA_qa_24hr__Rep6_S129/150-115_RNA_qa_24hr__Rep6_S130_log.bw \
     -R $QABED/early_recovered_genes.bed $QABED/late_recovered_genes.bed $QABED/unrecovered_genes.bed --skipZeros -o qa_genes_RNA.gz
 
     plotHeatmap -m qa_genes_RNA.gz -out qa-suz12_recover_genes_clustered_RNA.pdf \
-               --samplesLabel WT_0hr qa_0hr qa_24hr \
+               --samplesLabel WT_0hr qa_0hr qa_24hr 2 3 \
                --startLabel "5'" \
          			 --endLabel "3'" \
                --missingDataColor 1 \
                --heatmapHeight 12 \
                --sortUsing sum \
                --sortRegions descend \
+               --whatToShow "heatmap and colorbar" \
                --colorMap "bwr" \
                --zMin 0 --zMax 3
 
