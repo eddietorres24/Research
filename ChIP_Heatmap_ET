@@ -91,7 +91,7 @@ computeMatrix scale-regions -a 150 -b 150 --scale 2 \
     $P150DIR/150-111_RNA_qa_0hr__Rep4_S126/150-111_RNA_qa_0hr__Rep4_S126_log.bw \
     $P150DIR/150-114_RNA_qa_24hr__Rep5_S129/150-114_RNA_qa_24hr__Rep5_S129_log.bw \
     $P150DIR/150-113_RNA_qa_24hr__Rep4_S128/150-113_RNA_qa_24hr__Rep4_S128_log.bw \
-    $P150DIR/150-115_RNA_qa_24hr__Rep6_S129/150-115_RNA_qa_24hr__Rep6_S130_log.bw \
+    $P150DIR/150-115_RNA_qa_24hr__Rep6_S130/150-115_RNA_qa_24hr__Rep6_S130_log.bw \
     -R $QABED/early_recovered_genes.bed $QABED/late_recovered_genes.bed $QABED/unrecovered_genes.bed --skipZeros -o qa_genes_RNA.gz
 
     plotHeatmap -m qa_genes_RNA.gz -out qa-suz12_recover_genes_clustered_RNA.pdf \
