@@ -78,13 +78,12 @@ write.table(samplesname, file="samplenames.txt", sep="\t")
 #move the subset of genes you want to plot into a new matrix
 sampleNames <- colnames(allDataTPM)
 write.table(sampleNames, file="names.txt")
-Ordered_KO_data <- cbind(allDataTPM[,4:6],allDataTPM[,7:9],allDataTPM[,1:3],allDataTPM[,10:12],allDataTPM[,13:15])
+Ordered_KO_data <- cbind(allDataTPM[,4:6],allDataTPM[,7:9],allDataTPM[,10:12],allDataTPM[,13:15])
 Averaged_Orderd_KO_data <- cbind(rowMeans(allDataTPM[,4:6], na.rm = TRUE),
                                  rowMeans(allDataTPM[,7:9], na.rm = TRUE),
-                                 rowMeans(allDataTPM[,1:3], na.rm = TRUE),
                                  rowMeans(allDataTPM[,10:12], na.rm = TRUE),
                                  rowMeans(allDataTPM[,13:15], na.rm = TRUE))
-averageRowIDs=c("WT_0hr","WT_24hr","suz-12","qa-suz12_0hr", "qa-suz12_24hr")
+averageRowIDs=c("WT_0hr","WT_24hr","qa-suz12_0hr", "qa-suz12_24hr")
 colnames(Averaged_Orderd_KO_data) <- averageRowIDs
 
 
@@ -100,12 +99,14 @@ Prc2targets <- read.table("../bed_files/H3K27me3_methylated_genes_FINAL.bed", he
 
 ###SUBSET DATA FOR ALL KO SAMPLES
 Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,10])
+ectopicTPM <- subset(allDataTPM, rownames(allDataTPM)%in%ectopic_genes[,10])
 
 ###SUBSET DATA FOR AVERAGED KO SAMPLES
 AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,10])
+AVERAGE_ectopicTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%ectopic_genes[,10])
 
 ###Subset data to filter out non-PRC2 target regions that got through (cutting out any genes over 2 tpm in WT)
-AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 6))
+AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 10))
 AVERAGE_AlldataTPM <- subset(Averaged_Orderd_KO_data, (Averaged_Orderd_KO_data[,1] > -0.1))
 
 ###resubet PRC2 targets after filtering
@@ -115,12 +116,19 @@ Prc2targetTPM <- subset(Prc2targetTPM, rownames(Prc2targetTPM)%in%rownames(AVERA
 AVERAGE_Prc2targetTPM <- AVERAGE_Prc2targetTPM + 1
 AVERAGE_Prc2targetTPM <- log2(AVERAGE_Prc2targetTPM)
 
+AVERAGE_ectopicTPM <- AVERAGE_ectopicTPM + 1
+AVERAGE_ectopicTPM <- log2(AVERAGE_ectopicTPM)
+
 AVERAGE_AlldataTPM <- AVERAGE_AlldataTPM + 1
 AVERAGE_AlldataTPM <- log2(AVERAGE_AlldataTPM)
 #melt data to get it into a format ggplots can use (load library "reshape2")
 
-
+#PRC2
 meltedPRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
+                             varnames=c('GeneID', 'Sample'))
+
+#Ectopic
+meltedEctopicData <- melt(AVERAGE_ectopicTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
 #Alldata
@@ -130,7 +138,7 @@ meltedAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
 
 #################################################################################
 
-##PLOT AVERAGE DATA FOR FIGURE 1A
+##PLOT AVERAGE DATA FOR FIGURE 2A
 
 ##################################################################
 ```{r, boxplot}
@@ -144,36 +152,111 @@ meltedAveragePRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
 meltedAverageAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
                       varnames=c('GeneID', 'Sample'))
 
-altorder = rev(c("WT_0hr","WT_24hr","suz-12","qa-suz12_0hr", "qa-suz12_24hr"))
+altorder = rev(c("WT_0hr","WT_24hr","qa-suz12_0hr", "qa-suz12_24hr"))
 
 meltedAveragePRC2targetData$Sample <- factor(meltedAveragePRC2targetData$Sample)
 
 meltedAverageAllData$Sample <- factor(meltedAverageAllData$Sample)
 
-# Plot box & whisker chart
-xlabels = averageRowIDs
-colors = c( "#4575b4","#4575b4", "#fee090", "#fee090", "orange")
 
-box<-ggplot(meltedAveragePRC2targetData, aes(x=Sample, y=Count)) +
-  labs(y="Expression Level (Transcripts per Million)", x="Strain") +
-  stat_boxplot(geom = "errorbar", width = 0.2) + 
-  geom_boxplot(notch = TRUE, fill=colors, size=0.1, coef=1.5, lwd=0.25) +
-  ylim(0, 10) +
-  theme_get() + 
-  theme(axis.line.x = element_line(size = 0.5, colour = "black"),
-        axis.line.y = element_line(size = 0.5, colour = "black"),
-        axis.line = element_line(size=3, colour = "black"))+
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank()) +
-  theme(text = element_text(size = 10), axis.title.x=element_text(size=10, margin=margin(t = 10, r = 0, b = 0, l = 0),),axis.title.y=element_text( size=10)) +
-  theme(axis.text.x=element_text(angle = 270, vjust = 0.5, hjust = 1, size=10 )) +
-  theme(axis.text.y=element_text(vjust = 0.5, hjust = 1, size=10 )) 
-  guides(fill=F) 
+# Desired order (will be reversed on the plot)
+label_order <- c("WT_0hr", "WT_24hr", "qa-suz12_0hr", "qa-suz12_24hr")
 
-#device.on()
-box
+# Colors mapped by sample name
+fill_cols <- c(
+  "WT_0hr"        = "#4575b4",
+  "WT_24hr"       = "#4575b4",
+  "qa-suz12_0hr"  = "#fee090",
+  "qa-suz12_24hr" = "#4575b4"
+)
 
-ggsave(filename = "histone_chaperone_boxplot_PAPER_DELETE.pdf", plot = box, dpi=600, height= 3, width=4)
+df <- meltedAveragePRC2targetData %>%
+  mutate(Sample = factor(Sample, levels = rev(label_order)))  # reverse order
+
+box <- ggplot(df, aes(x = Count, y = Sample, fill = Sample)) +
+  labs(y = "Expression Level (Transcripts per Million)", x = "Strain") +
+  # thinner errorbar & box lines
+  stat_boxplot(geom = "errorbar", width = 0.2, linewidth = 0.35) +
+  geom_boxplot(notch = TRUE, width = 0.5,
+               coef = 1.5,
+               linewidth = 0.35,          # outline thickness
+               outlier.size = 0.6, outlier.alpha = 0.5) +
+  scale_fill_manual(values = fill_cols, guide = "none") +
+  xlim(0, 8) +
+  theme_classic(base_size = 10) +
+  theme(
+    axis.line.x  = element_line(linewidth = 0.6, colour = "black"),
+    axis.line.y  = element_line(linewidth = 0.6, colour = "black"),
+    panel.grid   = element_blank(),
+    axis.text.x  = element_text(angle = 0, vjust = 0.5, hjust = 0.5, size = 10, colour = "black"),
+    axis.text.y  = element_text(size = 10, colour = "black"),
+    axis.title.x = element_text(size = 10, margin = margin(t = 10)),
+    axis.title.y = element_text(size = 10),
+    plot.margin  = margin(t = 5.5, r = 5.5, b = 5.5, l = 30) # more left margin for labels
+  )
+
+print(box)
+
+ggsave(filename = "histone_chaperone_boxplot_PAPER_DELETE.pdf", plot = box, dpi = 600, height = 5.5, width = 9)
 ```
+
+#################################################################
+#Ectopic genes boxplot
+
+```{r, boxplot}
+#melt the data and label value "Count" and the sample IDs GeneID and Sample
+#meltedData <- melt(tpm, value.name = "Count",
+#varnames=c('GeneID', 'Sample'))
+
+meltedAverageEctopicData <- melt(AVERAGE_ectopicTPM, value.name = 'Count',
+                             varnames=c('GeneID', 'Sample'))
+
+altorder = rev(c("WT_0hr","WT_24hr","qa-suz12_0hr", "qa-suz12_24hr"))
+
+meltedAverageEctopicData$Sample <- factor(meltedAverageEctopicData$Sample)
+
+# Desired order (will be reversed on the plot)
+label_order <- c("WT_0hr", "WT_24hr", "qa-suz12_0hr", "qa-suz12_24hr")
+
+# Colors mapped by sample name
+fill_cols <- c(
+  "WT_0hr"        = "#4575b4",
+  "WT_24hr"       = "#4575b4",
+  "qa-suz12_0hr"  = "#fee090",
+  "qa-suz12_24hr" = "#4575b4"
+)
+
+df <- meltedAverageEctopicData %>%
+  mutate(Sample = factor(Sample, levels = rev(label_order)))  # reverse order
+
+box <- ggplot(df, aes(x = Count, y = Sample, fill = Sample)) +
+  labs(y = "Expression Level (Transcripts per Million)", x = "Strain") +
+  # thinner errorbar & box lines
+  stat_boxplot(geom = "errorbar", width = 0.2, linewidth = 0.35) +
+  geom_boxplot(notch = TRUE, width = 0.5,
+               coef = 1.5,
+               linewidth = 0.35,          # outline thickness
+               outlier.size = 0.6, outlier.alpha = 0.5) +
+  scale_fill_manual(values = fill_cols, guide = "none") +
+  xlim(0, 8) +
+  theme_classic(base_size = 10) +
+  theme(
+    axis.line.x  = element_line(linewidth = 0.6, colour = "black"),
+    axis.line.y  = element_line(linewidth = 0.6, colour = "black"),
+    panel.grid   = element_blank(),
+    axis.text.x  = element_text(angle = 0, vjust = 0.5, hjust = 0.5, size = 10, colour = "black"),
+    axis.text.y  = element_text(size = 10, colour = "black"),
+    axis.title.x = element_text(size = 10, margin = margin(t = 10)),
+    axis.title.y = element_text(size = 10),
+    plot.margin  = margin(t = 5.5, r = 5.5, b = 5.5, l = 30) # more left margin for labels
+  )
+
+print(box)
+
+ggsave(filename = "qa_ectopic_genes.pdf", plot = box, dpi = 600, height = 5.5, width = 9)
+```
+
+#################################################################
 
 ```{r statistics, echo=FALSE}
 #I want to run statistical tests to determine the signifcance of the difference in expression b/w mutant strains and WT
@@ -248,11 +331,10 @@ write.csv(wilcox_df, "Wilcoxon_summary_stats.csv", row.names = TRUE)
 #I want to make a violin plot instead of boxplot. Going to adapt Abby's code
 ```{r Plotting data in Violin Plot, echo=FALSE}
 # Define factor order and formatted x-axis labels
-label_order <- c("WT_0hr", "WT_24hr", "suz-12", "qa-suz12_0hr", "qa-suz12_24hr")
+label_order <- c("WT_0hr", "WT_24hr", "qa-suz12_0hr", "qa-suz12_24hr")
 formatted_labels <- c(
   "WT_0hr",
   "WT_24hr",
-  "suz12",
   "qa_0hr",
   "qa_24hr"
 )
@@ -292,9 +374,60 @@ violin <- total2 %>%
 print(violin)
 
 #save plot
-ggsave("./qa-suz12_PRC2_Gene_expression.pdf", plot=violin, width = 10, height = 8, unit="in",  dpi=400)
+ggsave("./qa-suz12_PRC2_Gene_expression.pdf", plot=violin, width = 8, height = 8, unit="in",  dpi=400)
 ```
 
+##############################################################################
+```{r Plotting data in Violin Plot, echo=FALSE}
+# Define factor order and formatted x-axis labels
+label_order <- c("WT_0hr", "WT_24hr", "qa-suz12_0hr", "qa-suz12_24hr")
+formatted_labels <- c(
+  "WT_0hr",
+  "WT_24hr",
+  "qa_0hr",
+  "qa_24hr"
+)
+
+#Group and summarize
+total2 <- meltedAverageEctopicData %>%
+  group_by(Sample)
+
+total_dist <- meltedAverageEctopicData %>%
+  group_by(Sample) %>%
+  summarise(num = n())
+
+#Set dodge for violin spacing
+dodge <- position_dodge(width = 1)
+
+#Build plot
+violin <- total2 %>%
+  left_join(total_dist) %>%
+  arrange(factor(Sample, levels = label_order)) %>%
+  mutate(Sample = factor(Sample, levels = label_order)) %>%
+  ggplot(aes(x = Sample, y = Count)) +
+  geom_violin(position = dodge, scale = "width", trim = FALSE) +
+  stat_summary(fun = "mean", geom = "crossbar", width = 0.25, colour = "red") +
+  scale_x_discrete(labels = formatted_labels) +
+  labs(
+    x = "Strain",
+    y = expression("Expression Level (log"[2]~"(TPM+1))")) +
+  theme_classic(base_size = 20) +
+  theme(
+    axis.text.x = element_text(color = "black"),
+    axis.text.y = element_text(color = "black"),
+    axis.title.x = element_text(color = "black"),
+    axis.title.y = element_text(color = "black")
+  )
+
+#check it
+print(violin)
+
+#save plot
+ggsave("./qa-suz12_Ectopic_Gene_expression.pdf", plot=violin, width = 8, height = 8, unit="in",  dpi=400)
+
+```
+
+##############################################################################
 
 ```{r, heatmap}
 
@@ -313,20 +446,123 @@ breaks1=seq(-4, 5, by=.09) #This is to set a custom heatmaps scale. Not used her
 ##Keep Only Genes that are expressed in at least one sample
 GenesWithChanges <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0) & (rowSums(AVERAGE_Prc2targetTPM) > 0))
 #CAFUpGenes <- subset(AVERAGE_CAFTPM, (rowSums(CAFUpTPM) > 0))
-GenesWithChanges_95 <- subset(AVERAGE_Prc2targetTPM, (rowSums(Prc2targetTPM) > 0))
 
 #plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above
 
-heatmap1 <- pheatmap(GenesWithChanges[,rev(altorder)], color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
+heatmap1 <- pheatmap::pheatmap(GenesWithChanges[,rev(altorder)], color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
                    cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
                    legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5)
 
 #to plot with ggplot, you need to extract [[4]] from the heatmap object
 heatmap_plot <- heatmap1[[4]]
 
-ggsave(filename = "./qa-suz12_log2_prc2_genes_heatmap_rowscale.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
+ggsave(filename = "./qa-suz12_log2_prc2_genes_heatmap_rowscale_TEST.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
 #dev.off()
+
+#extracting genes not re-repressed
+# Simple (assumes numeric)
+# n <- ncol(GenesWithChanges)
+# keep <- GenesWithChanges[, n-1] > GenesWithChanges[, 1] &
+#         GenesWithChanges[, n]   > GenesWithChanges[, 1]
+# Genes_subset <- GenesWithChanges[keep, , drop = FALSE]
+
+#####################################################################################################
+###Reclustering heatmap to split into genes groups recovered vs unrecovered and replotting.
+
+
+# --- Inputs from earlier steps ---
+# GenesWithChanges: matrix/data.frame with rows = genes (rownames), cols = samples
+# altorder: desired column order
+# early, late, unrec: character vectors of gene_ids per group (already intersected with rownames)
+
+# 1) subset & column order
+mat <- GenesWithChanges[c(early, late, unrec), rev(altorder), drop = FALSE]
+
+# 2) GLOBAL row scaling (same for all groups)
+mat_z <- t(scale(t(as.matrix(mat))))
+mat_z[is.na(mat_z)] <- 0  # if any constant rows
+
+# 3) Cluster **within each group** on the same global z-scores
+ord_early <- if (length(early)) {
+  e <- mat_z[early, , drop = FALSE]
+  rownames(e)[order.dendrogram(as.dendrogram(hclust(dist(e), method = "average")))]
+} else character(0)
+
+ord_late <- if (length(late)) {
+  l <- mat_z[late, , drop = FALSE]
+  rownames(l)[order.dendrogram(as.dendrogram(hclust(dist(l), method = "average")))]
+} else character(0)
+
+ord_unrec <- if (length(unrec)) {
+  u <- mat_z[unrec, , drop = FALSE]
+  rownames(u)[order.dendrogram(as.dendrogram(hclust(dist(u), method = "average")))]
+} else character(0)
+
+row_order <- c(ord_early, ord_late, ord_unrec)
+
+# 4) Reorder matrix by that within-group clustering order
+mat_z_ord <- mat_z[row_order, , drop = FALSE]
+
+# 5) Annotation + visible gaps
+ann_row <- data.frame(
+  Cluster = factor(
+    c(rep("Early recovered", length(ord_early)),
+      rep("Late recovered",  length(ord_late)),
+      rep("Unrecovered",     length(ord_unrec))),
+    levels = c("Early recovered","Late recovered","Unrecovered")
+  )
+)
+rownames(ann_row) <- row_order
+
+gaps <- c(length(ord_early), length(ord_early) + length(ord_late))
+
+# 6) pheatmap (no dendrogram, global colors)
+lims <- quantile(mat_z_ord, c(0.01, 0.99), na.rm = TRUE)
+lim  <- max(abs(lims))
+cols <- colorRampPalette(rev(brewer.pal(7, "RdBu")))(100)
+
+ph <- pheatmap::pheatmap(
+  mat_z_ord,
+  color = cols,
+  breaks = seq(-lim, lim, length.out = 101),
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  show_rownames = FALSE,
+  show_colnames = TRUE,
+  fontsize_col = 10,
+  gaps_row = gaps,
+  annotation_row = ann_row,
+  border_color = NA,
+  legend = FALSE,              # <-- hide colorbar legend
+  annotation_legend = FALSE    # <-- hide annotation legend
+)
+
+# Knit-friendly export
+heat_save <- ph[[4]]
+
+ggsave(filename = "./qa-suz12_log2_prc2_genes_heatmap_recovery_clustered.pdf", plot = heat_save, dpi=600, height=4, width=3)
+
 ```
+
+################################################################################
+#Heatmap for ectopic genes
+```{r,}
+##Keep Only Genes that are expressed in at least one sample
+GenesWithChanges_ectopic <- subset(AVERAGE_ectopicTPM, (rowSums(ectopicTPM) > 0) & (rowSums(AVERAGE_ectopicTPM) > 0))
+#CAFUpGenes <- subset(AVERAGE_CAFTPM, (rowSums(CAFUpTPM) > 0))
+
+#plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above
+
+heatmap_ectopic <- pheatmap::pheatmap(GenesWithChanges_ectopic[,rev(altorder)], color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
+                   cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
+                   legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5)
+
+#to plot with ggplot, you need to extract [[4]] from the heatmap object
+heatmap_ectopic_plot <- heatmap_ectopic[[4]]
+
+ggsave(filename = "./qa-suz12_ectopic_genes_heatmap_row_scale.pdf", plot = heatmap_ectopic_plot, dpi=600, height=4, width=3)
+```
+################################################################################
 
 #Moving on to DESeq2
 ##We will use this to determine the genes significantly DE (p < 0.05 & < 0.01)
@@ -368,7 +604,6 @@ all(rownames(coldata) == colnames(cts_numeric))
 ```
 
 ```{r, Run DESeq analysis, echo=FALSE}
-# --- your setup code (unchanged) ---
 cts_numeric_pseudo = cts_numeric + 1
 dds <- DESeqDataSetFromMatrix(countData = round(cts_numeric_pseudo),
                               colData = coldata,
@@ -484,6 +719,31 @@ export_deseq_csvs_no_intersections(
   alphas       = c(0.05, 0.01)
 )
 
+```
+
+```{r, Venn Diagrams}
+#Read in gene lists
+qa_0hr_RNA= read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_0hr__vs__WT_0hr__alpha0.05__DE_absLFC_ge_1p0.csv", row.names = 1)
+qa_24hr_RNA= read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_24hr__vs__WT_0hr__alpha0.05__DE_absLFC_ge_1p0.csv", row.names = 1)
+WT_24hr_RNA= read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/WT_24hr__vs__WT_0hr__alpha0.05__DE_absLFC_ge_1p0.csv", row.names = 1)
+suz12RNA= read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/suz12__vs__WT_0hr__alpha0.05__DE_absLFC_ge_1p0.csv", row.names = 1)
+
+qa_24hr_K27 = subset(qa_24hr_RNA, rownames(qa_24hr_RNA) %in% Prc2targets$V10) 
+qa_0hr_K27 = subset(qa_0hr_RNA, rownames(qa_0hr_RNA) %in% Prc2targets$V10)
+WT_24hr_K27 = subset(WT_24hr_RNA, rownames(WT_24hr_RNA) %in% Prc2targets$V10)
+suz12_K27 = subset(suz12RNA, rownames(suz12RNA) %in% Prc2targets$V10)
+
+venn.diagram(
+  x = list(genes_early$gene_id, rownames(qa_24hr_K27), rownames(WT_24hr_K27)),
+  category.names = c("H3K27me3 Unrecovered", "qa_24hr UP ", "WT_24hr UP"),
+  filename = 'unrecovered_upregulated_genes.png',
+  col=c("#8da0cb", "#66c2a5", "#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+#Make euler plot inputing values gathered from venn.diagram(). This will provide a proportional venn-diagram
+CAF1_up_fit = euler(c("A" = 100, "B" = 218, "C" = 472, "A&B" = 254, "A&C" = 74, "B&C" =110, "A&B&C" = 695))
+CAF1_up_eulerplot <- plot(CAF1_up_fit)
 ```
 
 #Lastly, I want to make an IGV track for visualizing DE data with ChIP data

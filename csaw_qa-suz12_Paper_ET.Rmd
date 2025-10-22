@@ -537,30 +537,36 @@ rownames(K27_FilteredHeatmap_df) <- paste(K27.chip.Filteredres.df_SigOnly$seqnam
 K27_FilteredHeatmap_mat <- as.matrix(K27_FilteredHeatmap_df)
 quantile(K27_FilteredHeatmap_mat, c(.01, .50, .75, .95, .98, .995)) 
 max <- quantile(K27_FilteredHeatmap_mat, 0.995) # identify the 98th percentile value and assign this to max
-K27_FilteredHeatmap_mat[K27_FilteredHeatmap_mat>max] = max    #replace any value larger than the 98th percentile value with the 98th
 
-#I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 0 in both WT samples
-K27_FilteredHeatmap_mat <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 2] > 2)
+#replace any value larger than the 98th percentile value with the 98th
+K27_FilteredHeatmap_mat[K27_FilteredHeatmap_mat>max] = max    
 
+#set any values below 1 to 0
+K27_FilteredHeatmap_mat[K27_FilteredHeatmap_mat < 1]   <- 0
+
+#I want to subset the data frame to get rid of regions that aren't actually K27 enirched/depleted in any of the mutants. I will do this by eliminating regions that are < 1 in all samples
+# keep rows that have at least one value >= 1 across ALL columns
+K27_FilteredHeatmap_mat_fig1 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[,1] >= 1)
+  
 #throwing our regions that are > 0.1 in suz12 (if any got through)
-K27_FilteredHeatmap_mat <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 11] <= 0)
+K27_FilteredHeatmap_mat_fig1 <- subset(K27_FilteredHeatmap_mat_fig1, K27_FilteredHeatmap_mat_fig1[, 11] <= 0)
 
 # #I only want to look at qa-suz12
-K27_FilteredHeatmap_mat_map <- K27_FilteredHeatmap_mat[,c(2,11,3:7)]
+K27_FilteredHeatmap_mat_map_fig1 <- K27_FilteredHeatmap_mat_fig1[,c(1,11,3:7)]
 
-write.csv(K27_FilteredHeatmap_mat_map, file = "qa_suz12_matrix_24hr_Peaks.csv", row.names = FALSE)
+# write.csv(K27_FilteredHeatmap_mat_map, file = "qa_suz12_matrix_24hr_Peaks.csv", row.names = FALSE)
 
 #cluster into areas that recover vs. not
-recover <- subset(K27_FilteredHeatmap_mat_map, rowSums(K27_FilteredHeatmap_mat_map[, 3:7] > 0) > 0)
+recover_fig1 <- subset(K27_FilteredHeatmap_mat_map_fig1, rowSums(K27_FilteredHeatmap_mat_map_fig1[, 3:7] > 1) > 0)
 
-no_recover <- subset(K27_FilteredHeatmap_mat_map, rowSums(K27_FilteredHeatmap_mat_map[, 3:7] <= 0) == 5) # == 5 because there will be 5 columns < 0
+no_recover_fig1 <- subset(K27_FilteredHeatmap_mat_map_fig1, rowSums(K27_FilteredHeatmap_mat_map_fig1[, 3:7] <= 1) == 5) # == 5 because there will be 5 columns < 0
 
 #order rows based on mean value across timecourse
-recover_order <-order(rowMeans(recover[,c(3:7)]), decreasing = TRUE)
-no_recover_order <-order(no_recover[, 1], decreasing = TRUE)
+recover_order <- order(rowMeans(recover_fig1[,c(3:7)]), decreasing = TRUE)
+no_recover_order <- order(no_recover_fig1[, 1], decreasing = TRUE)
 
-recover_sort <- recover[recover_order, ]
-no_recover_sort <- no_recover[no_recover_order, ]
+recover_sort <- recover_fig1[recover_order, ]
+no_recover_sort <- no_recover_fig1[no_recover_order, ]
 
 forheat1 <- rownames(recover_sort)
 forheat2 <- rownames(no_recover_sort)
@@ -568,21 +574,88 @@ forheat2 <- rownames(no_recover_sort)
 finalorder <- c(forheat1, forheat2)
 
 #Final Order
-K27_FilteredHeatmap_mat_sort = K27_FilteredHeatmap_mat_map[finalorder, ]
+K27_FilteredHeatmap_mat_sort_fig1 = K27_FilteredHeatmap_mat_map_fig1[finalorder, ]
 
 #setting color scale
 col_fun<- colorRamp2(c(0, max), c("white", "darkgreen"))
 col_fun(seq(0, max, length = 20))
 
 #Plot
-K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "H3K27me3"))
-png("./H3K27me3_24hr_peaks_qa-suz12_forZack_2FC.png", units = "in", height = 8, width = 6, res = 300)
+K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort_fig1, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort_fig1)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "H3K27me3"))
+pdf("./H3K27me3_recovered_unrecovered_WT_0hr_peaks_qa-suz12.pdf", height = 8, width = 6)
 # Draw the heatmap
 draw(K27_Filtered_hm)
 # Close the device to save the file
 dev.off()
 
 ```
+
+###
+
+```{r, heatmap for ectopic peaks}
+#filtering anything above 0 in suz12
+K27_FilteredHeatmap_mat_fig3 <- subset(K27_FilteredHeatmap_mat, K27_FilteredHeatmap_mat[, 11] <= 0)
+
+#Now including 24 hr WT sample
+K27_FilteredHeatmap_mat_map_fig3 <- K27_FilteredHeatmap_mat_fig3[,c(1,2,11,3:7)]
+
+#filtering all peaks below 1 in all samples
+K27_FilteredHeatmap_mat_map_fig3_filter <- K27_FilteredHeatmap_mat_map_fig3[
+  rowSums(data.matrix(K27_FilteredHeatmap_mat_map_fig3) >= 1, na.rm = TRUE) > 0,
+  ,
+  drop = FALSE
+]
+
+#ectopic clustering
+recover_any = subset(K27_FilteredHeatmap_mat_map_fig3_filter, rowSums(K27_FilteredHeatmap_mat_map_fig3_filter[, 4:8] > 1) > 0)
+
+unrecover_any = subset(K27_FilteredHeatmap_mat_map_fig3_filter, rowSums(K27_FilteredHeatmap_mat_map_fig3_filter[, 4:8] <= 1) == 5)
+
+recover_0hr_fig3 <- subset(recover_any, recover_any[, 1] >= 1)
+
+recover_24hr_fig3 <- subset(recover_any, ! rownames(recover_any) %in% rownames(recover_0hr_fig3) & recover_any[,2] >= 1)
+
+no_recover_0hr_fig3 <- subset(unrecover_any, unrecover_any[,1] >= 1)
+
+no_recover_24hr_fig3 <- subset(unrecover_any, ! rownames(unrecover_any) %in% rownames(no_recover_0hr_fig3) )
+
+ectopic_fig3 <- subset(recover_any, ! rownames(recover_any) %in% rownames(recover_0hr_fig3) & ! rownames(recover_any) %in% rownames(recover_24hr_fig3))
+
+#order rows based on mean value across timecourse
+recover_0hr_fig3_order = order(rowMeans(recover_0hr_fig3[,c(4:8)]), decreasing = TRUE)
+recover_24hr_fig3_order = order(rowMeans(recover_24hr_fig3[,c(4:8)]), decreasing = TRUE)
+no_recover_0hr_fig3_order = order(rowMeans(recover_24hr_fig3[,c(1:2)]), decreasing = TRUE)
+no_recover_24hr_fig3_order = order(recover_24hr_fig3[,2], decreasing = TRUE)
+ectopic_fig3_order = order(rowMeans(ectopic_fig3[,c(4:8)]), decreasing = TRUE)
+
+#sort
+recover_0hr_sort <- recover_0hr_fig3[recover_0hr_fig3_order, ]
+recover_24hr_sort <- recover_24hr_fig3[recover_24hr_fig3_order, ]
+no_recover_0hr_sort <- no_recover_0hr_fig3[no_recover_0hr_fig3_order, ]
+no_recover_24hr_sort <- no_recover_24hr_fig3[no_recover_24hr_fig3_order, ]
+ectopic_sort <- ectopic_fig3[ectopic_fig3_order, ]
+
+forheat1 <- rownames(recover_0hr_sort)
+forheat2 <- rownames(recover_24hr_sort)
+forheat3 <- rownames(no_recover_0hr_sort)
+forheat4 <- rownames(no_recover_24hr_sort)
+forheat5 <- rownames(ectopic_sort)
+
+finalorder_fig3 <- c(forheat1, forheat2, forheat3, forheat4, forheat5)
+
+###keeping same order of genes here
+K27_FilteredHeatmap_mat_sort_fig3 = K27_FilteredHeatmap_mat_map_fig3_filter[finalorder_fig3, ]
+
+#Plot
+K27_Filtered_hm <- Heatmap(K27_FilteredHeatmap_mat_sort_fig3, col = col_fun, cluster_columns = FALSE, show_row_names = FALSE, row_order = order(as.numeric(gsub("row", "", rownames(K27_FilteredHeatmap_mat_sort_fig3)))), show_column_dend = FALSE, show_row_dend = FALSE, heatmap_legend_param = list(title = "H3K27me3"))
+pdf("./H3K27me3_ectopic_peaks_qa-suz12.pdf", height = 9)
+# Draw the heatmap
+draw(K27_Filtered_hm)
+# Close the device to save the file
+dev.off()
+```
+
+###
 
 ```{r, heatmap for 96hr timecourse}
 # #I only want to look at qa-suz12 96 hr timecourse

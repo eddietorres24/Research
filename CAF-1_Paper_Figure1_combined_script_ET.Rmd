@@ -398,33 +398,33 @@ plotDispEsts(dds2)
 
 ```{r create csvs with DE genes for each strain, echo=FALSE}
 export_deseq_csvs <- function(
-  dds2,
-  ref_level = "WT",
-  strains,
-  neurospora_bed_path,
-  prc2_targets_path,
-  lfc_cutoff = 1.0,
-  alphas = c(0.05, 0.01)
+    dds2,
+    ref_level = "WT",
+    strains,
+    neurospora_bed_path,
+    prc2_targets_path,
+    lfc_cutoff = 1.0,
+    alphas = c(0.05, 0.01)
 ) {
   ## ---- load mappings ----
   neurospora  <- read.table(neurospora_bed_path, header = TRUE, sep = "\t",
                             check.names = FALSE, stringsAsFactors = FALSE)
   Prc2targets <- read.table(prc2_targets_path,   header = FALSE, sep = "\t",
                             check.names = FALSE, stringsAsFactors = FALSE)
-
+  
   choose_first <- function(nms, opts) opts[opts %in% nms][1]
   idcol_bed <- choose_first(names(neurospora),  c("VALUE","gene_id","NCU","Attributes","V11","V4"))
   idcol_prc <- choose_first(names(Prc2targets), c("V11","VALUE","gene_id","NCU","Attributes","V4"))
   if (is.na(idcol_bed) || is.na(idcol_prc)) stop("Could not find ID columns in BED/PRC2 files.")
   prc2_ids <- unique(Prc2targets[[idcol_prc]])
-
+  
   ## ---- helpers ----
   alpha_lab  <- function(a) formatC(a, format = "f", digits = 2)
   lfc_tag    <- function(x) paste0("ge_", gsub("\\.", "p", sprintf("%.1f", x)))  # e.g., ge_1p0
   sanitize   <- function(x) gsub("[^A-Za-z0-9._-]+", "_", x)
   safe_write <- function(df, fname) utils::write.csv(df, file = sanitize(fname), row.names = FALSE)
   bed_from_ids <- function(ids) neurospora[neurospora[[idcol_bed]] %in% unique(ids), , drop = FALSE]
-
+  
   # RAW (unshrunken) DESeq2 results used here
   res_for <- function(strain, alpha) {
     df <- as.data.frame(DESeq2::results(dds2, contrast = c("condition", strain, ref_level), alpha = alpha))
@@ -435,57 +435,57 @@ export_deseq_csvs <- function(
     dn  <- sig[sig$log2FoldChange <= -lfc_cutoff, ]
     list(all = sig, up = up, dn = dn, full = df)
   }
-
+  
   write_deg_csvs <- function(strain, alpha, reslist) {
     a   <- alpha_lab(alpha)
     lt  <- lfc_tag(lfc_cutoff)
     base <- paste0(strain, "__alpha", a)
-
+    
     ## 1) ALL results (no cutoffs), RAW LFCs
     res_all <- as.data.frame(DESeq2::results(dds2, contrast = c("condition", strain, ref_level),
                                              independentFiltering = FALSE))
     res_all$NCU <- rownames(res_all)
     safe_write(res_all[, c("NCU", setdiff(names(res_all), "NCU"))],
                sprintf("%s__ALL_results_LFC.csv", base))
-
+    
     ## 2) DE table: padj<alpha & |LFC|>=cutoff (both directions)
     safe_write(reslist$all[, c("NCU", setdiff(names(reslist$all), "NCU"))],
                sprintf("%s__DE_absLFC_%s.csv", base, lt))
-
-    ## 3) UP results (actual rows meeting cutoffs)
+    
+    ## 3) UP results
     if (nrow(reslist$up)) {
       safe_write(reslist$up[, c("NCU", setdiff(names(reslist$up), "NCU"))],
                  sprintf("%s__UP_results_LFC_%s.csv", base, lt))
     } else {
       safe_write(data.frame(), sprintf("%s__UP_results_LFC_%s.csv", base, lt))
     }
-
-    ## 4) DOWN results (actual rows meeting cutoffs)
+    
+    ## 4) DOWN results  ⬅️ (already existed)
     if (nrow(reslist$dn)) {
       safe_write(reslist$dn[, c("NCU", setdiff(names(reslist$dn), "NCU"))],
                  sprintf("%s__DOWN_results_LFC_%s.csv", base, lt))
     } else {
       safe_write(data.frame(), sprintf("%s__DOWN_results_LFC_%s.csv", base, lt))
     }
-
+    
     ## 5) UP gene list (BED-mapped rows)
     up_ids <- unique(reslist$up$NCU)
     safe_write(bed_from_ids(up_ids), sprintf("%s__UP_genes.csv", base))
-
+    
     ## 6) DOWN gene list (BED-mapped rows)
     dn_ids <- unique(reslist$dn$NCU)
     safe_write(bed_from_ids(dn_ids), sprintf("%s__DOWN_genes.csv", base))
-
+    
     ## 7) K27-UP gene list (UP ∩ PRC2 targets)
     safe_write(bed_from_ids(intersect(up_ids, prc2_ids)), sprintf("%s__K27_UP_genes.csv", base))
-
+    
     ## 8) nonK27-UP gene list (UP \ PRC2 targets)
     nonk27_up_ids <- setdiff(up_ids, prc2_ids)
     safe_write(bed_from_ids(nonk27_up_ids), sprintf("%s__nonK27_UP_genes.csv", base))
-
+    
     invisible(list(up_ids = up_ids, dn_ids = dn_ids, de_ids = unique(reslist$all$NCU)))
   }
-
+  
   ## ---- main per-strain loop ----
   available_levels <- levels(colData(dds2)$condition)
   deg_map <- list()
@@ -501,19 +501,20 @@ export_deseq_csvs <- function(
       deg_map[[paste(s, a, sep = "|")]] <- id_sets
     }
   }
-
-  ## ---- CAF-1 combos: pairwise (cac1_cac2) & triple (cac1_cac2_cac3) ----
-  # (No DOWN CSVs for combos per your note; includes UP, DE, nonK27_UP)
+  
+  ## ---- CAF-1 combos: pairwise (cac1 & cac2) & triple (cac1 & cac2 & cac3) ----
+  # Previously only UP/DE were written. Now we also export DOWN intersections.
   caf1 <- c("cac1","cac2","cac3")
   have_caf1 <- all(caf1 %in% strains) && all(caf1 %in% available_levels)
   if (have_caf1) {
     for (alpha in alphas) {
       a <- alpha_lab(alpha)
       key <- function(s) paste(s, a, sep = "|")
-
+      
       up_sets <- lapply(caf1, function(s) deg_map[[key(s)]]$up_ids)
+      dn_sets <- lapply(caf1, function(s) deg_map[[key(s)]]$dn_ids)   # ⬅️ NEW
       de_sets <- lapply(caf1, function(s) deg_map[[key(s)]]$de_ids)
-
+      
       ## pairwise: cac1 & cac2
       safe_write(bed_from_ids(intersect(up_sets[[1]], up_sets[[2]])),
                  sprintf("cac1_cac2__alpha%s__UP_intersection.csv", a))
@@ -521,7 +522,13 @@ export_deseq_csvs <- function(
                  sprintf("cac1_cac2__alpha%s__DE_intersection.csv", a))
       safe_write(bed_from_ids(setdiff(intersect(up_sets[[1]], up_sets[[2]]), prc2_ids)),
                  sprintf("cac1_cac2__alpha%s__nonK27_UP_intersection.csv", a))
-
+      
+      ## NEW: DOWN intersections
+      safe_write(bed_from_ids(intersect(dn_sets[[1]], dn_sets[[2]])),
+                 sprintf("cac1_cac2__alpha%s__DOWN_intersection.csv", a))
+      safe_write(bed_from_ids(setdiff(intersect(dn_sets[[1]], dn_sets[[2]]), prc2_ids)),
+                 sprintf("cac1_cac2__alpha%s__nonK27_DOWN_intersection.csv", a))
+      
       ## triple: cac1 & cac2 & cac3
       safe_write(bed_from_ids(Reduce(intersect, up_sets)),
                  sprintf("cac1_cac2_cac3__alpha%s__UP_intersection.csv", a))
@@ -529,16 +536,21 @@ export_deseq_csvs <- function(
                  sprintf("cac1_cac2_cac3__alpha%s__DE_intersection.csv", a))
       safe_write(bed_from_ids(setdiff(Reduce(intersect, up_sets), prc2_ids)),
                  sprintf("cac1_cac2_cac3__alpha%s__nonK27_UP_intersection.csv", a))
+      
+      ## NEW: triple DOWN intersections
+      safe_write(bed_from_ids(Reduce(intersect, dn_sets)),
+                 sprintf("cac1_cac2_cac3__alpha%s__DOWN_intersection.csv", a))
+      safe_write(bed_from_ids(setdiff(Reduce(intersect, dn_sets), prc2_ids)),
+                 sprintf("cac1_cac2_cac3__alpha%s__nonK27_DOWN_intersection.csv", a))
     }
   } else {
     message("CAF-1 combo outputs skipped (one or more of cac1/cac2/cac3 missing).")
   }
-
+  
   invisible(deg_map)
 }
 
-# assumes you've already run DESeq() and added the apeglm results() monkey-patch
-# and set lfc_cutoff elsewhere if you want a different threshold
+# call (same as before)
 deg_map <- export_deseq_csvs(
   dds2,
   ref_level = "WT",

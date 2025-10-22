@@ -1919,19 +1919,16 @@ make_csaw_heatmap_clusterby(
 #script to make a heatmap w ChIP log2FC data & RNA-seq log2FC data (will use csaw results, which is why i have it here)
 
 #read in log2FC Expression data saved from DESeq for whatever strains you want
-cac1RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1__alpha0.05__ALL_results_LFC.csv", row.names = 1)
-cac2RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac2__alpha0.05__ALL_results_LFC.csv", row.names = 1)
-cac3RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac3__alpha0.05__ALL_results_LFC.csv", row.names = 1)
-set7RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/set7__alpha0.05__ALL_results_LFC.csv", row.names = 1)
-ash1RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/ash1__alpha0.05__ALL_results_LFC.csv", row.names = 1)
-cac1suz12RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/cac1_suz12__alpha0.05__ALL_results_LFC.csv", row.names = 1)
-suz12RNA= read.csv("../CAF-1_RNA-seq_Analysis/csv_files/suz12__alpha0.05__ALL_results_LFC.csv", row.names = 1)
+qa_0hr_RNA= read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_0hr__vs__WT_0hr__alpha0.05__DE_absLFC_ge_1p0.csv", row.names = 1)
+qa_24hr_RNA= read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_24hr__vs__WT_0hr__alpha0.05__DE_absLFC_ge_1p0.csv", row.names = 1)
+WT_24hr= read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/WT_24hr__vs__WT_0hr__alpha0.05__DE_absLFC_ge_1p0.csv", row.names = 1)
+suz12RNA= read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/suz12__vs__WT_0hr__alpha0.05__DE_absLFC_ge_1p0.csv", row.names = 1)
 
 #RNA coloring function for colorbrwer RdBu heatmap
-rng <- c(-2.67, 2.67)
-pal  <- colorRampPalette(rev(brewer.pal(7, "RdBu")))(100)  # includes white in the middle
-vals <- seq(rng[1], rng[2], length.out = length(pal))
-rna_col_fun <- colorRamp2(vals, pal)
+# rng <- c(-2.67, 2.67)
+# pal  <- colorRampPalette(rev(brewer.pal(7, "RdBu")))(100)  # includes white in the middle
+# vals <- seq(rng[1], rng[2], length.out = length(pal))
+# rna_col_fun <- colorRamp2(vals, pal)
 
 #Plot heatmap with ChIP & RNA-seq log2FC
 
@@ -2429,42 +2426,40 @@ out <- make_chip_rna_heatmap_simple(
 ##vInput
 out <- make_chip_rna_heatmap_simple(
   chip_list = list(
-    K27 = H3K27me3_CS_Results_K27promTSS_vInput,
-    K36 = H3K36me3_Results_K27promTSS_vInput
+    K27 = H3K27me3_Results_K27promTSSext_vInput
   ),
   chip_cols_list = list(
-    K27 = c("logFC_cac1","logFC_cac2","logFC_ash1"),
-    K36 = c("logFC_cac1","logFC_cac2","logFC_set7")
+    K27 = c("logFC_WT_0hr","logFC_qa_4hr","logFC_qa_24hr")
   ),
-  rna_list  = list(cac1 = cac1RNA, cac2 = cac2RNA, set7 = set7RNA, ash1 = ash1RNA),
+  rna_list  = list(zerohr = qa_0hr_RNA, twofourhr = qa_24hr_RNA),
   gene_col  = "gene_id",
   manual_clusters = list(
-    K36_lost       = K36lost,
-    K27_lost_only  = K27lost_only
+    genes_early = genes_early,
+    genes_late  = genes_late,
+    genes_unrecovered_hmap = genes_unrecovered_hmap
   ),
-  manual_labels = c("K36 lost","K27 lost only","K27+K36 retain"),
+  manual_labels = c("early recovered","late recovered","unrecovered"),
   manual_sort = list(
-    "K36 lost"       = list(on="chip", chip="K27", strains=c("cac1","cac2"), decreasing=TRUE),
-    "K27 lost only"  = list(on="chip", chip="K27", strains=c("cac1","cac2"), decreasing=TRUE)
+    "early recovered" = list(on="rna", strains=c("zerohr","twofourhr"), decreasing=FALSE),
+    "late recovered"  = list(on="rna", strains=c("zerohr", "twofourhr"), decreasing=FALSE),
+    "unrecovered" = list(on="rna", strains=c("zerohr", "twofourhr"), decreasing=FALSE)
   ),
   manual_keep_unassigned = FALSE,  
   chip_colors_list = list(
-    K27 = c("white","#00441B"),
-    K36 = c("white","#a65628")
+    K27 = c("white","#00441B")
   ),
   chip_limits_list = list(
-    K27 = c(0, 5),
-    K36 = c(0, 2)
+    K27 = c(0, 5)
   ),
-  chip_zero_band = 0,
+  chip_zero_band = 1,
   rna_limits = c(-8,8),
-  rna_zero_band = 1.5,
+  rna_zero_band = 1,
   rna_colors = c("blue","white","red"),
   row_gaps_mm = 0,
   out_dir = "csaw_heatmaps",
-  file_prefix = "K27_K36_RNA_TEST",
+  file_prefix = "qa_RNA_test",
   save_formats = c("pdf","png"),
-  width_in = 12,
+  width_in = 9,
   dpi = 300,
   write_plotted_rows = TRUE
 )
@@ -3691,6 +3686,8 @@ genes_late = H3K27me3_Results_K27promTSSext_vInput %>%
   filter(if_any(all_of(c(18, 21, 24)), ~ coalesce(.x > 1, FALSE)))
 genes_late = subset(genes_late, (genes_late$FDR_qa_24hr < 0.05 | genes_late$FDR_qa_12hr < 0.05 | genes_late$FDR_qa_8hr < 0.05) & ! genes_late$gene_id %in% genes_early$gene_id) 
 
+genes_unrecovered_hmap = subset(H3K27me3_Results_K27promTSSext_vInput, ! H3K27me3_Results_K27promTSSext_vInput$gene_id %in% genes_early$gene_id & ! H3K27me3_Results_K27promTSSext_vInput$gene_id %in% genes_late$gene_id)
+
 #Making files for bed output
 genes_early_BED = subset(regions$K27genes, regions$K27genes$gene_id %in% genes_early$gene_id)
 genes_late_BED = subset(regions$K27genes, regions$K27genes$gene_id %in% genes_late$gene_id)
@@ -3705,36 +3702,64 @@ write.table(genes_unrecovered, file = "unrecovered_genes.bed", sep = "\t", quote
 ###I want to know what genes are located within ectopic peaks
 
 #First, determine ectopic peaks that are significantly enriched
-ectopic_sig = subset(H3K27me3_Results_K27peaks_ectopic_vWT_0hr, H3K27me3_Results_K27peaks_ectopic_vWT_0hr$logFC_qa_24hr > 1 & H3K27me3_Results_K27peaks_ectopic_vWT_0hr$FDR_qa_24hr < 0.05 & H3K27me3_Results_K27peaks_ectopic_vInput$logFC_WT_24hr < 1 & H3K27me3_Results_K27peaks_ectopic_vInput$logFC_WT_0hr < 1 )
 
-#now subsetting genes
-library(data.table)
+###MIGHT BE GOOD TO DO TO SUPPORT PEAK CALLING< BUT SKIPPING FOR NOW
 
-# --- 1) Start from your data.frames ---
-g <- as.data.table(regions$allgenes_promTSSext)   # genes (keep all original cols)
-p <- as.data.table(ectopic_sig)                   # peaks
+#ectopic_sig = subset(H3K27me3_Results_K27peaks_ectopic_vWT_0hr, H3K27me3_Results_K27peaks_ectopic_vWT_0hr$logFC_qa_24hr > 1 & H3K27me3_Results_K27peaks_ectopic_vWT_0hr$FDR_qa_24hr < 0.05 & H3K27me3_Results_K27peaks_ectopic_vInput$logFC_WT_24hr < 1 & H3K27me3_Results_K27peaks_ectopic_vInput$logFC_WT_0hr < 1 )
 
-# --- 2) Add join columns required by foverlaps (start/end) WITHOUT clobbering originals
-# If your V2/V3 are BED 0-based, half-open [start, end), see BED NOTE below.
-g[, `:=`(start = V2, end = V3, row_id = .I)]      # row_id lets us restore original order
-p[, `:=`(start, end)]
+#subset genes
+# --- 0) start from your original data.frames
+genes_df <- regions$allgenes_promTSSext   # has V1,V2,V3,V6,gene_id,...
+peaks_df <- H3K27me3_Results_K27peaks_ectopic_vInput                   # has seqnames,start,end,...
 
-# Keep only needed join cols from peaks (chrom, start, end)
-p <- p[, .(seqnames, start, end)]
+# --- 1) add a stable row id so we can return rows exactly as they were
+genes_df$row_id <- seq_len(nrow(genes_df))
 
-# --- 3) Keys and overlap join (genes as x, peaks as y) ---
-setkey(g, V1, start, end)
-setkey(p, seqnames, start, end)
+# --- 2) GRanges: genes are BED-like (usually 0-based, half-open)
+genes_gr <- makeGRangesFromDataFrame(
+  genes_df,
+  seqnames.field = "V1",
+  start.field    = "V2",
+  end.field      = "V3",
+  strand.field   = "V6",
+  keep.extra.columns = TRUE,
+  starts.in.df.are.0based = TRUE
+)
 
-ov <- foverlaps(g, p, nomatch = 0L)  # returns genes+peaks columns for overlapping rows
+# --- 3) Build peaks GRanges two ways (0-based and 1-based) and choose the one that overlaps most
+peaks_gr_0 <- makeGRangesFromDataFrame(
+  peaks_df,
+  seqnames.field = "seqnames",
+  start.field    = "start",
+  end.field      = "end",
+  keep.extra.columns = FALSE,
+  starts.in.df.are.0based = TRUE
+)
+peaks_gr_1 <- makeGRangesFromDataFrame(
+  peaks_df,
+  seqnames.field = "seqnames",
+  start.field    = "start",
+  end.field      = "end",
+  keep.extra.columns = FALSE,
+  starts.in.df.are.0based = FALSE
+)
 
-# --- 4) Keep the exact, original genes rows that had ≥1 overlap ---
-keep_ids <- unique(ov$row_id)
-genes_overlapping <- g[keep_ids]               # preserves all original columns
+n0 <- length(unique(queryHits(findOverlaps(genes_gr, peaks_gr_0, ignore.strand = TRUE))))
+n1 <- length(unique(queryHits(findOverlaps(genes_gr, peaks_gr_1, ignore.strand = TRUE))))
+peaks_gr <- if (n1 >= n0) peaks_gr_1 else peaks_gr_0
+message(sprintf("Picked peaks as %s-based (overlaps: %d vs %d).", if (identical(peaks_gr, peaks_gr_1)) "1" else "0", n1, n0))
 
-# Optional: restore original row order and drop helper cols
-setorder(genes_overlapping, row_id)
-genes_overlapping[, `:=`(row_id = NULL, start = NULL, end = NULL)]
+# --- 4) ANY overlap, ignore strand; keep genes exactly as-is
+hits <- findOverlaps(genes_gr, peaks_gr, ignore.strand = TRUE, minoverlap = 1, type = "any")
+keep_ids <- mcols(genes_gr)$row_id[unique(queryHits(hits))]
+genes_overlapping <- genes_df[sort(keep_ids), ]
+
+# --- 5) drop helper column
+genes_overlapping$row_id <- NULL
+
+ectopic_genes = genes_overlapping
+ectopic_genes_BED = subset(allgenes, allgenes$V10 %in% ectopic_genes$gene_id)
+ectopic_code = subset(ectopic_genes_BED, ectopic_genes$gene_id %in% rownames(allDataTPM))
 
 #Write bed file
 write.table(genes_overlapping, file = "ectopic_qa_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
