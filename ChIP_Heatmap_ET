@@ -95,7 +95,7 @@ computeMatrix scale-regions -a 500 -b 500 \
     $P148DIR/148-143_ChIP_qa-suz12_24hr_H3K4me2_Rep1_S167.bin_25.smooth_75Bulk.bw \
     -R $QABED/early_recovered_genes.bed $QABED/late_recovered_genes.bed $QABED/unrecovered_genes.bed --skipZeros --missingDataAsZero -o qa_genes_K4.gz
 
-    plotHeatmap -m qa_genes_K4.gz -out qa-suz12_ectopic_genes_K4.pdf \
+    plotHeatmap -m qa_genes_K4.gz -out qa-suz12_recover_genes_K4.pdf \
                --samplesLabel WT_0hr qa_0hr qa_24hr \
                --startLabel "5'" \
          			 --endLabel "3'" \
@@ -113,7 +113,7 @@ computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
     $P146DIR/146-135_ChIP_qa-suz12_24hr_H3K36me3_Rep1_S154.bin_25.smooth_75Bulk.bw \
     -R $QABED/early_recovered_genes.bed $QABED/late_recovered_genes.bed $QABED/unrecovered_genes.bed --skipZeros --missingDataAsZero -o qa_genes_K36.gz
 
-    plotHeatmap -m qa_genes_K36.gz -out qa-suz12_ectopic_genes_K36.pdf \
+    plotHeatmap -m qa_genes_K36.gz -out qa-suz12_recover_genes_K36.pdf \
                --samplesLabel WT_0hr qa_0hr qa_24hr \
                --startLabel "5'" \
          			 --endLabel "3'" \
