@@ -3447,4 +3447,12 @@ H3K27me3_GAIN_qa_24hr = subset(H3K27me3_Results_allgenes_promTSSext_vWT_0hr, H3K
 sanity = subset(H3K27me3_GAIN_qa_24hr, H3K27me3_GAIN_qa_24hr$gene_id %in% ectopic_genes$gene_id)
 sanity_genes = subset(ectopic_genes_BED, ectopic_genes_BED$V10 %in% sanity$gene_id)
 
+write.table(sanity_genes, file = "ectopic_qa_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+#Real Ectopic peaks (cut out < 0 log2FC over Input)
+ectopic_peaks = subset(H3K27me3_Results_K27peaks_ectopic_vInput, H3K27me3_Results_K27peaks_ectopic_vInput$logFC_qa_24hr > 0)
+ectopic_peaks = ectopic_peaks[,1:3]
+
+write.table(ectopic_peaks, file = "ectopic_qa_peaks.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
 ```

@@ -668,7 +668,7 @@ all(rownames(coldata) == colnames(cts_numeric))
 
 ```{r, Run DESeq analysis, echo=FALSE}
 cts_numeric_pseudo = cts_numeric + 1
-dds <- DESeqDataSetFromMatrix(countData = round(cts_numeric_pseudo),
+dds <- DESeqDataSetFromMatrix(countData = round(cts_numeric),
                               colData = coldata,
                               design = ~ condition)
 keep <- rowSums(counts(dds)) > 16
@@ -796,6 +796,21 @@ qa_0hr_K27 = subset(qa_0hr_RNA, rownames(qa_0hr_RNA) %in% Prc2targets$V10)
 WT_24hr_K27 = subset(WT_24hr_RNA, rownames(WT_24hr_RNA) %in% Prc2targets$V10)
 suz12_K27 = subset(suz12RNA, rownames(suz12RNA) %in% Prc2targets$V10)
 
+qa_24hr_K27_UP = subset(qa_24hr_K27, rownames(qa_24hr_K27) %in% rownames(qa_24hr_UP))
+qa_0hr_K27_UP = subset(qa_0hr_RNA, rownames(qa_0hr_K27) %in% rownames(qa_0hr_UP))
+WT_24hr_K27_UP = subset(WT_24hr_RNA, rownames(WT_24hr_K27) %in% rownames(WT_24hr_UP))
+suz12_K27_UP = subset(suz12RNA, rownames(suz12_K27) %in% rownames(suz12_UP))
+
+qa_24hr_all_K27 = subset(qa_24hr_RNA, rownames(qa_24hr_RNA) %in% all_qa_k27_genes$gene_id) 
+qa_0hr_all_K27 = subset(qa_0hr_RNA, rownames(qa_0hr_RNA) %in% all_qa_k27_genes$gene_id)
+WT_24hr_all_K27 = subset(WT_24hr_RNA, rownames(WT_24hr_RNA) %in% all_qa_k27_genes$gene_id)
+suz12_all_K27 = subset(suz12RNA, rownames(suz12RNA) %in% all_qa_k27_genes$gene_id)
+
+qa_24hr_all_K27_DOWN = subset(qa_24hr_all_K27, rownames(qa_24hr_all_K27) %in% rownames(qa_24hr_DOWN)) 
+qa_0hr_all_K27_DOWN = subset(qa_0hr_all_K27, rownames(qa_0hr_all_K27) %in% (qa_0hr_DOWN))
+WT_24hr_all_K27_DOWN = subset(WT_24hr_all_K27, rownames(WT_24hr_all_K27) %in% (WT_24hr_DOWN))
+suz12_all_K27_DOWN = subset(suz12_all_K27, rownames(suz12_all_K27) %in% (suz12_DOWN))
+
 qa_0hr_DOWN = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_0hr__vs__WT_0hr__alpha0.05__DOWN_results_LFC_ge_1p0.csv", row.names = 1)
 qa_24hr_DOWN = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_24hr__vs__WT_0hr__alpha0.05__DOWN_results_LFC_ge_1p0.csv", row.names = 1)
 WT_24hr_DOWN = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/WT_24hr__vs__WT_0hr__alpha0.05__DOWN_results_LFC_ge_1p0.csv", row.names = 1)
@@ -807,29 +822,35 @@ WT_24hr_UP = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/WT_24hr__vs__WT_0h
 suz12_UP = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/suz12__vs__WT_0hr__alpha0.05__UP_results_LFC_ge_1p0.csv", row.names = 1)
 
 ##########FIGURE 2###############
-#genes that dont recover K27 and are upregulated
+#late and unrecovered K27 genes upregulated in qa 24 hr
 venn.diagram(
-  x = list(genes_unrecovered$gene_id, rownames(qa_24hr_K27), rownames(WT_24hr_K27)),
-  category.names = c("H3K27me3 Unrecovered", "qa_24hr UP ", "WT_24hr UP"),
+  x = list(late_or_unrecovered$gene_id, rownames(qa_24hr_K27_UP)),
+  category.names = c("H3K27me3 Unrecovered", "qa_24hr UP "),
   filename = 'unrecovered_upregulated_genes.png',
-  col=c("#8da0cb", "#66c2a5", "#fc8d62"),
-  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
-  output=TRUE)
+  col=c("#8da0cb", "#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=FALSE)
 
+qa_WT_24hr_DOWN_fit = euler(c("A" = 262, "B" = 26, "A&B" = 45))
+qa_WT_24hr_DOWN_eulerplot <- plot(qa_WT_24hr_DOWN_fit)
+ggsave(filename = "qa_WT_24hr_DOWN.pdf", plot = qa_WT_24hr_DOWN_eulerplot, width = 4, height = 4, dpi = 600)
 ##########FIGURE 3###############
-#ecoptic K27 genes that are downregulated
-#read in DOWN genes
+#Genes that Gain H3K27me3 and are downregulated
 
 venn.diagram(
-  x = list(sanity_genes$V10, rownames(qa_24hr_DOWN)),
+  x = list(sanity_genes$V10, rownames(qa_24hr_all_K27_DOWN)),
   category.names = c("H3K27me3 Ectopic", "qa_24hr DOWN "),
   filename = 'ectopic_DOWN_24hr_genes_TEST.png',
   col=c("#8da0cb", "#66c2a5"),
   fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25)),
-  output=TRUE)
+  output=FALSE)
+
+qa_WT_24hr_DOWN_fit = euler(c("A" = 1101, "B" = 129, "A&B" = 606))
+qa_WT_24hr_DOWN_eulerplot <- plot(qa_WT_24hr_DOWN_fit)
+ggsave(filename = "qa_WT_24hr_DOWN.pdf", plot = qa_WT_24hr_DOWN_eulerplot, width = 4, height = 4, dpi = 600)
 
 #Make euler plot
-ectopic_gain_fit = euler(c("A" = 1671, "B" = 149, "A&B" = 36))
+ectopic_gain_fit = euler(c("A" = 41, "B" = 149, "A&B" = 36))
 ectopic_gain_eulerplot <- plot(ectopic_gain_fit)
 ggsave(filename = "Ectopic_K27_genes_Downregulated.pdf", plot = ectopic_gain_eulerplot, width = 4, height = 4, dpi = 600)
 
@@ -840,11 +861,52 @@ venn.diagram(
   filename = 'qa_WT_24hr_DOWN.png',
   col=c("#8da0cb","#fc8d62"),
   fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
-  output=TRUE)
+  output=FALSE)
 
 qa_WT_24hr_DOWN_fit = euler(c("A" = 1101, "B" = 129, "A&B" = 606))
 qa_WT_24hr_DOWN_eulerplot <- plot(qa_WT_24hr_DOWN_fit)
 ggsave(filename = "qa_WT_24hr_DOWN.pdf", plot = qa_WT_24hr_DOWN_eulerplot, width = 4, height = 4, dpi = 600)
+
+###############################################
+#Misc.
+#Genes Upregulated in both WT & qa 24
+venn.diagram(
+  x = list(rownames(qa_24hr_UP), rownames(WT_24hr_UP)),
+  category.names = c("qa_24hr UP", "WT_24hr UP"),
+  filename = 'qa_WT_24hr_UP.png',
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=FALSE)
+
+qa_WT_24hr_UP_fit = euler(c("A" = 1101, "B" = 129, "A&B" = 606))
+qa_WT_24hr_UP_eulerplot <- plot(qa_WT_24hr_UP_fit)
+ggsave(filename = "qa_WT_24hr_UP.pdf", plot = qa_WT_24hr_UP_eulerplot, width = 4, height = 4, dpi = 600)
+
+#Genes DE in both WT & qa 24
+venn.diagram(
+  x = list(rownames(qa_24hr_RNA), rownames(WT_24hr_RNA)),
+  category.names = c("qa_24hr DE", "WT_24hr DE"),
+  filename = 'qa_WT_24hr_DE.png',
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=FALSE)
+
+qa_WT_24hr_DE_fit = euler(c("A" = 1538, "B" = 391, "A&B" = 1301))
+qa_WT_24hr_DE_eulerplot <- plot(qa_WT_24hr_DE_fit)
+ggsave(filename = "qa_WT_24hr_DE.pdf", plot = qa_WT_24hr_DE_eulerplot, width = 4, height = 4, dpi = 600)
+
+#Genes Upregulated in both qa_suz12_0hr and suz12
+venn.diagram(
+  x = list(rownames(qa_0hr_UP), rownames(suz12_UP)),
+  category.names = c("qa_0hr UP", "suz12 UP"),
+  filename = 'qa_0hr_suz12_UP.png',
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=FALSE)
+
+qa_0hr_suz12_UP_fit = euler(c("A" = 1101, "B" = 129, "A&B" = 606))
+qa_0hr_suz12_UP_eulerplot <- plot(qa_0hr_suz12_UP_fit)
+ggsave(filename = "qa_0hr_suz12_UP.pdf", plot = qa_0hr_suz12_UP_eulerplot, width = 4, height = 4, dpi = 600)
 
 ```
 
@@ -883,71 +945,87 @@ track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", 
 write.table(track, file="RNAseq_qa-suz12_Paper_Final.igv", sep="\t", row.names = FALSE, quote = FALSE)
 ```
 
-
+###Heatmaps using DEseq nromalized counts
 ```{r,}
-## ------------------------------------------------------------------
-## 1) Get DESeq2-normalized counts from your existing dds2
-##    (these reflect size-factor normalization on your +1 counts)
-## ------------------------------------------------------------------
+library(DESeq2)
+library(pheatmap)
+library(RColorBrewer)
+library(ggplot2)
+
+# --- Required column order for plotting
+cond_order <- c("WT_0hr","WT_24hr","qa_0hr","qa_24hr")
+
+# --- Hard sanity checks
+stopifnot(all(rownames(coldata) == colnames(counts(dds2))))
+stopifnot(all(cond_order %in% as.character(coldata$condition)))
+
+## ====================== NORMALIZATION & AVERAGING ======================
+# Pull DESeq2 size-factor–normalized counts (no extra +1)
 norm_counts <- counts(dds2, normalized = TRUE)
-expr_mat    <- log2(norm_counts + 1)    # keeps your pseudocount logic for log-scale
 
-## ------------------------------------------------------------------
-## 2) Average replicates to 4 columns using coldata$condition
-##    Adjust the level names here if your coldata uses underscores.
-## ------------------------------------------------------------------
-# Ensure these are the level names you want; edit if needed:
-# levels(coldata$condition)
-# e.g., "WT_0hr","WT_24hr","qa_0hr","qa_24hr"
+# Map each column to its condition (character, not factor to avoid level order issues)
+conds <- as.character(coldata$condition)
 
-group_means <- sapply(levels(coldata$condition), function(g) {
-  rowMeans(expr_mat[, coldata$condition == g, drop = FALSE], na.rm = TRUE)
+# Average *counts* by condition in the explicit order, then log2
+group_means_counts <- sapply(cond_order, function(g) {
+  rowMeans(norm_counts[, conds == g, drop = FALSE], na.rm = TRUE)
 })
 
-# Reorder / rename to match your figure labels
-Averaged_DESeq <- cbind(
-  WT_0hr        = group_means[,"WT_0hr"],
-  WT_24hr       = group_means[,"WT_24hr"],
-  `qa_0hr`  = if ("qa_0hr" %in% colnames(group_means)) group_means[,"qa-suz12_0hr"] else group_means[,"qa_suz12_0hr"],
-  `qa_24hr` = if ("qa_24hr" %in% colnames(group_means)) group_means[,"qa-suz12_24hr"] else group_means[,"qa_suz12_24hr"]
+Averaged_DESeq_log2 <- log2(group_means_counts)         # no extra pseudocount
+# Replace -Inf/+Inf (can occur if a condition mean is exactly 0) with NA, drop later
+Averaged_DESeq_log2[!is.finite(Averaged_DESeq_log2)] <- NA
+
+## ========================== HELPER: HEATMAP ==========================
+make_rowscaled_heatmap <- function(mat_log2, out_pdf, title = NULL) {
+  # Drop rows with any NA and zero variance (prevents NaNs in clustering)
+  mat_log2 <- mat_log2[stats::complete.cases(mat_log2), , drop = FALSE]
+  if (nrow(mat_log2) == 0L) stop("No rows left after filtering (check gene IDs & zeros).")
+  nz <- apply(mat_log2, 1, stats::sd) > 0
+  mat_log2 <- mat_log2[nz, , drop = FALSE]
+
+  # Plot (row-scaled Z)
+  hm <- pheatmap::pheatmap(
+    mat_log2[, cond_order],                              # left→right: WT_0hr, WT_24hr, qa_0hr, qa_24hr
+    color = colorRampPalette(rev(brewer.pal(7, "RdBu")))(100),
+    scale = "row",
+    cluster_rows = TRUE, cluster_cols = FALSE,
+    clustering_method = "centroid", clustering_distance_cols = "euclidean",
+    show_rownames = FALSE, show_colnames = TRUE,
+    legend = TRUE, fontsize_col = 10,
+    treeheight_row = 0, treeheight_col = 5,
+    cellwidth = NA, cellheight = NA, height = 1.5, width = 2.5,
+    main = title
+  )
+  gg <- hm[[4]]
+  ggsave(out_pdf, plot = gg, dpi = 600, height = 4, width = 3)
+  invisible(hm)
+}
+
+## ========================== ECTOPIC GENE SET ==========================
+# Subset by ectopic list (gene IDs are in column 10 of sanity_genes)
+ectopic_ids <- intersect(rownames(Averaged_DESeq_log2), sanity_genes[,10])
+AVERAGE_ectopic_DESeq <- Averaged_DESeq_log2[ectopic_ids, , drop = FALSE]
+
+make_rowscaled_heatmap(
+  mat_log2 = AVERAGE_ectopic_DESeq,
+  out_pdf  = "./qa_ectopic_genes_heatmap_row_scale_DESeqNorm.pdf",
+  title    = "Ectopic H3K27me3-marked Genes (DESeq norm, row Z)"
 )
 
-## ------------------------------------------------------------------
-## 3) Subset to your ectopic genes (same list you used before)
-##    Here I assume 'sanity_genes' is already loaded and gene IDs are in column 10.
-## ------------------------------------------------------------------
-AVERAGE_ectopic_DESeq <- Averaged_DESeq[
-  rownames(Averaged_DESeq) %in% sanity_genes[,10], , drop = FALSE
-]
+## ============================ PRC2 GENE SET ===========================
+# Subset by PRC2 list (gene IDs are in column 10 of Prc2targets)
+prc2_ids <- intersect(rownames(Averaged_DESeq_log2), Prc2targets[,10])
+AVERAGE_PRC2_DESeq <- Averaged_DESeq_log2[prc2_ids, , drop = FALSE]
 
-# Optional: keep rows with any signal
-GenesWithChanges_ectopic <- AVERAGE_ectopic_DESeq[
-  rowSums(AVERAGE_ectopic_DESeq) > 0, , drop = FALSE
-]
-
-# Important: drop rows with zero variance (prevents NA/NaN in clustering)
-nz <- apply(GenesWithChanges_ectopic, 1, sd, na.rm = TRUE) > 0
-GenesWithChanges_ectopic <- GenesWithChanges_ectopic[nz, , drop = FALSE]
-
-## ------------------------------------------------------------------
-## 4) Heatmap (row-scaled Z) in your preferred column order
-## ------------------------------------------------------------------
-altorder <- c("WT_0hr","WT_24hr","qa-suz12_0hr","qa-suz12_24hr")
-
-heatmap_ectopic <- pheatmap(
-  GenesWithChanges_ectopic[, rev(altorder)],   # use rev() if it matches your panel layout
-  color = colorRampPalette(rev(brewer.pal(7, "RdBu")))(100),
-  scale = "row",
-  cluster_rows = TRUE, cluster_cols = FALSE,
-  clustering_method = "centroid", clustering_distance_cols = "euclidean",
-  show_rownames = FALSE, show_colnames = TRUE,
-  legend = TRUE, fontsize_col = 10,
-  treeheight_row = 0, treeheight_col = 5,
-  cellwidth = NA, cellheight = NA, height = 1.5, width = 2.5
+make_rowscaled_heatmap(
+  mat_log2 = AVERAGE_PRC2_DESeq,
+  out_pdf  = "./qa_PRC2_genes_heatmap_row_scale_DESeqNorm.pdf",
+  title    = "PRC2-marked Genes (DESeq norm, row Z)"
 )
 
-heatmap_ectopic_plot <- heatmap_ectopic[[4]]
-ggsave("./qa-suz12_ectopic_genes_heatmap_row_scale_DESeqNorm.pdf",
-       plot = heatmap_ectopic_plot, dpi = 600, height = 4, width = 3)
+## ============================== OPTIONAL QC ===========================
+# Size factors & quick spread check
+print(sizeFactors(dds2))
+print(apply(Averaged_DESeq_log2, 2, sd))
 
 ```
