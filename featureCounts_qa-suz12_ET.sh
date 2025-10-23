@@ -35,13 +35,13 @@ fi
 module load Subread/
 
 featureCounts -T $THREADS \
-  -p -B -C \
+  -p \
   -t exon \
   -g gene_name \
   -s 2 \
   --primary \
   -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
-  -o $OUTDIR/readcounts_qa_paper_FINAL.txt \
+  -o $OUTDIR/readcounts_qa_paper_TEST.txt \
   $BAMDIR/SRR9027658/SRR9027658_Aligned.sortedByCoord.out.bam \
   $BAMDIR/SRR9027689/SRR9027689_Aligned.sortedByCoord.out.bam \
   $BAMDIR/SRR9027759/SRR9027759_Aligned.sortedByCoord.out.bam \

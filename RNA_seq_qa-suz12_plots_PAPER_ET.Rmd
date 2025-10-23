@@ -796,6 +796,16 @@ qa_0hr_K27 = subset(qa_0hr_RNA, rownames(qa_0hr_RNA) %in% Prc2targets$V10)
 WT_24hr_K27 = subset(WT_24hr_RNA, rownames(WT_24hr_RNA) %in% Prc2targets$V10)
 suz12_K27 = subset(suz12RNA, rownames(suz12RNA) %in% Prc2targets$V10)
 
+qa_0hr_DOWN = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_0hr__vs__WT_0hr__alpha0.05__DOWN_results_LFC_ge_1p0.csv", row.names = 1)
+qa_24hr_DOWN = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_24hr__vs__WT_0hr__alpha0.05__DOWN_results_LFC_ge_1p0.csv", row.names = 1)
+WT_24hr_DOWN = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/WT_24hr__vs__WT_0hr__alpha0.05__DOWN_results_LFC_ge_1p0.csv", row.names = 1)
+suz12_DOWN = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/suz12__vs__WT_0hr__alpha0.05__DOWN_results_LFC_ge_1p0.csv", row.names = 1)
+
+qa_0hr_UP = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_0hr__vs__WT_0hr__alpha0.05__UP_results_LFC_ge_1p0.csv", row.names = 1)
+qa_24hr_UP = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_24hr__vs__WT_0hr__alpha0.05__UP_results_LFC_ge_1p0.csv", row.names = 1)
+WT_24hr_UP = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/WT_24hr__vs__WT_0hr__alpha0.05__UP_results_LFC_ge_1p0.csv", row.names = 1)
+suz12_UP = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/suz12__vs__WT_0hr__alpha0.05__UP_results_LFC_ge_1p0.csv", row.names = 1)
+
 ##########FIGURE 2###############
 #genes that dont recover K27 and are upregulated
 venn.diagram(
@@ -809,19 +819,17 @@ venn.diagram(
 ##########FIGURE 3###############
 #ecoptic K27 genes that are downregulated
 #read in DOWN genes
-qa_24hr_DOWN = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_24hr__vs__WT_0hr__alpha0.05__DOWN_results_LFC_ge_1p0.csv", row.names = 1)
-WT_24hr_DOWN = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/WT_24hr__vs__WT_0hr__alpha0.05__DOWN_results_LFC_ge_1p0.csv", row.names = 1)
 
 venn.diagram(
-  x = list(sanity_genes$V10, rownames(qa_24hr_DOWN), rownames(WT_24hr_DOWN)),
-  category.names = c("H3K27me3 Ectopic", "qa_24hr DOWN ", "WT_24hr DOWN"),
+  x = list(sanity_genes$V10, rownames(qa_24hr_DOWN)),
+  category.names = c("H3K27me3 Ectopic", "qa_24hr DOWN "),
   filename = 'ectopic_DOWN_24hr_genes_TEST.png',
-  col=c("#8da0cb", "#66c2a5", "#fc8d62"),
-  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
+  col=c("#8da0cb", "#66c2a5"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25)),
   output=TRUE)
 
 #Make euler plot
-ectopic_gain_fit = euler(c("A" = 148, "B" = 1076, "C" = 128, "A&B" = 25, "A&C" = 1, "B&C" = 595, "A&B&C" = 11))
+ectopic_gain_fit = euler(c("A" = 1671, "B" = 149, "A&B" = 36))
 ectopic_gain_eulerplot <- plot(ectopic_gain_fit)
 ggsave(filename = "Ectopic_K27_genes_Downregulated.pdf", plot = ectopic_gain_eulerplot, width = 4, height = 4, dpi = 600)
 
@@ -873,4 +881,73 @@ track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", 
 
 #write track to file
 write.table(track, file="RNAseq_qa-suz12_Paper_Final.igv", sep="\t", row.names = FALSE, quote = FALSE)
+```
+
+
+```{r,}
+## ------------------------------------------------------------------
+## 1) Get DESeq2-normalized counts from your existing dds2
+##    (these reflect size-factor normalization on your +1 counts)
+## ------------------------------------------------------------------
+norm_counts <- counts(dds2, normalized = TRUE)
+expr_mat    <- log2(norm_counts + 1)    # keeps your pseudocount logic for log-scale
+
+## ------------------------------------------------------------------
+## 2) Average replicates to 4 columns using coldata$condition
+##    Adjust the level names here if your coldata uses underscores.
+## ------------------------------------------------------------------
+# Ensure these are the level names you want; edit if needed:
+# levels(coldata$condition)
+# e.g., "WT_0hr","WT_24hr","qa_0hr","qa_24hr"
+
+group_means <- sapply(levels(coldata$condition), function(g) {
+  rowMeans(expr_mat[, coldata$condition == g, drop = FALSE], na.rm = TRUE)
+})
+
+# Reorder / rename to match your figure labels
+Averaged_DESeq <- cbind(
+  WT_0hr        = group_means[,"WT_0hr"],
+  WT_24hr       = group_means[,"WT_24hr"],
+  `qa_0hr`  = if ("qa_0hr" %in% colnames(group_means)) group_means[,"qa-suz12_0hr"] else group_means[,"qa_suz12_0hr"],
+  `qa_24hr` = if ("qa_24hr" %in% colnames(group_means)) group_means[,"qa-suz12_24hr"] else group_means[,"qa_suz12_24hr"]
+)
+
+## ------------------------------------------------------------------
+## 3) Subset to your ectopic genes (same list you used before)
+##    Here I assume 'sanity_genes' is already loaded and gene IDs are in column 10.
+## ------------------------------------------------------------------
+AVERAGE_ectopic_DESeq <- Averaged_DESeq[
+  rownames(Averaged_DESeq) %in% sanity_genes[,10], , drop = FALSE
+]
+
+# Optional: keep rows with any signal
+GenesWithChanges_ectopic <- AVERAGE_ectopic_DESeq[
+  rowSums(AVERAGE_ectopic_DESeq) > 0, , drop = FALSE
+]
+
+# Important: drop rows with zero variance (prevents NA/NaN in clustering)
+nz <- apply(GenesWithChanges_ectopic, 1, sd, na.rm = TRUE) > 0
+GenesWithChanges_ectopic <- GenesWithChanges_ectopic[nz, , drop = FALSE]
+
+## ------------------------------------------------------------------
+## 4) Heatmap (row-scaled Z) in your preferred column order
+## ------------------------------------------------------------------
+altorder <- c("WT_0hr","WT_24hr","qa-suz12_0hr","qa-suz12_24hr")
+
+heatmap_ectopic <- pheatmap(
+  GenesWithChanges_ectopic[, rev(altorder)],   # use rev() if it matches your panel layout
+  color = colorRampPalette(rev(brewer.pal(7, "RdBu")))(100),
+  scale = "row",
+  cluster_rows = TRUE, cluster_cols = FALSE,
+  clustering_method = "centroid", clustering_distance_cols = "euclidean",
+  show_rownames = FALSE, show_colnames = TRUE,
+  legend = TRUE, fontsize_col = 10,
+  treeheight_row = 0, treeheight_col = 5,
+  cellwidth = NA, cellheight = NA, height = 1.5, width = 2.5
+)
+
+heatmap_ectopic_plot <- heatmap_ectopic[[4]]
+ggsave("./qa-suz12_ectopic_genes_heatmap_row_scale_DESeqNorm.pdf",
+       plot = heatmap_ectopic_plot, dpi = 600, height = 4, width = 3)
+
 ```
