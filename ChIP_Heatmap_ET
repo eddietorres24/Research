@@ -226,6 +226,56 @@ computeMatrix scale-regions -a 500 -b 500 \
 
 ###################################################################################################################################
 
+#Look at other mutants
+#genes
+      computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
+        -S $P144DIR/144-28_ChIP_WT_0hr_H3K27me3_Rep3_S28.bin_25.smooth_75Bulk.bw \
+           $P144DIR/144-31_ChIP_qa-suz12_4hr_H3K27me3_Rep2_S31.bin_25.smooth_75Bulk.bw \
+           $P146DIR/146-40_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S40.bin_25.smooth_75Bulk.bw \
+           $MISCDIR/hpo_H3K27me3.bin_25.smooth_75Bulk.bw \
+           $MISCDIR/isw_H3K27me2me3_rep1.bin_25.smooth_75Bulk.bw \
+           $MISCDIR/h2az_H3K27me2me3_Rep2.bin_25.smooth_75Bulk.bw \
+           $MISCDIR/ash1_H3K27me2me3_Rep1.bin_25.smooth_75Bulk.bw  \
+           $P141DIR/141-91_ChIP_cac-3_H3K27me2_Rep1_S85.bin_25.smooth_75Bulk.bw  \
+        -R $QABED/early_recovered_genes.bed $QABED/late_recovered_genes.bed $QABED/unrecovered_genes.bed \
+        --skipZeros \
+        -o matrix_qa-suz12_GENES_clustered.gz
+
+      plotHeatmap -m matrix_qa-suz12_GENES_clustered.gz -out H3K27me3_GENES_qa-suz12_clustered_mutants_test.pdf \
+        --samplesLabel WT 4hr 24hr hpo isw h2az ash1 cac-3 \
+        --startLabel "5'" --endLabel "3'" \
+        --missingDataColor 1 \
+        --sortRegions descend --sortUsing sum \
+        --whatToShow "heatmap and colorbar" \
+        --colorList 'white,g,darkgreen' \
+        --zMin 0 --zMax 40 \
+
+
+#Peaks
+        computeMatrix scale-regions -a 150 -b 150 \
+          -S $P144DIR/144-28_ChIP_WT_0hr_H3K27me3_Rep3_S28.bin_25.smooth_75Bulk.bw \
+             $P144DIR/144-31_ChIP_qa-suz12_4hr_H3K27me3_Rep2_S31.bin_25.smooth_75Bulk.bw \
+             $P146DIR/146-40_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S40.bin_25.smooth_75Bulk.bw \
+             $MISCDIR/hpo_H3K27me3.bin_25.smooth_75Bulk.bw \
+             $MISCDIR/isw_H3K27me2me3_rep1.bin_25.smooth_75Bulk.bw \
+             $MISCDIR/h2az_H3K27me2me3_Rep2.bin_25.smooth_75Bulk.bw \
+             $MISCDIR/ash1_H3K27me2me3_Rep1.bin_25.smooth_75Bulk.bw  \
+             $P141DIR/141-91_ChIP_cac-3_H3K27me2_Rep1_S85.bin_25.smooth_75Bulk.bw  \
+          -R $QABED/early_recovered_peaks.bed $QABED/late_recovered_peaks.bed $QABED/unrecovered_peaks.bed \
+          --skipZeros \
+          -o matrix_qa-suz12_PEAKS_clustered.gz
+
+        plotHeatmap -m matrix_qa-suz12_PEAKS_clustered.gz -out H3K27me3_PEAKS_qa-suz12_clustered_mutants_test.pdf \
+          --samplesLabel WT 4hr 24hr hpo isw h2az ash1 cac-3 \
+          --startLabel "5'" --endLabel "3'" \
+          --missingDataColor 1 \
+          --sortRegions descend --sortUsing sum \
+          --whatToShow "heatmap and colorbar" \
+          --colorList 'white,g,darkgreen' \
+          --zMin 0 --zMax 40 \
+
+
+###############################################################################################################################################
 ###referencePoint
 # computeMatrix reference-point --referencePoint center -a 2500 -b 2500 -bs 2 --scale 0.5 \
 

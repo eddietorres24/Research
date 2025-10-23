@@ -143,12 +143,6 @@ done
 
 ###rethinking ectopic peak calls
 #going to keep all regions not overlapping WT samples and cut out small peaks (< 650 bp)
-qa-suz12_24hr_H3K27me3_Rep2_peaks_peaks.bed
-WT_24hr_H3K27me3_Rep2_peaks_peaks.bed
-
-
-
-
 
 
 #Rep1

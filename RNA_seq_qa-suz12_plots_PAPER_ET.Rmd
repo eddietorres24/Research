@@ -99,11 +99,11 @@ Prc2targets <- read.table("../bed_files/H3K27me3_methylated_genes_FINAL.bed", he
 
 ###SUBSET DATA FOR ALL KO SAMPLES
 Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,10])
-ectopicTPM <- subset(allDataTPM, rownames(allDataTPM)%in%ectopic_genes[,10])
+ectopicTPM <- subset(allDataTPM, rownames(allDataTPM)%in%sanity_genes[,10])
 
 ###SUBSET DATA FOR AVERAGED KO SAMPLES
 AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,10])
-AVERAGE_ectopicTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%ectopic_genes[,10])
+AVERAGE_ectopicTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%sanity_genes[,10])
 
 ###Subset data to filter out non-PRC2 target regions that got through (cutting out any genes over 2 tpm in WT)
 AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 10))
@@ -408,22 +408,68 @@ violin <- total2 %>%
   geom_violin(position = dodge, scale = "width", trim = FALSE) +
   stat_summary(fun = "mean", geom = "crossbar", width = 0.25, colour = "red") +
   scale_x_discrete(labels = formatted_labels) +
-  labs(
-    x = "Strain",
-    y = expression("Expression Level (log"[2]~"(TPM+1))")) +
+  scale_y_continuous(limits = c(-3, 13), breaks = seq(0, 12, 3), expand = c(0,0)) +
+  labs(x = "Strain", y = expression("Expression Level (log"[2]~"(TPM+1))")) +
   theme_classic(base_size = 20) +
-  theme(
-    axis.text.x = element_text(color = "black"),
-    axis.text.y = element_text(color = "black"),
-    axis.title.x = element_text(color = "black"),
-    axis.title.y = element_text(color = "black")
-  )
+  theme(axis.text.x = element_text(color = "black"),
+        axis.text.y = element_text(color = "black"),
+        axis.title.x = element_text(color = "black"),
+        axis.title.y = element_text(color = "black"))
+
 
 #check it
 print(violin)
 
 #save plot
-ggsave("./qa-suz12_Ectopic_Gene_expression.pdf", plot=violin, width = 8, height = 8, unit="in",  dpi=400)
+ggsave("./qa-suz12_Ectopic_Gene_expression.pdf", plot=violin, width = 8, height = 5, unit="in",  dpi=400)
+
+```
+
+#Alldata
+```{r Plotting data in Violin Plot, echo=FALSE}
+# Define factor order and formatted x-axis labels
+label_order <- c("WT_0hr", "WT_24hr", "qa-suz12_0hr", "qa-suz12_24hr")
+formatted_labels <- c(
+  "WT_0hr",
+  "WT_24hr",
+  "qa_0hr",
+  "qa_24hr"
+)
+
+#Group and summarize
+total2 <- meltedAverageAllData %>%
+  group_by(Sample)
+
+total_dist <- meltedAverageAllData %>%
+  group_by(Sample) %>%
+  summarise(num = n())
+
+#Set dodge for violin spacing
+dodge <- position_dodge(width = 1)
+
+#Build plot
+violin <- total2 %>%
+  left_join(total_dist) %>%
+  arrange(factor(Sample, levels = label_order)) %>%
+  mutate(Sample = factor(Sample, levels = label_order)) %>%
+  ggplot(aes(x = Sample, y = Count)) +
+  geom_violin(position = dodge, scale = "width", trim = FALSE) +
+  stat_summary(fun = "mean", geom = "crossbar", width = 0.25, colour = "red") +
+  scale_x_discrete(labels = formatted_labels) +
+  scale_y_continuous(limits = c(-3, 13), breaks = seq(0, 12, 3), expand = c(0,0)) +
+  labs(x = "Strain", y = expression("Expression Level (log"[2]~"(TPM+1))")) +
+  theme_classic(base_size = 20) +
+  theme(axis.text.x = element_text(color = "black"),
+        axis.text.y = element_text(color = "black"),
+        axis.title.x = element_text(color = "black"),
+        axis.title.y = element_text(color = "black"))
+
+
+#check it
+print(violin)
+
+#save plot
+ggsave("./qa-suz12_Ectopic_Gene_expression.pdf", plot=violin, width = 8, height = 5, unit="in",  dpi=400)
 
 ```
 
@@ -559,6 +605,23 @@ heatmap_ectopic <- pheatmap::pheatmap(GenesWithChanges_ectopic[,rev(altorder)], 
 
 #to plot with ggplot, you need to extract [[4]] from the heatmap object
 heatmap_ectopic_plot <- heatmap_ectopic[[4]]
+
+ggsave(filename = "./qa-suz12_ectopic_genes_heatmap_row_scale.pdf", plot = heatmap_ectopic_plot, dpi=600, height=4, width=3)
+```
+
+```{r,}
+##Keep Only Genes that are expressed in at least one sample
+GenesWithChanges_All <- subset(AVERAGE_AlldataTPM, (rowSums(allDataTPM) > 0) & (rowSums(AVERAGE_AlldataTPM) > 0))
+#CAFUpGenes <- subset(AVERAGE_CAFTPM, (rowSums(CAFUpTPM) > 0))
+
+#plot in the desired column order; did this by subsetting the dataset based on sample list 'altorder' above
+
+heatmap_all <- pheatmap::pheatmap(GenesWithChanges_All[,rev(altorder)], color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100),
+                   cellwidth = NA, cellheight = NA, scale = "row", cluster_rows = T, cluster_cols = F, clustering_method="centroid", clustering_distance_cols="euclidean",
+                   legend=T, show_rownames=F, show_colnames=T, fontsize_col=10, treeheight_row=0, treeheight_col=5, height = 1.5, width = 2.5)
+
+#to plot with ggplot, you need to extract [[4]] from the heatmap object
+heatmap_all_plot <- heatmap_all[[4]]
 
 ggsave(filename = "./qa-suz12_ectopic_genes_heatmap_row_scale.pdf", plot = heatmap_ectopic_plot, dpi=600, height=4, width=3)
 ```
@@ -733,17 +796,48 @@ qa_0hr_K27 = subset(qa_0hr_RNA, rownames(qa_0hr_RNA) %in% Prc2targets$V10)
 WT_24hr_K27 = subset(WT_24hr_RNA, rownames(WT_24hr_RNA) %in% Prc2targets$V10)
 suz12_K27 = subset(suz12RNA, rownames(suz12RNA) %in% Prc2targets$V10)
 
+##########FIGURE 2###############
+#genes that dont recover K27 and are upregulated
 venn.diagram(
-  x = list(genes_early$gene_id, rownames(qa_24hr_K27), rownames(WT_24hr_K27)),
+  x = list(genes_unrecovered$gene_id, rownames(qa_24hr_K27), rownames(WT_24hr_K27)),
   category.names = c("H3K27me3 Unrecovered", "qa_24hr UP ", "WT_24hr UP"),
   filename = 'unrecovered_upregulated_genes.png',
   col=c("#8da0cb", "#66c2a5", "#fc8d62"),
   fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
   output=TRUE)
 
-#Make euler plot inputing values gathered from venn.diagram(). This will provide a proportional venn-diagram
-CAF1_up_fit = euler(c("A" = 100, "B" = 218, "C" = 472, "A&B" = 254, "A&C" = 74, "B&C" =110, "A&B&C" = 695))
-CAF1_up_eulerplot <- plot(CAF1_up_fit)
+##########FIGURE 3###############
+#ecoptic K27 genes that are downregulated
+#read in DOWN genes
+qa_24hr_DOWN = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_24hr__vs__WT_0hr__alpha0.05__DOWN_results_LFC_ge_1p0.csv", row.names = 1)
+WT_24hr_DOWN = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/WT_24hr__vs__WT_0hr__alpha0.05__DOWN_results_LFC_ge_1p0.csv", row.names = 1)
+
+venn.diagram(
+  x = list(sanity_genes$V10, rownames(qa_24hr_DOWN), rownames(WT_24hr_DOWN)),
+  category.names = c("H3K27me3 Ectopic", "qa_24hr DOWN ", "WT_24hr DOWN"),
+  filename = 'ectopic_DOWN_24hr_genes_TEST.png',
+  col=c("#8da0cb", "#66c2a5", "#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+#Make euler plot
+ectopic_gain_fit = euler(c("A" = 148, "B" = 1076, "C" = 128, "A&B" = 25, "A&C" = 1, "B&C" = 595, "A&B&C" = 11))
+ectopic_gain_eulerplot <- plot(ectopic_gain_fit)
+ggsave(filename = "Ectopic_K27_genes_Downregulated.pdf", plot = ectopic_gain_eulerplot, width = 4, height = 4, dpi = 600)
+
+#Genes Downregulated in common b/w qa and WT 24 hours
+venn.diagram(
+  x = list(rownames(qa_24hr_DOWN), rownames(WT_24hr_DOWN)),
+  category.names = c("qa_24hr DOWN", "WT_24hr DOWN"),
+  filename = 'qa_WT_24hr_DOWN.png',
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=TRUE)
+
+qa_WT_24hr_DOWN_fit = euler(c("A" = 1101, "B" = 129, "A&B" = 606))
+qa_WT_24hr_DOWN_eulerplot <- plot(qa_WT_24hr_DOWN_fit)
+ggsave(filename = "qa_WT_24hr_DOWN.pdf", plot = qa_WT_24hr_DOWN_eulerplot, width = 4, height = 4, dpi = 600)
+
 ```
 
 #Lastly, I want to make an IGV track for visualizing DE data with ChIP data

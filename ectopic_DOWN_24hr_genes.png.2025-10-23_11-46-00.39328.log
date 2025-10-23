@@ -1,0 +1,19 @@
+INFO [2025-10-23 11:46:00] $x
+INFO [2025-10-23 11:46:00] list(H3K27me3_GAIN_qa_24hr$gene_id, rownames(qa_24hr_DOWN), rownames(WT_24hr_DOWN))
+INFO [2025-10-23 11:46:00] 
+INFO [2025-10-23 11:46:00] $category.names
+INFO [2025-10-23 11:46:00] c("H3K27me3 Ectopic", "qa_24hr DOWN ", "WT_24hr DOWN")
+INFO [2025-10-23 11:46:00] 
+INFO [2025-10-23 11:46:00] $filename
+INFO [2025-10-23 11:46:00] [1] "ectopic_DOWN_24hr_genes.png"
+INFO [2025-10-23 11:46:00] 
+INFO [2025-10-23 11:46:00] $col
+INFO [2025-10-23 11:46:00] c("#8da0cb", "#66c2a5", "#fc8d62")
+INFO [2025-10-23 11:46:00] 
+INFO [2025-10-23 11:46:00] $fill
+INFO [2025-10-23 11:46:00] c(alpha("#8da0cb", 0.25), alpha("#66c2a5", 0.25), alpha("#fc8d62", 
+INFO [2025-10-23 11:46:00]     0.25))
+INFO [2025-10-23 11:46:00] 
+INFO [2025-10-23 11:46:00] $output
+INFO [2025-10-23 11:46:00] [1] TRUE
+INFO [2025-10-23 11:46:00] 
