@@ -272,7 +272,7 @@ module load deepTools
           --sortRegions descend --sortUsing sum \
           --whatToShow "heatmap and colorbar" \
           --colorList 'white,g,darkgreen' \
-          --zMin 0 --zMax 40 \
+          --zMin 0 --zMax 30 \
 
 
 ###############################################################################################################################################
