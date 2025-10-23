@@ -152,9 +152,9 @@ computeMatrix scale-regions -a 150 -b 150 --scale 2 \
 #ectopic genes
 #K27
 computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
- -S $P148DIR/148-102_ChIP_WT_H3K27me3_Rep3_S126.bin_25.smooth_75Bulk.bw \
+ -S $P137DIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
-    $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
+    $P137DIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
     -R $QABED/ectopic_qa_genes.bed --skipZeros --missingDataAsZero -o qa_ectopic_genes_K27.gz
 
@@ -168,7 +168,6 @@ computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
                --sortRegions descend \
                --colorList 'white, g, darkgreen' \
                --zMin 0 \
-               --zMax 20
 
 #RNA
 computeMatrix scale-regions -a 150 -b 150 --scale 2 \
