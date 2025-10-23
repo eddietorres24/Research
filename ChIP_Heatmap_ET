@@ -109,12 +109,13 @@ computeMatrix scale-regions -a 500 -b 500 \
 #K36
 computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
  -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
+    $P138DIR/138-62_ChIP_WT_H3K36me3_Rep2_6252_S61.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-131_ChIP_qa-suz12_0hr_H3K36me3_Rep1_S150.bin_25.smooth_75Bulk.bw \
     $P146DIR/146-135_ChIP_qa-suz12_24hr_H3K36me3_Rep1_S154.bin_25.smooth_75Bulk.bw \
     -R $QABED/early_recovered_genes.bed $QABED/late_recovered_genes.bed $QABED/unrecovered_genes.bed --skipZeros --missingDataAsZero -o qa_genes_K36.gz
 
     plotHeatmap -m qa_genes_K36.gz -out qa-suz12_recover_genes_K36.pdf \
-               --samplesLabel WT_0hr qa_0hr qa_24hr \
+               --samplesLabel WT_0hr WT_0hr_2 qa_0hr qa_24hr \
                --startLabel "5'" \
          			 --endLabel "3'" \
                --missingDataColor 1 \
@@ -134,7 +135,7 @@ computeMatrix scale-regions -a 150 -b 150 --scale 2 \
     -R $QABED/early_recovered_genes.bed $QABED/late_recovered_genes.bed $QABED/unrecovered_genes.bed --skipZeros --missingDataAsZero -o qa_genes_RNA.gz
 
     plotHeatmap -m qa_genes_RNA.gz -out qa-suz12_recover_genes_clustered_RNA.pdf \
-               --samplesLabel WT_0hr WT_24hr qa_4hr qa_24hr \
+               --samplesLabel WT_0hr WT_24hr qa_0hr qa_24hr \
                --startLabel "5'" \
          			 --endLabel "3'" \
                --missingDataColor 1 \
@@ -157,7 +158,7 @@ computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
     -R $QABED/ectopic_qa_genes.bed --skipZeros --missingDataAsZero -o qa_ectopic_genes_K27.gz
 
-    plotHeatmap -m qa_ectopic_genes_K27.gz -out qqa-suz12_ectopic_genes_K27.pdf \
+    plotHeatmap -m qa_ectopic_genes_K27.gz -out qa-suz12_ectopic_genes_K27.pdf \
                --samplesLabel WT_0hr WT_24hr qa_0hr qa_24hr \
                --startLabel "5'" \
          			 --endLabel "3'" \
@@ -167,7 +168,7 @@ computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
                --sortRegions descend \
                --colorList 'white, g, darkgreen' \
                --zMin 0 \
-               --zMax 50
+               --zMax 20
 
 #RNA
 computeMatrix scale-regions -a 150 -b 150 --scale 2 \
@@ -223,7 +224,7 @@ computeMatrix scale-regions -a 500 -b 500 \
                --sortUsing sum \
                --sortRegions descend \
                --colorList 'white, violet, magenta' \
-               --zMin 0 --zMax 9
+               --zMin 0 --zMax 8
 
 ###################################################################################################################################
 
