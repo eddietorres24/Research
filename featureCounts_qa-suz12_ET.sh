@@ -54,10 +54,9 @@ featureCounts -T $THREADS \
   $B149DIR/149-91_RNA_qa-suz12__Rep2_S91/149-91_RNA_qa-suz12__Rep2_S91_Aligned.sortedByCoord.out.bam \
   $B150DIR/150-111_RNA_qa_0hr__Rep4_S126/150-111_RNA_qa_0hr__Rep4_S126_Aligned.sortedByCoord.out.bam \
   $B150DIR/150-112_RNA_qa_0hr__Rep5_S127/150-112_RNA_qa_0hr__Rep5_S127_Aligned.sortedByCoord.out.bam \
-  $B150DIR/150-113_RNA_qa_24hr__Rep4_S128/150-113_RNA_qa_24hr__Rep4_S128_Aligned.sortedByCoord.out.bam \
+  $B149DIR/149-95_RNA_qa-suz12_24hrqa__Rep3_S95/149-95_RNA_qa-suz12_24hrqa__Rep3_S95_Aligned.sortedByCoord.out.bam \
   $B150DIR/150-114_RNA_qa_24hr__Rep5_S129/150-114_RNA_qa_24hr__Rep5_S129_Aligned.sortedByCoord.out.bam \
   $B150DIR/150-115_RNA_qa_24hr__Rep6_S130/150-115_RNA_qa_24hr__Rep6_S130_Aligned.sortedByCoord.out.bam
-
 
 ###NOTE: 149-87 is actually 0 hr 149-84 is actually 24 hr
 
