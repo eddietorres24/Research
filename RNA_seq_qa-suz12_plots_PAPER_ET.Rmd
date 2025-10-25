@@ -41,7 +41,7 @@ knitr::opts_knit$set(root.dir = "workingdir")
 ```{r, data processing}
 #Bring in table with unnormalized transcription counts; check.names is important if you have dashes in the gene names 
 #row.names=1 command sets geneIDs as the row name
-countdataInteractors <- read.table("../text_files/readcounts_qa_paper_FINAL.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
+countdataInteractors <- read.table("../text_files/readcounts_qa_paper_TEST.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
 #countdataInteractors_final = cbind(countdataInteractors, countdataInteractors_ash3[,6:7])
 #countdataInteractors <- data.matrix(countdataInteractors_final)
 
@@ -197,7 +197,7 @@ box <- ggplot(df, aes(x = Count, y = Sample, fill = Sample)) +
 
 print(box)
 
-ggsave(filename = "histone_chaperone_boxplot_PAPER_DELETE.pdf", plot = box, dpi = 600, height = 5.5, width = 9)
+ggsave(filename = "qa-suz12_PRC2_genes.pdf", plot = box, dpi = 600, height = 5.5, width = 9)
 ```
 
 #################################################################
@@ -505,89 +505,6 @@ heatmap_plot <- heatmap1[[4]]
 ggsave(filename = "./qa-suz12_log2_prc2_genes_heatmap_rowscale_TEST.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
 #dev.off()
 
-#extracting genes not re-repressed
-# Simple (assumes numeric)
-# n <- ncol(GenesWithChanges)
-# keep <- GenesWithChanges[, n-1] > GenesWithChanges[, 1] &
-#         GenesWithChanges[, n]   > GenesWithChanges[, 1]
-# Genes_subset <- GenesWithChanges[keep, , drop = FALSE]
-
-#####################################################################################################
-###Reclustering heatmap to split into genes groups recovered vs unrecovered and replotting.
-
-
-# --- Inputs from earlier steps ---
-# GenesWithChanges: matrix/data.frame with rows = genes (rownames), cols = samples
-# altorder: desired column order
-# early, late, unrec: character vectors of gene_ids per group (already intersected with rownames)
-
-# 1) subset & column order
-mat <- GenesWithChanges[c(early, late, unrec), rev(altorder), drop = FALSE]
-
-# 2) GLOBAL row scaling (same for all groups)
-mat_z <- t(scale(t(as.matrix(mat))))
-mat_z[is.na(mat_z)] <- 0  # if any constant rows
-
-# 3) Cluster **within each group** on the same global z-scores
-ord_early <- if (length(early)) {
-  e <- mat_z[early, , drop = FALSE]
-  rownames(e)[order.dendrogram(as.dendrogram(hclust(dist(e), method = "average")))]
-} else character(0)
-
-ord_late <- if (length(late)) {
-  l <- mat_z[late, , drop = FALSE]
-  rownames(l)[order.dendrogram(as.dendrogram(hclust(dist(l), method = "average")))]
-} else character(0)
-
-ord_unrec <- if (length(unrec)) {
-  u <- mat_z[unrec, , drop = FALSE]
-  rownames(u)[order.dendrogram(as.dendrogram(hclust(dist(u), method = "average")))]
-} else character(0)
-
-row_order <- c(ord_early, ord_late, ord_unrec)
-
-# 4) Reorder matrix by that within-group clustering order
-mat_z_ord <- mat_z[row_order, , drop = FALSE]
-
-# 5) Annotation + visible gaps
-ann_row <- data.frame(
-  Cluster = factor(
-    c(rep("Early recovered", length(ord_early)),
-      rep("Late recovered",  length(ord_late)),
-      rep("Unrecovered",     length(ord_unrec))),
-    levels = c("Early recovered","Late recovered","Unrecovered")
-  )
-)
-rownames(ann_row) <- row_order
-
-gaps <- c(length(ord_early), length(ord_early) + length(ord_late))
-
-# 6) pheatmap (no dendrogram, global colors)
-lims <- quantile(mat_z_ord, c(0.01, 0.99), na.rm = TRUE)
-lim  <- max(abs(lims))
-cols <- colorRampPalette(rev(brewer.pal(7, "RdBu")))(100)
-
-ph <- pheatmap::pheatmap(
-  mat_z_ord,
-  color = cols,
-  breaks = seq(-lim, lim, length.out = 101),
-  cluster_rows = FALSE,
-  cluster_cols = FALSE,
-  show_rownames = FALSE,
-  show_colnames = TRUE,
-  fontsize_col = 10,
-  gaps_row = gaps,
-  annotation_row = ann_row,
-  border_color = NA,
-  legend = FALSE,              # <-- hide colorbar legend
-  annotation_legend = FALSE    # <-- hide annotation legend
-)
-
-# Knit-friendly export
-heat_save <- ph[[4]]
-
-ggsave(filename = "./qa-suz12_log2_prc2_genes_heatmap_recovery_clustered.pdf", plot = heat_save, dpi=600, height=4, width=3)
-
 ```
 
 ################################################################################
@@ -668,7 +585,7 @@ all(rownames(coldata) == colnames(cts_numeric))
 
 ```{r, Run DESeq analysis, echo=FALSE}
 cts_numeric_pseudo = cts_numeric + 1
-dds <- DESeqDataSetFromMatrix(countData = round(cts_numeric),
+dds <- DESeqDataSetFromMatrix(countData = round(cts_numeric_pseudo),
                               colData = coldata,
                               design = ~ condition)
 keep <- rowSums(counts(dds)) > 16
@@ -791,26 +708,6 @@ qa_24hr_RNA= read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_24hr__vs__WT_0h
 WT_24hr_RNA= read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/WT_24hr__vs__WT_0hr__alpha0.05__DE_absLFC_ge_1p0.csv", row.names = 1)
 suz12RNA= read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/suz12__vs__WT_0hr__alpha0.05__DE_absLFC_ge_1p0.csv", row.names = 1)
 
-qa_24hr_K27 = subset(qa_24hr_RNA, rownames(qa_24hr_RNA) %in% Prc2targets$V10) 
-qa_0hr_K27 = subset(qa_0hr_RNA, rownames(qa_0hr_RNA) %in% Prc2targets$V10)
-WT_24hr_K27 = subset(WT_24hr_RNA, rownames(WT_24hr_RNA) %in% Prc2targets$V10)
-suz12_K27 = subset(suz12RNA, rownames(suz12RNA) %in% Prc2targets$V10)
-
-qa_24hr_K27_UP = subset(qa_24hr_K27, rownames(qa_24hr_K27) %in% rownames(qa_24hr_UP))
-qa_0hr_K27_UP = subset(qa_0hr_RNA, rownames(qa_0hr_K27) %in% rownames(qa_0hr_UP))
-WT_24hr_K27_UP = subset(WT_24hr_RNA, rownames(WT_24hr_K27) %in% rownames(WT_24hr_UP))
-suz12_K27_UP = subset(suz12RNA, rownames(suz12_K27) %in% rownames(suz12_UP))
-
-qa_24hr_all_K27 = subset(qa_24hr_RNA, rownames(qa_24hr_RNA) %in% all_qa_k27_genes$gene_id) 
-qa_0hr_all_K27 = subset(qa_0hr_RNA, rownames(qa_0hr_RNA) %in% all_qa_k27_genes$gene_id)
-WT_24hr_all_K27 = subset(WT_24hr_RNA, rownames(WT_24hr_RNA) %in% all_qa_k27_genes$gene_id)
-suz12_all_K27 = subset(suz12RNA, rownames(suz12RNA) %in% all_qa_k27_genes$gene_id)
-
-qa_24hr_all_K27_DOWN = subset(qa_24hr_all_K27, rownames(qa_24hr_all_K27) %in% rownames(qa_24hr_DOWN)) 
-qa_0hr_all_K27_DOWN = subset(qa_0hr_all_K27, rownames(qa_0hr_all_K27) %in% (qa_0hr_DOWN))
-WT_24hr_all_K27_DOWN = subset(WT_24hr_all_K27, rownames(WT_24hr_all_K27) %in% (WT_24hr_DOWN))
-suz12_all_K27_DOWN = subset(suz12_all_K27, rownames(suz12_all_K27) %in% (suz12_DOWN))
-
 qa_0hr_DOWN = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_0hr__vs__WT_0hr__alpha0.05__DOWN_results_LFC_ge_1p0.csv", row.names = 1)
 qa_24hr_DOWN = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_24hr__vs__WT_0hr__alpha0.05__DOWN_results_LFC_ge_1p0.csv", row.names = 1)
 WT_24hr_DOWN = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/WT_24hr__vs__WT_0hr__alpha0.05__DOWN_results_LFC_ge_1p0.csv", row.names = 1)
@@ -821,33 +718,55 @@ qa_24hr_UP = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/qa_24hr__vs__WT_0h
 WT_24hr_UP = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/WT_24hr__vs__WT_0hr__alpha0.05__UP_results_LFC_ge_1p0.csv", row.names = 1)
 suz12_UP = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/suz12__vs__WT_0hr__alpha0.05__UP_results_LFC_ge_1p0.csv", row.names = 1)
 
+qa_24hr_K27 = subset(qa_24hr_RNA, rownames(qa_24hr_RNA) %in% Prc2targets$V10) 
+qa_0hr_K27 = subset(qa_0hr_RNA, rownames(qa_0hr_RNA) %in% Prc2targets$V10)
+WT_24hr_K27 = subset(WT_24hr_RNA, rownames(WT_24hr_RNA) %in% Prc2targets$V10)
+suz12_K27 = subset(suz12RNA, rownames(suz12RNA) %in% Prc2targets$V10)
+
+qa_24hr_all_K27 = subset(qa_24hr_RNA, rownames(qa_24hr_RNA) %in% all_qa_k27_genes$gene_id) 
+qa_0hr_all_K27 = subset(qa_0hr_RNA, rownames(qa_0hr_RNA) %in% all_qa_k27_genes$gene_id)
+WT_24hr_all_K27 = subset(WT_24hr_RNA, rownames(WT_24hr_RNA) %in% all_qa_k27_genes$gene_id)
+suz12_all_K27 = subset(suz12RNA, rownames(suz12RNA) %in% all_qa_k27_genes$gene_id)
+
+qa_24hr_K27_UP = subset(qa_24hr_K27, rownames(qa_24hr_K27) %in% rownames(qa_24hr_UP))
+qa_0hr_K27_UP = subset(qa_0hr_K27, rownames(qa_0hr_K27) %in% rownames(qa_0hr_UP))
+WT_24hr_K27_UP = subset(WT_24hr_K27, rownames(WT_24hr_K27) %in% rownames(WT_24hr_UP))
+suz12_K27_UP = subset(suz12_K27, rownames(suz12_K27) %in% rownames(suz12_UP))
+
+qa_24hr_all_K27_DOWN = subset(qa_24hr_all_K27, rownames(qa_24hr_all_K27) %in% rownames(qa_24hr_DOWN)) 
+qa_0hr_all_K27_DOWN = subset(qa_0hr_all_K27, rownames(qa_0hr_all_K27) %in% rownames(qa_0hr_DOWN))
+WT_24hr_all_K27_DOWN = subset(WT_24hr_all_K27, rownames(WT_24hr_all_K27) %in% rownames(WT_24hr_DOWN))
+suz12_all_K27_DOWN = subset(suz12_all_K27, rownames(suz12_all_K27) %in% rownames(suz12_DOWN))
+
+
+
 ##########FIGURE 2###############
 #late and unrecovered K27 genes upregulated in qa 24 hr
 venn.diagram(
   x = list(late_or_unrecovered$gene_id, rownames(qa_24hr_K27_UP)),
-  category.names = c("H3K27me3 Unrecovered", "qa_24hr UP "),
+  category.names = c("H3K27me3 Lost", "qa 24hr UP"),
   filename = 'unrecovered_upregulated_genes.png',
   col=c("#8da0cb", "#fc8d62"),
   fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
   output=FALSE)
 
-qa_WT_24hr_DOWN_fit = euler(c("A" = 262, "B" = 26, "A&B" = 45))
+qa_WT_24hr_DOWN_fit = euler(c("A" = 264, "B" = 27, "A&B" = 43))
 qa_WT_24hr_DOWN_eulerplot <- plot(qa_WT_24hr_DOWN_fit)
-ggsave(filename = "qa_WT_24hr_DOWN.pdf", plot = qa_WT_24hr_DOWN_eulerplot, width = 4, height = 4, dpi = 600)
+ggsave(filename = "K27_LOSS_qa_24hr_UP.pdf", plot = qa_WT_24hr_DOWN_eulerplot, width = 4, height = 4, dpi = 600)
 ##########FIGURE 3###############
 #Genes that Gain H3K27me3 and are downregulated
 
 venn.diagram(
-  x = list(sanity_genes$V10, rownames(qa_24hr_all_K27_DOWN)),
-  category.names = c("H3K27me3 Ectopic", "qa_24hr DOWN "),
+  x = list(sanity_genes$V10, rownames(qa_24hr_all_K27_DOWN), rownames(WT_24hr_all_K27_DOWN)),
+  category.names = c("H3K27me3 Gained", "qa 24hr DOWN", "WT 24hr DOWN"),
   filename = 'ectopic_DOWN_24hr_genes_TEST.png',
-  col=c("#8da0cb", "#66c2a5"),
-  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25)),
+  col=c("#8da0cb", "#66c2a5", "#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
   output=FALSE)
 
-qa_WT_24hr_DOWN_fit = euler(c("A" = 1101, "B" = 129, "A&B" = 606))
+qa_WT_24hr_DOWN_fit = euler(c("A" = 200, "B" = 14, "C" = 10, "A&B" = 23, "A&C" = 1, "B&C" = 12, "A&B&C" = 14))
 qa_WT_24hr_DOWN_eulerplot <- plot(qa_WT_24hr_DOWN_fit)
-ggsave(filename = "qa_WT_24hr_DOWN.pdf", plot = qa_WT_24hr_DOWN_eulerplot, width = 4, height = 4, dpi = 600)
+ggsave(filename = "K27_GAIN_qa_WT_24hr_DOWN.pdf", plot = qa_WT_24hr_DOWN_eulerplot, width = 4, height = 4, dpi = 600)
 
 #Make euler plot
 ectopic_gain_fit = euler(c("A" = 41, "B" = 149, "A&B" = 36))
@@ -944,6 +863,7 @@ track = combine %>% select("SequenceID", "FeatureStart", "FeatureEnd", "VALUE", 
 #write track to file
 write.table(track, file="RNAseq_qa-suz12_Paper_Final.igv", sep="\t", row.names = FALSE, quote = FALSE)
 ```
+
 
 ###Heatmaps using DEseq nromalized counts
 ```{r,}
