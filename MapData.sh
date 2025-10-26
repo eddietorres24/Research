@@ -16,7 +16,7 @@ source config.txt
 ###ADD a source file with path to FastqFiles
 #variables imported from submission script
 fastqPath="/scratch/evt82290/FastqFiles/misc_data"
-accession="eed_comp_Courtney_2020"
+# accession="eed_comp_Courtney_2020"
 outdir="/scratch/evt82290/MappingOutputs/misc_data"
 
 # #if output directory doesn't exist, create it
@@ -32,9 +32,9 @@ fi
 
 ###################################
 #input file variables
-# read1="${fastqPath}/${accession}*_R1_001.fastq.gz"
-# read2="${fastqPath}/${accession}*_R2_001.fastq.gz"
-read1="${fastqPath}/${accession}.fastq.gz"
+read1="${fastqPath}/${accession}*_R1_001.fastq.gz"
+read2="${fastqPath}/${accession}*_R2_001.fastq.gz"
+# read1="${fastqPath}/${accession}.fastq.gz"
 # read2="${fastqPath}/${accession}_2.fastq.gz"
 
 #make output file folders
@@ -72,9 +72,9 @@ name=${bam/*.fq.gz/}
 #################
 	  ml Trim_Galore/0.6.10-GCCcore-12.3.0
 
-	  # trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
+	  trim_galore --illumina --fastqc --paired --length 25 --basename ${accession} --gzip -o $trimmed $read1 $read2
 
-    trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $read1
+    # trim_galore --illumina --fastqc --length 25 --basename ${accession} --gzip -o $trimmed $read1
 
 	  wait
 
