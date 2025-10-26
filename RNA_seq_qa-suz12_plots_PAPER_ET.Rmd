@@ -99,11 +99,11 @@ Prc2targets <- read.table("../bed_files/H3K27me3_methylated_genes_FINAL.bed", he
 
 ###SUBSET DATA FOR ALL KO SAMPLES
 Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,10])
-ectopicTPM <- subset(allDataTPM, rownames(allDataTPM)%in%sanity_genes[,10])
+ectopicTPM <- subset(allDataTPM, rownames(allDataTPM)%in%ectopic_genes[,10])
 
 ###SUBSET DATA FOR AVERAGED KO SAMPLES
 AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,10])
-AVERAGE_ectopicTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%sanity_genes[,10])
+AVERAGE_ectopicTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%ectopic_genes[,10])
 
 ###Subset data to filter out non-PRC2 target regions that got through (cutting out any genes over 2 tpm in WT)
 AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 10))
@@ -408,7 +408,7 @@ violin <- total2 %>%
   geom_violin(position = dodge, scale = "width", trim = FALSE) +
   stat_summary(fun = "mean", geom = "crossbar", width = 0.25, colour = "red") +
   scale_x_discrete(labels = formatted_labels) +
-  scale_y_continuous(limits = c(-3, 13), breaks = seq(0, 12, 3), expand = c(0,0)) +
+  scale_y_continuous(limits = c(-2.75, 15), breaks = seq(0, 15, 3), expand = c(0,0)) +
   labs(x = "Strain", y = expression("Expression Level (log"[2]~"(TPM+1))")) +
   theme_classic(base_size = 20) +
   theme(axis.text.x = element_text(color = "black"),
@@ -504,6 +504,92 @@ heatmap_plot <- heatmap1[[4]]
 
 ggsave(filename = "./qa-suz12_log2_prc2_genes_heatmap_rowscale_TEST.pdf", plot = heatmap_plot, dpi=600, height=4, width=3)
 #dev.off()
+
+```
+
+``` {r, clustered heatmap}
+
+early_ids <- unique(genes_early_BED$gene_id)
+late_ids  <- unique(genes_late_BED$gene_id)
+unrec_ids <- unique(genes_unrecovered$gene_id)
+
+## Genes present in GenesWithChanges
+all_ids <- rownames(GenesWithChanges)
+
+early <- intersect(all_ids, early_ids)
+late  <- setdiff(intersect(all_ids, late_ids), early)
+unrec <- setdiff(intersect(all_ids, unrec_ids), c(early, late))
+
+## order: Early, Late, Unrecovered
+ordered_ids <- c(early, late, unrec)
+
+# 1) subset & column order
+mat <- GenesWithChanges[c(early, late, unrec), rev(altorder), drop = FALSE]
+
+# 2) GLOBAL row scaling (same for all groups)
+mat_z <- t(scale(t(as.matrix(mat))))
+mat_z[is.na(mat_z)] <- 0  # if any constant rows
+
+# 3) Cluster **within each group** on the same global z-scores
+ord_early <- if (length(early)) {
+  e <- mat_z[early, , drop = FALSE]
+  rownames(e)[order.dendrogram(as.dendrogram(hclust(dist(e), method = "average")))]
+} else character(0)
+
+ord_late <- if (length(late)) {
+  l <- mat_z[late, , drop = FALSE]
+  rownames(l)[order.dendrogram(as.dendrogram(hclust(dist(l), method = "average")))]
+} else character(0)
+
+ord_unrec <- if (length(unrec)) {
+  u <- mat_z[unrec, , drop = FALSE]
+  rownames(u)[order.dendrogram(as.dendrogram(hclust(dist(u), method = "average")))]
+} else character(0)
+
+row_order <- c(ord_early, ord_late, ord_unrec)
+
+# 4) Reorder matrix by that within-group clustering order
+mat_z_ord <- mat_z[row_order, , drop = FALSE]
+
+# 5) Annotation + visible gaps
+ann_row <- data.frame(
+  Cluster = factor(
+    c(rep("Early recovered", length(ord_early)),
+      rep("Late recovered",  length(ord_late)),
+      rep("Unrecovered",     length(ord_unrec))),
+    levels = c("Early recovered","Late recovered","Unrecovered")
+  )
+)
+rownames(ann_row) <- row_order
+
+gaps <- c(length(ord_early), length(ord_early) + length(ord_late))
+
+# 6) pheatmap (no dendrogram, global colors)
+lims <- quantile(mat_z_ord, c(0.01, 0.99), na.rm = TRUE)
+lim  <- max(abs(lims))
+cols <- colorRampPalette(rev(brewer.pal(7, "RdBu")))(100)
+
+ph <- pheatmap::pheatmap(
+  mat_z_ord,
+  color = cols,
+  breaks = seq(-lim, lim, length.out = 101),
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  show_rownames = FALSE,
+  show_colnames = TRUE,
+  fontsize_col = 10,
+  gaps_row = gaps,
+  annotation_row = ann_row,
+  border_color = NA,
+  legend = FALSE,              # <-- hide colorbar legend
+  annotation_legend = FALSE    # <-- hide annotation legend
+)
+
+# Knit-friendly export
+ggplot2::ggsave(
+  "qa-suz12_log2_prc2_genes_heatmap_recovery_clustered_pheatmap.pdf",
+  plot = ph[[4]], width = 3, height = 4, dpi = 600, device = cairo_pdf
+)
 
 ```
 
@@ -758,21 +844,18 @@ ggsave(filename = "K27_LOSS_qa_24hr_UP.pdf", plot = qa_WT_24hr_DOWN_eulerplot, w
 #Genes that Gain H3K27me3 and are downregulated
 
 venn.diagram(
-  x = list(sanity_genes$V10, rownames(qa_24hr_all_K27_DOWN), rownames(WT_24hr_all_K27_DOWN)),
-  category.names = c("H3K27me3 Gained", "qa 24hr DOWN", "WT 24hr DOWN"),
+  x = list(ectopic_genes$V10, rownames(qa_24hr_all_K27_DOWN), rownames(WT_24hr_all_K27_DOWN)),
+  category.names = c("H3K27me3 Ectopic", "qa 24hr DOWN", "WT 24hr DOWN"),
   filename = 'ectopic_DOWN_24hr_genes_TEST.png',
   col=c("#8da0cb", "#66c2a5", "#fc8d62"),
   fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
   output=FALSE)
 
-qa_WT_24hr_DOWN_fit = euler(c("A" = 200, "B" = 14, "C" = 10, "A&B" = 23, "A&C" = 1, "B&C" = 12, "A&B&C" = 14))
-qa_WT_24hr_DOWN_eulerplot <- plot(qa_WT_24hr_DOWN_fit)
-ggsave(filename = "K27_GAIN_qa_WT_24hr_DOWN.pdf", plot = qa_WT_24hr_DOWN_eulerplot, width = 4, height = 4, dpi = 600)
+#Doesnt work well
+# ectopic_DOWN_fit = euler(c("A" = 137, "B" = 20, "C" = 11, "A&B" = 17, "A&C" = 0, "B&C" = 15, "A&B&C" = 11))
+# ectopic_DOWN_eulerplot <- plot(ectopic_DOWN_fit)
+# ggsave(filename = "ectopic_DOWN.pdf", plot = ectopic_DOWN_eulerplot, width = 4, height = 4, dpi = 600)
 
-#Make euler plot
-ectopic_gain_fit = euler(c("A" = 41, "B" = 149, "A&B" = 36))
-ectopic_gain_eulerplot <- plot(ectopic_gain_fit)
-ggsave(filename = "Ectopic_K27_genes_Downregulated.pdf", plot = ectopic_gain_eulerplot, width = 4, height = 4, dpi = 600)
 
 #Genes Downregulated in common b/w qa and WT 24 hours
 venn.diagram(
@@ -940,85 +1023,85 @@ write.table(track, file="RNAseq_qa-suz12_Paper_Final.igv", sep="\t", row.names =
 
 ###Heatmaps using DEseq nromalized counts
 ```{r,}
-library(DESeq2)
-library(pheatmap)
-library(RColorBrewer)
-library(ggplot2)
-
-# --- Required column order for plotting
-cond_order <- c("WT_0hr","WT_24hr","qa_0hr","qa_24hr")
-
-# --- Hard sanity checks
-stopifnot(all(rownames(coldata) == colnames(counts(dds2))))
-stopifnot(all(cond_order %in% as.character(coldata$condition)))
-
-## ====================== NORMALIZATION & AVERAGING ======================
-# Pull DESeq2 size-factor–normalized counts (no extra +1)
-norm_counts <- counts(dds2, normalized = TRUE)
-
-# Map each column to its condition (character, not factor to avoid level order issues)
-conds <- as.character(coldata$condition)
-
-# Average *counts* by condition in the explicit order, then log2
-group_means_counts <- sapply(cond_order, function(g) {
-  rowMeans(norm_counts[, conds == g, drop = FALSE], na.rm = TRUE)
-})
-
-Averaged_DESeq_log2 <- log2(group_means_counts)         # no extra pseudocount
-# Replace -Inf/+Inf (can occur if a condition mean is exactly 0) with NA, drop later
-Averaged_DESeq_log2[!is.finite(Averaged_DESeq_log2)] <- NA
-
-## ========================== HELPER: HEATMAP ==========================
-make_rowscaled_heatmap <- function(mat_log2, out_pdf, title = NULL) {
-  # Drop rows with any NA and zero variance (prevents NaNs in clustering)
-  mat_log2 <- mat_log2[stats::complete.cases(mat_log2), , drop = FALSE]
-  if (nrow(mat_log2) == 0L) stop("No rows left after filtering (check gene IDs & zeros).")
-  nz <- apply(mat_log2, 1, stats::sd) > 0
-  mat_log2 <- mat_log2[nz, , drop = FALSE]
-
-  # Plot (row-scaled Z)
-  hm <- pheatmap::pheatmap(
-    mat_log2[, cond_order],                              # left→right: WT_0hr, WT_24hr, qa_0hr, qa_24hr
-    color = colorRampPalette(rev(brewer.pal(7, "RdBu")))(100),
-    scale = "row",
-    cluster_rows = TRUE, cluster_cols = FALSE,
-    clustering_method = "centroid", clustering_distance_cols = "euclidean",
-    show_rownames = FALSE, show_colnames = TRUE,
-    legend = TRUE, fontsize_col = 10,
-    treeheight_row = 0, treeheight_col = 5,
-    cellwidth = NA, cellheight = NA, height = 1.5, width = 2.5,
-    main = title
-  )
-  gg <- hm[[4]]
-  ggsave(out_pdf, plot = gg, dpi = 600, height = 4, width = 3)
-  invisible(hm)
-}
-
-## ========================== ECTOPIC GENE SET ==========================
-# Subset by ectopic list (gene IDs are in column 10 of sanity_genes)
-ectopic_ids <- intersect(rownames(Averaged_DESeq_log2), sanity_genes[,10])
-AVERAGE_ectopic_DESeq <- Averaged_DESeq_log2[ectopic_ids, , drop = FALSE]
-
-make_rowscaled_heatmap(
-  mat_log2 = AVERAGE_ectopic_DESeq,
-  out_pdf  = "./qa_ectopic_genes_heatmap_row_scale_DESeqNorm.pdf",
-  title    = "Ectopic H3K27me3-marked Genes (DESeq norm, row Z)"
-)
-
-## ============================ PRC2 GENE SET ===========================
-# Subset by PRC2 list (gene IDs are in column 10 of Prc2targets)
-prc2_ids <- intersect(rownames(Averaged_DESeq_log2), Prc2targets[,10])
-AVERAGE_PRC2_DESeq <- Averaged_DESeq_log2[prc2_ids, , drop = FALSE]
-
-make_rowscaled_heatmap(
-  mat_log2 = AVERAGE_PRC2_DESeq,
-  out_pdf  = "./qa_PRC2_genes_heatmap_row_scale_DESeqNorm.pdf",
-  title    = "PRC2-marked Genes (DESeq norm, row Z)"
-)
-
-## ============================== OPTIONAL QC ===========================
-# Size factors & quick spread check
-print(sizeFactors(dds2))
-print(apply(Averaged_DESeq_log2, 2, sd))
+# library(DESeq2)
+# library(pheatmap)
+# library(RColorBrewer)
+# library(ggplot2)
+# 
+# # --- Required column order for plotting
+# cond_order <- c("WT_0hr","WT_24hr","qa_0hr","qa_24hr")
+# 
+# # --- Hard sanity checks
+# stopifnot(all(rownames(coldata) == colnames(counts(dds2))))
+# stopifnot(all(cond_order %in% as.character(coldata$condition)))
+# 
+# ## ====================== NORMALIZATION & AVERAGING ======================
+# # Pull DESeq2 size-factor–normalized counts (no extra +1)
+# norm_counts <- counts(dds2, normalized = TRUE)
+# 
+# # Map each column to its condition (character, not factor to avoid level order issues)
+# conds <- as.character(coldata$condition)
+# 
+# # Average *counts* by condition in the explicit order, then log2
+# group_means_counts <- sapply(cond_order, function(g) {
+#   rowMeans(norm_counts[, conds == g, drop = FALSE], na.rm = TRUE)
+# })
+# 
+# Averaged_DESeq_log2 <- log2(group_means_counts)         # no extra pseudocount
+# # Replace -Inf/+Inf (can occur if a condition mean is exactly 0) with NA, drop later
+# Averaged_DESeq_log2[!is.finite(Averaged_DESeq_log2)] <- NA
+# 
+# ## ========================== HELPER: HEATMAP ==========================
+# make_rowscaled_heatmap <- function(mat_log2, out_pdf, title = NULL) {
+#   # Drop rows with any NA and zero variance (prevents NaNs in clustering)
+#   mat_log2 <- mat_log2[stats::complete.cases(mat_log2), , drop = FALSE]
+#   if (nrow(mat_log2) == 0L) stop("No rows left after filtering (check gene IDs & zeros).")
+#   nz <- apply(mat_log2, 1, stats::sd) > 0
+#   mat_log2 <- mat_log2[nz, , drop = FALSE]
+# 
+#   # Plot (row-scaled Z)
+#   hm <- pheatmap::pheatmap(
+#     mat_log2[, cond_order],                              # left→right: WT_0hr, WT_24hr, qa_0hr, qa_24hr
+#     color = colorRampPalette(rev(brewer.pal(7, "RdBu")))(100),
+#     scale = "row",
+#     cluster_rows = TRUE, cluster_cols = FALSE,
+#     clustering_method = "centroid", clustering_distance_cols = "euclidean",
+#     show_rownames = FALSE, show_colnames = TRUE,
+#     legend = TRUE, fontsize_col = 10,
+#     treeheight_row = 0, treeheight_col = 5,
+#     cellwidth = NA, cellheight = NA, height = 1.5, width = 2.5,
+#     main = title
+#   )
+#   gg <- hm[[4]]
+#   ggsave(out_pdf, plot = gg, dpi = 600, height = 4, width = 3)
+#   invisible(hm)
+# }
+# 
+# ## ========================== ECTOPIC GENE SET ==========================
+# # Subset by ectopic list (gene IDs are in column 10 of ectopic_genes)
+# ectopic_ids <- intersect(rownames(Averaged_DESeq_log2), ectopic_genes[,10])
+# AVERAGE_ectopic_DESeq <- Averaged_DESeq_log2[ectopic_ids, , drop = FALSE]
+# 
+# make_rowscaled_heatmap(
+#   mat_log2 = AVERAGE_ectopic_DESeq,
+#   out_pdf  = "./qa_ectopic_genes_heatmap_row_scale_DESeqNorm.pdf",
+#   title    = "Ectopic H3K27me3-marked Genes (DESeq norm, row Z)"
+# )
+# 
+# ## ============================ PRC2 GENE SET ===========================
+# # Subset by PRC2 list (gene IDs are in column 10 of Prc2targets)
+# prc2_ids <- intersect(rownames(Averaged_DESeq_log2), Prc2targets[,10])
+# AVERAGE_PRC2_DESeq <- Averaged_DESeq_log2[prc2_ids, , drop = FALSE]
+# 
+# make_rowscaled_heatmap(
+#   mat_log2 = AVERAGE_PRC2_DESeq,
+#   out_pdf  = "./qa_PRC2_genes_heatmap_row_scale_DESeqNorm.pdf",
+#   title    = "PRC2-marked Genes (DESeq norm, row Z)"
+# )
+# 
+# ## ============================== OPTIONAL QC ===========================
+# # Size factors & quick spread check
+# print(sizeFactors(dds2))
+# print(apply(Averaged_DESeq_log2, 2, sd))
 
 ```

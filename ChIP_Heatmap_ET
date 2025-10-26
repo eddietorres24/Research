@@ -41,8 +41,8 @@ BEDDIR2="/home/evt82290/Research/bed_files"
 module load deepTools
 
 ####################################################################################################################################
-###NEW HEATMAPS FOR QA-SUZ12
-#recovered vs unrecovered peaks
+##NEW HEATMAPS FOR QA-SUZ12
+##recovered vs unrecovered peaks
 # computeMatrix scale-regions -a 150 -b 150 \
 #  -S $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
 #     $P146DIR/146-125_ChIP_qa-suz12_0hr_H3K27me3_Rep1_S144.bin_25.smooth_75Bulk.bw \
@@ -66,8 +66,8 @@ module load deepTools
 #                --zMin 0 \
 #                --zMax 40
 
-#recovered genes vs unrecovered genes
-#K27
+##recovered genes vs unrecovered genes
+## K27
 # computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
 #  -S $P148DIR/148-102_ChIP_WT_H3K27me3_Rep3_S126.bin_25.smooth_75Bulk.bw \
 #     $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
@@ -124,8 +124,8 @@ module load deepTools
 #                --colorMap "afmhot_r" \
 #                --zMin 0 \
 #                --zMax 12
-#
-# #RNA-seq
+
+#RNA-seq
 # computeMatrix scale-regions -a 150 -b 150 --scale 2 \
 #  -S $P150DIR/150-106_RNA_WT_0hr__Rep4_S121/150-106_RNA_WT_0hr__Rep4_S121_log.bw \
 #     $P150DIR/150-109_RNA_WT_24hr__Rep5_S124/150-109_RNA_WT_24hr__Rep5_S124_log.bw \
@@ -144,85 +144,85 @@ module load deepTools
 #                --whatToShow "heatmap and colorbar" \
 #                --colorMap "bwr" \
 #                --zMin 0 --zMax 3
+#
+#                --outFileSortedRegions heatmap.bed \
 
-               # --outFileSortedRegions heatmap.bed \
+#######################################################################################
+##ectopic genes
+##K27
+computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
+ -S $P137DIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
+    $P137DIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
+    -R $QABED/ectopic_qa_genes.bed --skipZeros --missingDataAsZero -o qa_ectopic_genes_K27.gz
 
-########################################################################################
-#ectopic genes
-#K27
-# computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
-#  -S $P137DIR/137-66_ChIP_WT_H3K27me3_Rep1_S63.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-44_ChIP_WT_H3K27me3_Rep1_S44.bin_25.smooth_75Bulk.bw \
-#     $P137DIR/137-67_ChIP_qa-suz12_H3K27me3_Rep1_S64.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-129_ChIP_qa-suz12_24hr_H3K27me3_Rep1_S148.bin_25.smooth_75Bulk.bw \
-#     -R $QABED/ectopic_qa_genes.bed --skipZeros --missingDataAsZero -o qa_ectopic_genes_K27.gz
-#
-#     plotHeatmap -m qa_ectopic_genes_K27.gz -out qa-suz12_ectopic_genes_K27.pdf \
-#                --samplesLabel WT_0hr WT_24hr qa_0hr qa_24hr \
-#                --startLabel "5'" \
-#          			 --endLabel "3'" \
-#                --missingDataColor 1 \
-#                --heatmapHeight 8 \
-#                --sortUsing sum \
-#                --sortRegions descend \
-#                --colorList 'white, g, darkgreen' \
-#                --zMin 0 \
-#
-# #RNA
-# computeMatrix scale-regions -a 150 -b 150 --scale 2 \
-#  -S $P150DIR/150-106_RNA_WT_0hr__Rep4_S121/150-106_RNA_WT_0hr__Rep4_S121_log.bw \
-#     $P150DIR/150-109_RNA_WT_24hr__Rep5_S124/150-109_RNA_WT_24hr__Rep5_S124_log.bw \
-#     $P150DIR/150-111_RNA_qa_0hr__Rep4_S126/150-111_RNA_qa_0hr__Rep4_S126_log.bw \
-#     $P150DIR/150-114_RNA_qa_24hr__Rep5_S129/150-114_RNA_qa_24hr__Rep5_S129_log.bw \
-#     -R $QABED/ectopic_qa_genes.bed --skipZeros --missingDataAsZero -o qa_ectopic_genes_RNA.gz
-#
-#     plotHeatmap -m qa_ectopic_genes_RNA.gz -out qa-suz12_ectopic_genes_RNA.pdf \
-#                --samplesLabel WT_0hr WT_24hr qa_0hr qa_24hr \
-#                --startLabel "5'" \
-#          			 --endLabel "3'" \
-#                --missingDataColor 1 \
-#                --heatmapHeight 8 \
-#                --sortUsing sum \
-#                --sortRegions descend \
-#                --colorMap "bwr" \
-#                --zMin 0 --zMax 3
-#
-# #K36
-# computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
-#  -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-131_ChIP_qa-suz12_0hr_H3K36me3_Rep1_S150.bin_25.smooth_75Bulk.bw \
-#     $P146DIR/146-135_ChIP_qa-suz12_24hr_H3K36me3_Rep1_S154.bin_25.smooth_75Bulk.bw \
-#     -R $QABED/ectopic_qa_genes.bed --skipZeros --missingDataAsZero -o qa_ectopic_genes_K36.gz
-#
-#     plotHeatmap -m qa_ectopic_genes_K36.gz -out qa-suz12_ectopic_genes_K36.pdf \
-#                --samplesLabel WT_0hr qa_0hr qa_24hr \
-#                --startLabel "5'" \
-#          			 --endLabel "3'" \
-#                --missingDataColor 1 \
-#                --heatmapHeight 8 \
-#                --sortUsing sum \
-#                --sortRegions descend \
-#                --colorMap "afmhot_r" \
-#                --zMin 0 \
-#                --zMax 12
-#
-# #K4
-# computeMatrix scale-regions -a 500 -b 500 \
-#  -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
-#     $P148DIR/148-103_ChIP_qa-suz12_0hr_H3K4me2_Rep1_S127.bin_25.smooth_75Bulk.bw \
-#     $P148DIR/148-143_ChIP_qa-suz12_24hr_H3K4me2_Rep1_S167.bin_25.smooth_75Bulk.bw \
-#     -R $QABED/ectopic_qa_genes.bed --skipZeros --missingDataAsZero -o qa_ectopic_genes_K4.gz
-#
-#     plotHeatmap -m qa_ectopic_genes_K4.gz -out qa-suz12_ectopic_genes_K4.pdf \
-#                --samplesLabel WT_0hr qa_0hr qa_24hr \
-#                --startLabel "5'" \
-#          			 --endLabel "3'" \
-#                --missingDataColor 1 \
-#                --heatmapHeight 8 \
-#                --sortUsing sum \
-#                --sortRegions descend \
-#                --colorList 'white, violet, magenta' \
-#                --zMin 0 --zMax 8
+    plotHeatmap -m qa_ectopic_genes_K27.gz -out qa-suz12_ectopic_genes_K27.pdf \
+               --samplesLabel WT_0hr WT_24hr qa_0hr qa_24hr \
+               --startLabel "5'" \
+         			 --endLabel "3'" \
+               --missingDataColor 1 \
+               --heatmapHeight 8 \
+               --sortUsing sum \
+               --sortRegions descend \
+               --colorList 'white, g, darkgreen' \
+               --zMin 0 \
+
+#RNA
+computeMatrix scale-regions -a 150 -b 150 --scale 2 \
+ -S $P150DIR/150-106_RNA_WT_0hr__Rep4_S121/150-106_RNA_WT_0hr__Rep4_S121_log.bw \
+    $P150DIR/150-109_RNA_WT_24hr__Rep5_S124/150-109_RNA_WT_24hr__Rep5_S124_log.bw \
+    $P150DIR/150-111_RNA_qa_0hr__Rep4_S126/150-111_RNA_qa_0hr__Rep4_S126_log.bw \
+    $P150DIR/150-114_RNA_qa_24hr__Rep5_S129/150-114_RNA_qa_24hr__Rep5_S129_log.bw \
+    -R $QABED/ectopic_qa_genes.bed --skipZeros --missingDataAsZero -o qa_ectopic_genes_RNA.gz
+
+    plotHeatmap -m qa_ectopic_genes_RNA.gz -out qa-suz12_ectopic_genes_RNA.pdf \
+               --samplesLabel WT_0hr WT_24hr qa_0hr qa_24hr \
+               --startLabel "5'" \
+         			 --endLabel "3'" \
+               --missingDataColor 1 \
+               --heatmapHeight 8 \
+               --sortUsing sum \
+               --sortRegions descend \
+               --colorMap "bwr" \
+               --zMin 0 --zMax 3
+
+#K36
+computeMatrix reference-point --referencePoint TSS -a 1000 -b 800 \
+ -S $P149DIR/149-99_ChIP_WT_H3K36me3_Rep3_S123.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-131_ChIP_qa-suz12_0hr_H3K36me3_Rep1_S150.bin_25.smooth_75Bulk.bw \
+    $P146DIR/146-135_ChIP_qa-suz12_24hr_H3K36me3_Rep1_S154.bin_25.smooth_75Bulk.bw \
+    -R $QABED/ectopic_qa_genes.bed --skipZeros --missingDataAsZero -o qa_ectopic_genes_K36.gz
+
+    plotHeatmap -m qa_ectopic_genes_K36.gz -out qa-suz12_ectopic_genes_K36.pdf \
+               --samplesLabel WT_0hr qa_0hr qa_24hr \
+               --startLabel "5'" \
+         			 --endLabel "3'" \
+               --missingDataColor 1 \
+               --heatmapHeight 8 \
+               --sortUsing sum \
+               --sortRegions descend \
+               --colorMap "afmhot_r" \
+               --zMin 0 \
+               --zMax 12
+
+#K4
+computeMatrix scale-regions -a 500 -b 500 \
+ -S $P146DIR/146-19_ChIP_WT_H3K4me2_Rep1_S19.bin_25.smooth_75Bulk.bw \
+    $P148DIR/148-103_ChIP_qa-suz12_0hr_H3K4me2_Rep1_S127.bin_25.smooth_75Bulk.bw \
+    $P148DIR/148-143_ChIP_qa-suz12_24hr_H3K4me2_Rep1_S167.bin_25.smooth_75Bulk.bw \
+    -R $QABED/ectopic_qa_genes.bed --skipZeros --missingDataAsZero -o qa_ectopic_genes_K4.gz
+
+    plotHeatmap -m qa_ectopic_genes_K4.gz -out qa-suz12_ectopic_genes_K4.pdf \
+               --samplesLabel WT_0hr qa_0hr qa_24hr \
+               --startLabel "5'" \
+         			 --endLabel "3'" \
+               --missingDataColor 1 \
+               --heatmapHeight 8 \
+               --sortUsing sum \
+               --sortRegions descend \
+               --colorList 'white, violet, magenta' \
+               --zMin 0 --zMax 8
 
 ###################################################################################################################################
 

@@ -3290,8 +3290,35 @@ p2 <- ggplot(df2, aes(x = "", y = bp, fill = group)) +
 
 p2
 
-ggsave("ectopic_peak_coverage_pie.pdf", p, width = 3, height = 3)
+ggsave("ectopic_peak_coverage_pie.pdf", p2, width = 3, height = 3)
 
+###Finally, for 4hr peaks, telomeric vs internal
+df3 <- data.frame(
+  group = c("Internal", "subtelomeric"),
+  bp    = c(bp_4hr_internal, bp_4hr_subtelomeres)
+)
+df3$pct <- df3$bp / sum(df3$bp)
+df3$lbl <- sprintf("%s (%.1f%%)", df3$group, 100*df3$pct)
+
+# --- custom light colors ---
+base_colors <- c("#66c2a5", "#fc8d62")  # soft palette
+light_colors <- alpha(base_colors, 0.6)            # lighter transparency
+
+# --- plot ---
+p3 <- ggplot(df3, aes(x = "", y = bp, fill = group)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  scale_fill_manual(values = light_colors) +
+  geom_text(aes(label = lbl),
+            position = position_stack(vjust = 0.5),
+            size = 3) +
+  theme_void() +
+  guides(fill = guide_legend(title = NULL)) +
+  ggtitle("Coverage by category")
+
+p3
+
+ggsave("4hr_peak_coverage_pie.pdf", p3, width = 3, height = 3)
 
 ```
 
@@ -3396,7 +3423,9 @@ early_recovered_bp <- total_bp(early_recover_BED)
 late_recovered_bp  <- total_bp(late_recover_BED)
 unrecovered_bp     <- total_bp(unrecovered_BED)
 
-###Doing similar appraoch for ectopic genes in qa 24 hr time point
+###
+#Doing similar appraoch for ectopic peaks in qa 24 hr time point
+###
 
 ## --- 0) Prefilter by QA 24h > 1 ---
 df_pref <- K27_FilteredHeatmap_df2 %>%
@@ -3423,6 +3452,28 @@ bp_outside <- sum(df_bp$width[!df_bp$within], na.rm = TRUE)
 
 bp_within; bp_outside
 
+###
+#Also testing locations of 4 hour recovery
+###
+#read in chrom length file
+chromlength = read.table(file="../bed_files/neurospora_chrom_full.bed")
+
+#filter subtelomeres
+chromlength_internal <- transform(chromlength, V2 = V2 + 150000L, V3 = V3 - 150000L)
+
+#subest early recovered peaks inside and outside of subtelomeres
+gE <- with(early_recover, GRanges(seqnames, IRanges(start, end)))
+gI <- with(chromlength_internal, GRanges(V1, IRanges(V2, V3)))
+
+mask <- overlapsAny(gE, gI)  # TRUE = within internal regions
+
+`4hr_internal`     <- early_recover[ mask, ]
+`4hr_subtelomeric` <- early_recover[!mask, ]
+
+total_bp <- function(df) sum(pmax(as.integer(df$end) - as.integer(df$start), 0L), na.rm = TRUE)
+
+bp_4hr_internal     <- total_bp(`4hr_internal`)
+bp_4hr_subtelomeres <- total_bp(`4hr_subtelomeric`)
 
 #################################################
 ### determining genes that experience recovery
@@ -3441,77 +3492,42 @@ genes_early_BED = subset(regions$K27genes, regions$K27genes$gene_id %in% genes_e
 genes_late_BED = subset(regions$K27genes, regions$K27genes$gene_id %in% genes_late$gene_id)
 genes_unrecovered = subset(regions$K27genes, ! regions$K27genes$gene_id %in% genes_early$gene_id & ! regions$K27genes$gene_id %in% genes_late$gene_id)
 
+#
+late_or_unrecovered = genes_union <- dplyr::bind_rows(genes_late_BED, genes_unrecovered) |> dplyr::distinct(V1, V2, V3, .keep_all = TRUE)
+
 #write beds
 write.table(genes_early_BED, file = "early_recovered_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(genes_late_BED, file = "late_recovered_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(genes_unrecovered, file = "unrecovered_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 ##################################################
-###I want to know what genes are located within ectopic peaks
+#Ectopic Peaks and Genes
 
-#First, determine ectopic peaks that are significantly enriched
+#Any ectopic peaks in WT 24hr?  ###NO###
+H3K27me3_peaks_GAIN_WT_24hr = subset(H3K27me3_Results_K27peaks_ectopic_vWT_0hr, H3K27me3_Results_K27peaks_ectopic_vWT_0hr$logFC_WT_24hr > 1 & H3K27me3_Results_K27peaks_ectopic_vWT_0hr$FDR_WT_24hr < 0.05)
 
-###MIGHT BE GOOD TO DO TO SUPPORT PEAK CALLING< BUT SKIPPING FOR NOW
+#significant ectopic peaks in qa-suz12
+H3K27me3_peaks_GAIN_qa_24hr = subset(H3K27me3_Results_K27peaks_ectopic_vWT_0hr, H3K27me3_Results_K27peaks_ectopic_vWT_0hr$logFC_qa_24hr > 1 & H3K27me3_Results_K27peaks_ectopic_vWT_0hr$FDR_qa_24hr < 0.05)
 
-#ectopic_sig = subset(H3K27me3_Results_K27peaks_ectopic_vWT_0hr, H3K27me3_Results_K27peaks_ectopic_vWT_0hr$logFC_qa_24hr > 1 & H3K27me3_Results_K27peaks_ectopic_vWT_0hr$FDR_qa_24hr < 0.05 & H3K27me3_Results_K27peaks_ectopic_vInput$logFC_WT_24hr < 1 & H3K27me3_Results_K27peaks_ectopic_vInput$logFC_WT_0hr < 1 )
+ectopic_peaks = regions$K27peaks_ectopic[overlapsAny(with(regions$K27peaks_ectopic, GRanges(V1, IRanges(V2, V3))), with(H3K27me3_peaks_GAIN_qa_24hr, GRanges(seqnames, IRanges(start, end)))), ]
 
-#subset genes
-# --- 0) start from your original data.frames
-genes_df <- regions$allgenes_promTSSext   # has V1,V2,V3,V6,gene_id,...
-peaks_df <- H3K27me3_Results_K27peaks_ectopic_vInput                   # has seqnames,start,end,...
+write.table(ectopic_peaks, file = "ectopic_qa_peaks.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
-# --- 1) add a stable row id so we can return rows exactly as they were
-genes_df$row_id <- seq_len(nrow(genes_df))
+#I want to know ALL genes that have > H3K27me3 in qa 24 hr vs WT 0 hr
+H3K27me3_GAIN_qa_24hr = subset(H3K27me3_Results_allgenes_promTSSext_vWT_0hr, H3K27me3_Results_allgenes_promTSSext_vWT_0hr$logFC_qa_24hr > 1 & H3K27me3_Results_allgenes_promTSSext_vWT_0hr$gene_id %in% all_qa_k27_genes$gene_id & H3K27me3_Results_allgenes_promTSSext_vWT_0hr$FDR_qa_24hr < 0.05 )
 
-# --- 2) GRanges: genes are BED-like (usually 0-based, half-open)
-genes_gr <- makeGRangesFromDataFrame(
-  genes_df,
-  seqnames.field = "V1",
-  start.field    = "V2",
-  end.field      = "V3",
-  strand.field   = "V6",
-  keep.extra.columns = TRUE,
-  starts.in.df.are.0based = TRUE
-)
+H3K27me3_LOSS_qa_24hr = subset(H3K27me3_Results_allgenes_promTSSext_vWT_0hr, H3K27me3_Results_allgenes_promTSSext_vWT_0hr$logFC_qa_24hr < -1 & H3K27me3_Results_allgenes_promTSSext_vWT_0hr$gene_id %in% all_qa_k27_genes$gene_id & H3K27me3_Results_allgenes_promTSSext_vWT_0hr$FDR_qa_24hr < 0.05)
 
-# --- 3) Build peaks GRanges two ways (0-based and 1-based) and choose the one that overlaps most
-peaks_gr_0 <- makeGRangesFromDataFrame(
-  peaks_df,
-  seqnames.field = "seqnames",
-  start.field    = "start",
-  end.field      = "end",
-  keep.extra.columns = FALSE,
-  starts.in.df.are.0based = TRUE
-)
-peaks_gr_1 <- makeGRangesFromDataFrame(
-  peaks_df,
-  seqnames.field = "seqnames",
-  start.field    = "start",
-  end.field      = "end",
-  keep.extra.columns = FALSE,
-  starts.in.df.are.0based = FALSE
-)
+#all genes w/ > K27me3
+K27_gain_genes = subset(allgenes, allgenes$V10 %in% H3K27me3_GAIN_qa_24hr$gene_id)
 
-n0 <- length(unique(queryHits(findOverlaps(genes_gr, peaks_gr_0, ignore.strand = TRUE))))
-n1 <- length(unique(queryHits(findOverlaps(genes_gr, peaks_gr_1, ignore.strand = TRUE))))
-peaks_gr <- if (n1 >= n0) peaks_gr_1 else peaks_gr_0
-message(sprintf("Picked peaks as %s-based (overlaps: %d vs %d).", if (identical(peaks_gr, peaks_gr_1)) "1" else "0", n1, n0))
+# > K27me3, but only in ectopic peaks
+ectopics = H3K27me3_GAIN_qa_24hr[overlapsAny(with(H3K27me3_GAIN_qa_24hr, GRanges(seqnames, IRanges(start, end))), with(H3K27me3_peaks_GAIN_qa_24hr, GRanges(seqnames, IRanges(start, end)))), ]
 
-# --- 4) ANY overlap, ignore strand; keep genes exactly as-is
-hits <- findOverlaps(genes_gr, peaks_gr, ignore.strand = TRUE, minoverlap = 1, type = "any")
-keep_ids <- mcols(genes_gr)$row_id[unique(queryHits(hits))]
-genes_overlapping <- genes_df[sort(keep_ids), ]
+ectopics_genes = subset(allgenes, allgenes$V10 %in% ectopics$gene_id)
 
-# --- 5) drop helper column
-genes_overlapping$row_id <- NULL
-
-ectopic_genes = genes_overlapping
-ectopic_genes_BED = subset(allgenes, allgenes$V10 %in% ectopic_genes$gene_id)
-ectopic_code = subset(ectopic_genes_BED, ectopic_genes$gene_id %in% rownames(allDataTPM))
-
-#Write bed file
-write.table(ectopic_genes_BED, file = "ectopic_qa_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
-
+write.table(K27_gain_genes, file = "qa_K27_gain_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+write.table(ectopic_genes, file = "ectopic_qa_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 #combining native and ectopic K27 genes
 library(dplyr)
@@ -3521,21 +3537,5 @@ all_qa_k27_genes <- bind_rows(regions$K27genes, ectopic_genes) %>%
   mutate(gene_id = if_else(is.na(gene_id) | gene_id == "", V11, gene_id)) %>%
   distinct(gene_id, .keep_all = TRUE) %>%
   arrange(V1, V2, V3)
-
-#I want to know ALL genes that have > H3K27me3 in qa 24 hr vs WT 0 hr
-H3K27me3_GAIN_qa_24hr = subset(H3K27me3_Results_allgenes_promTSSext_vWT_0hr, H3K27me3_Results_allgenes_promTSSext_vWT_0hr$logFC_qa_24hr > 1 & H3K27me3_Results_allgenes_promTSSext_vWT_0hr$gene_id %in% all_qa_k27_genes$gene_id )
-
-H3K27me3_LOSS_qa_24hr = subset(H3K27me3_Results_allgenes_promTSSext_vWT_0hr, H3K27me3_Results_allgenes_promTSSext_vWT_0hr$logFC_qa_24hr < -1 & H3K27me3_Results_allgenes_promTSSext_vWT_0hr$gene_id %in% all_qa_k27_genes$gene_id)
-
-sanity = subset(H3K27me3_GAIN_qa_24hr, H3K27me3_GAIN_qa_24hr$gene_id %in% ectopic_genes$gene_id)
-sanity_genes = subset(ectopic_genes_BED, ectopic_genes_BED$V10 %in% sanity$gene_id)
-
-write.table(sanity_genes, file = "ectopic_qa_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
-
-#Real Ectopic peaks (cut out < 0 log2FC over Input)
-ectopic_peaks = subset(H3K27me3_Results_K27peaks_ectopic_vInput, H3K27me3_Results_K27peaks_ectopic_vInput$logFC_qa_24hr > 0.585)
-ectopic_peaks = ectopic_peaks[,1:3]
-
-write.table(ectopic_peaks, file = "ectopic_qa_peaks.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 ```
