@@ -246,7 +246,7 @@ computeMatrix scale-regions -a 500 -b 500 \
         --startLabel "5'" --endLabel "3'" \
         --missingDataColor 1 \
         --sortRegions descend --sortUsing sum \
-        --heatmapHeight 15
+        --heatmapHeight 15 \
         --whatToShow "heatmap and colorbar" \
         --colorList 'white,g,darkgreen' 'white,g,darkgreen' 'white,g,darkgreen' 'white,g,darkgreen' 'white,cadetblue,teal' 'white,cadetblue,teal' 'white,cadetblue,teal' 'white,cadetblue,teal' \
         --zMin 0 --zMax 50 \
@@ -270,7 +270,7 @@ computeMatrix scale-regions -a 500 -b 500 \
           --samplesLabel WT 4hr 24hr hpo isw h2az ash1 cac-3 \
           --startLabel "5'" --endLabel "3'" \
           --missingDataColor 1 \
-          --heatmapHeight 15
+          --heatmapHeight 15 \
           --sortRegions descend --sortUsing sum \
           --whatToShow "heatmap and colorbar" \
           --colorList 'white,g,darkgreen' 'white,g,darkgreen' 'white,g,darkgreen' 'white,g,darkgreen' 'white,cadetblue,teal' 'white,cadetblue,teal' 'white,cadetblue,teal' 'white,cadetblue,teal' \
