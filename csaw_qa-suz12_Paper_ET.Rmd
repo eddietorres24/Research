@@ -198,23 +198,28 @@ rownames(DGElistAll$samples) <-  paste(paste(qasamples$Strain,qasamples$Antibody
 ```
 
 ```{r, Designing the matrix}
+keep <- colSums(DGElistAll$counts) > 0
+DGElistAll               <- DGElistAll[, keep]
+DGElistK27               <- DGElistK27[, keep]
+DGElistK27_genes         <- DGElistK27_genes[, keep]
+DGElistK27peaks_ectopic  <- DGElistK27peaks_ectopic[, keep]
+
+# drop orphaned factor levels after subsetting
+DGElistAll$samples$group              <- droplevels(DGElistAll$samples$group)
+DGElistK27$samples$group              <- droplevels(DGElistK27$samples$group)
+DGElistK27_genes$samples$group        <- droplevels(DGElistK27_genes$samples$group)
+DGElistK27peaks_ectopic$samples$group <- droplevels(DGElistK27peaks_ectopic$samples$group)
+
 #design a model matrix to compare groups, This Should be the same for all mods, as it depends on you sample sheet
 ##Im using the set of regions with the combined WT & ectopic qa-suz12 peaks
 design.mat <- model.matrix(~0 + DGElistAll$samples$group)
 #replace wonky column names with readable ones
 colnames(design.mat) <- levels(DGElistAll$samples$group)
 
-keep.samples <- colSums(DGElistAll$counts) > 0
-DGElistAll <- DGElistAll[, keep.samples]
+# ✅ build after the shared filtering above
+design.mat <- model.matrix(~0 + DGElistAll$samples$group)
+colnames(design.mat) <- levels(DGElistAll$samples$group)
 
-keep.samples <- colSums(DGElistK27$counts) > 0
-DGElistK27 <- DGElistK27[, keep.samples]
-
-keep.samples <- colSums(DGElistK27_genes$counts) > 0
-DGElistK27_genes <- DGElistK27_genes[, keep.samples]
-
-keep.samples <- colSums(DGElistK27peaks_ectopic$counts) > 0
-DGElistK27peaks_ectopic <- DGElistK27peaks_ectopic[, keep.samples]
 
 ```
 
@@ -249,16 +254,19 @@ plotQLDisp(fitK27)
 ```
 
 
-```{r START OF WT K27 region Analysis}
+```{r START OF ALL K27 region Analysis}
 ###Analyzing K27 enrichment within K27 regions across samples
 #set up pairwise contrast
+
+###NOTE: set fits and filtered data to K27 only regions if you are only interested in those peaks
+
 FC_WT_0hrvInput.K27.contrast <- makeContrasts(K27vWT=WT_0hr.H3K27me3-WT_0hr.input, levels=design.mat)
 
 #analyze data
-FC_WT_0hrvI.K27.res <- glmQLFTest(fitK27, contrast=FC_WT_0hrvInput.K27.contrast)
+FC_WT_0hrvI.K27.res <- glmQLFTest(fitAll, contrast=FC_WT_0hrvInput.K27.contrast)
 
 #merge results to generate FDR; #calculates FRD on a per-region basis. This is not appropriate here since you have set the window size to 1000
-FC_WT_0hrvI.K27.merged <- mergeResults(filtered.dataK27, FC_WT_0hrvI.K27.res$table, tol=300, 
+FC_WT_0hrvI.K27.merged <- mergeResults(filtered.dataAll, FC_WT_0hrvI.K27.res$table, tol=300, 
                             merge.args=list(max.width=300))
 
 #move FC data into a dataframe
@@ -272,8 +280,8 @@ mcols(WT_0hrvI.K27.out.ranges) <- DataFrame(WT_0hrvI.K27.tabular)
 
 #WT 24hr
 FC_WT_24hrvInput.K27.contrast <- makeContrasts(K27vWT_24hr=WT_24hr.H3K27me3-WT_24hr.input,levels=design.mat)
-FC_WT_24hrvInput.res <- glmQLFTest(fitK27, contrast=FC_WT_24hrvInput.K27.contrast)
-FC_WT_24hrvInput.merged <- mergeResults(filtered.dataK27, FC_WT_24hrvInput.res$table, tol=300, 
+FC_WT_24hrvInput.res <- glmQLFTest(fitAll, contrast=FC_WT_24hrvInput.K27.contrast)
+FC_WT_24hrvInput.merged <- mergeResults(filtered.dataAll, FC_WT_24hrvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_WT_24hrvInput.K27.tabular <- FC_WT_24hrvInput.merged$combined
 FC_WT_24hrvInput.K27.out.ranges <- FC_WT_24hrvInput.merged$regions
@@ -281,8 +289,8 @@ mcols(FC_WT_24hrvInput.K27.out.ranges) <- DataFrame(FC_WT_24hrvInput.K27.tabular
 
 #qa-suz12 0hr
 FC_qa_0hrvInput.K27.contrast <- makeContrasts(K27vqa_0hr=qa_0hr.H3K27me3-qa_0hr.input,levels=design.mat)
-FC_qa_0hrvInput.res <- glmQLFTest(fitK27, contrast=FC_qa_0hrvInput.K27.contrast)
-FC_qa_0hrvInput.merged <- mergeResults(filtered.dataK27, FC_qa_0hrvInput.res$table, tol=300, 
+FC_qa_0hrvInput.res <- glmQLFTest(fitAll, contrast=FC_qa_0hrvInput.K27.contrast)
+FC_qa_0hrvInput.merged <- mergeResults(filtered.dataAll, FC_qa_0hrvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_qa_0hrvInput.K27.tabular <- FC_qa_0hrvInput.merged$combined
 FC_qa_0hrvInput.K27.out.ranges <- FC_qa_0hrvInput.merged$regions
@@ -290,8 +298,8 @@ mcols(FC_qa_0hrvInput.K27.out.ranges) <- DataFrame(FC_qa_0hrvInput.K27.tabular)
 
 #qa-suz12 4hr
 FC_qa_4hrvInput.K27.contrast <- makeContrasts(K27vqa_4hr=qa_4hr.H3K27me3-qa_4hr.input,levels=design.mat)
-FC_qa_4hrvInput.res <- glmQLFTest(fitK27, contrast=FC_qa_4hrvInput.K27.contrast)
-FC_qa_4hrvInput.merged <- mergeResults(filtered.dataK27, FC_qa_4hrvInput.res$table, tol=300, 
+FC_qa_4hrvInput.res <- glmQLFTest(fitAll, contrast=FC_qa_4hrvInput.K27.contrast)
+FC_qa_4hrvInput.merged <- mergeResults(filtered.dataAll, FC_qa_4hrvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_qa_4hrvInput.K27.tabular <- FC_qa_4hrvInput.merged$combined
 FC_qa_4hrvInput.K27.out.ranges <- FC_qa_4hrvInput.merged$regions
@@ -299,8 +307,8 @@ mcols(FC_qa_4hrvInput.K27.out.ranges) <- DataFrame(FC_qa_4hrvInput.K27.tabular)
 
 #qa-suz12 8hr
 FC_qa_8hrvInput.K27.contrast <- makeContrasts(K27vqa_8hr=qa_8hr.H3K27me3-qa_8hr.input,levels=design.mat)
-FC_qa_8hrvInput.res <- glmQLFTest(fitK27, contrast=FC_qa_8hrvInput.K27.contrast)
-FC_qa_8hrvInput.merged <- mergeResults(filtered.dataK27, FC_qa_8hrvInput.res$table, tol=300, 
+FC_qa_8hrvInput.res <- glmQLFTest(fitAll, contrast=FC_qa_8hrvInput.K27.contrast)
+FC_qa_8hrvInput.merged <- mergeResults(filtered.dataAll, FC_qa_8hrvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_qa_8hrvInput.K27.tabular <- FC_qa_8hrvInput.merged$combined
 FC_qa_8hrvInput.K27.out.ranges <- FC_qa_8hrvInput.merged$regions
@@ -308,8 +316,8 @@ mcols(FC_qa_8hrvInput.K27.out.ranges) <- DataFrame(FC_qa_8hrvInput.K27.tabular)
 
 #qa-suz12 12hr
 FC_qa_12hrvInput.K27.contrast <- makeContrasts(K27vqa_12hr=qa_12hr.H3K27me3-qa_12hr.input,levels=design.mat)
-FC_qa_12hrvInput.res <- glmQLFTest(fitK27, contrast=FC_qa_12hrvInput.K27.contrast)
-FC_qa_12hrvInput.merged <- mergeResults(filtered.dataK27, FC_qa_12hrvInput.res$table, tol=300, 
+FC_qa_12hrvInput.res <- glmQLFTest(fitAll, contrast=FC_qa_12hrvInput.K27.contrast)
+FC_qa_12hrvInput.merged <- mergeResults(filtered.dataAll, FC_qa_12hrvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_qa_12hrvInput.K27.tabular <- FC_qa_12hrvInput.merged$combined
 FC_qa_12hrvInput.K27.out.ranges <- FC_qa_12hrvInput.merged$regions
@@ -317,8 +325,8 @@ mcols(FC_qa_12hrvInput.K27.out.ranges) <- DataFrame(FC_qa_12hrvInput.K27.tabular
 
 #qa-suz12 24hr
 FC_qa_24hrvInput.K27.contrast <- makeContrasts(K27vqa_24hr=qa_24hr.H3K27me3-qa_24hr.input,levels=design.mat)
-FC_qa_24hrvInput.res <- glmQLFTest(fitK27, contrast=FC_qa_24hrvInput.K27.contrast)
-FC_qa_24hrvInput.merged <- mergeResults(filtered.dataK27, FC_qa_24hrvInput.res$table, tol=300, 
+FC_qa_24hrvInput.res <- glmQLFTest(fitAll, contrast=FC_qa_24hrvInput.K27.contrast)
+FC_qa_24hrvInput.merged <- mergeResults(filtered.dataAll, FC_qa_24hrvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_qa_24hrvInput.K27.tabular <- FC_qa_24hrvInput.merged$combined
 FC_qa_24hrvInput.K27.out.ranges <- FC_qa_24hrvInput.merged$regions
@@ -326,8 +334,8 @@ mcols(FC_qa_24hrvInput.K27.out.ranges) <- DataFrame(FC_qa_24hrvInput.K27.tabular
 
 #qa-suz12 48hr
 FC_qa_48hrvInput.K27.contrast <- makeContrasts(K27vqa_48hr=qa_48hr.H3K27me3-qa_48hr.input,levels=design.mat)
-FC_qa_48hrvInput.res <- glmQLFTest(fitK27, contrast=FC_qa_48hrvInput.K27.contrast)
-FC_qa_48hrvInput.merged <- mergeResults(filtered.dataK27, FC_qa_48hrvInput.res$table, tol=300, 
+FC_qa_48hrvInput.res <- glmQLFTest(fitAll, contrast=FC_qa_48hrvInput.K27.contrast)
+FC_qa_48hrvInput.merged <- mergeResults(filtered.dataAll, FC_qa_48hrvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_qa_48hrvInput.K27.tabular <- FC_qa_48hrvInput.merged$combined
 FC_qa_48hrvInput.K27.out.ranges <- FC_qa_48hrvInput.merged$regions
@@ -335,8 +343,8 @@ mcols(FC_qa_48hrvInput.K27.out.ranges) <- DataFrame(FC_qa_48hrvInput.K27.tabular
 
 #qa-suz12 72hr
 FC_qa_72hrvInput.K27.contrast <- makeContrasts(K27vqa_72hr=qa_72hr.H3K27me3-qa_72hr.input,levels=design.mat)
-FC_qa_72hrvInput.res <- glmQLFTest(fitK27, contrast=FC_qa_72hrvInput.K27.contrast)
-FC_qa_72hrvInput.merged <- mergeResults(filtered.dataK27, FC_qa_72hrvInput.res$table, tol=300, 
+FC_qa_72hrvInput.res <- glmQLFTest(fitAll, contrast=FC_qa_72hrvInput.K27.contrast)
+FC_qa_72hrvInput.merged <- mergeResults(filtered.dataAll, FC_qa_72hrvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_qa_72hrvInput.K27.tabular <- FC_qa_72hrvInput.merged$combined
 FC_qa_72hrvInput.K27.out.ranges <- FC_qa_72hrvInput.merged$regions
@@ -344,8 +352,8 @@ mcols(FC_qa_72hrvInput.K27.out.ranges) <- DataFrame(FC_qa_72hrvInput.K27.tabular
 
 #qa-suz12 96hr
 FC_qa_96hrvInput.K27.contrast <- makeContrasts(K27vqa_96hr=qa_96hr.H3K27me3-qa_96hr.input,levels=design.mat)
-FC_qa_96hrvInput.res <- glmQLFTest(fitK27, contrast=FC_qa_96hrvInput.K27.contrast)
-FC_qa_96hrvInput.merged <- mergeResults(filtered.dataK27, FC_qa_96hrvInput.res$table, tol=300, 
+FC_qa_96hrvInput.res <- glmQLFTest(fitAll, contrast=FC_qa_96hrvInput.K27.contrast)
+FC_qa_96hrvInput.merged <- mergeResults(filtered.dataAll, FC_qa_96hrvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_qa_96hrvInput.K27.tabular <- FC_qa_96hrvInput.merged$combined
 FC_qa_96hrvInput.K27.out.ranges <- FC_qa_96hrvInput.merged$regions
@@ -353,8 +361,8 @@ mcols(FC_qa_96hrvInput.K27.out.ranges) <- DataFrame(FC_qa_96hrvInput.K27.tabular
 
 #suz12 0hr
 FC_suz12_0hrvInput.K27.contrast <- makeContrasts(K27vsuz12_0hr=suz12_0hr.H3K27me3-suz12_0hr.input,levels=design.mat)
-FC_suz12_0hrvInput.res <- glmQLFTest(fitK27, contrast=FC_suz12_0hrvInput.K27.contrast)
-FC_suz12_0hrvInput.merged <- mergeResults(filtered.dataK27, FC_suz12_0hrvInput.res$table, tol=300, 
+FC_suz12_0hrvInput.res <- glmQLFTest(fitAll, contrast=FC_suz12_0hrvInput.K27.contrast)
+FC_suz12_0hrvInput.merged <- mergeResults(filtered.dataAll, FC_suz12_0hrvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_suz12_0hrvInput.K27.tabular <- FC_suz12_0hrvInput.merged$combined
 FC_suz12_0hrvInput.K27.out.ranges <- FC_suz12_0hrvInput.merged$regions
@@ -362,8 +370,8 @@ mcols(FC_suz12_0hrvInput.K27.out.ranges) <- DataFrame(FC_suz12_0hrvInput.K27.tab
 
 #suz12 24hr
 FC_suz12_24hrvInput.K27.contrast <- makeContrasts(K27vsuz12_24hr=suz12_24hr.H3K27me3-suz12_24hr.input,levels=design.mat)
-FC_suz12_24hrvInput.res <- glmQLFTest(fitK27, contrast=FC_suz12_24hrvInput.K27.contrast)
-FC_suz12_24hrvInput.merged <- mergeResults(filtered.dataK27, FC_suz12_24hrvInput.res$table, tol=300, 
+FC_suz12_24hrvInput.res <- glmQLFTest(fitAll, contrast=FC_suz12_24hrvInput.K27.contrast)
+FC_suz12_24hrvInput.merged <- mergeResults(filtered.dataAll, FC_suz12_24hrvInput.res$table, tol=300, 
                             merge.args=list(max.width=300))
 FC_suz12_24hrvInput.K27.tabular <- FC_suz12_24hrvInput.merged$combined
 FC_suz12_24hrvInput.K27.out.ranges <- FC_suz12_24hrvInput.merged$regions
@@ -371,8 +379,8 @@ mcols(FC_suz12_24hrvInput.K27.out.ranges) <- DataFrame(FC_suz12_24hrvInput.K27.t
 
 # #cac-1_CS
 # FC_cac1_CSvInput.K27.contrast <- makeContrasts(K27vcac1_CS=cac1_CS.H3K27me3-cac1_CS.input,levels=design.mat)
-# FC_cac1_CSvInput.res <- glmQLFTest(fitK27, contrast=FC_cac1_CSvInput.K27.contrast)
-# FC_cac1_CSvInput.merged <- mergeResults(filtered.dataK27, FC_cac1_CSvInput.res$table, tol=300, 
+# FC_cac1_CSvInput.res <- glmQLFTest(fitAll, contrast=FC_cac1_CSvInput.K27.contrast)
+# FC_cac1_CSvInput.merged <- mergeResults(filtered.dataAll, FC_cac1_CSvInput.res$table, tol=300, 
 #                             merge.args=list(max.width=300))
 # FC_cac1_CSvInput.K27.tabular <- FC_cac1_CSvInput.merged$combined
 # FC_cac1_CSvInput.K27.out.ranges <- FC_cac1_CSvInput.merged$regions
@@ -380,7 +388,7 @@ mcols(FC_suz12_24hrvInput.K27.out.ranges) <- DataFrame(FC_suz12_24hrvInput.K27.t
 # 
 # #cac-2_CS
 # FC_cac2_CSvInput.K27.contrast <- makeContrasts(K27vcac2_CS=cac2_CS.H3K27me3-cac2_CS.input,levels=design.mat)
-# FC_cac2_CSvInput.res <- glmQLFTest(fitK27, contrast=FC_cac2_CSvInput.K27.contrast)
+# FC_cac2_CSvInput.res <- glmQLFTest(fitAll, contrast=FC_cac2_CSvInput.K27.contrast)
 # FC_cac2_CSvInput.merged <- mergeResults(filtered.dataK27, FC_cac2_CSvInput.res$table, tol=300, 
 #                             merge.args=list(max.width=300))
 # FC_cac2_CSvInput.K27.tabular <- FC_cac2_CSvInput.merged$combined
@@ -389,7 +397,7 @@ mcols(FC_suz12_24hrvInput.K27.out.ranges) <- DataFrame(FC_suz12_24hrvInput.K27.t
 # 
 # #cac-3_CS
 # FC_cac3_CSvInput.K27.contrast <- makeContrasts(K27vcac3_CS=cac3_CS.H3K27me3-cac3_CS.input,levels=design.mat)
-# FC_cac3_CSvInput.res <- glmQLFTest(fitK27, contrast=FC_cac3_CSvInput.K27.contrast)
+# FC_cac3_CSvInput.res <- glmQLFTest(fitAll, contrast=FC_cac3_CSvInput.K27.contrast)
 # FC_cac3_CSvInput.merged <- mergeResults(filtered.dataK27, FC_cac3_CSvInput.res$table, tol=300, 
 #                             merge.args=list(max.width=300))
 # FC_cac3_CSvInput.K27.tabular <- FC_cac3_CSvInput.merged$combined
@@ -399,7 +407,7 @@ mcols(FC_suz12_24hrvInput.K27.out.ranges) <- DataFrame(FC_suz12_24hrvInput.K27.t
 # #cac-1_abc
 # 
 # FC_cac1_abcvInput.K27.contrast <- makeContrasts(K27vcac1_abc=cac1_abc.H3K27me3-cac1_abc.input,levels=design.mat)
-# FC_cac1_abcvInput.res <- glmQLFTest(fitK27, contrast=FC_cac1_abcvInput.K27.contrast)
+# FC_cac1_abcvInput.res <- glmQLFTest(fitAll, contrast=FC_cac1_abcvInput.K27.contrast)
 # FC_cac1_abcvInput.merged <- mergeResults(filtered.dataK27, FC_cac1_abcvInput.res$table, tol=300, 
 #                             merge.args=list(max.width=300))
 # FC_cac1_abcvInput.K27.tabular <- FC_cac1_abcvInput.merged$combined
@@ -409,7 +417,7 @@ mcols(FC_suz12_24hrvInput.K27.out.ranges) <- DataFrame(FC_suz12_24hrvInput.K27.t
 # #cac-2_abc
 # 
 # FC_cac2_abcvInput.K27.contrast <- makeContrasts(K27vcac2_abc=cac2_abc.H3K27me3-cac2_abc.input,levels=design.mat)
-# FC_cac2_abcvInput.res <- glmQLFTest(fitK27, contrast=FC_cac2_abcvInput.K27.contrast)
+# FC_cac2_abcvInput.res <- glmQLFTest(fitAll, contrast=FC_cac2_abcvInput.K27.contrast)
 # FC_cac2_abcvInput.merged <- mergeResults(filtered.dataK27, FC_cac2_abcvInput.res$table, tol=300, 
 #                             merge.args=list(max.width=300))
 # FC_cac2_abcvInput.K27.tabular <- FC_cac2_abcvInput.merged$combined
@@ -419,7 +427,7 @@ mcols(FC_suz12_24hrvInput.K27.out.ranges) <- DataFrame(FC_suz12_24hrvInput.K27.t
 # #cac-3_abc
 # 
 # FC_cac3_abcvInput.K27.contrast <- makeContrasts(K27vcac3_abc=cac3_abc.H3K27me3-cac3_abc.input,levels=design.mat)
-# FC_cac3_abcvInput.res <- glmQLFTest(fitK27, contrast=FC_cac3_abcvInput.K27.contrast)
+# FC_cac3_abcvInput.res <- glmQLFTest(fitAll, contrast=FC_cac3_abcvInput.K27.contrast)
 # FC_cac3_abcvInput.merged <- mergeResults(filtered.dataK27, FC_cac3_abcvInput.res$table, tol=300, 
 #                             merge.args=list(max.width=300))
 # FC_cac3_abcvInput.K27.tabular <- FC_cac3_abcvInput.merged$combined

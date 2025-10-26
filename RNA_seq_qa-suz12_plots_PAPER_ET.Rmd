@@ -753,6 +753,7 @@ venn.diagram(
 qa_WT_24hr_DOWN_fit = euler(c("A" = 264, "B" = 27, "A&B" = 43))
 qa_WT_24hr_DOWN_eulerplot <- plot(qa_WT_24hr_DOWN_fit)
 ggsave(filename = "K27_LOSS_qa_24hr_UP.pdf", plot = qa_WT_24hr_DOWN_eulerplot, width = 4, height = 4, dpi = 600)
+
 ##########FIGURE 3###############
 #Genes that Gain H3K27me3 and are downregulated
 
@@ -782,11 +783,26 @@ venn.diagram(
   fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
   output=FALSE)
 
-qa_WT_24hr_DOWN_fit = euler(c("A" = 1101, "B" = 129, "A&B" = 606))
+qa_WT_24hr_DOWN_fit = euler(c("A" = 584, "B" = 139, "A&B" = 576))
 qa_WT_24hr_DOWN_eulerplot <- plot(qa_WT_24hr_DOWN_fit)
 ggsave(filename = "qa_WT_24hr_DOWN.pdf", plot = qa_WT_24hr_DOWN_eulerplot, width = 4, height = 4, dpi = 600)
 
-###############################################
+
+#K27 Genes Downregulated in common b/w qa and WT 24 hours
+venn.diagram(
+  x = list(rownames(qa_24hr_all_K27_DOWN), rownames(WT_24hr_all_K27_DOWN)),
+  category.names = c("qa_24hr K27 DOWN", "WT_24hr K27 DOWN"),
+  filename = 'qa_WT_24hr_K27_DOWN.png',
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=FALSE)
+
+qa_WT_24hr_K27_DOWN_fit = euler(c("A" = 37, "B" = 11, "A&B" = 26))
+qa_WT_24hr_K27_DOWN_eulerplot <- plot(qa_WT_24hr_K27_DOWN_fit)
+ggsave(filename = "qa_WT_24hr_K27_DOWN.pdf", plot = qa_WT_24hr_K27_DOWN_eulerplot, width = 4, height = 4, dpi = 600)
+
+
+#######################################################################################
 #Misc.
 #Genes Upregulated in both WT & qa 24
 venn.diagram(
@@ -810,9 +826,23 @@ venn.diagram(
   fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
   output=FALSE)
 
-qa_WT_24hr_DE_fit = euler(c("A" = 1538, "B" = 391, "A&B" = 1301))
+qa_WT_24hr_DE_fit = euler(c("A" = 901, "B" = 353, "A&B" = 1302))
 qa_WT_24hr_DE_eulerplot <- plot(qa_WT_24hr_DE_fit)
 ggsave(filename = "qa_WT_24hr_DE.pdf", plot = qa_WT_24hr_DE_eulerplot, width = 4, height = 4, dpi = 600)
+
+
+#K27 Genes DE in both WT & qa 24
+venn.diagram(
+  x = list(rownames(qa_24hr_K27), rownames(WT_24hr_K27)),
+  category.names = c("qa_24hr K27 DE", "WT_24hr K27 DE"),
+  filename = 'qa_WT_24hr_K27_genes_DE.png',
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=FALSE)
+
+qa_WT_24hr_K27_DE_fit = euler(c("A" = 48, "B" = 14, "A&B" = 41))
+qa_WT_24hr_K27_DE_eulerplot <- plot(qa_WT_24hr_K27_DE_fit)
+ggsave(filename = "qa_WT_24hr_K27_DE.pdf", plot = qa_WT_24hr_K27_DE_eulerplot, width = 4, height = 4, dpi = 600)
 
 #Genes Upregulated in both qa_suz12_0hr and suz12
 venn.diagram(
@@ -826,6 +856,49 @@ venn.diagram(
 qa_0hr_suz12_UP_fit = euler(c("A" = 1101, "B" = 129, "A&B" = 606))
 qa_0hr_suz12_UP_eulerplot <- plot(qa_0hr_suz12_UP_fit)
 ggsave(filename = "qa_0hr_suz12_UP.pdf", plot = qa_0hr_suz12_UP_eulerplot, width = 4, height = 4, dpi = 600)
+
+
+#K27 Genes Upregulated in both qa_suz12_0hr and suz12
+venn.diagram(
+  x = list(rownames(qa_0hr_K27_UP), rownames(suz12_K27_UP)),
+  category.names = c("qa_0hr K27 UP", "suz12 K27 UP"),
+  filename = 'qa_0hr_suz12_K27_UP.png',
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=FALSE)
+
+qa_0hr_suz12_K27_UP_fit = euler(c("A" = 52, "B" = 3, "A&B" = 42))
+qa_0hr_suz12_K27_UP_eulerplot <- plot(qa_0hr_suz12_K27_UP_fit)
+ggsave(filename = "qa_0hr_suz12_K27_UP.pdf", plot = qa_0hr_suz12_K27_UP_eulerplot, width = 4, height = 4, dpi = 600)
+
+
+#K27 Genes Upregulated in both qa_suz12_0hr and qa_suz12_24hr
+venn.diagram(
+  x = list(rownames(qa_0hr_K27_UP), rownames(qa_24hr_K27_UP)),
+  category.names = c("qa 0hr K27 UP", "qa 24hr K27 UP"),
+  filename = 'qa_0hr_24hr_K27_UP.png',
+  col=c("#8da0cb","#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
+  output=FALSE)
+
+qa_0hr_24hr_K27_UP_fit = euler(c("A" = 38, "B" = 13, "A&B" = 32))
+qa_0hr_24hr_K27_UP_eulerplot <- plot(qa_0hr_24hr_K27_UP_fit)
+ggsave(filename = "qa_0hr_24hr_K27_UP.pdf", plot = qa_0hr_24hr_K27_UP_eulerplot, width = 4, height = 4, dpi = 600)
+
+
+#K27 Genes Upregulated in qa_suz12_0hr, qa_suz12_24hr, and WT 24 hr
+venn.diagram(
+  x = list(rownames(qa_0hr_K27_UP), rownames(qa_24hr_K27_UP), rownames(WT_24hr_K27_UP)),
+  category.names = c("qa 0hr K27 UP", "qa 24hr K27 UP", "WT 24 hr K27 UP"),
+  filename = 'qa_0hr_qa_WT_24hr_K27_UP.png',
+  col=c("#8da0cb", "#66c2a5", "#fc8d62"),
+  fill = c(alpha("#8da0cb",0.25), alpha("#66c2a5",0.25), alpha("#fc8d62",0.25)),
+  output=FALSE)
+
+#qa_0hr_qa_WT_24hr_K27_UP_fit = euler(c("A" = 12, "B" = 15, "C" = 2, "A&B" = 21, "A&C" = 1, "B&C" = 23, "A&B&C" = 11))
+#qa_0hr_qa_WT_24hr_K27_UP_eulerplot <- plot(qa_0hr_qa_WT_24hr_K27_UP_fit)
+#ggsave(filename = "qa_0hr_qa_WT_24hr_K27_UP.pdf", plot = qa_0hr_qa_WT_24hr_K27_UP_eulerplot, width = 4, height = 4, dpi = 600)
+####EULER DOESNT WORK WELL
 
 ```
 

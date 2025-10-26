@@ -3264,15 +3264,59 @@ p
 
 ggsave("peak_coverage_pie.pdf", p, width = 3, height = 3)
 
+###Also doing the same for regions in WT 24 hr (including ectopic peaks)
+df2 <- data.frame(
+  group = c("Ectopic", "Native"),
+  bp    = c(bp_within, bp_outside)
+)
+df2$pct <- df2$bp / sum(df2$bp)
+df2$lbl <- sprintf("%s (%.1f%%)", df2$group, 100*df2$pct)
+
+# --- custom light colors ---
+base_colors <- c("#66c2a5", "#fc8d62")  # soft palette
+light_colors <- alpha(base_colors, 0.6)            # lighter transparency
+
+# --- plot ---
+p2 <- ggplot(df2, aes(x = "", y = bp, fill = group)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  scale_fill_manual(values = light_colors) +
+  geom_text(aes(label = lbl),
+            position = position_stack(vjust = 0.5),
+            size = 3) +
+  theme_void() +
+  guides(fill = guide_legend(title = NULL)) +
+  ggtitle("Coverage by category")
+
+p2
+
+ggsave("ectopic_peak_coverage_pie.pdf", p, width = 3, height = 3)
+
+
 ```
 
 ```{r, Processing Dataframes}
 ###K27 Peaks regained in timecourse
-early_recover = subset(H3K27me3_Results_K27peaks_vInput, (H3K27me3_Results_K27peaks_vInput$logFC_qa_4hr > 1 | H3K27me3_Results_K27peaks_vInput$logFC_qa_0hr > 1) & H3K27me3_Results_K27peaks_vInput$FDR_qa_4hr < 0.05)
+###df from other script. convert row names to columns
+library(dplyr)
+library(tidyr)
 
-late_recover = H3K27me3_Results_K27peaks_vInput %>%
-  filter(if_any(all_of(c(18, 21, 24)), ~ coalesce(.x > 1, FALSE)))
-late_recover = subset(late_recover, late_recover$FDR_qa_24hr < 0.05 | late_recover$FDR_qa_12hr < 0.05 | late_recover$FDR_qa_8hr < 0.05)
+K27_FilteredHeatmap_df2 <- K27_FilteredHeatmap_df %>%
+  tibble::rownames_to_column("rid") %>%
+  tidyr::extract(
+    rid,
+    into = c("seqnames", "start", "end"),
+    regex = "^(.*)\\.(\\d+)\\.(\\d+)$",
+    remove = TRUE
+  ) %>%
+  mutate(start = as.integer(start), end = as.integer(end)) %>%
+  relocate(seqnames, start, end, .before = 1)
+
+#determine groups
+early_recover = subset(K27_FilteredHeatmap_df2, K27_FilteredHeatmap_df2$logFC_qa_4hrvInput_K27me3 > 1 | K27_FilteredHeatmap_df2$logFC_qa_0hrvInput_K27me3 > 1)
+
+late_recover = K27_FilteredHeatmap_df2 %>%
+  filter(if_any(all_of(c(5:7)), ~ coalesce(.x > 1, FALSE)))
                       
 #get unqiue rows
 keys <- c("seqnames","start","end")
@@ -3286,13 +3330,15 @@ late_key  <- do.call(paste, c(late_recover[keys],  sep = "\u0001"))
 late_only <- late_recover[!(late_key %in% early_key), ]
 
 unrecovered <- subset(
-  H3K27me3_Results_K27peaks_vInput,
-  !(do.call(paste, c(H3K27me3_Results_K27peaks_vInput[keys], sep="\u0001")) %in%
+  K27_FilteredHeatmap_df2,
+  !(do.call(paste, c(K27_FilteredHeatmap_df2[keys], sep="\u0001")) %in%
       union(key_str(early_recover), key_str(late_recover)))
 )
 
 #Make dfs for bed
+
 ## --- helper: join a (seqnames,start,end) df to regions$K27peaks and keep BED coords ---
+#NOTE: Need to change colnames accordingly
 make_bed <- function(df, regions_k27) {
   # Coerce types to ensure exact key matches
   df <- transform(df,
@@ -3301,30 +3347,36 @@ make_bed <- function(df, regions_k27) {
     end      = as.integer(end)
   )
   regions_k27 <- transform(regions_k27,
-    V1 = as.character(V1),
-    V2 = as.integer(V2),
-    V3 = as.integer(V3)
+    seqnames = as.character(seqnames),
+    start    = as.integer(start),
+    end      = as.integer(end)
   )
   # Inner join on the 3-key; keep K27peaks coordinates
   m <- merge(
     df[c("seqnames","start","end")],
     regions_k27,
     by.x = c("seqnames","start","end"),
-    by.y = c("V1","V2","V3"),
+    by.y = c("seqnames","start","end"),
     all = FALSE
   )
   # Keep only BED cols, de-dup, and optionally sort
   bed <- unique(m[c("seqnames","start","end")])
-  names(bed) <- c("V1","V2","V3")
-  bed[order(bed$V1, bed$V2, bed$V3), ]
+  names(bed) <- c("seqnames","start","end")
+  bed[order(bed$seqnames, bed$start, bed$end), ]
 }
 
 ## --- build the three BED data.frames ---
-early_recover_BED   <- make_bed(early_recover,   regions$K27peaks)
-late_recover_BED    <- make_bed(late_only,       regions$K27peaks)    # your "late minus early" df
-unrecovered_BED  <- make_bed(unrecovered,  regions$K27peaks)    # in neither early nor late
+# early_recover_BED   <- make_bed(early_recover,   regions$K27peaks)
+# late_recover_BED    <- make_bed(late_only,       regions$K27peaks)    # your "late minus early" df
+# unrecovered_BED  <- make_bed(unrecovered,  regions$K27peaks)    # in neither early nor late
+
+early_recover_BED   <- make_bed(early_recover,   K27_FilteredHeatmap_df2)
+late_recover_BED    <- make_bed(late_only,       K27_FilteredHeatmap_df2)    # your "late minus early" df
+unrecovered_BED  <- make_bed(unrecovered,  K27_FilteredHeatmap_df2)    # in neither early nor late
+
 
 #write beds
+###NOTE: dont do this for windowed calls, do this for whole length peak calls (region mode) to plot in deeptools accordingly
 write.table(early_recover_BED, file = "early_recovered_peaks.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 write.table(late_recover_BED, file = "late_recovered_peaks.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
@@ -3334,8 +3386,8 @@ write.table(unrecovered_BED, file = "unrecovered_peaks.bed", sep = "\t", quote =
 #calculating total length of peaks
 # helper: sum of BED widths (half-open intervals: length = end - start)
 total_bp <- function(bed) {
-  start <- as.integer(bed$V2)
-  end   <- as.integer(bed$V3)
+  start <- as.integer(bed$start)
+  end   <- as.integer(bed$end)
   sum(pmax(end - start, 0L), na.rm = TRUE)
 }
 
@@ -3343,6 +3395,35 @@ total_bp <- function(bed) {
 early_recovered_bp <- total_bp(early_recover_BED)
 late_recovered_bp  <- total_bp(late_recover_BED)
 unrecovered_bp     <- total_bp(unrecovered_BED)
+
+###Doing similar appraoch for ectopic genes in qa 24 hr time point
+
+## --- 0) Prefilter by QA 24h > 1 ---
+df_pref <- K27_FilteredHeatmap_df2 %>%
+  filter(coalesce(logFC_qa_24hrvInput_K27me3, -Inf) > 1)
+
+## --- 1) Ectopic peaks (BED: 0-based half-open → 1-based inclusive) ---
+ect <- with(regions$K27peaks_ectopic,
+            GRanges(seqnames = V1, ranges = IRanges(start = V2 + 1L, end = V3)))
+
+## --- 2) Windows from the prefiltered df (already 1-based) ---
+win <- with(df_pref,
+            GRanges(seqnames = seqnames, ranges = IRanges(start = start, end = end)))
+
+## --- 3) Overlap flag (any overlap = “within”) ---
+within_flag <- overlapsAny(win, ect)
+
+## ------- A) If you want TOTAL BP by class (uses start/end) -------
+df_bp <- df_pref %>%
+  mutate(within = within_flag,
+         width  = pmax(as.integer(end) - as.integer(start), 0L))
+
+bp_within  <- sum(df_bp$width[df_bp$within],  na.rm = TRUE)
+bp_outside <- sum(df_bp$width[!df_bp$within], na.rm = TRUE)
+
+bp_within; bp_outside
+
+
 #################################################
 ### determining genes that experience recovery
 
