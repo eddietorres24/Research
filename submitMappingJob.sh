@@ -16,8 +16,8 @@ then
 
 #iterates through list of accessions and passes to mapping script
 
-fastqPath="/scratch/evt82290/FastqFiles/Run146"
-outdir="/scratch/evt82290/MappingOutputs/Run146"
+fastqPath="/scratch/evt82290/FastqFiles/Run148"
+outdir="/scratch/evt82290/MappingOutputs/Run148"
 
 mkdir ${outdir}
 mkdir ${outdir}/logs
