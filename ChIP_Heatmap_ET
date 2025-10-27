@@ -241,13 +241,12 @@ computeMatrix scale-regions -a 500 -b 500 \
         --skipZeros \
         -o matrix_qa-suz12_GENES_clustered.gz
 
-      plotHeatmap -m matrix_qa-suz12_GENES_clustered.gz -out H3K27me3_GENES_qa-suz12_clustered_mutants_test.pdf \
+      plotHeatmap -m matrix_qa-suz12_GENES_clustered.gz -out H3K27me3_GENES_qa-suz12_clustered_mutants_test_withLegend.pdf \
         --samplesLabel WT 4hr 24hr hpo isw h2az ash1 cac-3 \
         --startLabel "5'" --endLabel "3'" \
         --missingDataColor 1 \
         --sortRegions descend --sortUsing sum \
         --heatmapHeight 15 \
-        --whatToShow "heatmap and colorbar" \
         --colorList 'white,g,darkgreen' 'white,g,darkgreen' 'white,g,darkgreen' 'white,g,darkgreen' 'white,cadetblue,teal' 'white,cadetblue,teal' 'white,cadetblue,teal' 'white,cadetblue,teal' \
         --zMin 0 --zMax 50 \
 
@@ -266,13 +265,12 @@ computeMatrix scale-regions -a 500 -b 500 \
           --skipZeros \
           -o matrix_qa-suz12_PEAKS_clustered.gz
 
-        plotHeatmap -m matrix_qa-suz12_PEAKS_clustered.gz -out H3K27me3_PEAKS_qa-suz12_clustered_mutants_test.pdf \
+        plotHeatmap -m matrix_qa-suz12_PEAKS_clustered.gz -out H3K27me3_PEAKS_qa-suz12_clustered_mutants_test_withLegend.pdf \
           --samplesLabel WT 4hr 24hr hpo isw h2az ash1 cac-3 \
           --startLabel "5'" --endLabel "3'" \
           --missingDataColor 1 \
           --heatmapHeight 15 \
           --sortRegions descend --sortUsing sum \
-          --whatToShow "heatmap and colorbar" \
           --colorList 'white,g,darkgreen' 'white,g,darkgreen' 'white,g,darkgreen' 'white,g,darkgreen' 'white,cadetblue,teal' 'white,cadetblue,teal' 'white,cadetblue,teal' 'white,cadetblue,teal' \
           --zMin 0 --zMax 30 \
 

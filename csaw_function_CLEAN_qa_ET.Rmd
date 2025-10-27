@@ -3292,7 +3292,7 @@ p2
 
 ggsave("ectopic_peak_coverage_pie.pdf", p2, width = 3, height = 3)
 
-###Finally, for 4hr peaks, telomeric vs internal
+###For 4hr peaks, telomeric vs internal
 df3 <- data.frame(
   group = c("Internal", "subtelomeric"),
   bp    = c(bp_4hr_internal, bp_4hr_subtelomeres)
@@ -3319,6 +3319,36 @@ p3 <- ggplot(df3, aes(x = "", y = bp, fill = group)) +
 p3
 
 ggsave("4hr_peak_coverage_pie.pdf", p3, width = 3, height = 3)
+
+###Ectopic peaks, subtelomeric vs. internal
+
+df4 <- data.frame(
+  group = c("Internal", "subtelomeric"),
+  bp    = c(bp_inside, bp_outside)
+)
+df4$pct <- df4$bp / sum(df4$bp)
+df4$lbl <- sprintf("%s (%.1f%%)", df4$group, 100*df4$pct)
+
+# --- custom light colors ---
+base_colors <- c("#66c2a5", "#fc8d62")  # soft palette
+light_colors <- alpha(base_colors, 0.6)            # lighter transparency
+
+# --- plot ---
+p4 <- ggplot(df4, aes(x = "", y = bp, fill = group)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  scale_fill_manual(values = light_colors) +
+  geom_text(aes(label = lbl),
+            position = position_stack(vjust = 0.5),
+            size = 3) +
+  theme_void() +
+  guides(fill = guide_legend(title = NULL)) +
+  ggtitle("Coverage by category")
+
+p4
+
+ggsave("ectopic_location_peak_coverage_pie.pdf", p4, width = 3, height = 3)
+
 
 ```
 
@@ -3452,6 +3482,7 @@ bp_outside <- sum(df_bp$width[!df_bp$within], na.rm = TRUE)
 
 bp_within; bp_outside
 
+
 ###
 #Also testing locations of 4 hour recovery
 ###
@@ -3474,6 +3505,118 @@ total_bp <- function(df) sum(pmax(as.integer(df$end) - as.integer(df$start), 0L)
 
 bp_4hr_internal     <- total_bp(`4hr_internal`)
 bp_4hr_subtelomeres <- total_bp(`4hr_subtelomeric`)
+
+
+###########
+### Ectopic Peaks within subtelomeres
+
+# Keep only windows that overlap ectopic peaks
+ect_win <- win[within_flag]
+
+# Convert chromlength_internal BED (currently 0-based half-open) → 1-based inclusive GRanges
+# You created it by shrinking V2/V3 by 150kb each side; ensure valid intervals remain.
+chromlength_internal <- chromlength_internal %>%
+  rename(chr = V1, start0 = V2, end0 = V3)
+
+internal_gr <- with(chromlength_internal, {
+  # keep only rows where end0 > start0 after shrink
+  keep <- which(end0 > start0)
+  GRanges(
+    seqnames = chr[keep],
+    ranges   = IRanges(start = start0[keep] + 1L, end = end0[keep])
+  )
+})
+
+# Reduce internal regions (merge any touching/overlapping intervals)
+internal_gr <- GenomicRanges::reduce(internal_gr)
+
+## ------------------------------
+## 2) Partition ectopic windows by INTERNAL vs OUTSIDE
+## ------------------------------
+
+# Portion INSIDE internal genome (sum of intersected widths)
+inside_parts  <- GenomicRanges::intersect(ect_win, internal_gr, ignore.strand = TRUE)
+bp_inside     <- sum(width(inside_parts))
+
+# Portion OUTSIDE internal genome (i.e., subtelomeric or gaps)
+outside_parts <- GenomicRanges::setdiff(ect_win, internal_gr, ignore.strand = TRUE)
+bp_outside    <- sum(width(outside_parts))
+
+# (Optional) sanity check: total ectopic bp should equal inside + outside
+bp_total_ect  <- sum(width(ect_win))
+
+## ------------------------------
+## 3) Counts of regions, too (optional)
+## ------------------------------
+n_inside  <- length(unique(findOverlaps(ect_win, internal_gr, ignore.strand = TRUE)@from))
+n_outside <- length(ect_win) - n_inside
+
+## ------------------------------
+## 4) Tidy summary tibble
+## ------------------------------
+summary_bp <- tibble::tibble(
+  class     = c("inside_internal", "outside_internal", "total_ectopic_windows"),
+  n_regions = c(n_inside, n_outside, length(ect_win)),
+  bp_sum    = c(bp_inside, bp_outside, bp_total_ect)
+)
+
+summary_bp
+
+####################################
+#Do for ectopic genes
+
+library(dplyr)
+library(tibble)
+library(GenomicRanges)
+
+## --- 1) Internal bounds as GRanges (1-based inclusive) ---
+
+keep <- which(chromlength_internal$end0 > chromlength_internal$start0)
+internal_gr <- with(chromlength_internal[keep, ],
+                    GRanges(seqnames = chr, ranges = IRanges(start = start0 + 1L, end = end0)))
+internal_gr <- GenomicRanges::reduce(internal_gr, ignore.strand = TRUE)
+
+## --- 2) Ectopic genes as GRanges (GFF-like -> already 1-based inclusive) ---
+# Use V10 (or V11) as a gene identifier if present
+gene_id <- if ("V10" %in% names(ectopic_genes)) ectopic_genes$V10 else seq_len(nrow(ectopic_genes))
+
+genes_gr <- with(ectopic_genes,
+                 GRanges(seqnames = V1,
+                         ranges   = IRanges(start = V2, end = V3),
+                         strand   = V6,
+                         gene_id  = gene_id))
+
+## --- 3) Partition by internal bounds ---
+# Flag genes overlapping internal regions (ignore strand)
+inside_flag <- GenomicRanges::countOverlaps(genes_gr, internal_gr, ignore.strand = TRUE) > 0
+
+genes_inside_gr <- genes_gr[ inside_flag]
+genes_out_gr    <- genes_gr[!inside_flag]
+
+# Region counts
+n_inside  <- length(genes_inside_gr)
+n_outside <- length(genes_out_gr)
+
+## --- 4) Basepairs INSIDE vs OUTSIDE (handle partial overlaps) ---
+# INSIDE bp: intersect genes with internal bounds
+inside_clip <- GenomicRanges::intersect(genes_gr, internal_gr, ignore.strand = TRUE)
+bp_inside   <- sum(width(inside_clip))
+
+# OUTSIDE bp: gene parts not in internal bounds
+outside_clip <- GenomicRanges::setdiff(genes_gr, internal_gr, ignore.strand = TRUE)
+bp_outside   <- sum(width(outside_clip))
+
+bp_total <- sum(width(genes_gr))  # equals bp_inside + bp_outside
+
+summary_genes <- tibble(
+  class     = c("genes_inside", "genes_outside", "total_genes",
+                "bp_inside", "bp_outside", "bp_total"),
+  value     = c(n_inside, n_outside, length(genes_gr),
+                bp_inside, bp_outside, bp_total)
+)
+
+summary_genes
+
 
 #################################################
 ### determining genes that experience recovery
@@ -3530,12 +3673,123 @@ write.table(K27_gain_genes, file = "qa_K27_gain_genes.bed", sep = "\t", quote = 
 write.table(ectopic_genes, file = "ectopic_qa_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 #combining native and ectopic K27 genes
-library(dplyr)
 
 all_qa_k27_genes <- bind_rows(regions$K27genes, ectopic_genes) %>%
   # if either file uses V11 as the ID, fall back to it
   mutate(gene_id = if_else(is.na(gene_id) | gene_id == "", V11, gene_id)) %>%
   distinct(gene_id, .keep_all = TRUE) %>%
   arrange(V1, V2, V3)
+
+
+#counting internal peaks in 4 hr time point
+fourhr_peaks = read.table("../bed_files/qa-suz12_4hr_H3K27me3_Rep2_peaks_peaks.bed")
+
+library(dplyr)
+library(tibble)
+library(GenomicRanges)
+# library(IRanges)  # not strictly needed below
+
+## --- 0) Inputs you already have ---
+# fourhr_peaks <- read.table("../bed_files/qa-suz12_4hr_H3K27me3_Rep2_peaks_peaks.bed")
+# chromlength, chromlength_internal from your earlier code (0-based BED)
+# H3K27me3_Results_Allpeaks_vInput (data.frame with seqnames/start/end/metrics)
+
+## --- 1) Build internal_gr (1-based inclusive) if not already present ---
+if (!exists("internal_gr")) {
+  chromlength_internal <- transform(chromlength, V2 = V2 + 150000L, V3 = V3 - 150000L)
+  chromlength_internal <- chromlength_internal %>%
+    rename(chr = V1, start0 = V2, end0 = V3)
+  keep <- which(chromlength_internal$end0 > chromlength_internal$start0)
+  internal_gr <- with(chromlength_internal[keep, ],
+                      GRanges(seqnames = chr, ranges = IRanges(start = start0 + 1L, end = end0)))
+  internal_gr <- GenomicRanges::reduce(internal_gr, ignore.strand = TRUE)
+}
+
+## --- 2) Filter results table for 4h thresholds ---
+df4 <- H3K27me3_Results_Allpeaks_vInput %>%
+  filter(coalesce(logFC_qa_4hr, -Inf) > 0.585,
+         coalesce(FDR_qa_4hr, 1) < 0.05)
+
+## --- 3) Convert both to GRanges (coordinate sanity: results = 1-based; BED = 0-based half-open) ---
+res_gr <- with(df4, GRanges(seqnames = seqnames, ranges = IRanges(start = start, end = end)))
+
+peaks_gr <- with(fourhr_peaks,
+                 GRanges(seqnames = V1, ranges = IRanges(start = V2 + 1L, end = V3)))
+
+## --- 4) All overlaps between filtered results and 4h peaks ---
+hits <- GenomicRanges::findOverlaps(res_gr, peaks_gr, ignore.strand = TRUE)
+
+# Make a tidy overlaps table (each row = one result–peak pair)
+overlaps_tbl <- bind_cols(
+  df4[queryHits(hits), ] %>% as_tibble(),
+  fourhr_peaks[subjectHits(hits), ] %>%
+    as_tibble() %>%
+    rename(peak_chr = V1, peak_start0 = V2, peak_end0 = V3, peak_name = V4) %>%
+    mutate(peak_start = peak_start0 + 1L, peak_end = peak_end0)
+) %>%
+  mutate(result_row = queryHits(hits),
+         peak_row   = subjectHits(hits))
+
+# If you want only unique peaks that overlap the filtered results:
+peak_idx_sub <- unique(subjectHits(hits))
+peaks_sub    <- peaks_gr[peak_idx_sub]
+
+## --- 5) Inside vs outside basepairs for the overlapping peaks only (unique coverage) ---
+# Union overlapping peaks to avoid double-counting bp
+peaks_union <- GenomicRanges::reduce(peaks_sub, ignore.strand = TRUE)
+
+inside_parts  <- GenomicRanges::intersect(peaks_union, internal_gr, ignore.strand = TRUE)
+outside_parts <- GenomicRanges::setdiff(peaks_union,  internal_gr, ignore.strand = TRUE)
+
+bp_inside  <- sum(width(inside_parts))
+bp_outside <- sum(width(outside_parts))
+bp_total   <- sum(width(peaks_union))  # should equal inside + outside
+
+n_peaks_total  <- length(peaks_sub)
+n_peaks_inside <- sum(GenomicRanges::countOverlaps(peaks_sub, internal_gr, ignore.strand = TRUE) > 0)
+n_peaks_outside <- n_peaks_total - n_peaks_inside
+
+summary_4h <- tibble(
+  class     = c("inside_internal_bp", "outside_internal_bp", "total_unique_bp",
+                "peaks_inside", "peaks_outside", "peaks_total"),
+  value     = c(bp_inside, bp_outside, bp_total,
+                n_peaks_inside, n_peaks_outside, n_peaks_total)
+)
+
+## --- 6) Outputs ---
+overlaps_tbl    # all result–peak overlaps (joined info)
+summary_4h      # bp + counts restricted to peaks overlapping significant 4h results
+
+# --- 0) Choose output paths
+out_dir <- "./"  # change if you want
+bed_orig_path   <- file.path(out_dir, "peaks_insideInternal.bed")
+
+# --- 1) Identify which of the (filtered-overlap) peaks are inside the internal bounds
+inside_flag <- GenomicRanges::countOverlaps(peaks_sub, internal_gr, ignore.strand = TRUE) > 0
+peaks_inside_gr <- peaks_sub[inside_flag]
+
+# Map back to the original fourhr_peaks rows (so we can write original intervals if desired)
+orig_rows_inside <- peak_idx_sub[inside_flag]
+
+# --- 2A) BED of original peak intervals that overlap internal (0-based half-open)
+# Handle presence/absence of a 4th "name" column gracefully
+if (ncol(fourhr_peaks) >= 4) {
+  bed_inside_orig <- tibble::tibble(
+    V1 = fourhr_peaks$V1[orig_rows_inside],
+    V2 = fourhr_peaks$V2[orig_rows_inside],           # already 0-based
+    V3 = fourhr_peaks$V3[orig_rows_inside],           # half-open end
+    V4 = fourhr_peaks$V4[orig_rows_inside]
+  )
+} else {
+  bed_inside_orig <- tibble::tibble(
+    V1 = fourhr_peaks$V1[orig_rows_inside],
+    V2 = fourhr_peaks$V2[orig_rows_inside],
+    V3 = fourhr_peaks$V3[orig_rows_inside]
+  )
+}
+
+write.table(bed_inside_orig, bed_orig_path, sep = "\t",
+            row.names = FALSE, col.names = FALSE, quote = FALSE)
+
 
 ```

@@ -14,7 +14,7 @@
 
 #Convert Broadpeaks to bed format
 
-#for file in *.broadPeak; do cut -f1-6 "$file" > "${file%.broadPeak}_peaks.bed"; done
+for file in *.broadPeak; do cut -f1-6 "$file" > "${file%.broadPeak}_peaks.bed"; done
 
 
 #bedtools

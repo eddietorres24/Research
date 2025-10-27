@@ -100,10 +100,12 @@ Prc2targets <- read.table("../bed_files/H3K27me3_methylated_genes_FINAL.bed", he
 ###SUBSET DATA FOR ALL KO SAMPLES
 Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,10])
 ectopicTPM <- subset(allDataTPM, rownames(allDataTPM)%in%ectopic_genes[,10])
+nonectopicTPM <- subset(allDataTPM, ! rownames(allDataTPM)%in%ectopic_genes[,10])
 
 ###SUBSET DATA FOR AVERAGED KO SAMPLES
 AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,10])
 AVERAGE_ectopicTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%ectopic_genes[,10])
+AVERAGE_nonectopicTPM <- subset(Averaged_Orderd_KO_data, ! rownames(Averaged_Orderd_KO_data)%in%ectopic_genes[,10])
 
 ###Subset data to filter out non-PRC2 target regions that got through (cutting out any genes over 2 tpm in WT)
 AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 10))
@@ -119,6 +121,9 @@ AVERAGE_Prc2targetTPM <- log2(AVERAGE_Prc2targetTPM)
 AVERAGE_ectopicTPM <- AVERAGE_ectopicTPM + 1
 AVERAGE_ectopicTPM <- log2(AVERAGE_ectopicTPM)
 
+AVERAGE_nonectopicTPM <- AVERAGE_nonectopicTPM + 1
+AVERAGE_nonectopicTPM <- log2(AVERAGE_nonectopicTPM)
+
 AVERAGE_AlldataTPM <- AVERAGE_AlldataTPM + 1
 AVERAGE_AlldataTPM <- log2(AVERAGE_AlldataTPM)
 #melt data to get it into a format ggplots can use (load library "reshape2")
@@ -129,6 +134,9 @@ meltedPRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
 
 #Ectopic
 meltedEctopicData <- melt(AVERAGE_ectopicTPM, value.name = 'Count',
+                             varnames=c('GeneID', 'Sample'))
+
+meltedNonEctopicData <- melt(AVERAGE_nonectopicTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
 #Alldata
@@ -211,9 +219,13 @@ ggsave(filename = "qa-suz12_PRC2_genes.pdf", plot = box, dpi = 600, height = 5.5
 meltedAverageEctopicData <- melt(AVERAGE_ectopicTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
+meltedAverageNonEctopicData <- melt(AVERAGE_nonectopicTPM, value.name = 'Count',
+                             varnames=c('GeneID', 'Sample'))
+
 altorder = rev(c("WT_0hr","WT_24hr","qa-suz12_0hr", "qa-suz12_24hr"))
 
 meltedAverageEctopicData$Sample <- factor(meltedAverageEctopicData$Sample)
+meltedAverageNonEctopicData$Sample <- factor(meltedAverageNonEctopicData$Sample)
 
 # Desired order (will be reversed on the plot)
 label_order <- c("WT_0hr", "WT_24hr", "qa-suz12_0hr", "qa-suz12_24hr")
@@ -260,19 +272,6 @@ ggsave(filename = "qa_ectopic_genes.pdf", plot = box, dpi = 600, height = 5.5, w
 
 ```{r statistics, echo=FALSE}
 #I want to run statistical tests to determine the signifcance of the difference in expression b/w mutant strains and WT
-
-AVERAGE_Prc2targetTPM_ALL <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%rownames(Prc2targetTPM))
-
-#Subset data to filter out non-repressed PRC2 targets regions that got through (cutting out any genes over 10 tpm in WT). Choice of 10 TPM cutoff was arbitrary
-##These are likely genes whose promoters are not marked by H3K27me3, genes on the edge of K27 regions, and/or bivalent genes
-AVERAGE_Prc2targetTPM_ALL <- subset(AVERAGE_Prc2targetTPM_ALL, (AVERAGE_Prc2targetTPM_ALL[,1] < 10))
-
-#resubet PRC2 targets after filtering
-Prc2targetTPM_ALL <- subset(Prc2targetTPM, rownames(Prc2targetTPM)%in%rownames(AVERAGE_Prc2targetTPM_ALL))
-
-#Add sudocount and log transform (if necessary)
-AVERAGE_Prc2targetTPM_ALL <- AVERAGE_Prc2targetTPM_ALL + 1
-AVERAGE_Prc2targetTPM_ALL <- log2(AVERAGE_Prc2targetTPM_ALL)
 
 ## First, I make histogram to visualize distribution of data. we'll use cac-1 as a comparison to WT
 hist <- as.data.frame(AVERAGE_Prc2targetTPM_ALL)
@@ -422,6 +421,55 @@ print(violin)
 
 #save plot
 ggsave("./qa-suz12_Ectopic_Gene_expression.pdf", plot=violin, width = 8, height = 5, unit="in",  dpi=400)
+
+```
+
+```{r, ectopic vs non-ectopic}
+library(dplyr)
+library(ggplot2)
+
+# ---- inputs ----
+label_order <- c("WT_0hr", "WT_24hr", "qa-suz12_0hr", "qa-suz12_24hr")
+formatted_labels <- c("WT_0hr","WT_24hr","qa_0hr","qa_24hr")
+
+# Add a dataset label and combine
+combined <- bind_rows(
+  meltedAverageEctopicData      %>% mutate(Dataset = "Ectopic"),
+  meltedAverageNonEctopicData   %>% mutate(Dataset = "Non-ectopic")
+) %>%
+  mutate(Sample = factor(Sample, levels = label_order),
+         Dataset = factor(Dataset, levels = c("Ectopic","Non-ectopic")))
+
+# (optional) sample sizes per group (used if you want n in legends/labels)
+n_per <- combined %>%
+  count(Sample, Dataset, name = "n")
+
+# Plot: two violins per Sample (grouped by Dataset)
+pd <- position_dodge(width = 0.8)
+
+violin <- ggplot(combined, aes(x = Sample, y = Count, fill = Dataset)) +
+  geom_violin(position = pd, scale = "width", trim = FALSE, width = 0.8) +
+  stat_summary(aes(group = Dataset),
+               fun = "mean", geom = "crossbar",
+               position = pd, width = 0.25, colour = "red") +
+  scale_x_discrete(labels = formatted_labels) +
+  scale_y_continuous(limits = c(-2.75, 15),
+                     breaks = seq(0, 15, 3),
+                     expand = c(0,0)) +
+  labs(x = "Strain",
+       y = expression("Expression Level (log"[2]~"(TPM+1))"),
+       fill = "Dataset") +
+  theme_classic(base_size = 20) +
+  theme(axis.text.x  = element_text(color = "black"),
+        axis.text.y  = element_text(color = "black"),
+        axis.title.x = element_text(color = "black"),
+        axis.title.y = element_text(color = "black"),
+        legend.position = "right")
+
+print(violin)
+
+ggsave("./qa-suz12_Ectopic_vs_Non_Gene_expression.pdf", plot=violin, width = 8, height = 5, unit="in",  dpi=400)
+
 
 ```
 
@@ -896,7 +944,7 @@ venn.diagram(
   fill = c(alpha("#8da0cb",0.25), alpha("#fc8d62",0.25)),
   output=FALSE)
 
-qa_WT_24hr_UP_fit = euler(c("A" = 1101, "B" = 129, "A&B" = 606))
+qa_WT_24hr_UP_fit = euler(c("A" = 317, "B" = 214, "A&B" = 726))
 qa_WT_24hr_UP_eulerplot <- plot(qa_WT_24hr_UP_fit)
 ggsave(filename = "qa_WT_24hr_UP.pdf", plot = qa_WT_24hr_UP_eulerplot, width = 4, height = 4, dpi = 600)
 
