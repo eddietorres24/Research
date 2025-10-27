@@ -15,9 +15,9 @@ source config.txt
 
 ###ADD a source file with path to FastqFiles
 #variables imported from submission script
-fastqPath="/scratch/evt82290/FastqFiles/Run148"
+fastqPath="/scratch/evt82290/FastqFiles/Run145"
 # accession="eed_comp_Courtney_2020"
-outdir="/scratch/evt82290/MappingOutputs/Run148"
+outdir="/scratch/evt82290/MappingOutputs/Run145"
 
 # #if output directory doesn't exist, create it
 if [ ! -d $outdir ]
