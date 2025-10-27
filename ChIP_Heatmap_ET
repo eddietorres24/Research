@@ -272,7 +272,7 @@ computeMatrix scale-regions -a 500 -b 500 \
           --heatmapHeight 15 \
           --sortRegions descend --sortUsing sum \
           --colorList 'white,g,darkgreen' 'white,g,darkgreen' 'white,g,darkgreen' 'white,g,darkgreen' 'white,cadetblue,teal' 'white,cadetblue,teal' 'white,cadetblue,teal' 'white,cadetblue,teal' \
-          --zMin 0 --zMax 30 \
+          --zMin 0 --zMax 50 50 50 20 20 20 20 20 \
 
 
 ###############################################################################################################################################
