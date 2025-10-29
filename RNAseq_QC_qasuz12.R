@@ -18,8 +18,8 @@ setwd(get_script_dir()); cat("Working directory set to:", getwd(), "\n")
 
 ## ================== user settings (edit) ==================
 counts_file      <- "../text_files/readcounts_qa_paper_TEST.txt"   # featureCounts output
-coldata_file     <- "../coldata_qa.csv"                            # must have columns: sample_id, condition
-names_file       <- "names_qa.txt"                                 # mapping columns -> desired names
+coldata_file     <- "../coldata_qa_test.csv"                            # must have columns: sample_id, condition
+names_file       <- "names_qa_test.txt"                                 # mapping columns -> desired names
 gene_map_file    <- "gene_annotation.csv"                          # optional: gene_id,gene_symbol
 k27_bed_file     <- "H3K27me3_methylated_genes_FINAL.bed"          # optional: IDs in col 10 (not required)
 outdir           <- "RNAseq_QC_qa-suz12_Fig_S1_out"
