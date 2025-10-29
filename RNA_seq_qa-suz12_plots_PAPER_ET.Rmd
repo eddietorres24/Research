@@ -274,41 +274,37 @@ ggsave(filename = "qa_ectopic_genes.pdf", plot = box, dpi = 600, height = 5.5, w
 #I want to run statistical tests to determine the signifcance of the difference in expression b/w mutant strains and WT
 
 ## First, I make histogram to visualize distribution of data. we'll use cac-1 as a comparison to WT
-hist <- as.data.frame(AVERAGE_Prc2targetTPM_ALL)
+hist <- as.data.frame(AVERAGE_Prc2targetTPM)
+hist_ect <- as.data.frame(AVERAGE_ectopicTPM)
 
 long_hist <- hist %>%
-  select(WT, `cac-1`) %>%
+  select(WT_0hr, `qa-suz12_24hr`) %>%
   pivot_longer(cols = everything(), names_to = "Strain", values_to = "TPM")
 
 # Plot overlapping histograms
 ggplot(long_hist, aes(x = TPM, fill = Strain)) +
   geom_histogram(position = "identity", alpha = 0.5, bins = 15, color = "black") +
   theme_minimal() +
-  labs(title = "TPM Distribution in WT and cac-1",
+  labs(title = "TPM Distribution in WT and qa-suz-12",
        x = "TPM",
        y = "Frequency") +
-  scale_fill_manual(values = c("WT" = "steelblue", "cac-1" = "tomato"))
+  scale_fill_manual(values = c("WT_0hr" = "steelblue", "qa-suz12_24hr" = "tomato"))
 
 #Histogram shows non-normal distribution (skewed right), so proceed with wilcox test instead of t test
 ##running tests
-set7_stat <- wilcox.test(hist$`set-7`, hist$WT, alternative = "greater")
-cac1_stat <- wilcox.test(hist$`cac-1`, hist$WT, alternative = "greater")
-cac2_stat <- wilcox.test(hist$`cac-2`, hist$WT, alternative = "greater")
-cac3_stat <- wilcox.test(hist$`cac-3`, hist$WT, alternative = "greater")
-naf1_stat <- wilcox.test(hist$`naf-1`, hist$WT, alternative = "greater")
-naf2_stat <- wilcox.test(hist$`naf-2`, hist$WT, alternative = "greater")
-asf1_stat <- wilcox.test(hist$`asf-1`, hist$WT, alternative = "greater")
-atrx_stat <- wilcox.test(hist$`ATRX`, hist$WT, alternative = "greater")
-cac1_2_stat <- wilcox.test(hist$`cac-1_cac-2`, hist$WT, alternative = "greater")
-cac1_suz12_stat <- wilcox.test(hist$`cac-1_suz-12`, hist$WT, alternative = "greater")
-suz12_stat <- wilcox.test(hist$`suz-12`, hist$WT, alternative = "greater")
-ash1_stat <- wilcox.test(hist$`ash-1`, hist$WT, alternative = "greater")
+qa_0hr_stat <- wilcox.test(hist$`qa-suz12_0hr`, hist$WT_0hr, alternative = "greater")
+qa_24hr_stat <- wilcox.test(hist$`qa-suz12_24hr`, hist$WT_0hr, alternative = "greater")
+WT_24hr_stat <- wilcox.test(hist$WT_24hr, hist$WT_0hr, alternative = "greater")
+
+qa_0hr_ect_stat <- wilcox.test(hist_ect$`qa-suz12_0hr`, hist_ect$WT_0hr, alternative = "less")
+qa_24hr_ect_stat <- wilcox.test(hist_ect$`qa-suz12_24hr`, hist_ect$WT_0hr, alternative = "less")
+WT_24hr_ect_stat <- wilcox.test(hist_ect$WT_24hr, hist_ect$WT_0hr, alternative = "less")
 
 #Make a list of all wilcox results objects
-wilcox_list <- list(set7_stat, cac1_stat, cac2_stat, cac3_stat, naf1_stat, naf2_stat, asf1_stat, atrx_stat, cac1_2_stat, cac1_suz12_stat, suz12_stat, ash1_stat)
+wilcox_list <- list(qa_0hr_stat, qa_24hr_stat, WT_24hr_stat, qa_0hr_ect_stat, qa_24hr_ect_stat, WT_24hr_ect_stat)
 
 #rename objects
-names(wilcox_list) <- c("set7", "cac1", "cac2", "cac3", "naf1", "naf2", "asf1", "atrx", "cac-1_cac-2", "cac-1_suz-12", "suz-12", "ash-1")
+names(wilcox_list) <- c("qa 0hr PRC2", "qa 24hr PRC2", "WT 24 hr PRC2", "qa 0hr ectopic", "qa 24hr ectopic", "WT 24 hr ectopic")
 
 #Extract relevant stats into a dataframe
 wilcox_df <- do.call(rbind, lapply(wilcox_list, function(res) {
@@ -324,7 +320,7 @@ wilcox_df <- do.call(rbind, lapply(wilcox_list, function(res) {
 rownames(wilcox_df) <- names(wilcox_list)
 
 # Save to CSV
-write.csv(wilcox_df, "Wilcoxon_summary_stats.csv", row.names = TRUE)
+write.csv(wilcox_df, "Wilcoxon_summary_stats_qa-suz-12.csv", row.names = TRUE)
 ```
 
 #I want to make a violin plot instead of boxplot. Going to adapt Abby's code

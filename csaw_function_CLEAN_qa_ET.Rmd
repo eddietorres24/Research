@@ -30,14 +30,14 @@ library(dplyr)
 ```{r, read in metadata & regions of interest}
 #reading in metdata
 meta <- read.csv("../csaw_samples_files/csaw_qa-suz12_ET.csv")
-# metaQC <- read.csv("../csaw_samples_files/cac_csaw_QC_TEST.csv")
+metaQC <- read.csv("../csaw_samples_files/csaw_qa-suz12_QC_ET.csv")
 
 #fix path (if necessary, should only be if you're in wrong directory)
 meta <- meta %>%
   mutate(bamReads = paste0("../", bamReads))
 
-# metaQC <- metaQC %>%
-  # mutate(bamReads = paste0("../", bamReads))
+ metaQC <- metaQC %>%
+   mutate(bamReads = paste0("../", bamReads))
 
 #meta <- meta %>%
 #mutate(Peaks = paste0("../", Peaks))
@@ -900,15 +900,10 @@ chipqc_metrics_to_excel <- function(metadata, out_dir = "QC_ChIPQCOnly", xlsx_fi
 
 ###########################################################################################
 ```{r, Run QC function}
-
 #This is where you change the parameters and run the function
-run_diffbind_only(metaQC, out_dir = "QC_DiffBindOnly")
-run_chipqc_only(metaQC, out_dir = "QC_ChIPQCOnly")
-chipqc_metrics_to_excel(metaQC, out_dir = "QC_ChIPQCOnly", xlsx_file = "ChIPQC_metrics.xlsx")
-
-meta_k4 <- subset(metaQC, grepl("H3K4me2", Antibody, ignore.case = TRUE))
-run_chipqc_only(meta_k4, out_dir = "QC_ChIPQCOnly_H3K4me2", normalize_only_mod_regex = NULL)
-
+run_diffbind_only(metaQC, out_dir = "qa_QC_DiffBindOnly")
+run_chipqc_only(metaQC, out_dir = "qa_QC_ChIPQCOnly")
+chipqc_metrics_to_excel(metaQC, out_dir = "qa_QC_ChIPQCOnly", xlsx_file = "ChIPQC_metrics.xlsx")
 
 ```
 ###########################################################################################
@@ -3646,11 +3641,11 @@ write.table(genes_unrecovered, file = "unrecovered_genes.bed", sep = "\t", quote
 ##################################################
 #Ectopic Peaks and Genes
 
-#Any ectopic peaks in WT 24hr?  ###NO###
-H3K27me3_peaks_GAIN_WT_24hr = subset(H3K27me3_Results_K27peaks_ectopic_vWT_0hr, H3K27me3_Results_K27peaks_ectopic_vWT_0hr$logFC_WT_24hr > 1 & H3K27me3_Results_K27peaks_ectopic_vWT_0hr$FDR_WT_24hr < 0.05)
+#Any ectopic peaks in WT 24hr?
+H3K27me3_peaks_GAIN_WT_24hr = subset(H3K27me3_Results_K27peaks_ectopic_vWT_0hr, H3K27me3_Results_K27peaks_ectopic_vWT_0hr$logFC_WT_24hr > 1)
 
 #significant ectopic peaks in qa-suz12
-H3K27me3_peaks_GAIN_qa_24hr = subset(H3K27me3_Results_K27peaks_ectopic_vWT_0hr, H3K27me3_Results_K27peaks_ectopic_vWT_0hr$logFC_qa_24hr > 1 & H3K27me3_Results_K27peaks_ectopic_vWT_0hr$FDR_qa_24hr < 0.05)
+H3K27me3_peaks_GAIN_qa_24hr = subset(H3K27me3_Results_K27peaks_ectopic_vWT_0hr, H3K27me3_Results_K27peaks_ectopic_vWT_0hr$logFC_qa_24hr > 1)
 
 ectopic_peaks = regions$K27peaks_ectopic[overlapsAny(with(regions$K27peaks_ectopic, GRanges(V1, IRanges(V2, V3))), with(H3K27me3_peaks_GAIN_qa_24hr, GRanges(seqnames, IRanges(start, end)))), ]
 

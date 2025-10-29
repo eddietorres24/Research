@@ -3584,6 +3584,8 @@ peaks <- heatmap_to_bed_peaks(
 ##isolate genes of interest
 CAF1_K36_lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_cac1 < -0.75 | H3K36me3_Results_K27promTSS_vWT$logFC_cac2 < -0.75)
 
+set7_K36_lost = subset(H3K36me3_Results_K27promTSS_vWT, H3K36me3_Results_K27promTSS_vWT$logFC_set7 < -0.75)
+
 ##subset the bed
 K36_lost_bed = subset(regions$K27genes, regions$K27genes$gene_id %in% CAF1_K36_lost$gene_id)
 K36_not_lost_bed = subset(regions$K27genes, ! regions$K27genes$gene_id %in% K36_lost_bed$gene_id)
@@ -3593,6 +3595,8 @@ write.table(K36_not_lost_bed, file = "CAF-1_H3K36me3_not_lost_K27_genes.bed", se
 
 
 ##############################
+#H3K36me3_Results_allgenes_vInput = read.table("./CAF-1_Full_genome_Analysis/H3K36me3_Results_K27promTSS_vInput.csv", sep = ",", header = TRUE)
+
 ###Figure 3
 #determining genes enriched for H3K36me3 in WT (log2FC > 1 over input)
 K36_enriched_genes <- H3K36me3_Results_allgenes_vInput %>%

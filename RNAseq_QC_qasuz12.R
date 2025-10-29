@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-###CURRENTLY SET FOR DOUBLE MUTANTS
+### NO GLOBAL STRAIN FILTERING; EXCLUDE condition == "suz12"
 
 ## --- set working directory to this script's folder ---
 get_script_dir <- function() {
@@ -17,24 +17,22 @@ get_script_dir <- function() {
 setwd(get_script_dir()); cat("Working directory set to:", getwd(), "\n")
 
 ## ================== user settings (edit) ==================
-counts_file      <- "../text_files/readcounts_A"   # featureCounts output
-coldata_file     <- "../coldata.csv"                            # must have columns: sample_id, condition
-names_file       <- "names.txt"                              # mapping columns -> desired names
-gene_map_file    <- "gene_annotation.csv"                    # optional: gene_id,gene_symbol
-k27_bed_file     <- "H3K27me3_methylated_genes_FINAL.bed"    # optional: IDs in col 10 (not required)
-outdir           <- "RNAseq_QC_doublemutant_Fig_SX_out"
-reference_level  <- "WT"                                     # reference in 'condition'
-min_count_filter <- 10                                       # keep genes with rowSums >= this
-ma_ylim          <- c(-8, 8)                                 # MA plot Y limits
-simplify_names   <- TRUE                                     # turn BAM paths into SRR… sample names
+counts_file      <- "../text_files/readcounts_qa_paper_TEST.txt"   # featureCounts output
+coldata_file     <- "../coldata_qa.csv"                            # must have columns: sample_id, condition
+names_file       <- "names_qa.txt"                                 # mapping columns -> desired names
+gene_map_file    <- "gene_annotation.csv"                          # optional: gene_id,gene_symbol
+k27_bed_file     <- "H3K27me3_methylated_genes_FINAL.bed"          # optional: IDs in col 10 (not required)
+outdir           <- "RNAseq_QC_qa-suz12_Fig_S1_out"
+reference_level  <- "WT_0hr"                                       # reference in 'condition'
+min_count_filter <- 10                                             # keep genes with rowSums >= this
+ma_ylim          <- c(-8, 8)                                       # MA plot Y limits
+simplify_names   <- TRUE                                           # turn BAM paths into SRR… sample names
 ## ==========================================================
 
-## Packages must already be installed locally
 suppressPackageStartupMessages({
   library(DESeq2); library(pheatmap); library(data.table); library(dplyr)
   library(tibble); library(ggplot2); library(tidyr); library(readr); library(stringr)
 })
-have_ggrepel <- requireNamespace("ggrepel", quietly = TRUE)
 
 ## --------- helpers ----------
 read_featureCounts <- function(path, simplify_names = TRUE) {
@@ -89,15 +87,18 @@ qcdir  <- file.path(outdir, "qc");      dir.create(qcdir,  FALSE, TRUE)
 cat("\n=== Loading coldata ===\n")
 coldata <- read.csv(coldata_file, stringsAsFactors = FALSE, check.names = FALSE)
 if (!"sample_id" %in% names(coldata)) stop("coldata.csv must have a 'sample_id' column.")
+coldata$sample_id <- trimws(as.character(coldata$sample_id))
+rownames(coldata) <- coldata$sample_id
+
+# Keep condition from coldata; only relevel if reference is present
 if ("condition" %in% names(coldata)) {
-  coldata$condition <- factor(coldata$condition)
+  coldata$condition <- factor(trimws(as.character(coldata$condition)))
   if (reference_level %in% levels(coldata$condition)) {
     coldata$condition <- stats::relevel(coldata$condition, ref = reference_level)
   }
 } else {
-  warning("'condition' missing; will use ~1 design (no contrasts).")
+  warning("'condition' missing in coldata; analysis will use ~ 1 (no contrasts).")
 }
-rownames(coldata) <- coldata$sample_id
 
 cat("=== Loading counts (featureCounts) ===\n")
 counts_raw <- read_featureCounts(counts_file, simplify_names = simplify_names)
@@ -106,6 +107,7 @@ cat("=== Renaming counts columns from names.txt ===\n")
 desired_names <- parse_names_file(names_file, n_expected = ncol(counts_raw))
 colnames(counts_raw) <- desired_names
 
+# Align counts to coldata order; check presence
 missing_in_counts <- setdiff(coldata$sample_id, colnames(counts_raw))
 if (length(missing_in_counts)) {
   stop("These coldata sample_id are not present in counts after renaming: ",
@@ -114,31 +116,24 @@ if (length(missing_in_counts)) {
 }
 counts_df <- counts_raw[, coldata$sample_id, drop = FALSE]
 
-## ----- normalize/limit samples & drop old cac-1 -----
-# make condition strings uniform
-coldata$condition <- as.character(coldata$condition)
-coldata$condition <- gsub("-", "", coldata$condition)   # set-7 -> set7, naf-1 -> naf1, etc.
-coldata$condition <- tolower(coldata$condition)
-coldata$condition[coldata$condition == "wt"] <- "WT"     # keep WT uppercase for labels
-
-# groups to keep in this figure
-target_groups <- c("WT","cac1_new","suz12","cac1_suz12")
-
-# drop legacy cac1 (old) entirely
-drop_idx <- which(coldata$condition == "cac1")
-if (length(drop_idx)) {
-  message("Dropping legacy cac-1 samples: ", paste(rownames(coldata)[drop_idx], collapse=", "))
-  coldata   <- coldata[-drop_idx, , drop = FALSE]
+## ===== Exclude samples where condition == "suz12" (exact, case-sensitive) =====
+excl <- if ("condition" %in% names(coldata)) {
+  as.character(coldata$condition) == "suz12"
+} else {
+  rep(FALSE, nrow(coldata))
 }
 
-# keep only the strains of interest
-keep_idx <- which(coldata$condition %in% target_groups)
-coldata   <- coldata[keep_idx, , drop = FALSE]
-counts_df <- counts_df[, rownames(coldata), drop = FALSE]
+if (any(excl)) {
+  message("Excluding ", sum(excl), " sample(s) with condition == 'suz12': ",
+          paste(rownames(coldata)[excl], collapse = ", "))
+  coldata   <- coldata[!excl, , drop = FALSE]
+  counts_df <- counts_df[, rownames(coldata), drop = FALSE]  # keep columns aligned to coldata
+} else {
+  message("No samples with condition exactly 'suz12' found.")
+}
 
-# tidy factor order
-coldata$condition <- factor(coldata$condition,
-                            levels = target_groups[target_groups %in% unique(coldata$condition)])
+# Drop unused condition levels after exclusion
+if ("condition" %in% names(coldata)) coldata$condition <- droplevels(coldata$condition)
 
 ## Optional: gene symbol map
 gene_map <- NULL
@@ -163,7 +158,15 @@ if (file.exists(k27_bed_file)) {
 cat("=== Build DESeq2 & QC ===\n")
 keep <- rowSums(counts_df) >= min_count_filter
 counts_f <- counts_df[keep, , drop=FALSE]
-design_formula <- if ("condition" %in% names(coldata)) ~ condition else ~ 1
+
+# Use ~ condition if it exists and has >=2 levels after exclusion; otherwise ~ 1
+if ("condition" %in% names(coldata) && nlevels(coldata$condition) >= 2) {
+  design_formula <- ~ condition
+} else {
+  message("Using design ~ 1 (no valid multi-level 'condition' after exclusion).")
+  design_formula <- ~ 1
+}
+
 dds <- DESeqDataSetFromMatrix(countData = counts_f, colData = coldata, design = design_formula)
 dds <- estimateSizeFactors(dds)
 
@@ -172,21 +175,25 @@ lib_sizes <- colSums(counts_df)
 detected  <- colSums(counts_df > 0)
 pct_zero  <- colSums(counts_df == 0) / nrow(counts_df) * 100
 qc_tbl <- tibble(
-  sample_id     = names(lib_sizes),
-  library_size  = as.numeric(lib_sizes),
-  detected_genes= as.numeric(detected),
-  pct_zero      = round(pct_zero, 2),
-  size_factor   = as.numeric(sizeFactors(dds))
+  sample_id      = names(lib_sizes),
+  library_size   = as.numeric(lib_sizes),
+  detected_genes = as.numeric(detected),
+  pct_zero       = round(pct_zero, 2),
+  size_factor    = as.numeric(sizeFactors(dds))
 )
 write.csv(qc_tbl, file.path(qcdir, "sample_qc_metrics.csv"), row.names = FALSE)
 
 # library size / detected genes
-p_lib <- ggplot(qc_tbl, aes(reorder(sample_id, library_size), library_size, fill = coldata$condition)) +
-  geom_col() + coord_flip() + labs(x="Sample", y="Library size", fill="condition") + theme_minimal(11)
+p_lib <- ggplot(qc_tbl, aes(reorder(sample_id, library_size), library_size,
+                            fill = if ("condition" %in% names(coldata)) coldata$condition else NULL)) +
+  geom_col() + coord_flip() +
+  labs(x="Sample", y="Library size", fill="condition") + theme_minimal(11)
 ggsave(file.path(figdir,"library_sizes.pdf"), p_lib, width=7.5, height=6, useDingbats=FALSE)
 
-p_det <- ggplot(qc_tbl, aes(reorder(sample_id, detected_genes), detected_genes, fill = coldata$condition)) +
-  geom_col() + coord_flip() + labs(x="Sample", y="Detected genes (>0)", fill="condition") + theme_minimal(11)
+p_det <- ggplot(qc_tbl, aes(reorder(sample_id, detected_genes), detected_genes,
+                            fill = if ("condition" %in% names(coldata)) coldata$condition else NULL)) +
+  geom_col() + coord_flip() +
+  labs(x="Sample", y="Detected genes (>0)", fill="condition") + theme_minimal(11)
 ggsave(file.path(figdir,"detected_genes.pdf"), p_det, width=7.5, height=6, useDingbats=FALSE)
 
 # export matrices
@@ -201,8 +208,11 @@ log_norm <- log10(norm_counts + 1)
 ln_df <- as.data.frame(log_norm) |>
   tibble::rownames_to_column("gene_id") |>
   tidyr::pivot_longer(-gene_id, names_to="sample_id", values_to="log10_norm")
-ln_df$condition <- coldata[ln_df$sample_id, "condition", drop=TRUE]
-p_nd <- ggplot(ln_df, aes(sample_id, log10_norm, fill = condition)) +
+if ("condition" %in% names(coldata)) {
+  ln_df$condition <- coldata[ln_df$sample_id, "condition", drop=TRUE]
+}
+p_nd <- ggplot(ln_df, aes(sample_id, log10_norm,
+                          fill = if ("condition" %in% names(coldata)) condition else NULL)) +
   geom_violin(scale="width", trim=TRUE) + coord_flip() +
   labs(x="Sample", y="log10(normalized counts + 1)", fill="condition") + theme_minimal(11)
 ggsave(file.path(figdir,"normalized_count_violin.pdf"), p_nd, width=7.5, height=6.5, useDingbats=FALSE)
@@ -212,83 +222,65 @@ cat("=== VST, PCA, correlation ===\n")
 vsd <- vst(dds, blind = FALSE)
 write.csv(as.data.frame(assay(vsd)), file.path(tbldir, "vst_matrix.csv"))
 
-# PCA (square aspect, symmetric limits, no point labels)
-pca_df <- DESeq2::plotPCA(vsd, intgroup = "condition", returnData = TRUE)
+# PCA (square aspect, symmetric limits)
+pca_df <- DESeq2::plotPCA(vsd, intgroup = if ("condition" %in% names(coldata)) "condition" else NULL, returnData = TRUE)
 percentVar <- round(100 * attr(pca_df, "percentVar"))
-
-xrange <- range(pca_df$PC1, na.rm = TRUE)
-yrange <- range(pca_df$PC2, na.rm = TRUE)
-lim <- max(abs(c(xrange, yrange)))
-xlims <- c(-lim, lim)
-ylims <- c(-lim, lim)
-
-p_pca <- ggplot(pca_df, aes(PC1, PC2, color = condition)) +
+xrange <- range(pca_df$PC1, na.rm = TRUE); yrange <- range(pca_df$PC2, na.rm = TRUE)
+lim <- max(abs(c(xrange, yrange))); xlims <- c(-lim, lim); ylims <- c(-lim, lim)
+p_pca <- ggplot(pca_df, aes(PC1, PC2, color = if ("condition" %in% names(coldata)) condition else NULL)) +
   geom_point(size = 3) +
-  scale_x_continuous(limits = xlims, expand = expansion(mult = 0.05),
-                     breaks = scales::pretty_breaks()) +
-  scale_y_continuous(limits = ylims, expand = expansion(mult = 0.05),
-                     breaks = scales::pretty_breaks()) +
+  scale_x_continuous(limits = xlims, expand = expansion(mult = 0.05), breaks = scales::pretty_breaks()) +
+  scale_y_continuous(limits = ylims, expand = expansion(mult = 0.05), breaks = scales::pretty_breaks()) +
   coord_equal() +
-  labs(
-    x = paste0("PC1: ", percentVar[1], "%"),
-    y = paste0("PC2: ", percentVar[2], "%"),
-    color = ""
-  ) +
+  labs(x = paste0("PC1: ", percentVar[1], "%"),
+       y = paste0("PC2: ", percentVar[2], "%"),
+       color = "") +
   theme_minimal(12) +
-  theme(
-    legend.position = "right",
-    panel.grid.minor = element_blank()
-  )
+  theme(legend.position = "right", panel.grid.minor = element_blank())
+ggsave(file.path(figdir, "PCA_vst.pdf"), p_pca, width = 6.5, height = 6.5, useDingbats = FALSE)
 
-ggsave(file.path(figdir, "PCA_vst_chaperones.pdf"),
-       p_pca, width = 6.5, height = 6.5, useDingbats = FALSE)
-
-# Correlation heatmap (original colors; legend ON; auto-size)
+# Correlation heatmap (explicit PDF device; no unsupported pheatmap args)
 cm  <- cor(assay(vsd), method = "pearson")
-ann <- data.frame(condition = coldata$condition); rownames(ann) <- rownames(coldata)
+ann <- if ("condition" %in% names(coldata)) data.frame(condition = coldata$condition) else NULL
+if (!is.null(ann)) rownames(ann) <- rownames(coldata)
 
-n <- ncol(cm)
-pdf_w <- max(7.5, 0.35 * n + 3.5)
-pdf_h <- max(6.0, 0.35 * n + 2.5)
-
-pheatmap(cm,
-         cluster_rows      = FALSE,
-         cluster_cols      = FALSE,
-         legend            = TRUE,
-         annotation_legend = TRUE,
-         annotation_col    = ann,
-         annotation_row    = ann,
-         display_numbers   = FALSE,
-         show_rownames     = TRUE,
-         show_colnames     = TRUE,
-         fontsize          = 10,
-         fontsize_col      = 8,
-         angle_col         = 45,
-         main              = "Sample–sample correlation (Pearson, VST)",
-         filename          = file.path(figdir, "correlation_heatmap_vst_chaperones.pdf"),
-         width             = pdf_w,
-         height            = pdf_h
+n <- ncol(cm); pdf_w <- max(7.5, 0.35 * n + 3.5); pdf_h <- max(6.0, 0.35 * n + 2.5)
+pdf(file.path(figdir, "correlation_heatmap_vst.pdf"), width = pdf_w, height = pdf_h, useDingbats = FALSE)
+pheatmap::pheatmap(
+  cm,
+  cluster_rows      = FALSE,
+  cluster_cols      = FALSE,
+  legend            = TRUE,
+  annotation_legend = TRUE,
+  annotation_col    = ann,
+  annotation_row    = ann,
+  display_numbers   = FALSE,
+  show_rownames     = TRUE,
+  show_colnames     = TRUE,
+  fontsize          = 10,
+  fontsize_col      = 8,
+  main              = "Sample–sample correlation (Pearson, VST)"
 )
+dev.off()
 
-## ======= DESeq2 fit, dispersion, MA plots & p-value hist (no shrinkage) =======
-cat("=== DESeq2 fit (dispersion, MA, p-hist; no shrinkage) ===\n")
+## ======= DESeq2 fit, dispersion, MA plots & p-value hist =======
+cat("=== DESeq2 fit (dispersion, MA, p-hist) ===\n")
 dds <- DESeq(dds)
 
-# Dispersion (Illustrator-safe: no dingbats, bigger points)
+# Dispersion
 pdf(file.path(figdir,"dispersion_plot.pdf"), width=6, height=5, useDingbats=FALSE)
 plotDispEsts(dds, cex = 0.8)
 dev.off()
 
-if ("condition" %in% names(coldata)) {
-  ref <- levels(coldata$condition)[1]  # after relevel should equal reference_level
+# Only run contrasts if we have a multi-level 'condition'
+if ("condition" %in% names(coldata) && nlevels(coldata$condition) >= 2) {
+  ref <- levels(coldata$condition)[1]
   for (lvl in setdiff(levels(coldata$condition), ref)) {
     res <- results(dds, contrast = c("condition", lvl, ref), alpha = 0.05)
     res_df <- as.data.frame(res) |> tibble::rownames_to_column("gene_id")
-    
     if (!is.null(gene_map)) res_df <- dplyr::left_join(res_df, gene_map, by="gene_id")
     write.csv(res_df, file.path(tbldir, paste0("DE_results_", lvl, "_vs_", ref, ".csv")), row.names = FALSE)
     
-    # MA plot (Illustrator-safe: no dingbats, no pch override, slightly larger points)
     pdf(file.path(figdir, paste0("MA_", lvl, "_vs_", ref, ".pdf")),
         width=6.2, height=5.2, useDingbats=FALSE)
     plotMA(res, ylim = ma_ylim, cex = 0.8, main = paste(lvl, "vs", ref))
@@ -302,9 +294,8 @@ if ("condition" %in% names(coldata)) {
     dev.off()
   }
 } else {
-  message("No 'condition' column; skipping contrasts/MA/p-hist.")
+  message("Skipping contrasts/MA/p-hist (no multi-level 'condition').")
 }
 
 writeLines(c(capture.output(sessionInfo())), con = file.path(outdir, "sessionInfo.txt"))
 cat("\nAll done. Outputs in: ", normalizePath(outdir), "\n")
-

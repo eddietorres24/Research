@@ -42,21 +42,25 @@ featureCounts -T $THREADS \
   --primary \
   -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GFFtoGTFconversion.gtf \
   -o $OUTDIR/readcounts_qa_paper_TEST.txt \
-  $BAMDIR/SRR9027658/SRR9027658_Aligned.sortedByCoord.out.bam \
-  $BAMDIR/SRR9027689/SRR9027689_Aligned.sortedByCoord.out.bam \
-  $BAMDIR/SRR9027759/SRR9027759_Aligned.sortedByCoord.out.bam \
+$BAMDIR/SRR9027658/SRR9027658_Aligned.sortedByCoord.out.bam \
+$BAMDIR/SRR9027689/SRR9027689_Aligned.sortedByCoord.out.bam \
+$BAMDIR/SRR9027759/SRR9027759_Aligned.sortedByCoord.out.bam \
   $B149DIR/149-85_RNA_WT__Rep2_S85/149-85_RNA_WT__Rep2_S85_Aligned.sortedByCoord.out.bam \
   $B150DIR/150-106_RNA_WT_0hr__Rep4_S121/150-106_RNA_WT_0hr__Rep4_S121_Aligned.sortedByCoord.out.bam \
   $B150DIR/150-107_RNA_WT_0hr__Rep5_S122/150-107_RNA_WT_0hr__Rep5_S122_Aligned.sortedByCoord.out.bam \
-  $B149DIR/149-89_RNA_WT_24hrqa__Rep3_S89/149-89_RNA_WT_24hrqa__Rep3_S89_Aligned.sortedByCoord.out.bam \
-  $B150DIR/150-108_RNA_WT_24hr__Rep4_S123/150-108_RNA_WT_24hr__Rep4_S123_Aligned.sortedByCoord.out.bam \
-  $B150DIR/150-109_RNA_WT_24hr__Rep5_S124/150-109_RNA_WT_24hr__Rep5_S124_Aligned.sortedByCoord.out.bam \
-  $B149DIR/149-91_RNA_qa-suz12__Rep2_S91/149-91_RNA_qa-suz12__Rep2_S91_Aligned.sortedByCoord.out.bam \
-  $B150DIR/150-111_RNA_qa_0hr__Rep4_S126/150-111_RNA_qa_0hr__Rep4_S126_Aligned.sortedByCoord.out.bam \
-  $B150DIR/150-112_RNA_qa_0hr__Rep5_S127/150-112_RNA_qa_0hr__Rep5_S127_Aligned.sortedByCoord.out.bam \
-  $B149DIR/149-95_RNA_qa-suz12_24hrqa__Rep3_S95/149-95_RNA_qa-suz12_24hrqa__Rep3_S95_Aligned.sortedByCoord.out.bam \
-  $B150DIR/150-114_RNA_qa_24hr__Rep5_S129/150-114_RNA_qa_24hr__Rep5_S129_Aligned.sortedByCoord.out.bam \
-  $B150DIR/150-115_RNA_qa_24hr__Rep6_S130/150-115_RNA_qa_24hr__Rep6_S130_Aligned.sortedByCoord.out.bam
+  $B149DIR/149-86_RNA_WT__Rep3_S86/149-86_RNA_WT__Rep3_S86_Aligned.sortedByCoord.out.bam \
+  $B149DIR/149-87_RNA_WT_24hrqa__Rep1_S87/149-87_RNA_WT_24hrqa__Rep1_S87_Aligned.sortedByCoord.out.bam \
+    $B149DIR/149-89_RNA_WT_24hrqa__Rep3_S89/149-89_RNA_WT_24hrqa__Rep3_S89_Aligned.sortedByCoord.out.bam \
+    $B150DIR/150-108_RNA_WT_24hr__Rep4_S123/150-108_RNA_WT_24hr__Rep4_S123_Aligned.sortedByCoord.out.bam \
+    $B150DIR/150-109_RNA_WT_24hr__Rep5_S124/150-109_RNA_WT_24hr__Rep5_S124_Aligned.sortedByCoord.out.bam \
+      $B149DIR/149-91_RNA_qa-suz12__Rep2_S91/149-91_RNA_qa-suz12__Rep2_S91_Aligned.sortedByCoord.out.bam \
+      $B150DIR/150-111_RNA_qa_0hr__Rep4_S126/150-111_RNA_qa_0hr__Rep4_S126_Aligned.sortedByCoord.out.bam \
+      $B150DIR/150-112_RNA_qa_0hr__Rep5_S127/150-112_RNA_qa_0hr__Rep5_S127_Aligned.sortedByCoord.out.bam \
+      $B149DIR/149-90_RNA_qa-suz12__Rep1_S90/149-90_RNA_qa-suz12__Rep1_S90_Aligned.sortedByCoord.out.bam \
+      $B149DIR/149-92_RNA_qa-suz12__Rep3_S92/149-92_RNA_qa-suz12__Rep3_S92_Aligned.sortedByCoord.out.bam \
+          $B149DIR/149-95_RNA_qa-suz12_24hrqa__Rep3_S95/149-95_RNA_qa-suz12_24hrqa__Rep3_S95_Aligned.sortedByCoord.out.bam \
+          $B150DIR/150-114_RNA_qa_24hr__Rep5_S129/150-114_RNA_qa_24hr__Rep5_S129_Aligned.sortedByCoord.out.bam \
+          $B150DIR/150-115_RNA_qa_24hr__Rep6_S130/150-115_RNA_qa_24hr__Rep6_S130_Aligned.sortedByCoord.out.bam
 
 ###NOTE: 149-87 is actually 0 hr 149-84 is actually 24 hr
 
