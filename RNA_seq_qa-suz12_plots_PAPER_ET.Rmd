@@ -41,7 +41,7 @@ knitr::opts_knit$set(root.dir = "workingdir")
 ```{r, data processing}
 #Bring in table with unnormalized transcription counts; check.names is important if you have dashes in the gene names 
 #row.names=1 command sets geneIDs as the row name
-countdataInteractors <- read.table("../text_files/readcounts_qa_paper_TEST.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
+countdataInteractors <- read.table("../text_files/readcounts_qa_paper_new_TEST.txt",skip=1, header=TRUE,stringsAsFactors=FALSE, row.names=1, check.names=FALSE, sep="\t")
 #countdataInteractors_final = cbind(countdataInteractors, countdataInteractors_ash3[,6:7])
 #countdataInteractors <- data.matrix(countdataInteractors_final)
 
