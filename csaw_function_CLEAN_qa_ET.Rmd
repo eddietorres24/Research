@@ -30,14 +30,14 @@ library(dplyr)
 ```{r, read in metadata & regions of interest}
 #reading in metdata
 meta <- read.csv("../csaw_samples_files/csaw_qa-suz12_ET.csv")
-metaQC <- read.csv("../csaw_samples_files/csaw_qa-suz12_QC_ET.csv")
+#metaQC <- read.csv("../csaw_samples_files/csaw_qa-suz12_QC_ET.csv")
 
 #fix path (if necessary, should only be if you're in wrong directory)
 meta <- meta %>%
   mutate(bamReads = paste0("../", bamReads))
 
- metaQC <- metaQC %>%
-   mutate(bamReads = paste0("../", bamReads))
+ #metaQC <- metaQC %>%
+  # mutate(bamReads = paste0("../", bamReads))
 
 #meta <- meta %>%
 #mutate(Peaks = paste0("../", Peaks))
@@ -3640,6 +3640,8 @@ write.table(genes_unrecovered, file = "unrecovered_genes.bed", sep = "\t", quote
 
 ##################################################
 #Ectopic Peaks and Genes
+##read in all genes
+allgenes = read.table("../bed_files/all_genes_forR.bed")
 
 #Any ectopic peaks in WT 24hr?
 H3K27me3_peaks_GAIN_WT_24hr = subset(H3K27me3_Results_K27peaks_ectopic_vWT_0hr, H3K27me3_Results_K27peaks_ectopic_vWT_0hr$logFC_WT_24hr > 1)
@@ -3652,7 +3654,7 @@ ectopic_peaks = regions$K27peaks_ectopic[overlapsAny(with(regions$K27peaks_ectop
 write.table(ectopic_peaks, file = "ectopic_qa_peaks.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 #I want to know ALL genes that have > H3K27me3 in qa 24 hr vs WT 0 hr
-H3K27me3_GAIN_qa_24hr = subset(H3K27me3_Results_allgenes_promTSSext_vWT_0hr, H3K27me3_Results_allgenes_promTSSext_vWT_0hr$logFC_qa_24hr > 1 & H3K27me3_Results_allgenes_promTSSext_vWT_0hr$gene_id %in% all_qa_k27_genes$gene_id & H3K27me3_Results_allgenes_promTSSext_vWT_0hr$FDR_qa_24hr < 0.05 )
+H3K27me3_GAIN_qa_24hr = subset(H3K27me3_Results_allgenes_promTSSext_vWT_0hr, H3K27me3_Results_allgenes_promTSSext_vWT_0hr$logFC_qa_24hr > 1 &  H3K27me3_Results_allgenes_promTSSext_vWT_0hr$FDR_qa_24hr < 0.05 )
 
 H3K27me3_LOSS_qa_24hr = subset(H3K27me3_Results_allgenes_promTSSext_vWT_0hr, H3K27me3_Results_allgenes_promTSSext_vWT_0hr$logFC_qa_24hr < -1 & H3K27me3_Results_allgenes_promTSSext_vWT_0hr$gene_id %in% all_qa_k27_genes$gene_id & H3K27me3_Results_allgenes_promTSSext_vWT_0hr$FDR_qa_24hr < 0.05)
 
@@ -3662,7 +3664,7 @@ K27_gain_genes = subset(allgenes, allgenes$V10 %in% H3K27me3_GAIN_qa_24hr$gene_i
 # > K27me3, but only in ectopic peaks
 ectopics = H3K27me3_GAIN_qa_24hr[overlapsAny(with(H3K27me3_GAIN_qa_24hr, GRanges(seqnames, IRanges(start, end))), with(H3K27me3_peaks_GAIN_qa_24hr, GRanges(seqnames, IRanges(start, end)))), ]
 
-ectopics_genes = subset(allgenes, allgenes$V10 %in% ectopics$gene_id)
+ectopic_genes = subset(allgenes, allgenes$V10 %in% ectopics$gene_id)
 
 write.table(K27_gain_genes, file = "qa_K27_gain_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 write.table(ectopic_genes, file = "ectopic_qa_genes.bed", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)

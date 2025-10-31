@@ -102,13 +102,25 @@ Prc2targetTPM <- subset(allDataTPM, rownames(allDataTPM)%in%Prc2targets[,10])
 ectopicTPM <- subset(allDataTPM, rownames(allDataTPM)%in%ectopic_genes[,10])
 nonectopicTPM <- subset(allDataTPM, ! rownames(allDataTPM)%in%ectopic_genes[,10])
 
+#split into recovery groups
+earlyTPM <- subset(allDataTPM, rownames(allDataTPM)%in%genes_early_BED[,10])
+lateTPM <- subset(allDataTPM, rownames(allDataTPM)%in%genes_late_BED[,10])
+unrecoverTPM <- subset(allDataTPM, rownames(allDataTPM)%in%genes_unrecovered[,10])
+
 ###SUBSET DATA FOR AVERAGED KO SAMPLES
 AVERAGE_Prc2targetTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%Prc2targets[,10])
 AVERAGE_ectopicTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%ectopic_genes[,10])
 AVERAGE_nonectopicTPM <- subset(Averaged_Orderd_KO_data, ! rownames(Averaged_Orderd_KO_data)%in%ectopic_genes[,10])
 
+AVERAGE_earlyTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%genes_early_BED[,10])
+AVERAGE_lateTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%genes_late_BED[,10])
+AVERAGE_unrecoverTPM <- subset(Averaged_Orderd_KO_data, rownames(Averaged_Orderd_KO_data)%in%genes_unrecovered[,10])
+
 ###Subset data to filter out non-PRC2 target regions that got through (cutting out any genes over 2 tpm in WT)
 AVERAGE_Prc2targetTPM <- subset(AVERAGE_Prc2targetTPM, (AVERAGE_Prc2targetTPM[,1] < 10))
+AVERAGE_earlyTPM <- subset(AVERAGE_earlyTPM, (AVERAGE_earlyTPM[,1] < 10))
+AVERAGE_lateTPM <- subset(AVERAGE_lateTPM, (AVERAGE_lateTPM[,1] < 10))
+AVERAGE_unrecoverTPM <- subset(AVERAGE_unrecoverTPM, (AVERAGE_unrecoverTPM[,1] < 10))
 AVERAGE_AlldataTPM <- subset(Averaged_Orderd_KO_data, (Averaged_Orderd_KO_data[,1] > -0.1))
 
 ###resubet PRC2 targets after filtering
@@ -126,21 +138,32 @@ AVERAGE_nonectopicTPM <- log2(AVERAGE_nonectopicTPM)
 
 AVERAGE_AlldataTPM <- AVERAGE_AlldataTPM + 1
 AVERAGE_AlldataTPM <- log2(AVERAGE_AlldataTPM)
+
+AVERAGE_earlyTPM <- AVERAGE_earlyTPM + 1
+AVERAGE_earlyTPM <- log2(AVERAGE_earlyTPM)
+
+AVERAGE_lateTPM <- AVERAGE_lateTPM + 1
+AVERAGE_lateTPM <- log2(AVERAGE_lateTPM)
+
+AVERAGE_unrecoverTPM <- AVERAGE_unrecoverTPM + 1
+AVERAGE_unrecoverTPM <- log2(AVERAGE_unrecoverTPM)
+
+
 #melt data to get it into a format ggplots can use (load library "reshape2")
 
 #PRC2
-meltedPRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
+meltedPRC2targetData <- reshape2::melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
 #Ectopic
-meltedEctopicData <- melt(AVERAGE_ectopicTPM, value.name = 'Count',
+meltedEctopicData <- reshape2::melt(AVERAGE_ectopicTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
-meltedNonEctopicData <- melt(AVERAGE_nonectopicTPM, value.name = 'Count',
+meltedNonEctopicData <- reshape2::melt(AVERAGE_nonectopicTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
 #Alldata
-meltedAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
+meltedAllData <- reshape2::melt(AVERAGE_AlldataTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 ```
 
@@ -154,10 +177,10 @@ meltedAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
 #meltedData <- melt(tpm, value.name = "Count",
 #varnames=c('GeneID', 'Sample'))
 
-meltedAveragePRC2targetData <- melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
+meltedAveragePRC2targetData <- reshape2::melt(AVERAGE_Prc2targetTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
-meltedAverageAllData <- melt(AVERAGE_AlldataTPM, value.name = 'Count',
+meltedAverageAllData <- reshape2::melt(AVERAGE_AlldataTPM, value.name = 'Count',
                       varnames=c('GeneID', 'Sample'))
 
 altorder = rev(c("WT_0hr","WT_24hr","qa-suz12_0hr", "qa-suz12_24hr"))
@@ -216,10 +239,10 @@ ggsave(filename = "qa-suz12_PRC2_genes.pdf", plot = box, dpi = 600, height = 5.5
 #meltedData <- melt(tpm, value.name = "Count",
 #varnames=c('GeneID', 'Sample'))
 
-meltedAverageEctopicData <- melt(AVERAGE_ectopicTPM, value.name = 'Count',
+meltedAverageEctopicData <- reshape2::melt(AVERAGE_ectopicTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
-meltedAverageNonEctopicData <- melt(AVERAGE_nonectopicTPM, value.name = 'Count',
+meltedAverageNonEctopicData <- reshape2::melt(AVERAGE_nonectopicTPM, value.name = 'Count',
                              varnames=c('GeneID', 'Sample'))
 
 altorder = rev(c("WT_0hr","WT_24hr","qa-suz12_0hr", "qa-suz12_24hr"))
@@ -276,6 +299,9 @@ ggsave(filename = "qa_ectopic_genes.pdf", plot = box, dpi = 600, height = 5.5, w
 ## First, I make histogram to visualize distribution of data. we'll use cac-1 as a comparison to WT
 hist <- as.data.frame(AVERAGE_Prc2targetTPM)
 hist_ect <- as.data.frame(AVERAGE_ectopicTPM)
+hist_early <- as.data.frame(AVERAGE_earlyTPM)
+hist_late <- as.data.frame(AVERAGE_lateTPM)
+hist_no <- as.data.frame(AVERAGE_unrecoverTPM)
 
 long_hist <- hist %>%
   select(WT_0hr, `qa-suz12_24hr`) %>%
@@ -300,11 +326,23 @@ qa_0hr_ect_stat <- wilcox.test(hist_ect$`qa-suz12_0hr`, hist_ect$WT_0hr, alterna
 qa_24hr_ect_stat <- wilcox.test(hist_ect$`qa-suz12_24hr`, hist_ect$WT_0hr, alternative = "less")
 WT_24hr_ect_stat <- wilcox.test(hist_ect$WT_24hr, hist_ect$WT_0hr, alternative = "less")
 
+qa_0hr_early_stat <- wilcox.test(hist_early$`qa-suz12_0hr`, hist_early$WT_0hr, alternative = "greater")
+qa_24hr_early_stat <- wilcox.test(hist_early$`qa-suz12_24hr`, hist_early$WT_0hr, alternative ="greater")
+WT_24hr_early_stat <- wilcox.test(hist_early$WT_24hr, hist_early$WT_0hr, alternative = "greater")
+
+qa_0hr_late_stat <- wilcox.test(hist_late$`qa-suz12_0hr`, hist_late$WT_0hr, alternative = "greater")
+qa_24hr_late_stat <- wilcox.test(hist_late$`qa-suz12_24hr`, hist_late$WT_0hr, alternative ="greater")
+WT_24hr_late_stat <- wilcox.test(hist_late$WT_24hr, hist_late$WT_0hr, alternative = "greater")
+
+qa_0hr_unrec_stat <- wilcox.test(hist_no$`qa-suz12_0hr`, hist_no$WT_0hr, alternative = "greater")
+qa_24hr_unrec_stat <- wilcox.test(hist_no$`qa-suz12_24hr`, hist_no$WT_0hr, alternative ="greater")
+WT_24hr_unrec_stat <- wilcox.test(hist_no$WT_24hr, hist_no$WT_0hr, alternative = "greater")
+
 #Make a list of all wilcox results objects
-wilcox_list <- list(qa_0hr_stat, qa_24hr_stat, WT_24hr_stat, qa_0hr_ect_stat, qa_24hr_ect_stat, WT_24hr_ect_stat)
+wilcox_list <- list(qa_0hr_stat, qa_24hr_stat, WT_24hr_stat, qa_0hr_ect_stat, qa_24hr_ect_stat, WT_24hr_ect_stat, qa_0hr_early_stat, qa_24hr_early_stat, WT_24hr_early_stat, qa_0hr_late_stat, qa_24hr_late_stat, WT_24hr_late_stat, qa_0hr_unrec_stat, qa_24hr_unrec_stat, WT_24hr_unrec_stat)
 
 #rename objects
-names(wilcox_list) <- c("qa 0hr PRC2", "qa 24hr PRC2", "WT 24 hr PRC2", "qa 0hr ectopic", "qa 24hr ectopic", "WT 24 hr ectopic")
+names(wilcox_list) <- c("qa 0hr PRC2", "qa 24hr PRC2", "WT 24 hr PRC2", "qa 0hr ectopic", "qa 24hr ectopic", "WT 24 hr ectopic", "qa 0hr early", "qa 24hr early", "WT 24 hr early", "qa 0hr late", "qa 24hr late", "WT 24 hr late", "qa 0hr unrecover", "qa 24hr unrecover", "WT 24 hr unrecover")
 
 #Extract relevant stats into a dataframe
 wilcox_df <- do.call(rbind, lapply(wilcox_list, function(res) {
@@ -372,6 +410,77 @@ print(violin)
 ggsave("./qa-suz12_PRC2_Gene_expression.pdf", plot=violin, width = 8, height = 8, unit="in",  dpi=400)
 ```
 
+#I also want to plot the violin while splitting the groups of genes with differential recovery
+#question: Are genes that dont recover H3K27me3 expressed at a higher level than genes that do across  the 4 strains?
+```{r Plotting PRC2 data in Violin Plot clustered, echo=FALSE}
+library(dplyr)
+library(tibble)
+library(ggplot2)
+
+## ---- 0) Define the target gene universe = WT-repressed PRC2 set ----
+# After your filter above, these rownames are the genes we want:
+repressed_ids <- rownames(AVERAGE_Prc2targetTPM)
+
+## ---- 1) Rebuild Early/Late/Unrecovered *within* this set ----
+early_ids_all <- unique(genes_early_BED$gene_id)
+late_ids_all  <- unique(genes_late_BED$gene_id)
+
+early_ids <- intersect(repressed_ids, early_ids_all)
+late_ids  <- setdiff(intersect(repressed_ids, late_ids_all), early_ids)
+unrec_ids <- setdiff(repressed_ids, union(early_ids, late_ids))
+
+group_levels <- c("Early recovered","Late recovered","Unrecovered")
+group_key <- tibble(
+  GeneID = c(early_ids, late_ids, unrec_ids),
+  Group  = factor(c(
+    rep("Early recovered", length(early_ids)),
+    rep("Late recovered",  length(late_ids)),
+    rep("Unrecovered",     length(unrec_ids))
+  ), levels = group_levels)
+)
+
+## ---- 2) Build expression matrix for just these genes (use your averaged TPM) ----
+# Averaged_Orderd_KO_data has the 4 samples: WT_0hr, WT_24hr, qa-suz12_0hr, qa-suz12_24hr
+expr_mat <- Averaged_Orderd_KO_data[intersect(rownames(Averaged_Orderd_KO_data), repressed_ids), , drop = FALSE]
+expr_mat <- log2(expr_mat + 1)  # same transform as before
+
+melted <- reshape2::melt(expr_mat, value.name = "Count", varnames = c("GeneID","Sample")) %>%
+  mutate(GeneID = as.character(GeneID))
+
+## ---- 3) Join groups and plot (same spacing tweaks as last time) ----
+label_order <- c("WT_0hr", "WT_24hr", "qa-suz12_0hr", "qa-suz12_24hr")
+formatted_labels <- c("WT_0hr","WT_24hr","qa_0hr","qa_24hr")
+
+plot_df <- melted %>%
+  inner_join(group_key, by = "GeneID") %>%   # keep only WT-repressed PRC2 genes in our 3 groups
+  mutate(Sample = factor(as.character(Sample), levels = label_order),
+         Group  = factor(Group, levels = group_levels))
+
+# Spacing: groups closer, end violins not clipped
+dodge <- position_dodge(width = 0.7)
+
+violin_repressed <- ggplot(plot_df, aes(x = Sample, y = Count, fill = Group)) +
+  geom_violin(position = dodge, width = 0.62, scale = "width", trim = FALSE) +
+  stat_summary(aes(group = Group), fun = "mean", geom = "crossbar",
+               width = 0.20, position = dodge, colour = "black") +
+  scale_x_discrete(labels = formatted_labels, expand = expansion(mult = 0.14)) +
+    scale_y_continuous(limits = c(-1, 9), breaks = seq(0, 9, 3), expand = c(0,0)) +
+  labs(x = "Strain", y = expression("Expression Level (log"[2]~"(TPM+1))"), fill = NULL) +
+  theme_classic(base_size = 18)
+
+print(violin_repressed)
+
+#sanity checks
+table_counts <- plot_df %>% distinct(GeneID, Group) %>% count(Group, name = "n_genes")
+print(table_counts) 
+
+# Save
+ggsave("./qa-suz12_PRC2_Gene_expression_clustered_violin.pdf",
+       plot = violin_repressed, width = 12, height = 8, units = "in", dpi = 400)
+
+
+```
+
 ##############################################################################
 ```{r Plotting data in Violin Plot, echo=FALSE}
 # Define factor order and formatted x-axis labels
@@ -417,8 +526,8 @@ print(violin)
 
 #save plot
 ggsave("./qa-suz12_Ectopic_Gene_expression.pdf", plot=violin, width = 8, height = 5, unit="in",  dpi=400)
-
 ```
+
 
 ```{r, ectopic vs non-ectopic}
 library(dplyr)
@@ -728,14 +837,11 @@ plotDispEsts(dds2)
 ```
 
 ```{r create csvs with DE genes for each strain, echo=FALSE}
-# Minimal exporter: per-strain CSVs only (ALL, DE, UP, DOWN), no intersections.
-# Assumes your DESeq2 object has a factor column (e.g., 'condition') with levels:
-# WT_0hr, WT_24hr, suz12_24hr, qa_0hr, qa_24hr
 export_deseq_csvs_no_intersections <- function(
   dds,
   condition_col   = "condition",
   ref_level       = "WT_0hr",
-  strains,                      # e.g., c("WT_24hr","suz12_24hr","qa_0hr","qa_24hr")
+  strains,                      # e.g., c("WT_24hr","suz12","qa_0hr","qa_24hr")
   lfc_cutoff      = 1.0,
   alphas          = c(0.05, 0.01)
 ) {
@@ -745,66 +851,93 @@ export_deseq_csvs_no_intersections <- function(
   sanitize   <- function(x) gsub("[^A-Za-z0-9._-]+", "_", x)
   safe_write <- function(df, fname) utils::write.csv(df, file = sanitize(fname), row.names = FALSE)
 
-  # Make sure the design/levels line up
+  # sanity / setup
   stopifnot(condition_col %in% colnames(colData(dds)))
-  cond <- as.character(colData(dds)[[condition_col]])
-  if (!ref_level %in% cond) stop("ref_level '", ref_level, "' not found in colData(dds)$", condition_col, ".")
-  # Relevel the factor if needed
-  colData(dds)[[condition_col]] <- relevel(factor(cond), ref = ref_level)
+  cond_vec <- as.character(colData(dds)[[condition_col]])
+  if (!ref_level %in% cond_vec) stop("ref_level '", ref_level, "' not found in colData(dds)$", condition_col, ".")
+  colData(dds)[[condition_col]] <- stats::relevel(factor(cond_vec), ref = ref_level)
+  available_levels <- levels(colData(dds)[[condition_col]])
 
-  # Pull results for one strain/alpha
+  # ---- run results and split by sig/up/down ----
   res_for <- function(strain, alpha) {
-    df <- as.data.frame(DESeq2::results(
-      dds, contrast = c(condition_col, strain, ref_level), alpha = alpha
-    ))
+    df <- as.data.frame(DESeq2::results(dds, contrast = c(condition_col, strain, ref_level), alpha = alpha))
     df$gene_id <- rownames(df)
-    df <- df[!is.na(df$padj), ]
-    sig <- df[df$padj < alpha & abs(df$log2FoldChange) >= lfc_cutoff, ]
-    up  <- sig[sig$log2FoldChange >=  lfc_cutoff, ]
-    dn  <- sig[sig$log2FoldChange <= -lfc_cutoff, ]
+    df <- df[!is.na(df$padj), , drop = FALSE]
+    sig <- df[df$padj < alpha & abs(df$log2FoldChange) >= lfc_cutoff, , drop = FALSE]
+    up  <- sig[sig$log2FoldChange >=  lfc_cutoff, , drop = FALSE]
+    dn  <- sig[sig$log2FoldChange <= -lfc_cutoff, , drop = FALSE]
     list(all = sig, up = up, dn = dn, full = df)
   }
 
+  # ---- write per-strain CSVs (unchanged behavior) ----
   write_deg_csvs <- function(strain, alpha, reslist) {
-    a   <- alpha_lab(alpha)
-    lt  <- lfc_tag(lfc_cutoff)
+    a    <- alpha_lab(alpha)
+    lt   <- lfc_tag(lfc_cutoff)
     base <- paste0(strain, "__vs__", ref_level, "__alpha", a)
 
-    # 1) ALL results (no independent filtering to keep every row)
-    res_all <- as.data.frame(DESeq2::results(
-      dds, contrast = c(condition_col, strain, ref_level),
-      independentFiltering = FALSE
-    ))
+    # 1) ALL results (no independent filtering)
+    res_all <- as.data.frame(DESeq2::results(dds, contrast = c(condition_col, strain, ref_level),
+                                             independentFiltering = FALSE))
     res_all$gene_id <- rownames(res_all)
     safe_write(res_all[, c("gene_id", setdiff(names(res_all), "gene_id"))],
                sprintf("%s__ALL_results_LFC.csv", base))
 
-    # 2) DE (padj<alpha & |LFC|>=cutoff)
+    # 2) DE
     safe_write(reslist$all[, c("gene_id", setdiff(names(reslist$all), "gene_id"))],
                sprintf("%s__DE_absLFC_%s.csv", base, lt))
 
-    # 3) UP only
-    if (nrow(reslist$up)) {
-      safe_write(reslist$up[, c("gene_id", setdiff(names(reslist$up), "gene_id"))],
-                 sprintf("%s__UP_results_LFC_%s.csv", base, lt))
-    } else {
-      safe_write(data.frame(), sprintf("%s__UP_results_LFC_%s.csv", base, lt))
+    # 3) UP
+    safe_write(if (nrow(reslist$up)) reslist$up[, c("gene_id", setdiff(names(reslist$up), "gene_id"))] else data.frame(),
+               sprintf("%s__UP_results_LFC_%s.csv", base, lt))
+
+    # 4) DOWN
+    safe_write(if (nrow(reslist$dn)) reslist$dn[, c("gene_id", setdiff(names(reslist$dn), "gene_id"))] else data.frame(),
+               sprintf("%s__DOWN_results_LFC_%s.csv", base, lt))
+    invisible(TRUE)
+  }
+
+  # ---- NEW: intersections for WT_24hr & qa_24hr (both vs WT_0hr) ----
+  write_intersections_wt24_qa24 <- function(alpha) {
+    a  <- alpha_lab(alpha)
+    lt <- lfc_tag(lfc_cutoff)
+
+    s_wt24 <- "WT_24hr"
+    s_qa24 <- "qa_24hr"
+    if (!(s_wt24 %in% available_levels && s_qa24 %in% available_levels)) {
+      warning("Skipping intersections: need both 'WT_24hr' and 'qa_24hr' in levels(colData(dds)$", condition_col, ").")
+      return(invisible(NULL))
     }
 
-    # 4) DOWN only
-    if (nrow(reslist$dn)) {
-      safe_write(reslist$dn[, c("gene_id", setdiff(names(reslist$dn), "gene_id"))],
-                 sprintf("%s__DOWN_results_LFC_%s.csv", base, lt))
-    } else {
-      safe_write(data.frame(), sprintf("%s__DOWN_results_LFC_%s.csv", base, lt))
+    r_wt24 <- res_for(s_wt24, alpha)
+    r_qa24 <- res_for(s_qa24, alpha)
+
+    # intersect UP and DOWN by gene_id
+    up_genes_int <- intersect(r_wt24$up$gene_id, r_qa24$up$gene_id)
+    dn_genes_int <- intersect(r_wt24$dn$gene_id, r_qa24$dn$gene_id)
+
+    # attach both strains' stats for context
+    mk_join <- function(gids, side1, side2) {
+      if (!length(gids)) return(data.frame())
+      j1 <- side1[match(gids, side1$gene_id), c("gene_id","log2FoldChange","lfcSE","stat","pvalue","padj")]
+      j2 <- side2[match(gids, side2$gene_id), c("log2FoldChange","lfcSE","stat","pvalue","padj")]
+      names(j1) <- c("gene_id",
+                     paste0(names(j1)[-1], "_", deparse(substitute(side1))))
+      names(j2) <- paste0(names(j2), "_", deparse(substitute(side2)))
+      cbind(j1, j2)
     }
 
+    up_out <- mk_join(up_genes_int,  r_wt24$up, r_qa24$up)
+    dn_out <- mk_join(dn_genes_int,  r_wt24$dn, r_qa24$dn)
+
+    base_pair <- sprintf("%s_AND_%s__alpha%s", s_wt24, s_qa24, a)
+    safe_write(up_out, sprintf("%s__INTERSECT_UP_LFC_%s.csv",   base_pair, lt))
+    safe_write(dn_out, sprintf("%s__INTERSECT_DOWN_LFC_%s.csv", base_pair, lt))
     invisible(TRUE)
   }
 
   # ---- main loop ----
-  available_levels <- levels(colData(dds)[[condition_col]])
   for (alpha in alphas) {
+    # existing per-strain outputs
     for (s in strains) {
       if (!(s %in% available_levels)) {
         warning("Skipping '", s, "' — not found in levels(colData(dds)$", condition_col, ").")
@@ -813,21 +946,252 @@ export_deseq_csvs_no_intersections <- function(
       rl <- res_for(s, alpha)
       write_deg_csvs(s, alpha, rl)
     }
+    # NEW: intersections specifically between WT_24hr and qa_24hr
+    write_intersections_wt24_qa24(alpha)
   }
 
   invisible(TRUE)
 }
 
 
-# Example call
 export_deseq_csvs_no_intersections(
-  dds          = dds2,                 # your DESeq2 object for this analysis
-  condition_col= "condition",             # change if you used a different column
+  dds          = dds2,
+  condition_col= "condition",
   ref_level    = "WT_0hr",
   strains      = c("WT_24hr","suz12","qa_0hr","qa_24hr"),
   lfc_cutoff   = 1.0,
   alphas       = c(0.05, 0.01)
 )
+
+```
+
+#GO Analysis for Downregulated genes in qa conditions
+#GO Analysis
+```{r, my script}
+
+qa_down_genes = read.csv("../qa-suz12_RNA-seq_Analysis/csv_files/WT_24hr_AND_qa_24hr__alpha0.05__INTERSECT_DOWN_LFC_ge_1p0.csv")
+
+ectopic_GO = subset(qa_down_genes, qa_down_genes$gene_id %in% ectopic_genes$gene_id)
+
+## --- packages ---
+#cran_pkgs <- c("readr","dplyr","tidyr","ggplot2")
+#miss <- setdiff(cran_pkgs, rownames(installed.packages()))
+#if (length(miss)) install.packages(miss, repos = "https://cloud.r-project.org")
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#  install.packages("BiocManager", repos = "https://cloud.r-project.org")
+#BiocManager::install(c("clusterProfiler","GO.db","AnnotationDbi"), ask = FALSE, update = FALSE)
+
+suppressPackageStartupMessages({
+  library(readr); library(dplyr); library(tidyr); library(ggplot2)
+  library(clusterProfiler); library(GO.db); library(AnnotationDbi)
+  library(stringr)
+})
+
+## =========================
+## 0) CONFIG / INPUTS
+## =========================
+
+fungidb_go_path <- "Nc_GO_mapping.txt"     # FungiDB mapping (tab-delimited; has ID & name cols)
+de_input        <- "../qa-suz12_RNA-seq_Analysis/csv_files/WT_24hr_AND_qa_24hr__alpha0.05__INTERSECT_DOWN_LFC_ge_1p0.csv"          # <-- can be: data.frame/tibble, file path, or character vector of IDs
+
+out_tag     <- "CAF1_shared_GO"
+out_res     <- paste0(out_tag, "_BP_enrichment.tsv")
+out_plot    <- paste0(out_tag, "_BP_lollipop.pdf")
+top_n_terms <- 20
+
+## =========================
+## 1) READ GO MAPPING
+## =========================
+
+stopifnot(file.exists(fungidb_go_path))
+go_raw <- readr::read_tsv(fungidb_go_path, show_col_types = FALSE)
+
+gene_col <- intersect(names(go_raw), c("Gene ID","gene_id","Genes","ID"))[1]
+if (is.na(gene_col)) stop("Could not find a 'Gene ID' column in Nc_GO_mapping.txt")
+
+pairs <- list(
+  list(id="Curated GO Process IDs",   nm="Curated GO Processes",   ns="BP"),
+  list(id="Computed GO Process IDs",  nm="Computed GO Processes",  ns="BP"),
+  list(id="Curated GO Component IDs", nm="Curated GO Components",  ns="CC"),
+  list(id="Computed GO Component IDs",nm="Computed GO Components", ns="CC"),
+  list(id="Curated GO Function IDs",  nm="Curated GO Functions",   ns="MF"),
+  list(id="Computed GO Function IDs", nm="Computed GO Functions",  ns="MF")
+)
+
+make_long <- function(idcol, nmcol, ns){
+  if (!(idcol %in% names(go_raw))) return(NULL)
+  go_raw %>%
+    dplyr::transmute(
+      gene_id = .data[[gene_col]],
+      go_id   = as.character(.data[[idcol]]),
+      go_name = if (nmcol %in% names(go_raw)) as.character(.data[[nmcol]]) else NA_character_
+    ) %>%
+    dplyr::filter(!is.na(go_id), nzchar(go_id)) %>%
+    tidyr::separate_rows(go_id,  sep = "\\s*;\\s*") %>%
+    tidyr::separate_rows(go_name, sep = "\\s*;\\s*") %>%
+    dplyr::mutate(namespace = ns) %>%
+    dplyr::distinct()
+}
+
+go_map <- do.call(
+  dplyr::bind_rows,
+  lapply(pairs, function(p) make_long(p$id, p$nm, p$ns))
+) %>%
+  dplyr::filter(grepl("^GO:", go_id)) %>%
+  dplyr::distinct()
+
+# Fill missing names from GO.db
+need_names <- setdiff(unique(go_map$go_id), unique(go_map$go_id[!is.na(go_map$go_name) & nzchar(go_map$go_name)]))
+if (length(need_names)) {
+  dbn <- AnnotationDbi::select(GO.db, keys = need_names, keytype = "GOID", columns = "TERM")
+  dbn <- dplyr::rename(dbn, go_id = GOID, go_name_db = TERM)
+  go_map <- go_map %>%
+    dplyr::left_join(dbn, by = "go_id") %>%
+    dplyr::mutate(go_name = dplyr::coalesce(go_name, go_name_db)) %>%
+    dplyr::select(-go_name_db)
+}
+
+## =========================
+## 2) READ DE GENES (FLEXIBLE)
+## =========================
+
+read_any_table <- function(path){
+  if (!file.exists(path)) stop("File not found: ", path)
+  ext <- tolower(tools::file_ext(path))
+  if (ext %in% c("csv")) {
+    readr::read_csv(path, show_col_types = FALSE)
+  } else {
+    readr::read_tsv(path, show_col_types = FALSE)
+  }
+}
+
+guess_id_col <- function(df){
+  cand <- intersect(names(df),
+    c("gene_id","Gene ID","ID","Genes","NCU","NCU_ID","NCUid",
+      "gene","Gene","geneID","GeneID","locus","Locus",
+      "Attributes","attribute","V10","V11"))
+  if (length(cand)) return(cand[1])
+  score <- sapply(df, function(x) sum(grepl("^NCU\\d{5}$", as.character(x))))
+  nm <- names(which.max(score))
+  if (length(nm) && !is.na(nm)) return(nm)
+  NA_character_
+}
+
+extract_gene_ids <- function(x){
+  # x can be: data.frame/tibble, filepath, or character vector
+  if (is.character(x) && length(x) == 1L && !is.na(x) && file.exists(x)) {
+    x <- read_any_table(x)
+  }
+  if (is.character(x) && (length(x) > 1L || (length(x) == 1L && !file.exists(x)))) {
+    return(unique(as.character(x)))
+  }
+  if (is.data.frame(x)) {
+    id_col <- guess_id_col(x)
+    if (!is.na(id_col) && id_col %in% names(x)) {
+      vals <- as.character(x[[id_col]])
+      if (grepl("Attributes", id_col, ignore.case = TRUE)) {
+        ids <- unlist(stringr::str_extract_all(vals, "NCU\\d{5}"))
+        ids <- unique(ids)
+        if (length(ids)) return(ids)
+      }
+      # V10/V11/standard columns
+      ids <- unique(vals[nzchar(vals)])
+      # Prefer clean NCU tokens if present
+      ncu <- ids[grepl("^NCU\\d{5}$", ids)]
+      if (length(ncu)) return(ncu)
+      return(ids)
+    }
+    # Fallback: scan all columns for NCU#####
+    all_ncu <- unique(unlist(lapply(x, function(col) stringr::str_extract_all(as.character(col), "NCU\\d{5}"))))
+    all_ncu <- unique(unlist(all_ncu))
+    if (length(all_ncu)) return(all_ncu)
+    stop("Could not find gene IDs in provided object; add a 'gene_id' column or supply a vector of IDs.")
+  }
+  stop("Unsupported 'de_input'. Provide a data.frame/tibble, a filepath, or a character vector of IDs.")
+}
+
+genes_shared <- extract_gene_ids(de_input)
+
+## =========================
+## 3) UNIVERSE + TERM SETS
+## =========================
+
+universe_genes <- unique(as.character(go_map$gene_id))
+
+TERM2GENE <- go_map %>%
+  dplyr::filter(tolower(namespace) %in% c("bp","biological process","biological_process","p")) %>%
+  dplyr::select(go_id, gene_id) %>% dplyr::distinct()
+
+TERM2NAME <- go_map %>%
+  dplyr::select(go_id, go_name) %>% dplyr::distinct()
+
+## =========================
+## 4) ENRICHMENT
+## =========================
+
+enr_bp <- clusterProfiler::enricher(
+  gene          = genes_shared,
+  universe      = universe_genes,
+  TERM2GENE     = TERM2GENE,
+  TERM2NAME     = TERM2NAME,
+  pAdjustMethod = "BH",
+  pvalueCutoff  = 1.0,
+  qvalueCutoff  = 1.0
+)
+if (is.null(enr_bp) || nrow(enr_bp@result) == 0)
+  stop("No BP terms returned. Check IDs vs GO mapping.")
+
+res <- enr_bp@result %>%
+  dplyr::mutate(
+    GeneRatioNum  = sapply(strsplit(GeneRatio, "/"), function(x) as.numeric(x[1]) / as.numeric(x[2])),
+    BgRatioNum    = sapply(strsplit(BgRatio,   "/"), function(x) as.numeric(x[1]) / as.numeric(x[2])),
+    FoldEnrich    = GeneRatioNum / BgRatioNum,
+    FDR           = p.adjust(pvalue, "BH"),
+    minusLog10FDR = -log10(FDR),
+    Term          = dplyr::coalesce(Description, ID)
+  ) %>%
+  dplyr::arrange(dplyr::desc(FoldEnrich))
+
+readr::write_tsv(res, out_res)
+
+## =========================
+## 5) PLOT (LOLLIPOP)
+## =========================
+
+max_chars <- 37
+shorten <- function(x, n = max_chars) ifelse(nchar(x) > n, paste0(substr(x, 1, n - 1), "…"), x)
+
+plot_df <- res %>%
+  dplyr::filter(FDR <= 0.05) %>%
+  dplyr::slice_head(n = top_n_terms) %>%
+  dplyr::mutate(
+    LabelShow = shorten(Term),
+    LabelKey  = paste0(Term, "\u200B", dplyr::row_number()),
+    Label     = factor(LabelKey, levels = rev(LabelKey))
+  )
+
+lab_map <- setNames(plot_df$LabelShow, plot_df$LabelKey)
+
+p <- ggplot(plot_df, aes(FoldEnrich, Label)) +
+  geom_segment(aes(x = 0, xend = FoldEnrich, yend = Label), linewidth = 0.8) +
+  geom_point(aes(size = Count, color = minusLog10FDR)) +
+  scale_size(range = c(3, 10), name = "N. of Genes") +
+  scale_color_viridis_c(option = "plasma", name = expression(-log[10]("FDR"))) +
+  scale_y_discrete(labels = lab_map) +
+  labs(x = "Fold Enrichment", y = NULL,
+       title = expression("GO Biological Process Enrichment (Down Regulated in Quinic Acid Conditions)")) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.y  = element_text(size = 6),
+    axis.text.x  = element_text(size = 9),
+    legend.text  = element_text(size = 9),
+    legend.title = element_text(size = 10),
+    plot.title   = element_text(size = 12, hjust = 0.5),
+    panel.grid.major.y = element_blank()
+  )
+
+ggplot2::ggsave(out_plot, p, width = 7, height = 5)
+p
 
 ```
 
